@@ -76,7 +76,6 @@
 
       call h5dopen_f(file_id, 'var', &
      &                dset_qua, hdf_error)
-
       call h5screate_simple_f(ndims, data_count, memspace, hdf_error) 
 
       call h5dget_space_f(dset_qua, slabspace, hdf_error)
@@ -85,6 +84,7 @@
       call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
       call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, &
      &                        hdf_error)
+
        call h5dread_f(dset_qua, H5T_NATIVE_DOUBLE, &
      &   qua(1:n3o,xs2:xe2,xs3:xe3), dims,  &
      &   hdf_error, file_space_id = slabspace, mem_space_id = memspace,  &

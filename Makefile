@@ -4,13 +4,14 @@
 FC = h5pfc -fpp
 FC += -r8 -O3
 # FC += -r8 -O0 -g -traceback -check bounds 
+# FC += -DSHM -DSHM_DEBUG
 
 #=======================================================================
 #  Library
 #======================================================================
 # Common build flags
 ##  MacOS
-LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5  -lz -ldl -lm
+LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 
 ## Cartesius
 # FFTW3_LIBS = -L/nfs/admin/hpc/sw/fftw3-3.3.3-intel-impi/lib

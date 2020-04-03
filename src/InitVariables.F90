@@ -127,3 +127,18 @@
       return 
       end   
 
+! --------------------------------
+      subroutine InitMgrdVariables
+      use param
+      use local_arrays
+      use stat_arrays
+      use decomp_2d
+      use AuxiliaryRoutines
+      implicit none
+
+      call AllocateReal3DArray(vyr,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+      call AllocateReal3DArray(vzr,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+      call AllocateReal3DArray(vxr,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+
+      return 
+      end   

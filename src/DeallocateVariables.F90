@@ -76,6 +76,10 @@
       call DestroyReal3DArray(vz)
       call DestroyReal3DArray(temp)
 
+      call DestroyReal3DArray(vxr)  !CS mgrd
+      call DestroyReal3DArray(vyr)  !CS mgrd
+      call DestroyReal3DArray(vzr)  !CS mgrd
+
       call DestroyReal3DArray(pr)
       call DestroyReal3DArray(rhs)
 

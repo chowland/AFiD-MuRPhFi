@@ -142,7 +142,7 @@ module decomp_2d
   END TYPE DECOMP_INFO
 
   ! main (default) decomposition information for global size nx*ny*nz
-  TYPE(DECOMP_INFO), save :: decomp_main
+  TYPE(DECOMP_INFO), save :: decomp_main,decomp_mainr !CS mgrd
   TYPE(DECOMP_INFO), save :: decomp_ph,decomp_sp
 
   ! staring/ending index and size of data held by current processor
@@ -150,6 +150,9 @@ module decomp_2d
   integer, save, dimension(3), public :: xstart, xend, xsize  ! x-pencil
   integer, save, dimension(3), public :: ystart, yend, ysize  ! y-pencil
   integer, save, dimension(3), public :: zstart, zend, zsize  ! z-pencil
+  integer, save, dimension(3), public :: xstartr, xendr, xsizer  ! x-pencil CS mgrd
+  integer, save, dimension(3), public :: ystartr, yendr, ysizer  ! y-pencil CS mgrd
+  integer, save, dimension(3), public :: zstartr, zendr, zsizer  ! z-pencil CS mgrd
 
   ! These are the buffers used by MPI_ALLTOALL(V) calls
   integer, save :: decomp_buf_size = 0
@@ -267,11 +270,11 @@ contains
   !     all internal data structures initialised properly
   !     library ready to use
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  subroutine decomp_2d_init(nx,ny,nz,p_row,p_col,periodic_bc)
+  subroutine decomp_2d_init(nx,ny,nz,nxr,nyr,nzr,p_row,p_col,periodic_bc)
 
     implicit none
 
-    integer, intent(IN) :: nx,ny,nz,p_row,p_col
+    integer, intent(IN) :: nx,ny,nz,nxr,nyr,nzr,p_row,p_col
     logical, dimension(3), intent(IN), optional :: periodic_bc
     
     integer :: errorcode, ierror, row, col
@@ -315,7 +318,7 @@ contains
 
        end if
     end if
-    
+
     ! Create 2D Catersian topology
     ! Note that in order to support periodic B.C. in the halo-cell code,
     ! need to create multiple topology objects: DECOMP_2D_COMM_CART_?,
@@ -348,10 +351,11 @@ contains
 
     ! gather information for halo-cell support code
     call init_neighbour
-    
+
     ! actually generate all 2D decomposition information
     call decomp_info_init(nx,ny,nz,decomp_main)
-    
+    call decomp_info_init(nxr,nyr,nzr,decomp_mainr)
+
     ! make a copy of the decomposition information associated with the
     ! default global size in these global variables so applications can
     ! use them to create data structures 
@@ -364,7 +368,17 @@ contains
     xsize  = decomp_main%xsz
     ysize  = decomp_main%ysz
     zsize  = decomp_main%zsz
-      
+
+    xstartr = decomp_mainr%xst
+    ystartr = decomp_mainr%yst
+    zstartr = decomp_mainr%zst
+    xendr   = decomp_mainr%xen
+    yendr   = decomp_mainr%yen
+    zendr   = decomp_mainr%zen
+    xsizer  = decomp_mainr%xsz
+    ysizer  = decomp_mainr%ysz
+    zsizer  = decomp_mainr%zsz
+     
     decomp_ph=decomp_main
 
 #ifdef SHM_DEBUG
@@ -444,6 +458,7 @@ contains
     integer ierr
 
     call decomp_info_finalize(decomp_main)
+    call decomp_info_finalize(decomp_mainr)  !CS mgrd
 
     decomp_buf_size = 0
     deallocate(work1_r, work2_r, work1_c, work2_c)

@@ -1,5 +1,8 @@
+afid
 .DS_Store
 *.txt
+src/new_*
+src/org_*
 obj/*.o
 obj/*.mod
 outputdir/*.h5

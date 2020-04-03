@@ -1,11 +1,13 @@
- NXM  NYM  NZM   NSST(>1=RK,else AB) NREAD 
- 64   64   64    3                   1
- NTST   WALLTIMEMAX    TOUT      TMAX     IRESET
- 15     83000          1e-2      50.0     1
- ALX3D      ISTR3   STR3 
- 1.0000     6       12.0
+ NXM    NYM   NZM    NSST(>1=RK,else AB) NREAD 
+ 96     96    96     3                   0
+ NXMR   NYMR  NZMR (Ignored if ISTR3R>0)
+ 64     64    64
+ NTST   WALLTIMEMAX  TOUT   TMAX   IRESET
+ 1      83000        1e-2   50.0   1
+ ALX3D  ISTR3 STR3   ISTR3R
+ 1.0    6     12.0   0
  YLEN ZLEN 
- 1.5  0.5   
+ 1.0  1.0   
  REN   PRA   DT     RESID    CFLMAX
  1e4   1.0   1e-8   1.e-2    1.0
  STATON  BALANCEON  TSTA  STAREAD

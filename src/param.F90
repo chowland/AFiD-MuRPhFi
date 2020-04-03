@@ -7,6 +7,7 @@
 !       read from input file bou.in
 !==========================================================
         integer   :: nx, ny, nz
+        integer   :: nxr, nyr, nzr, istr3r  !CS mgrd
         integer   :: nsst, nread, ntst, ireset
         real      :: walltimemax,tout,tmax
         real      :: alx3,str3
@@ -50,6 +51,7 @@
 !===========================================================
 !******* Other variables ***********************************
         integer  :: nxm, nym, nzm
+        integer  :: nxmr, nymr, nzmr   !CS mgrd
         real :: ren, pec
         real :: pi
         real :: al,ga,ro
@@ -83,6 +85,7 @@
       use param
         implicit none
         real,allocatable,dimension(:,:,:) :: vx,vy,vz
+        real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
         real,allocatable,dimension(:,:,:) :: pr,temp,rhs
         real,allocatable,dimension(:,:,:) :: rux,ruy,ruz,rutemp
         real,allocatable,dimension(:,:,:) :: dph,qcap,dq,hro,dphhalo

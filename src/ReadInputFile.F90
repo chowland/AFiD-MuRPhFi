@@ -17,9 +17,11 @@
         read(15,301) dummy
         read(15,*) nxm,nym,nzm,nsst,nread
         read(15,301) dummy
+        read(15,*) nxmr,nymr,nzmr
+        read(15,301) dummy
         read(15,*) ntst,walltimemax,tout,tmax,ireset
         read(15,301) dummy
-        read(15,*) alx3,istr3,str3
+        read(15,*) alx3,istr3,str3,istr3r
         read(15,301) dummy
         read(15,*) ylen,zlen
         read(15,301) dummy
@@ -43,11 +45,14 @@
       ny=nym+1                                                          
       nz=nzm+1                                                          
 
+      nxr=nxmr+1
+      nyr=nymr+1                                                          
+      nzr=nzmr+1                                                          
 !m============================================
 !
 !     DEFINITIONS FOR THE NATURAL CONVECTION
 !
-      ! ren = ray ! dsqrt(ray/pra)  !CS Ren for pCF only
+!      ren = dsqrt(ray/pra)  !CS Ren for pCF only
       pec = dsqrt(pra*ray)
       pi=2.d0*dasin(1.d0)                          
 !                                                                       
