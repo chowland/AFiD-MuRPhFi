@@ -1,0 +1,7 @@
+.DS_Store
+*.txt
+obj/*.o
+obj/*.mod
+outputdir/*.h5
+outputdir/*.out
+outputdir/*
