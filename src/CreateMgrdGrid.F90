@@ -1,0 +1,286 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                         ! 
+!    FILE: CreateMgrdGrid.F90                             !
+!    CONTAINS: subroutine CreateMgrdGrid                  !
+!                                                         ! 
+!    PURPOSE: Compute the mgrd indices, grid,             !
+!     grid metrics and coefficients for differentiation   !
+!                                                         !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+      subroutine CreateMgrdGrid
+      use param
+      use AuxiliaryRoutines
+      implicit none
+
+      real :: x1,x2,x3
+      real :: a33, a33m, a33p
+      real :: delet, etain, tstr3
+      real :: z2dp
+
+      real, allocatable, dimension(:) :: etaz, etazm
+
+      integer :: i, j, kc, km, kp
+      integer :: nxmo, nclip
+      logical :: fexist
+
+      do kc=1,nxmr
+        kmvr(kc)=kc-1
+        kpvr(kc)=kc+1
+        if(kc.eq.1) kmvr(kc)=kc
+        if(kc.eq.nxmr) kpvr(kc)=kc
+      end do
+
+      do kc=1,nxmr
+        kpcr(kc)=kpvr(kc)-kc
+        kmcr(kc)=kc-kmvr(kc)
+      end do
+
+
+!
+!     UNIFORM (HORIZONTAL DIRECTIONS) GRID
+!
+       do  i=1,nzr
+        x1=real(i-1)/real(nzmr)
+        zcr(i)= zlen*x1
+       end do
+
+       do i=1,nzmr
+         zmr(i)=(zcr(i)+zcr(i+1))*0.5d0
+       end do
+
+       do j=1,nyr
+        x2=real(j-1)/real(nymr)
+        ycr(j)= ylen*x2
+       end do
+
+       do j=1,nymr
+        ymr(j)=(ycr(j)+ycr(j+1))*0.5d0
+       end do
+
+!
+!     VERTICAL COORDINATE DEFINITION
+!
+!     OPTION 0: UNIFORM CLUSTERING
+!
+      call AllocateReal1DArray(etaz,1,nxr+500)
+      call AllocateReal1DArray(etazm,1,nxr+500)
+
+      if (istr3r.eq.0) then
+        do kc=1,nxr
+          x3=real(kc-1)/real(nxmr)
+          etaz(kc)=alx3*x3
+          xcr(kc)=etaz(kc)
+        enddo
+      endif
+
+!CS !
+!CS !     OPTION 4: HYPERBOLIC TANGENT-TYPE CLUSTERING
+!CS !
+!CS 
+!CS         tstr3=tanh(str3)
+!CS 
+!CS         if (istr3.eq.4) then
+!CS          xc(1)=0.0d0
+!CS          do kc=2,nx
+!CS           z2dp=float(2*kc-nx-1)/float(nxm)
+!CS           xc(kc)=(1+tanh(str3*z2dp)/tstr3)*0.5*alx3
+!CS           if(xc(kc).lt.0.or.xc(kc).gt.alx3)then
+!CS            write(*,*)'Grid is too streched: ','zc(',kc,')=',xc(kc)
+!CS            stop
+!CS           endif
+!CS          end do
+!CS         end if
+
+!CS !
+!CS !     OPTION 6: CLIPPED CHEBYCHEV-TYPE CLUSTERING
+!CS !
+!CS 
+!CS 
+!CS       if(istr3r.eq.6) then
+!CS       nclip = int(str3)
+!CS       nxmo = nx+nclip+nclip
+!CS       do kc=1,nxmo
+!CS         etazm(kc)=+cos(pi*(float(kc)-0.5)/float(nxmo))
+!CS       end do
+!CS       do kc=1,nx
+!CS         etaz(kc)=etazm(kc+nclip)
+!CS       end do
+!CS       delet = etaz(1)-etaz(nx)
+!CS       etain = etaz(1)
+!CS       do kc=1,nx
+!CS         etaz(kc)=etaz(kc)/(0.5*delet)
+!CS       end do
+!CS       xc(1) = 0.
+!CS       do kc=2,nxm
+!CS         xc(kc) = alx3*(1.-etaz(kc))*0.5
+!CS       end do
+!CS       xc(nx) = alx3
+!CS       endif
+
+!       if(istr3.eq.99) then
+!         if (ismaster) write(6,*) 'Reading custom xc ... '
+!         inquire(file='./xccor.in', exist=fexist) 
+!         if(fexist) then
+!          if (ismaster) write(6,*) 'xccor.in found'
+!         else
+!          if (ismaster) write(6,*) 'Warning: xccor.in not found!'
+!          call MpiAbort
+!         end if
+!         open(unit=78,file='xccor.in',status='old')
+!         do kc=1,nx
+!           read(78,*) xc(kc)
+!         end do
+!         close(78)
+!       endif
+
+      call DestroyReal1DArray(etaz)
+      call DestroyReal1DArray(etazm)
+      
+!m-----------------------------------------
+!
+!     METRIC FOR UNIFORM DIRECTIONS
+!
+
+      dxr=real(nxmr)/alx3
+      dyr=real(nymr)/ylen
+      dzr=real(nzmr)/zlen
+
+      dxqr=dxr*dxr
+      dyqr=dyr*dyr
+      dzqr=dzr*dzr
+
+!
+!     STAGGERED COORDINATES AND
+!     METRIC QUANTITIES FOR NON-UNIFORM 
+!     DIRECTIONS
+!
+
+      do kc=1,nxmr
+        xmr(kc)=(xcr(kc)+xcr(kc+1))*0.5d0
+        g3rmr(kc)=(xcr(kc+1)-xcr(kc))*dxr
+      enddo
+      do kc=2,nxmr
+        g3rcr(kc)=(xcr(kc+1)-xcr(kc-1))*dxr*0.5d0
+      enddo
+      g3rcr(1)=(xcr(2)-xcr(1))*dxr
+      g3rcr(nxr)= (xcr(nxr)-xcr(nxmr))*dxr
+!
+!     WRITE GRID INFORMATION
+!
+      do kc=1,nxmr
+        udx3mr(kc) = dxr/g3rmr(kc)
+        udx3cr(kc) = dxr/g3rcr(kc)
+      end do
+      udx3cr(nxr) = dxr/g3rcr(nxr)
+!m====================================================
+      if(ismaster) then
+      open(unit=78,file='outputdir/axicorr.out',status='unknown')
+      do kc=1,nxr
+        write(78,345) kc,xcr(kc),xmr(kc),g3rcr(kc),g3rmr(kc)
+      end do
+      close(78)
+ 345  format(i4,4(2x,e23.15))
+!m===================================================
+!
+!     QUANTITIES FOR DERIVATIVES
+!
+      open(unit=78,file='outputdir/fact3r.out',status='unknown')
+      do kc=1,nxmr
+        write(78,*) kc,udx3mr(kc),udx3cr(kc)
+      end do
+        write(78,*) nxr,udx3mr(nxmr),udx3cr(nxr)
+      close(78)
+      endif
+
+!CS !
+!CS !    COEFFICIENTS FOR DIFFERENTIATION FOR NON-UNIFORM GRID
+!CS !
+!CS !    Q3 DIFFERENTIATION (CENTERED VARIABLE)
+!CS !
+!CS 
+!CS       am3ck(1)=0.d0
+!CS       ap3ck(1)=0.d0
+!CS       ac3ck(1)=1.d0
+!CS       am3ck(nx)=0.d0
+!CS       ap3ck(nx)=0.d0
+!CS       ac3ck(nx)=1.d0
+!CS 
+!CS       do kc=2,nxm
+!CS        km=kc-1
+!CS        kp=kc+1
+!CS        a33=dxq/g3rc(kc)
+!CS        a33p=1.d0/g3rm(kc)
+!CS        a33m=1.d0/g3rm(km)
+!CS        ap3ck(kc)=a33*a33p
+!CS        am3ck(kc)=a33*a33m
+!CS        ac3ck(kc)=-(ap3ck(kc)+am3ck(kc))
+!CS       enddo
+!CS 
+!CS !
+!CS !    Q1/Q2 DIFFERENTIATION (STAGGERED VARIABLE)
+!CS !
+!CS !
+!CS 
+!CS       do kc=2,nxm-1
+!CS       kp=kc+1
+!CS       km=kc-1
+!CS       a33=dxq/g3rm(kc)
+!CS       a33p= +a33/g3rc(kp)
+!CS       a33m= +a33/g3rc(kc)
+!CS       ap3sk(kc)=a33p
+!CS       am3sk(kc)=a33m
+!CS       ac3sk(kc)=-(ap3sk(kc)+am3sk(kc))
+!CS       enddo
+!CS !    
+!CS !    LOWER WALL BOUNDARY CONDITIONS (INSLWS SETS NO-SLIP vs STRESS-FREE WALL)
+!CS !    
+!CS       kc=1
+!CS       kp=kc+1
+!CS       a33=dxq/g3rm(kc)
+!CS       a33p= +a33/g3rc(kp)
+!CS       a33m= +a33/g3rc(kc)
+!CS       ap3sk(kc)=a33p
+!CS       am3sk(kc)=0.d0
+!CS       ac3sk(kc)=-(a33p+inslws*a33m*2.d0)
+!CS 
+!CS !    
+!CS !    UPPER WALL BOUNDARY CONDITIONS (INSLWN SETS NO-SLIP vs STRESS-FREE WALL)
+!CS !    
+!CS 
+!CS       kc=nxm
+!CS       kp=kc+1
+!CS       a33=dxq/g3rm(kc)
+!CS       a33p= +a33/g3rc(kp)
+!CS       a33m= +a33/g3rc(kc)
+!CS       am3sk(kc)=a33m
+!CS       ap3sk(kc)=0.d0
+!CS       ac3sk(kc)=-(a33m+inslwn*a33p*2.d0)
+!CS 
+!CS       am3ssk(1)=0.d0
+!CS       ap3ssk(1)=0.d0
+!CS       ac3ssk(1)=1.d0
+!CS 
+!CS !
+!CS !    TEMPERATURE DIFFERENTIATION (CENTERED VARIABLE)
+!CS !
+!CS 
+!CS 
+!CS       do kc=2,nxm
+!CS        kp=kc+1
+!CS        km=kc-1
+!CS        a33=dxq/g3rc(kc)
+!CS        a33p=1.d0/g3rm(kc)
+!CS        a33m=1.d0/g3rm(km)
+!CS        ap3ssk(kc)=a33*a33p
+!CS        am3ssk(kc)=a33*a33m
+!CS        ac3ssk(kc)=-(ap3ssk(kc)+am3ssk(kc))
+!CS       enddo
+!CS 
+!CS       am3ssk(nx)=0.d0
+!CS       ap3ssk(nx)=0.d0
+!CS       ac3ssk(nx)=1.d0
+
+      return                                                            
+      end                                                               
+

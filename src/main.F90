@@ -2,10 +2,13 @@
       use mpih
       use param
       use local_arrays, only: vx,vy,vz,temp,pr
+      use mgrd_arrays!, only: vxr
+      use AuxiliaryRoutines
       use hdf5
       use decomp_2d
       use decomp_2d_fft
       use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
+
 !$    use omp_lib
       implicit none
       integer :: errorcode, nthreads, i, j, k
@@ -80,80 +83,88 @@
       call InitTimeMarchScheme
 
       call InitVariables
-
       call InitMgrdVariables  !CS mgrd
-!
-!      call CreateGrid
-!
-!!      call CreateMGrid        !CS mgrd
-!
-!      call WriteGridInfo
-!
-!      call Init_ycut
-!
-!!      call Init_zcut
-!
-!!      call InitSpec
-!
-!      if (dumpslabs) call InitializeSlabDump
-!
-!!m===================================                                                      
-!!m===================================
-!!m===================================
-!      if(ismaster) then
-!      write(6,754)nx,ny,nz                                              
-!  754 format(/,5x,'grid resolution: ',' nx= ',i5,' ny= ',i5, &
-!      ' nz= ',i5/)                       
-!      write(6,755) 1.d0/dx,1.d0/dy,1.d0/dz,dt,ntst                  
-!  755 format(/,2x,' dx=',e10.3,' dy=',e10.3,' dz=',e10.3,' dt=' &
-!      ,e10.3,' ntst=',i7,/)
-!      endif
-!
-!!m===================================
-!!m===================================     
-!      
-!      time=0.d0
-!      if(statcal) nstatsamples = 0
-!
-!      call InitPressureSolver
-!      call SetTempBCs
-!
-!      if(readflow) then
-!
-!        if(ismaster) write(6,*) 'Reading initial condition from file'
-!
-!        call ReadFlowField
-!
-!      else
-!
-!        if(ismaster) write(6,*) 'Creating initial condition'
-!
-!        ntime=0                                                         
-!        time=0.d0
-!        instCFL=0.d0
-!        
-!        call CreateInitialConditions
-!
-!        if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-!!        call Mkmov_ycut
-!        call Mkmov_zcut
-!
-!      endif                                                             
-!
-!!EP   Update all relevant halos
-!      call update_halo(vx,lvlhalo)
-!      call update_halo(vy,lvlhalo)
-!      call update_halo(vz,lvlhalo)
-!      ! call update_halo(temp,lvlhalo)
-!      call update_halo(pr,lvlhalo)
-!
-!!EP   Check divergence. Should be reduced to machine precision after the first
-!!phcalc. Here it can still be high.
-!
-!      call CheckDivergence(dmax,dmaxr)
-!
-!      if(ismaster) write(6,*)' Initial maximum divergence: ',dmax,dmaxr
-!
+
+      call CreateGrid
+      call CreateMgrdGrid     !CS mgrd
+
+      call WriteGridInfo
+
+!CS      call Init_ycut
+      call Init_zcut
+      call Init_zcutr
+!CS
+!CS      call InitSpec
+!CS
+!CS      if (dumpslabs) call InitializeSlabDump
+
+!m===================================                                                      
+!m===================================
+!m===================================
+
+      if(ismaster) then
+      write(6,754)nx,ny,nz                                              
+  754 format(/,5x,'grid resolution: ',' nx = ',i5,' ny = ',i5,' nz = ',i5)                       
+      write(6,756)nxr,nyr,nzr
+  756 format(5x,'grid resolution: ',' nxr= ',i5,' nyr= ',i5,' nzr= ',i5)
+      write(6,755) 1.d0/dx,1.d0/dy,1.d0/dz,1.d0/dxr,1.d0/dyr,1.d0/dzr,dt,ntst
+  755 format(/,2x,' dx=',e10.3,' dy=',e10.3,' dz=',e10.3, &
+                  ' dxr=',e10.3,' dyr=',e10.3,' dzr=',e10.3, &
+                  ' dt=',e10.3,' ntst=',i7,/)
+      endif
+
+!m===================================
+!m===================================     
+      
+      time=0.d0
+      if(statcal) nstatsamples = 0
+
+      call InitPressureSolver
+      call SetTempBCs
+
+      if(readflow) then
+
+        if(ismaster) write(6,*) 'Reading initial condition from file'
+
+        call ReadFlowField
+
+      else
+
+        if(ismaster) write(6,*) 'Creating initial condition'
+
+        ntime=0                                                         
+        time=0.d0
+        instCFL=0.d0
+        
+        call CreateInitialConditions
+
+        if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+!        call Mkmov_ycut
+        call Mkmov_zcut
+        call Mkmov_zcutr
+
+      endif                                                             
+
+!EP   Update all relevant halos
+      call update_halo(vx,lvlhalo)
+      call update_halo(vy,lvlhalo)
+      call update_halo(vz,lvlhalo)
+      !call update_halo(temp,lvlhalo)
+      call update_halo(pr,lvlhalo)
+
+!CS   Create multigrid stencil for interpolation
+      call CreateMgrdStencil
+
+!CS   Interpolate initial values
+      call InterpVelMgrd  !TODO
+
+!EP   Check divergence. Should be reduced to machine precision after the first
+!phcalc. Here it can still be high.
+
+      call CheckDivergence(dmax)!,dmaxr)
+
+      if(ismaster) write(6,*)' Initial maximum divergence: ',dmax!,dmaxr
+
 !!EP   Write some values
 !      if(variabletstep) then
 !       if(ismaster) write(6,*)ntime,time,dt,dmax,tempm,tempmax,tempmin
@@ -161,82 +172,86 @@
 !       if(ismaster) write(6,*)ntime,time,dt,dmax,tempm,tempmax,tempmin !RO Fix??
 !      end if
 !
-!      if(ismaster) then                  
-!        tin(2) = MPI_WTIME()             
-!        write(6,'(a,f6.2,a)') 'Initialization Time = ', tin(2) -tin(1), ' sec.'
-!      endif 
+
+     if(ismaster) then                  
+       tin(2) = MPI_WTIME()             
+       write(6,'(a,f6.2,a)') 'Initialization Time = ', tin(2) -tin(1), ' sec.'
+     endif 
 !      call QuitRoutine(tin,.true.,555) !CS Check initial divergence
-!                                                                        
-!!  ********* starts the time dependent calculation ***
-!      errorcode = 0 !EP set errocode to 0 (OK)
-!      minwtdt = huge(0.0d0) !EP initialize minimum time step walltime
-!
-!      ! Check input for efficient FFT
-!      ! factorize input FFT directions. The largest factor should
-!      ! be relatively small to have efficient FFT's
-!      lfactor=2 ! initialize
-!      call Factorize(nym,lfactor2) ! check nym
-!      lfactor=max(lfactor,lfactor2)
-!      call Factorize(nzm,lfactor2)
-!      lfactor=max(lfactor,lfactor2)
-!      ! if largest factor larger than 7 quit the simulation     
-!      ! if (lfactor>7) errorcode=444
-!
-!      do ntime=0,ntst                                           
-!        ti(1) = MPI_WTIME()
-!
-!!EP   Determine timestep size
-!        call CalcMaxCFL(instCFL)
-!
-!        if(variabletstep) then
-!          if(ntime.gt.1) then
-!            if(instCFL.lt.1.0d-8) then !EP prevent fp-overflow
-!              dt=dtmax
-!            else
-!              dt=limitCFL/instCFL
-!            endif
-!            if(dt.gt.dtmax) dt=dtmax
-!          else
-!            dt=dtmin
-!          endif
-!            if(dt.lt.dtmin) errorcode = 166
-!        else  
-!!RO    fixed time-step
-!          instCFL=instCFL*dt
-!          if(instCFL.gt.limitCFL) errorcode = 165
-!        endif
-!
-!        call TimeMarcher
+
+!  ********* starts the time dependent calculation ***
+      errorcode = 0 !EP set errocode to 0 (OK)
+      minwtdt = huge(0.0d0) !EP initialize minimum time step walltime
+
+      ! Check input for efficient FFT
+      ! factorize input FFT directions. The largest factor should
+      ! be relatively small to have efficient FFT's
+      lfactor=2 ! initialize
+      call Factorize(nym,lfactor2) ! check nym
+      lfactor=max(lfactor,lfactor2)
+      call Factorize(nzm,lfactor2)
+      lfactor=max(lfactor,lfactor2)
+      ! if largest factor larger than 7 quit the simulation     
+      ! if (lfactor>7) errorcode=444
+
+      do ntime=0,ntst                                           
+        ti(1) = MPI_WTIME()
+
+!EP   Determine timestep size
+        call CalcMaxCFL(instCFL)
+
+        if(variabletstep) then
+          if(ntime.gt.1) then
+            if(instCFL.lt.1.0d-8) then !EP prevent fp-overflow
+              dt=dtmax
+            else
+              dt=limitCFL/instCFL
+            endif
+            if(dt.gt.dtmax) dt=dtmax
+          else
+            dt=dtmin
+          endif
+            if(dt.lt.dtmin) errorcode = 166
+        else  
+!RO    fixed time-step
+          instCFL=instCFL*dt
+          if(instCFL.gt.limitCFL) errorcode = 165
+        endif
+
+        call TimeMarcher
+        call InterpVelMgrd  !TODO
+
 !        call CalcGlobalStats
-!        if(ismaster) then
-!          open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
-!          write(96,769) ntime,time,dt,instCFL*dt,vx_global,vy_global,vz_global
-!          close(96)
-!        endif
-!769     format(1x,i12,6(1x,ES20.8))
-!
-!        if(mod(time,tout).lt.dt) then
-!         if(ismaster) then
-!          write(6,*) ' -------------------------------------------------- '
-!          write(6,'(a,E11.4,a,i9,a,E11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
-!         endif
-!        endif
-!
-!        if(mod(time,tframe).lt.dt) then
-!          if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-!!          call Mkmov_ycut
-!          call Mkmov_zcut
-!!          call CalcWriteQ
-!        endif
-!
-!        time=time+dt
-!
-!        if(ntime.eq.1.or.mod(time,tout).lt.dt) then
+        if(ismaster) then
+          open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
+          write(96,769) ntime,time,dt,instCFL*dt!,vx_global,vy_global,vz_global
+          close(96)
+        endif
+769     format(1x,i12,3(1x,ES20.8))
+
+        if(mod(time,tout).lt.dt) then
+         if(ismaster) then
+          write(6,*) ' -------------------------------------------------- '
+          write(6,'(a,E11.4,a,i9,a,E11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
+         endif
+        endif
+
+        if(mod(time,tframe).lt.dt) then
+          if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+!          call CalcWriteQ
+!          call Mkmov_ycut
+          call Mkmov_zcut
+          call Mkmov_zcutr
+        endif
+
+        time=time+dt
+
+        if(ntime.eq.1.or.mod(time,tout).lt.dt) then
 !          call GlobalQuantities
 !          if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
 !
-!            call CalcMaxCFL(instCFL)
-!            call CheckDivergence(dmax)
+           call CalcMaxCFL(instCFL)
+           call CheckDivergence(dmax)
 !            call CalcPlateNu
 !            call CalcPlateCf
 !
@@ -249,70 +264,70 @@
 !
 !            endif
 !
-!            if(.not.variabletstep) instCFL=instCFL*dt
+            if(.not.variabletstep) instCFL=instCFL*dt
 !
 !            if(abs(dmax).gt.resid) errorcode = 169
 !
-!        endif
+        endif
 !
 !        if(time.gt.tmax) errorcode = 333
-!
-!        ti(2) = MPI_WTIME()
-!        minwtdt = min(minwtdt,ti(2) - ti(1))
-!        if(mod(time,tout).lt.dt) then
-!          if(ismaster) then
-!          write(6,*) ' Maximum divergence = ', dmax
-!          !write(6,*)'ntime - time - vmax(1) - vmax(2) - vmax(3)  -&
-!          !           tempm - tempmax - tempmin'
-!          !write(6,*)ntime,time,vmax(1),vmax(2),vmax(3),tempm,tempmax,tempmin
-!          write(6,'(a,f8.3,a)') '  Minimum Iteration Time = ', minwtdt, &
-!                  ' sec.'
-!          endif
-!          minwtdt = huge(0.0d0)
-!        endif
-!
-!       if( (ti(2) - tin(1)) .gt. walltimemax) errorcode = 334
-!
-!       if( ntime .eq. ntst ) errorcode = 555 
-!
-!      call MpiBcastInt(errorcode)
-!
-!!EP   Conditional exits
-!      if(errorcode.ne.0) then
-!
-!!EP    dt too small
-!        if(errorcode.eq.166) call QuitRoutine(tin,.false.,errorcode)
-!
-!!EP   cfl too high    
-!        if(errorcode.eq.165) call QuitRoutine(tin,.false.,errorcode)
-!      
-!!EP   velocities diverged
-!        if(errorcode.eq.266) call QuitRoutine(tin,.false.,errorcode)
-!          
-!!EP   mass not conserved
-!        if(errorcode.eq.169) call QuitRoutine(tin,.false.,errorcode)
-!
-!!EP   Physical time exceeded tmax, no error; normal quit
-!        if(errorcode.eq.333) call QuitRoutine(tin,.true.,errorcode)
-!
-!!EP   walltime exceeded walltimemax, no error; normal quit
-!        if(errorcode.eq.334) call QuitRoutine(tin,.true.,errorcode)
-!
-!!RS   FFT input not correct
-!        if(errorcode.eq.444) call QuitRoutine(tin,.false.,errorcode)
-!
-!!RS   maximum number of timesteps reached, no error; normal quit
-!        if(errorcode.eq.555) call QuitRoutine(tin,.true.,errorcode)
-!
-!        errorcode = 100 !EP already finalized
-!      
-!        exit
-!
-!      endif
-!
-!      enddo !EP main loop
-!
-!      call QuitRoutine(tin,.true.,errorcode)
+
+        ti(2) = MPI_WTIME()
+        minwtdt = min(minwtdt,ti(2) - ti(1))
+        if(mod(time,tout).lt.dt) then
+          if(ismaster) then
+          write(6,*) ' Maximum divergence = ', dmax
+          !write(6,*)'ntime - time - vmax(1) - vmax(2) - vmax(3)  -&
+          !           tempm - tempmax - tempmin'
+          !write(6,*)ntime,time,vmax(1),vmax(2),vmax(3),tempm,tempmax,tempmin
+          write(6,'(a,f8.3,a)') '  Minimum Iteration Time = ', minwtdt, &
+                  ' sec.'
+          endif
+          minwtdt = huge(0.0d0)
+        endif
+
+       if( (ti(2) - tin(1)) .gt. walltimemax) errorcode = 334
+
+       if( ntime .eq. ntst ) errorcode = 555 
+
+      call MpiBcastInt(errorcode)
+
+!EP   Conditional exits
+      if(errorcode.ne.0) then
+
+!EP    dt too small
+        if(errorcode.eq.166) call QuitRoutine(tin,.false.,errorcode)
+
+!EP   cfl too high    
+        if(errorcode.eq.165) call QuitRoutine(tin,.false.,errorcode)
+      
+!EP   velocities diverged
+        if(errorcode.eq.266) call QuitRoutine(tin,.false.,errorcode)
+          
+!EP   mass not conserved
+        if(errorcode.eq.169) call QuitRoutine(tin,.false.,errorcode)
+
+!EP   Physical time exceeded tmax, no error; normal quit
+        if(errorcode.eq.333) call QuitRoutine(tin,.true.,errorcode)
+
+!EP   walltime exceeded walltimemax, no error; normal quit
+        if(errorcode.eq.334) call QuitRoutine(tin,.true.,errorcode)
+
+!RS   FFT input not correct
+        if(errorcode.eq.444) call QuitRoutine(tin,.false.,errorcode)
+
+!RS   maximum number of timesteps reached, no error; normal quit
+        if(errorcode.eq.555) call QuitRoutine(tin,.true.,errorcode)
+
+        errorcode = 100 !EP already finalized
+      
+        exit
+
+      endif
+
+      enddo !EP main loop
+
+      call QuitRoutine(tin,.true.,errorcode)
       
       end                                                               
 

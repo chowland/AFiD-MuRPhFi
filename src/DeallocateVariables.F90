@@ -11,6 +11,7 @@
       subroutine DeallocateVariables
       use param
       use local_arrays
+      use mgrd_arrays
       use stat_arrays
       use AuxiliaryRoutines
       implicit none
@@ -33,6 +34,17 @@
       call DestroyReal1DArray(udx3c)
       call DestroyReal1DArray(udx3m)
 
+      call DestroyReal1DArray(zcr)     !CS mgrd
+      call DestroyReal1DArray(zmr)     !CS mgrd
+      call DestroyReal1DArray(ycr)     !CS mgrd
+      call DestroyReal1DArray(ymr)     !CS mgrd
+      call DestroyReal1DArray(xcr)     !CS mgrd
+      call DestroyReal1DArray(xmr)     !CS mgrd
+      call DestroyReal1DArray(g3rcr)   !CS mgrd
+      call DestroyReal1DArray(g3rmr)   !CS mgrd
+      call DestroyReal1DArray(udx3cr)  !CS mgrd
+      call DestroyReal1DArray(udx3mr)  !CS mgrd
+
       call DestroyReal1DArray(ap3ck)
       call DestroyReal1DArray(ac3ck)
       call DestroyReal1DArray(am3ck)
@@ -53,6 +65,11 @@
       call DestroyInt1dArray(kpc)
       call DestroyInt1dArray(kmv)
       call DestroyInt1dArray(kpv)
+
+      call DestroyInt1dArray(kmcr)  !CS mgrd
+      call DestroyInt1dArray(kpcr)  !CS mgrd
+      call DestroyInt1dArray(kmvr)  !CS mgrd
+      call DestroyInt1dArray(kpvr)  !CS mgrd
 
       call DestroyReal2DArray(tempbp)
       call DestroyReal2DArray(temptp)
@@ -90,6 +107,29 @@
       call DestroyReal3DArray(ruy)
       call DestroyReal3DArray(ruz)
       call DestroyReal3DArray(rutemp)
+
+      call DestroyInt1dArray(irangs)   !CS mgrd
+      call DestroyInt1dArray(jrangs)   !CS mgrd
+      call DestroyInt1dArray(krangs)   !CS mgrd
+
+      call DestroyReal2DArray(cxvx) !CS mgrd
+      call DestroyReal2DArray(cxvy) !CS mgrd
+      call DestroyReal2DArray(cxvz) !CS mgrd
+
+      call DestroyReal2DArray(cyvx) !CS mgrd
+      call DestroyReal2DArray(cyvy) !CS mgrd
+      call DestroyReal2DArray(cyvz) !CS mgrd
+
+      call DestroyReal2DArray(czvx) !CS mgrd
+      call DestroyReal2DArray(czvy) !CS mgrd
+      call DestroyReal2DArray(czvz) !CS mgrd
+
+      call DestroyReal2DArray(cxrs) !CS mgrd
+      call DestroyReal2DArray(cyrs) !CS mgrd
+      call DestroyReal2DArray(czrs) !CS mgrd
+
+      call DestroyReal3DArray(tpdv)
+      !call DestroyReal3DArray(tpdvr)  !CS BUG: ERROR WHILE DEALLOCATING
 
       return 
       end   

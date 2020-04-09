@@ -26,17 +26,24 @@
         real :: time
 !******* Grid parameters**************************
         real :: dx,dy,dz,dxq,dyq,dzq
+        real :: dxr,dyr,dzr,dxqr,dyqr,dzqr      !CS mgrd
 !        
         real, allocatable, dimension(:) :: xc,xm
         real, allocatable, dimension(:) :: yc,ym
         real, allocatable, dimension(:) :: zc,zm
         real, allocatable, dimension(:) :: g3rc,g3rm
+        real, allocatable, dimension(:) :: xcr,xmr       !CS mgrd    
+        real, allocatable, dimension(:) :: ycr,ymr       !CS mgrd
+        real, allocatable, dimension(:) :: zcr,zmr       !CS mgrd
+        real, allocatable, dimension(:) :: g3rcr,g3rmr   !CS mgrd
 !====================================================
 !******* QUANTITIES FOR DERIVATIVES******************
         real, allocatable, dimension(:) :: udx3c,udx3m
+        real, allocatable, dimension(:) :: udx3cr,udx3mr   !CS mgrd
 !==========================================================
 !******* Grid indices**************************************
         integer, allocatable, dimension(:) :: kmc,kpc,kmv,kpv
+        integer, allocatable, dimension(:) :: kmcr,kpcr,kmvr,kpvr  !CS mgrd
 !===========================================================
 !******* Metric coefficients *******************************
         real, allocatable, dimension(:) :: ap3ck,ac3ck,am3ck
@@ -85,13 +92,24 @@
       use param
         implicit none
         real,allocatable,dimension(:,:,:) :: vx,vy,vz
-        real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
         real,allocatable,dimension(:,:,:) :: pr,temp,rhs
         real,allocatable,dimension(:,:,:) :: rux,ruy,ruz,rutemp
         real,allocatable,dimension(:,:,:) :: dph,qcap,dq,hro,dphhalo
         real,allocatable,dimension(:,:,:) :: qtens
       end module local_arrays
 
+      module mgrd_arrays
+      use param
+        implicit none
+        integer,allocatable,dimension(:) :: irangs,jrangs,krangs
+        integer,allocatable,dimension(:) :: irangc,jrangc,krangc
+!CS        integer indc1sal(m1),indc2sal(m2),indc3sal(m3)
+        real,allocatable,dimension(:,:) :: cxvx, cxvy, cxvz, cxrs
+        real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs
+        real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs
+        real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
+        real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
+      end module mgrd_arrays
 !===============================================================
       module stat_arrays
        implicit none

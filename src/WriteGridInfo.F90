@@ -32,6 +32,15 @@
        dsetname = trim('zm')
        call HdfSerialWriteReal1D(dsetname,namfile,zm,nzm)
 
+       dsetname = trim('xmr')
+       call HdfSerialWriteReal1D(dsetname,namfile,xmr,nxmr)
+       dsetname = trim('xcr')
+       call HdfSerialWriteReal1D(dsetname,namfile,xcr,nxr)
+       dsetname = trim('ymr')
+       call HdfSerialWriteReal1D(dsetname,namfile,ymr,nymr)
+       dsetname = trim('zmr')
+       call HdfSerialWriteReal1D(dsetname,namfile,zmr,nzmr)
+
       endif
 
       return

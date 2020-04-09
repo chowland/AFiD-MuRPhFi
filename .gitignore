@@ -3,6 +3,7 @@ afid
 *.txt
 src/new_*
 src/org_*
+src/original
 obj/*.o
 obj/*.mod
 outputdir/*.h5

@@ -82,7 +82,7 @@
 !
 !  add the buoyancy term
 !
-          tempit=0.d0 ! temp(kc,jc,ic)
+          tempit=0.d0 !temp(kc,jc,ic) !0.d0
 
 !
 !   z second derivatives of vx

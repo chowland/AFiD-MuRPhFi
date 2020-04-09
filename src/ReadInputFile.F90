@@ -52,7 +52,7 @@
 !
 !     DEFINITIONS FOR THE NATURAL CONVECTION
 !
-!      ren = dsqrt(ray/pra)  !CS Ren for pCF only
+      !ren = dsqrt(ray/pra)  !CS Ren for pCF only
       pec = dsqrt(pra*ray)
       pi=2.d0*dasin(1.d0)                          
 !                                                                       

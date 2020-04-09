@@ -118,21 +118,21 @@
       xc(nx) = alx3
       endif
 
-      if(istr3.eq.99) then
-        if (ismaster) write(6,*) 'Reading custom xc ... '
-        inquire(file='./xccor.in', exist=fexist) 
-        if(fexist) then
-         if (ismaster) write(6,*) 'xccor.in found'
-        else
-         if (ismaster) write(6,*) 'Warning: xccor.in not found!'
-         call MpiAbort
-        end if
-        open(unit=78,file='xccor.in',status='old')
-        do kc=1,nx
-          read(78,*) xc(kc)
-        end do
-        close(78)
-      endif
+!       if(istr3.eq.99) then
+!         if (ismaster) write(6,*) 'Reading custom xc ... '
+!         inquire(file='./xccor.in', exist=fexist) 
+!         if(fexist) then
+!          if (ismaster) write(6,*) 'xccor.in found'
+!         else
+!          if (ismaster) write(6,*) 'Warning: xccor.in not found!'
+!          call MpiAbort
+!         end if
+!         open(unit=78,file='xccor.in',status='old')
+!         do kc=1,nx
+!           read(78,*) xc(kc)
+!         end do
+!         close(78)
+!       endif
 
       call DestroyReal1DArray(etaz)
       call DestroyReal1DArray(etazm)

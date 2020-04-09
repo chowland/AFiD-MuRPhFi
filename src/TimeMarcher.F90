@@ -32,16 +32,15 @@
         call ExplicitTermsVX
         call ExplicitTermsVY
         call ExplicitTermsVZ
-!        call ExplicitTermsTemp     
+        !call ExplicitTermsTemp     
 
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ
-!        call ImplicitAndUpdateTemp
+        !call ImplicitAndUpdateTemp
 
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
-
 
         call CalcLocalDivergence
         call SolvePressureCorrection
@@ -69,7 +68,7 @@
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
         call update_halo(pr,lvlhalo)
-!        call update_halo(temp,lvlhalo)
+        !call update_halo(temp,lvlhalo)
 
         enddo
 
