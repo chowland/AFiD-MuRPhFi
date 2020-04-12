@@ -14,11 +14,13 @@
       integer :: errorcode, nthreads, i, j, k
       real    :: instCFL,dmax,dmaxr
       real    :: ti(2), tin(3), minwtdt
-      real :: ts, varptb
+      real :: ts, varptb,chksum
       integer :: prow=0,pcol=0
       integer :: lfactor,lfactor2
       character(100) :: arg
       logical :: nanexist
+      real,allocatable,dimension(:,:) :: dummy,dscan,dbot
+      integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
 !*******************************************************
 !******* Read input file bou.in by all processes********
@@ -90,10 +92,11 @@
 
       call WriteGridInfo
 
-!CS      call Init_ycut
+      call Init_ycut
+      call Init_ycutr
       call Init_zcut
       call Init_zcutr
-!CS
+
 !CS      call InitSpec
 !CS
 !CS      if (dumpslabs) call InitializeSlabDump
@@ -139,9 +142,10 @@
         call CreateInitialConditions
 
         if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-!        call Mkmov_ycut
+        call Mkmov_ycut
+        !call Mkmov_ycutr
         call Mkmov_zcut
-        call Mkmov_zcutr
+        !call Mkmov_zcutr
 
       endif                                                             
 
@@ -149,7 +153,7 @@
       call update_halo(vx,lvlhalo)
       call update_halo(vy,lvlhalo)
       call update_halo(vz,lvlhalo)
-      !call update_halo(temp,lvlhalo)
+      call update_halo(temp,lvlhalo)
       call update_halo(pr,lvlhalo)
 
 !CS   Create multigrid stencil for interpolation
@@ -177,7 +181,6 @@
        tin(2) = MPI_WTIME()             
        write(6,'(a,f6.2,a)') 'Initialization Time = ', tin(2) -tin(1), ' sec.'
      endif 
-!      call QuitRoutine(tin,.true.,555) !CS Check initial divergence
 
 !  ********* starts the time dependent calculation ***
       errorcode = 0 !EP set errocode to 0 (OK)
@@ -239,9 +242,10 @@
         if(mod(time,tframe).lt.dt) then
           if(ismaster)  write(6,*) 'Write slice ycut and zcut'
 !          call CalcWriteQ
-!          call Mkmov_ycut
+          call Mkmov_ycut
+          !call Mkmov_ycutr
           call Mkmov_zcut
-          call Mkmov_zcutr
+          !call Mkmov_zcutr
         endif
 
         time=time+dt
@@ -249,10 +253,10 @@
         if(ntime.eq.1.or.mod(time,tout).lt.dt) then
 !          call GlobalQuantities
 !          if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
-!
+
            call CalcMaxCFL(instCFL)
            call CheckDivergence(dmax)
-!            call CalcPlateNu
+           call CalcPlateNu
 !            call CalcPlateCf
 !
 !            if(time.gt.tsta) then
@@ -265,12 +269,12 @@
 !            endif
 !
             if(.not.variabletstep) instCFL=instCFL*dt
-!
-!            if(abs(dmax).gt.resid) errorcode = 169
-!
+
+            if(abs(dmax).gt.resid) errorcode = 169
+
         endif
-!
-!        if(time.gt.tmax) errorcode = 333
+
+        if(time.gt.tmax) errorcode = 333
 
         ti(2) = MPI_WTIME()
         minwtdt = min(minwtdt,ti(2) - ti(1))

@@ -27,13 +27,15 @@
            xxx=yc(j)            
            call random_number(varptb)
            varptb=0.d0
-           vy(k,j,i)=(xm(k))+0.3*(2.d0*varptb-1.d0)+ &
+           !vy(k,j,i)=(xm(k))+0.3*(2.d0*varptb-1.d0)+ &
+           vy(k,j,i)=+0.3*(2.d0*varptb-1.d0)+ &
      &                  (2.0d0*yyy-6.0d0*yyy**2+4.0d0*yyy**3) &
      &                  *sin(3*xxx)*eps
 
            yyy=xc(k)          
            xxx=ym(j)
            vx(k,j,i)=-yyy**2*(1.0d0-yyy)**2*cos(3.1*xxx)*eps
+!           vx(k,j,i)=1.d0 ! -yyy**2*(1.0d0-yyy)**2*cos(3.1*xxx)*eps
 
          enddo
         enddo

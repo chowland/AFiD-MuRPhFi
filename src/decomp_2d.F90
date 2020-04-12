@@ -51,7 +51,7 @@ module decomp_2d
   ! define neighboring blocks (to be used in halo-cell support)
   !  first dimension 1=X-pencil, 2=Y-pencil, 3=Z-pencil
   ! second dimension 1=east, 2=west, 3=north, 4=south, 5=top, 6=bottom 
-  integer, save, dimension(1,6) :: neighbour 
+  integer, save, dimension(3,6) :: neighbour 
 
   ! flags for periodic condition in three dimensions
   logical, save :: periodic_x, periodic_y, periodic_z
@@ -354,7 +354,7 @@ contains
 
     ! actually generate all 2D decomposition information
     call decomp_info_init(nx,ny,nz,decomp_main)
-    call decomp_info_init(nxr,nyr,nzr,decomp_mainr)
+    call decomp_info_init(nxr,nyr,nzr,decomp_mainr)   !CS mgrd
 
     ! make a copy of the decomposition information associated with the
     ! default global size in these global variables so applications can
@@ -369,15 +369,15 @@ contains
     ysize  = decomp_main%ysz
     zsize  = decomp_main%zsz
 
-    xstartr = decomp_mainr%xst
-    ystartr = decomp_mainr%yst
-    zstartr = decomp_mainr%zst
-    xendr   = decomp_mainr%xen
-    yendr   = decomp_mainr%yen
-    zendr   = decomp_mainr%zen
-    xsizer  = decomp_mainr%xsz
-    ysizer  = decomp_mainr%ysz
-    zsizer  = decomp_mainr%zsz
+    xstartr = decomp_mainr%xst  !CS mgrd 
+    ystartr = decomp_mainr%yst  !CS mgrd
+    zstartr = decomp_mainr%zst  !CS mgrd
+    xendr   = decomp_mainr%xen  !CS mgrd
+    yendr   = decomp_mainr%yen  !CS mgrd
+    zendr   = decomp_mainr%zen  !CS mgrd
+    xsizer  = decomp_mainr%xsz  !CS mgrd
+    ysizer  = decomp_mainr%ysz  !CS mgrd
+    zsizer  = decomp_mainr%zsz  !CS mgrd
      
     decomp_ph=decomp_main
 
@@ -467,7 +467,6 @@ contains
     
     return
   end subroutine decomp_2d_finalize
-
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ! Return the default decomposition object

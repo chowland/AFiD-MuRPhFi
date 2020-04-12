@@ -14,8 +14,8 @@
       implicit none
       character*30 :: filnam1,dsetname
 
-!      filnam1 = trim('outputdir/continua_temp.h5')
-!      call HdfWriteRealHalo3D(filnam1,temp)
+      filnam1 = trim('outputdir/continua_temp.h5')
+      call HdfWriteRealHalo3D(filnam1,temp)
       filnam1 = trim('outputdir/continua_vx.h5')
       call HdfWriteRealHalo3D(filnam1,vx)
       filnam1 = trim('outputdir/continua_vy.h5')
