@@ -13,14 +13,12 @@
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ! Halo cell support for neighbouring pencils to exchange data
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  subroutine update_halo_real(in, level, opt_decomp)
+  subroutine update_halo_real(in, level)
 
     implicit none
 
     integer, intent(IN) :: level      ! levels of halo cells required
     real(mytype), dimension(:,:,:), intent(INOUT) :: in    
-    TYPE(DECOMP_INFO), optional :: opt_decomp
-    TYPE(DECOMP_INFO) :: decomp
 
     ! starting/ending index of array with halo cells
     integer :: xs, ys, zs, xe, ye, ze

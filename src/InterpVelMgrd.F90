@@ -46,8 +46,8 @@
         enddo
 
         !-- Boundary points, enforce continuity
-        tpdv( 0,jc,ic)=-(vy( 0,jp,ic)-vy( 0,jc,ic))*dy &
-                       -(vz( 0,jc,ip)-vz( 0,jc,ic))*dz 
+        !tpdv( 0,jc,ic)=-(vy( 0,jp,ic)-vy( 0,jc,ic))*dy &
+        !               -(vz( 0,jc,ip)-vz( 0,jc,ic))*dz 
         tpdv(nx,jc,ic)=-(vy(nx,jp,ic)-vy(nx,jc,ic))*dy &
                        -(vz(nx,jc,ip)-vz(nx,jc,ic))*dz 
 
@@ -116,7 +116,7 @@
        enddo
       enddo
 
-      call update_halo(tpdv,2)   !CS Are the corners updated? Might need to check.
+      call update_halo(tpdv,2)
 
       !-- Now interpolate gradients to refined grid
       do ic=xstart(3)-1,xend(3)
@@ -125,13 +125,13 @@
 
          qv3=tpdv(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
 
-         do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)  !CS Is this correct?
+         do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
           qv2(:,:) = qv3(:,:,1)*czrs(1,icr)+qv3(:,:,2)*czrs(2,icr) &
                     +qv3(:,:,3)*czrs(3,icr)+qv3(:,:,4)*czrs(4,icr)
-          do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr) !CS Is this correct?
+          do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
            qv1(:) = qv2(:,1)*cyrs(1,jcr)+qv2(:,2)*cyrs(2,jcr) &
                    +qv2(:,3)*cyrs(3,jcr)+qv2(:,4)*cyrs(4,jcr)
-           do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr) !CS Is this correct?
+           do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
             tpdvr(kcr,jcr,icr) = sum(qv1*cxrs(:,kcr))
            enddo
           enddo
@@ -149,51 +149,30 @@
       vyxzc(:,:)=0.d0
       if (jc0.ge.xstart(2).and.jc0.le.xend(2)) then
        do ic=xstart(3)-2,xend(3)+2
-        do kc=0,nxm+1
+        do kc=1,nxm+1 !0,nxm+1
          vyxzc(kc,ic)=vy(kc,jc0,ic)
         enddo
        enddo
-      endif
 
-      ! write(*,*)'VYXZC: ',nrank,sum(vyxzc(1:nxm,xstart(3):xend(3)))
+       do ic=xstart(3)-1,xend(3)
+        do kc=0,nxm
 
-      do ic=xstart(3)-1,xend(3)
-       do kc=0,nxm
+         qv2=vyxzc(kc-1:kc+2,ic-1:ic+2)
 
-        qv2=vyxzc(kc-1:kc+2,ic-1:ic+2)
-
-        do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
-         qv1(:) = qv2(:,1)*czvy(1,icr)+qv2(:,2)*czvy(2,icr) &
-                 +qv2(:,3)*czvy(3,icr)+qv2(:,4)*czvy(4,icr)
-         do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
-          vyr(kcr,jcr0,icr) = sum(qv1*cxvy(:,kcr))
+         do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
+          qv1(:) = qv2(:,1)*czvy(1,icr)+qv2(:,2)*czvy(2,icr) &
+                  +qv2(:,3)*czvy(3,icr)+qv2(:,4)*czvy(4,icr)
+          do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
+           vyr(kcr,jcr0,icr) = sum(qv1*cxvy(:,kcr))
+          enddo
          enddo
+
         enddo
-
        enddo
-      enddo
-
-      ! write(*,*)'VYXZR: ',nrank,sum(vyr(1:nxmr,xstartr(2),xstartr(3):xendr(3)))
-      ! call MpiBarrier
-      ! stop
+      endif
       
       call MPI_CART_SUB(DECOMP_2D_COMM_CART_X,(/.true.,.false./),comm_col,ierror)
-
       !call MPI_Comm_rank(comm, row_id, ierror)
-      !TODO Need to interpolate only for ROW_ID corresponding to jcr.eq.1 (desired)
-      !TODO Need to use jc0 equals jcr0
- 
-      !-- Set up starting array, only populate if ROW_ID=0
-      ! do icr=xstartr(3),xendr(3)
-      !  jcr=xstartr(2)
-      !  if (jcr.eq.1) then
-      !   do kcr=1,nxmr
-      !    vyr(kcr,jcr,icr)=vyxzr(kcr,icr)
-      !   enddo
-      !  else
-      !   vyr(:,jcr,:)=0.d0
-      !  endif
-      ! enddo
 
       lya = 1./dyr
       !-- Integrate along each y-line 
@@ -223,11 +202,10 @@
       call MPI_Comm_free(comm_col,ierror) !CS Probably can be avoided by creating comm once
       ! call MPI_BARRIER(comm,ierr)
 
+      !CS Is the following necessary? Maybe not.
       !-- Construct 2nd guess of vyr (vyr) at an arbitrary x-z plane
       !-- Integrate along each y-line 
-
       !-- Average of two integrations
-      !-- Transpose y to x
 
 !=========================================================
 !     Interpolation of vz
@@ -285,29 +263,30 @@
       vzxyc(:,:)=0.d0
       if (ic0.ge.xstart(3).and.ic0.le.xend(3)) then
        do jc=xstart(2)-2,xend(2)+2
-        do kc=0,nxm+1
+        do kc=1,nxm+1 !0,nxm+1
          vzxyc(kc,jc)=vz(kc,jc,ic0)
+        enddo
+       enddo
+
+       do jc=xstart(2)-1,xend(2)
+        do kc=0,nxm
+
+         qv2=vzxyc(kc-1:kc+2,jc-1:jc+2)
+
+         do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
+          qv1(:) = qv2(:,1)*cyvz(1,jcr)+qv2(:,2)*cyvz(2,jcr) &
+                  +qv2(:,3)*cyvz(3,jcr)+qv2(:,4)*cyvz(4,jcr)
+          do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
+           vzr(kcr,jcr,icr0) = sum(qv1*cxvz(:,kcr))
+          enddo
+         enddo
+
         enddo
        enddo
       endif
 
-      do jc=xstart(2)-1,xend(2)
-       do kc=0,nxm
-
-        qv2=vzxyc(kc-1:kc+2,jc-1:jc+2)
-
-        do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
-         qv1(:) = qv2(:,1)*cyvz(1,jcr)+qv2(:,2)*cyvz(2,jcr) &
-                 +qv2(:,3)*cyvz(3,jcr)+qv2(:,4)*cyvz(4,jcr)
-         do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
-          vzr(kcr,jcr,icr0) = sum(qv1*cxvz(:,kcr))
-         enddo
-        enddo
-
-       enddo
-      enddo
-
       call MPI_CART_SUB(DECOMP_2D_COMM_CART_X,(/.false.,.true./),comm_row,ierror)
+      !call MPI_Comm_rank(comm, row_id, ierror)
 
       lza = 1./dzr
       !-- Integrate along each y-line 
@@ -336,6 +315,11 @@
       enddo
       call MPI_Comm_free(comm_row,ierror) !CS Probably can be avoided by creating comm once
       !call MPI_BARRIER(comm,ierr)
+
+      !CS Is the following necessary? Maybe not.
+      !-- Construct 2nd guess of vyr (vyr) at an arbitrary x-z plane
+      !-- Integrate along each y-line 
+      !-- Average of two integrations
 
 !=========================================================
       call update_halo(vxr,lvlhalo)

@@ -224,7 +224,7 @@
       xdmnam='outputdir/flowmov/frame_'//ipfi//'_ycutr.xmf'
 
       !-- select mid plane
-      ic=1 ! nymr/2+1
+      ic=nymr/2+1
 
       !-- MPI
       call MPI_CART_SUB(DECOMP_2D_COMM_CART_X,(/.false.,.true./),comm,ierror)

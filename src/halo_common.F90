@@ -9,12 +9,6 @@
 !
 !=======================================================================
 
-    if (present(opt_decomp)) then
-       decomp = opt_decomp
-    else
-       decomp = decomp_main
-    end if
-
     s1 = size(in,1)
     s2 = size(in,2)
     s3 = size(in,3)
