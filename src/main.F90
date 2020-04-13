@@ -143,9 +143,9 @@
 
         if(ismaster)  write(6,*) 'Write slice ycut and zcut'
         call Mkmov_ycut
-        !call Mkmov_ycutr
+        call Mkmov_ycutr
         call Mkmov_zcut
-        !call Mkmov_zcutr
+        call Mkmov_zcutr
 
       endif                                                             
 
@@ -162,12 +162,13 @@
 !CS   Interpolate initial values
       call InterpVelMgrd  !TODO
 
+      write(*,*)'RANK: ',nrank,xstart(2),xend(2),xstart(3),xend(3)
 !EP   Check divergence. Should be reduced to machine precision after the first
 !phcalc. Here it can still be high.
 
-      call CheckDivergence(dmax)!,dmaxr)
+      call CheckDivergence(dmax,dmaxr)
 
-      if(ismaster) write(6,*)' Initial maximum divergence: ',dmax!,dmaxr
+      if(ismaster) write(6,*)' Initial maximum divergence: ',dmax,dmaxr
 
 !!EP   Write some values
 !      if(variabletstep) then
@@ -243,9 +244,9 @@
           if(ismaster)  write(6,*) 'Write slice ycut and zcut'
 !          call CalcWriteQ
           call Mkmov_ycut
-          !call Mkmov_ycutr
+          call Mkmov_ycutr
           call Mkmov_zcut
-          !call Mkmov_zcutr
+          call Mkmov_zcutr
         endif
 
         time=time+dt
@@ -255,7 +256,7 @@
 !          if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
 
            call CalcMaxCFL(instCFL)
-           call CheckDivergence(dmax)
+           call CheckDivergence(dmax,dmaxr)
            call CalcPlateNu
 !            call CalcPlateCf
 !
@@ -280,7 +281,7 @@
         minwtdt = min(minwtdt,ti(2) - ti(1))
         if(mod(time,tout).lt.dt) then
           if(ismaster) then
-          write(6,*) ' Maximum divergence = ', dmax
+          write(6,*) ' Maximum divergence = ', dmax, dmaxr
           !write(6,*)'ntime - time - vmax(1) - vmax(2) - vmax(3)  -&
           !           tempm - tempmax - tempmin'
           !write(6,*)ntime,time,vmax(1),vmax(2),vmax(3),tempm,tempmax,tempmin

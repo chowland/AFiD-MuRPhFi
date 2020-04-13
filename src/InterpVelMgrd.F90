@@ -10,21 +10,18 @@
        
       integer  :: ic,jc,kc, ip,jp,kp, icr,jcr,kcr
       integer  :: icc,jcc,kcc
-      integer  :: jc0,jcr0, ic0,icr0 !, ipr,jpr
+      integer  :: jc0,jcr0, ic0,icr0
       integer  :: comm_col,comm_row,comm,ierror,chk
 
       real,dimension(4,4,4) :: qv3 
       real,dimension(4,4) :: qv2
       real,dimension(4) :: qv1
 
-      !real,dimension(1:m1mr,1:m2mr) :: dwloc,dwbot,dwall
-      !real,allocatable,dimension(:,:,:) :: tpdv, tpdvr!, tpvr
       real,allocatable,dimension(:,:) :: vyxzc,vyxzr, vzxyc,vzxyr
 
-      !real udx1r, udx2r
-      real  :: lxa, lya, lza ! dl1q, dl2q, dlf1, dlf2, lza
+      real  :: lxa, lya, lza
 
-      !!-- Allocate temporary arrays for velocities and gradients
+      !-- Allocate temporary arrays for velocities and gradients
       real,allocatable,dimension(:,:) :: dvyloc,dvybot, dvzloc,dvzbot
 
       tpdv(:,:,:) = 0.d0   ! Temporary gradient array - coarse
@@ -32,7 +29,6 @@
       vxr(:,:,:) = 0.d0
       vyr(:,:,:) = 0.d0
       vzr(:,:,:) = 0.d0
-      !tpvr = 0.d0
 
 !=========================================================
 !     Interpolation of vx
@@ -95,8 +91,7 @@
       enddo
 
       !-- Enforce zero net flux in x !TODO
-
-!!!!       !call DestroyReal3DArray(tpdv)
+      !call DestroyReal3DArray(tpdv)
 
 !=========================================================
 !     Interpolation of vy
@@ -147,13 +142,13 @@
       enddo
 
       !-- Interpolate vyr at an arbitrary x-z plane | tpvr | 1st guess
-      call AllocateReal2DArray(vyxzc,-1,nxm+2,xstart(3)-2,xend(3)+1)
+      call AllocateReal2DArray(vyxzc,-1,nxm+2,xstart(3)-2,xend(3)+2)
       call AllocateReal2DArray(vyxzr,1,nxmr,xstartr(3),xendr(3))
       jc0 = 1 !global index
       jcr0 = 1
       vyxzc(:,:)=0.d0
       if (jc0.ge.xstart(2).and.jc0.le.xend(2)) then
-       do ic=xstart(3)-2,xend(3)+1
+       do ic=xstart(3)-2,xend(3)+2
         do kc=0,nxm+1
          vyxzc(kc,ic)=vy(kc,jc0,ic)
         enddo
@@ -200,7 +195,7 @@
       !  endif
       ! enddo
 
-      lya = 1./dy 
+      lya = 1./dyr
       !-- Integrate along each y-line 
       do icr=xstartr(3),xendr(3)
        do jcr=xstartr(2),xendr(2)
@@ -225,7 +220,7 @@
         enddo
        enddo
       enddo
-      call MPI_Comm_free(comm_col,ierror)
+      call MPI_Comm_free(comm_col,ierror) !CS Probably can be avoided by creating comm once
       ! call MPI_BARRIER(comm,ierr)
 
       !-- Construct 2nd guess of vyr (vyr) at an arbitrary x-z plane
@@ -281,15 +276,15 @@
         enddo
        enddo
       enddo
-
+      
       !-- Interpolate vzr at an arbitrary x-y plane | tpvr | 1st guess
-      call AllocateReal2DArray(vzxyc,-1,nxm+2,xstart(2)-2,xend(2)+1)
+      call AllocateReal2DArray(vzxyc,-1,nxm+2,xstart(2)-2,xend(2)+2)
       call AllocateReal2DArray(vzxyr,1,nxmr,xstartr(2),xendr(2))
       ic0 = 1 !global index
       icr0 = 1
       vzxyc(:,:)=0.d0
       if (ic0.ge.xstart(3).and.ic0.le.xend(3)) then
-       do jc=xstart(2)-2,xend(2)+1
+       do jc=xstart(2)-2,xend(2)+2
         do kc=0,nxm+1
          vzxyc(kc,jc)=vz(kc,jc,ic0)
         enddo
@@ -314,7 +309,7 @@
 
       call MPI_CART_SUB(DECOMP_2D_COMM_CART_X,(/.false.,.true./),comm_row,ierror)
 
-      lza = 1./dz 
+      lza = 1./dzr
       !-- Integrate along each y-line 
       do icr=xstartr(3),xendr(3)
        do jcr=xstartr(2),xendr(2)
@@ -339,7 +334,7 @@
         enddo
        enddo
       enddo
-      call MPI_Comm_free(comm_row,ierror)
+      call MPI_Comm_free(comm_row,ierror) !CS Probably can be avoided by creating comm once
       !call MPI_BARRIER(comm,ierr)
 
 !=========================================================

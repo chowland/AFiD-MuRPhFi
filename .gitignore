@@ -9,3 +9,4 @@ obj/*.mod
 outputdir/*.h5
 outputdir/*.out
 outputdir/*
+continua/

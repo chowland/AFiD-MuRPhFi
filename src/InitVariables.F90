@@ -190,7 +190,7 @@
 
       call AllocateReal3DArray(tpdv,-1,nx+1,xstart(2)-2,xend(2)+2,xstart(3)-2,xend(3)+2)
       !CS  For tpdvr, larger array needed to prevent memory overflow in InterpVelMgrd
-      call AllocateReal3DArray(tpdvr,-1,nxr+1,xstartr(2)-2,xendr(2)+2,xstartr(3)-2,xendr(3)+2)
+      call AllocateReal3DArray(tpdvr,1,nxmr,xstartr(2)-2,xendr(2)+2,xstartr(3)-2,xendr(3)+2) !CS Something here causing blowup
       !call AllocateReal3DArray(tpdvr,1,nxmr,xstartr(2),xendr(2),xstartr(3),xendr(3))
       return 
       end   
