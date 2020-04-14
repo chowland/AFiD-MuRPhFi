@@ -193,30 +193,30 @@
       close(78)
       endif
 
-!CS !
-!CS !    COEFFICIENTS FOR DIFFERENTIATION FOR NON-UNIFORM GRID
-!CS !
-!CS !    Q3 DIFFERENTIATION (CENTERED VARIABLE)
-!CS !
-!CS 
-!CS       am3ck(1)=0.d0
-!CS       ap3ck(1)=0.d0
-!CS       ac3ck(1)=1.d0
-!CS       am3ck(nx)=0.d0
-!CS       ap3ck(nx)=0.d0
-!CS       ac3ck(nx)=1.d0
-!CS 
-!CS       do kc=2,nxm
-!CS        km=kc-1
-!CS        kp=kc+1
-!CS        a33=dxq/g3rc(kc)
-!CS        a33p=1.d0/g3rm(kc)
-!CS        a33m=1.d0/g3rm(km)
-!CS        ap3ck(kc)=a33*a33p
-!CS        am3ck(kc)=a33*a33m
-!CS        ac3ck(kc)=-(ap3ck(kc)+am3ck(kc))
-!CS       enddo
-!CS 
+!
+!    COEFFICIENTS FOR SALINITY DIFFERENTIATION FOR NON-UNIFORM GRID
+!
+!    Q3 DIFFERENTIATION (CENTERED VARIABLE)
+!
+
+      am3ckr(1)=0.d0
+      ap3ckr(1)=0.d0
+      ac3ckr(1)=1.d0
+      am3ckr(nxr)=0.d0
+      ap3ckr(nxr)=0.d0
+      ac3ckr(nxr)=1.d0
+
+      do kc=2,nxmr
+       km=kc-1
+       kp=kc+1
+       a33=dxqr/g3rcr(kc)
+       a33p=1.d0/g3rmr(kc)
+       a33m=1.d0/g3rmr(km)
+       ap3ckr(kc)=a33*a33p
+       am3ckr(kc)=a33*a33m
+       ac3ckr(kc)=-(ap3ckr(kc)+am3ckr(kc))
+      enddo
+
 !CS !
 !CS !    Q1/Q2 DIFFERENTIATION (STAGGERED VARIABLE)
 !CS !
@@ -256,30 +256,30 @@
 !CS       am3sk(kc)=a33m
 !CS       ap3sk(kc)=0.d0
 !CS       ac3sk(kc)=-(a33m+inslwn*a33p*2.d0)
-!CS 
-!CS       am3ssk(1)=0.d0
-!CS       ap3ssk(1)=0.d0
-!CS       ac3ssk(1)=1.d0
-!CS 
-!CS !
-!CS !    TEMPERATURE DIFFERENTIATION (CENTERED VARIABLE)
-!CS !
-!CS 
-!CS 
-!CS       do kc=2,nxm
-!CS        kp=kc+1
-!CS        km=kc-1
-!CS        a33=dxq/g3rc(kc)
-!CS        a33p=1.d0/g3rm(kc)
-!CS        a33m=1.d0/g3rm(km)
-!CS        ap3ssk(kc)=a33*a33p
-!CS        am3ssk(kc)=a33*a33m
-!CS        ac3ssk(kc)=-(ap3ssk(kc)+am3ssk(kc))
-!CS       enddo
-!CS 
-!CS       am3ssk(nx)=0.d0
-!CS       ap3ssk(nx)=0.d0
-!CS       ac3ssk(nx)=1.d0
+
+      am3sskr(1)=0.d0
+      ap3sskr(1)=0.d0
+      ac3sskr(1)=1.d0
+
+!
+!    SALINITY DIFFERENTIATION (CENTERED VARIABLE)
+!
+
+
+      do kc=2,nxmr
+       kp=kc+1
+       km=kc-1
+       a33=dxqr/g3rcr(kc)
+       a33p=1.d0/g3rmr(kc)
+       a33m=1.d0/g3rmr(km)
+       ap3sskr(kc)=a33*a33p
+       am3sskr(kc)=a33*a33m
+       ac3sskr(kc)=-(ap3sskr(kc)+am3sskr(kc))
+      enddo
+
+      am3sskr(nxr)=0.d0
+      ap3sskr(nxr)=0.d0
+      ac3sskr(nxr)=1.d0
 
       return                                                            
       end                                                               

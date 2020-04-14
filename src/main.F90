@@ -1,7 +1,7 @@
       program AFiD
       use mpih
       use param
-      use local_arrays, only: vx,vy,vz,temp,pr
+      use local_arrays, only: vx,vy,vz,temp,pr,sal
       use mgrd_arrays!, only: vxr
       use AuxiliaryRoutines
       use hdf5
@@ -124,6 +124,7 @@
 
       call InitPressureSolver
       call SetTempBCs
+      call SetSalBCs
 
       if(readflow) then
 
@@ -154,6 +155,7 @@
       call update_halo(vy,lvlhalo)
       call update_halo(vz,lvlhalo)
       call update_halo(temp,lvlhalo)
+      call update_halo(sal,lvlhalo)
       call update_halo(pr,lvlhalo)
 
 !CS   Create multigrid stencil for interpolation
@@ -162,7 +164,11 @@
 !CS   Interpolate initial values
       call InterpVelMgrd  !TODO
 
-      write(*,*)'RANK: ',nrank,xstart(2),xend(2),xstart(3),xend(3)
+!EP   Update all relevant halos
+      call update_halo(vxr,lvlhalo)
+      call update_halo(vyr,lvlhalo)
+      call update_halo(vzr,lvlhalo)
+
 !EP   Check divergence. Should be reduced to machine precision after the first
 !phcalc. Here it can still be high.
 
@@ -223,9 +229,9 @@
         endif
 
         call TimeMarcher
-        call InterpVelMgrd  !TODO
+        !call InterpVelMgrd
 
-!        call CalcGlobalStats
+        !call CalcGlobalStats
         if(ismaster) then
           open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
           write(96,769) ntime,time,dt,instCFL*dt!,vx_global,vy_global,vz_global
@@ -241,12 +247,16 @@
         endif
 
         if(mod(time,tframe).lt.dt) then
-          if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-!          call CalcWriteQ
-          call Mkmov_ycut
-          call Mkmov_ycutr
-          call Mkmov_zcut
-          call Mkmov_zcutr
+          ! call InterpVelMgrd !Vel from base mesh to refined mesh
+          ! call update_halo(vxr,lvlhalo)
+          ! call update_halo(vyr,lvlhalo)
+          ! call update_halo(vzr,lvlhalo)
+          ! if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+          ! !call CalcWriteQ
+          ! call Mkmov_ycut
+          ! call Mkmov_ycutr
+          ! call Mkmov_zcut
+          ! call Mkmov_zcutr
         endif
 
         time=time+dt
@@ -254,6 +264,17 @@
         if(ntime.eq.1.or.mod(time,tout).lt.dt) then
 !          call GlobalQuantities
 !          if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
+
+          call InterpVelMgrd !Vel from base mesh to refined mesh
+          call update_halo(vxr,lvlhalo)
+          call update_halo(vyr,lvlhalo)
+          call update_halo(vzr,lvlhalo)
+          if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+          !call CalcWriteQ
+          call Mkmov_ycut
+          call Mkmov_ycutr
+          call Mkmov_zcut
+          call Mkmov_zcutr
 
            call CalcMaxCFL(instCFL)
            call CheckDivergence(dmax,dmaxr)

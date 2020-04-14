@@ -47,8 +47,10 @@
 !===========================================================
 !******* Metric coefficients *******************************
         real, allocatable, dimension(:) :: ap3ck,ac3ck,am3ck
+        real, allocatable, dimension(:) :: ap3ckr,ac3ckr,am3ckr      !CS mgrd
         real, allocatable, dimension(:) :: ap3sk,ac3sk,am3sk
         real, allocatable, dimension(:) :: ap3ssk,ac3ssk,am3ssk   
+        real, allocatable, dimension(:) :: ap3sskr,ac3sskr,am3sskr   !CS mgrd
 !============================================================
 !******* Variables for FFTW and Poisson solver****************
         real, allocatable, dimension(:) :: ak2,ap
@@ -71,6 +73,7 @@
         real, dimension(1:ndv) :: vmax
         real, dimension(1:3) :: gam,rom,alm
         real, allocatable, dimension(:,:) :: tempbp,temptp
+        real, allocatable, dimension(:,:) :: salbp,saltp
               
         logical :: dumpslabs=.false.
         logical :: statcal=.false.
@@ -96,6 +99,7 @@
         real,allocatable,dimension(:,:,:) :: rux,ruy,ruz,rutemp
         real,allocatable,dimension(:,:,:) :: dph,qcap,dq,hro,dphhalo
         real,allocatable,dimension(:,:,:) :: qtens
+        real,allocatable,dimension(:,:,:) :: sal,rhsr,rusal,hsal
       end module local_arrays
 
       module mgrd_arrays
@@ -103,10 +107,9 @@
         implicit none
         integer,allocatable,dimension(:) :: irangs,jrangs,krangs
         integer,allocatable,dimension(:) :: irangc,jrangc,krangc
-!CS        integer indc1sal(m1),indc2sal(m2),indc3sal(m3)
-        real,allocatable,dimension(:,:) :: cxvx, cxvy, cxvz, cxrs
-        real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs
-        real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs
+        real,allocatable,dimension(:,:) :: cxvx, cxvy, cxvz, cxrs, cxvxc
+        real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs, cyvxc
+        real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs, czvxc
         real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
         real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
       end module mgrd_arrays

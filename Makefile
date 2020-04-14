@@ -37,15 +37,16 @@ EXTRA_DIST = transpose_z_to_x.F90 transpose_x_to_z.F90 transpose_x_to_y.F90\
 FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
 	  CalcLocalDivergence.F90 CheckDivergence.F90 CorrectPressure.F90\
           CorrectVelocity.F90 CreateGrid.F90 CreateInitialConditions.F90\
-	  DeallocateVariables.F90 DebugRoutines.F90 ExplicitTermsTemp.F90\
+	  DeallocateVariables.F90 DebugRoutines.F90\
+	  ExplicitTermsTemp.F90 ExplicitTermsSal.F90\
 	  ExplicitTermsVX.F90 ExplicitTermsVY.F90 ExplicitTermsVZ.F90\
 	  GlobalQuantities.F90 HdfReadContinua.F90 HdfRoutines.F90\
-	  ImplicitAndUpdateTemp.F90\
+	  ImplicitAndUpdateTemp.F90 ImplicitAndUpdateSal.F90\
 	  ImplicitAndUpdateVX.F90 ImplicitAndUpdateVY.F90 ImplicitAndUpdateVZ.F90\
 	  InitPressureSolver.F90 InitTimeMarchScheme.F90 InitVariables.F90\
           LocateLargeDivergence.F90 MpiAuxRoutines.F90 QuitRoutine.F90\
 	  ReadFlowField.F90 ReadInputFile.F90 ResetLogs.F90 SetTempBCs.F90\
-          SlabDumpRoutines.F90 SolveImpEqnUpdate_Temp.F90\
+          SlabDumpRoutines.F90 SolveImpEqnUpdate_Temp.F90 SolveImpEqnUpdate_Sal.F90\
 	  SolveImpEqnUpdate_X.F90 SolveImpEqnUpdate_YZ.F90 SolvePressureCorrection.F90\
           StatReadReduceWrite.F90 StatRoutines.F90\
 	  TimeMarcher.F90 WriteFlowField.F90 WriteGridInfo.F90 factorize.F90\

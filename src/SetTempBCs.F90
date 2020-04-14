@@ -23,3 +23,18 @@
       return
       end
 !
+      subroutine SetSalBCs
+      use param
+      implicit none
+      integer :: ic,jc
+
+      do ic=1,nzmr
+       do jc=1,nymr
+        saltp(jc,ic)=1.d0
+        salbp(jc,ic)=0.d0
+       enddo
+      enddo
+
+      return
+      end
+

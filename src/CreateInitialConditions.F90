@@ -10,8 +10,8 @@
 
       subroutine CreateInitialConditions
       use param
-      use local_arrays, only: vy,vx,temp,vz
-      use decomp_2d, only: xstart,xend
+      use local_arrays, only: vy,vx,temp,vz,sal
+      use decomp_2d, only: xstart,xend,xstartr,xendr
       use mpih
       implicit none
       integer :: j,k,i
@@ -58,5 +58,22 @@
       end do
       end do
 
-      return                                                            
-      end                                                               
+      !assign linear salinity profile in the nodes k=2 to k=nxm
+      do i=xstartr(3),xendr(3)
+      do j=xstartr(2),xendr(2)
+      do k=2,nxmr
+      sal(k,j,i)=salbp(j,i)-(salbp(j,i)-saltp(j,i))*xcr(k)/xcr(nxr)
+      enddo
+      enddo
+      enddo
+
+      !assign the boundary conditions at k=1 and k=nx
+      do i=xstartr(3),xendr(3)
+      do j=xstartr(2),xendr(2)
+      sal(1  ,j,i) = salbp(j,i)
+      sal(nxr,j,i) = saltp(j,i)
+      end do
+      end do
+
+      return
+      end

@@ -48,6 +48,8 @@
         !-- Boundary points, enforce continuity
         !tpdv( 0,jc,ic)=-(vy( 0,jp,ic)-vy( 0,jc,ic))*dy &
         !               -(vz( 0,jc,ip)-vz( 0,jc,ic))*dz 
+        tpdv( 0,jc,ic)=-(-vy( 1,jp,ic)+vy( 1,jc,ic))*dy &
+                       -(-vz( 1,jc,ip)+vz( 1,jc,ic))*dz 
         tpdv(nx,jc,ic)=-(vy(nx,jp,ic)-vy(nx,jc,ic))*dy &
                        -(vz(nx,jc,ip)-vz(nx,jc,ic))*dz 
 
@@ -56,7 +58,7 @@
 
       call update_halo(tpdv,2)
 
-      !-- Now interpolate gradients to refined grid !BUG INTERPOLATING TPDVR HERE >>>>
+      !-- Now interpolate gradients to refined grid
       do ic=xstart(3)-1,xend(3)
        do jc=xstart(2)-1,xend(2)
         do kc=0,nxm
@@ -150,7 +152,7 @@
       if (jc0.ge.xstart(2).and.jc0.le.xend(2)) then
        do ic=xstart(3)-2,xend(3)+2
         do kc=1,nxm+1 !0,nxm+1
-         vyxzc(kc,ic)=vy(kc,jc0,ic)
+         vyxzc(kc,ic)=vy(kc,jc0,ic) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
         enddo
        enddo
 
@@ -264,7 +266,7 @@
       if (ic0.ge.xstart(3).and.ic0.le.xend(3)) then
        do jc=xstart(2)-2,xend(2)+2
         do kc=1,nxm+1 !0,nxm+1
-         vzxyc(kc,jc)=vz(kc,jc,ic0)
+         vzxyc(kc,jc)=vz(kc,jc,ic0) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
         enddo
        enddo
 
@@ -322,9 +324,9 @@
       !-- Average of two integrations
 
 !=========================================================
-      call update_halo(vxr,lvlhalo)
-      call update_halo(vyr,lvlhalo)
-      call update_halo(vzr,lvlhalo)
+      !call update_halo(vxr,lvlhalo)
+      !call update_halo(vyr,lvlhalo)
+      !call update_halo(vzr,lvlhalo)
 
       return
       end subroutine InterpVelMgrd

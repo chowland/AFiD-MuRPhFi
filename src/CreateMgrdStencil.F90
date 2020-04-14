@@ -648,6 +648,102 @@
          enddo
       enddo
 
+      !==============================================
+      !--- Interpolate Coefficients for Coarse Vx ---
+      !==============================================
+      !-- Set-up large (l) and small (s) arrays
+      zzl(1:nzmr) = zmr(1:nzmr)
+      zzl(0) = 2.d0*zzl(1) - zzl(2)
+      zzl(nzr) = 2.d0*zzl(nzmr) - zzl(nzmr-1)
+      zzs(1:nzm) = zm(1:nzm)
+      zzs(0) = 2.d0*zzs(1) - zzs(2)
+      zzs(-1) = 2.d0*zzs(0) - zzs(1)
+      zzs(nz) = 2.d0*zzs(nzm) - zzs(nzm-1)
+      zzs(nz+1) = 2.d0*zzs(nz) - zzs(nzm)
+
+      yyl(1:nymr) = ymr(1:nymr)
+      yyl(0) = 2.d0*yyl(1) - yyl(2)
+      yyl(nyr) = 2.d0*yyl(nymr) - yyl(nymr-1)
+      yys(1:nym) = ym(1:nym)
+      yys(0) = 2.d0*yys(1) - yys(2)
+      yys(-1) = 2.d0*yys(0) - yys(1)
+      yys(ny) = 2.d0*yys(nym) - yys(nym-1)
+      yys(ny+1) = 2.d0*yys(ny) - yys(nym)
+
+      xxl(1:nxr) = xcr(1:nxr)
+      xxs(1:nx) = xc(1:nx)
+
+      !-- Get weights for gradient calculations
+      !-- Now construct Hermite basis function in x | cxvxc
+      do ic=1,nxm
+         if(ic.eq.1)then
+            cxvxc(1,ic)=0.d0!-h10*dlc*dlc/dlm/(dlc+dlm)
+            cxvxc(2,ic)=1.d0!h00-h11*dlp/(dlp+dlc)+h10*(dlc-dlm)/dlm
+            cxvxc(3,ic)=0.d0!h01+h10*dlm/(dlm+dlc)+h11*(dlp-dlc)/dlp
+            cxvxc(4,ic)=0.d0!h11*dlc*dlc/dlp/(dlp+dlc)
+         elseif(ic.eq.nxm)then
+            cxvxc(1,ic)=0.d0!-h10*dlc*dlc/dlm/(dlc+dlm)
+            cxvxc(2,ic)=0.d0!h00-h11*dlp/(dlp+dlc)+h10*(dlc-dlm)/dlm
+            cxvxc(3,ic)=1.d0!h01+h10*dlm/(dlm+dlc)+h11*(dlp-dlc)/dlp
+            cxvxc(4,ic)=0.d0!h11*dlc*dlc/dlp/(dlp+dlc)
+         else
+            icr = irangc(ic)-1
+            dlc = xxl(icr+1)-xxl(icr)
+            dlm = xxl(icr)-xxl(icr-1)
+            dlp = xxl(icr+2)-xxl(icr+1)
+            lxa = 1.d0/dlc
+            lxm = (xxs(ic) - xxl(icr))*lxa
+            lxp = 1.d0 - lxm
+
+            h00=(1.d0+2.d0*lxm)*lxp*lxp
+            h10=lxm*lxp*lxp
+            h01=(1.d0+2.d0*lxp)*lxm*lxm
+            h11=-lxp*lxm*lxm
+            cxvxc(1,ic)=-h10*dlc*dlc/dlm/(dlc+dlm)
+            cxvxc(2,ic)=h00-h11*dlp/(dlp+dlc)+h10*(dlc-dlm)/dlm
+            cxvxc(3,ic)=h01+h10*dlm/(dlm+dlc)+h11*(dlp-dlc)/dlp
+            cxvxc(4,ic)=h11*dlc*dlc/dlp/(dlp+dlc)
+         endif
+      enddo
+      !-- Now construct Hermite basis function in y | cyvxc
+      do jc=0,nym
+         jcr = jrangs(jc)-1
+         dlc = yyl(jcr+1)-yyl(jcr)
+         dlm = yyl(jcr)-yyl(jcr-1)
+         dlp = yyl(jcr+2)-yyl(jcr+1)
+         lya = 1.d0/dlc
+         lym = (yys(jc) - yyl(jcr))*lya
+         lyp = 1.d0 - lym
+
+         h00=(1.d0+2.d0*lym)*lyp*lyp
+         h10=lym*lyp*lyp
+         h01=(1.d0+2.d0*lyp)*lym*lym
+         h11=-lyp*lym*lym
+         cyvxc(1,jc)=-h10*dlc*dlc/dlm/(dlc+dlm)
+         cyvxc(2,jc)=h00-h11*dlp/(dlp+dlc)+h10*(dlc-dlm)/dlm
+         cyvxc(3,jc)=h01+h10*dlm/(dlm+dlc)+h11*(dlp-dlc)/dlp
+         cyvxc(4,jc)=h11*dlc*dlc/dlp/(dlp+dlc)
+      enddo
+      !-- Now construct Hermite basis function in z | czvxc
+      do kc=0,nzm
+         kcr = krangs(kc)-1
+         dlc = zzl(kcr+1)-zzl(kcr)
+         dlm = zzl(kcr)-zzl(kcr-1)
+         dlp = zzl(kcr+2)-zzl(kcr+1)
+         lza = 1.d0/dlc
+         lzm = (zzs(kc) - zzl(kcr))*lza
+         lzp = 1.d0 - lzm
+
+         h00=(1.d0+2.d0*lzm)*lzp*lzp
+         h10=lzm*lzp*lzp
+         h01=(1.d0+2.d0*lzp)*lzm*lzm
+         h11=-lzp*lzm*lzm
+         czvxc(1,kc)=-h10*dlc*dlc/dlm/(dlc+dlm)
+         czvxc(2,kc)=h00-h11*dlp/(dlp+dlc)+h10*(dlc-dlm)/dlm
+         czvxc(3,kc)=h01+h10*dlm/(dlm+dlc)+h11*(dlp-dlc)/dlp
+         czvxc(4,kc)=h11*dlc*dlc/dlp/(dlp+dlc)
+      enddo
+
       return
       end subroutine CreateMgrdStencil
 
