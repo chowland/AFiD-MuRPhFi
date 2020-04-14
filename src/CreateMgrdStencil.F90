@@ -13,6 +13,7 @@
       use param
       use mgrd_arrays
       use mpih
+      use decomp_2d,only: nrank
       implicit none
       integer :: jc,kc,ic,i,j,k
       integer :: icr, jcr, kcr
@@ -50,8 +51,10 @@
           endif
         enddo
         do i=irangc(ic-1),nxmr
+          if(i.gt.0) then
           if(xcr(i).lt.xc(ic) .and. xcr(i+1).ge.xc(ic))then
             irangc(ic) = i+1
+          endif
           endif
         enddo
       enddo
@@ -83,8 +86,10 @@
           endif
         enddo
         do j=jrangc(jc-1),nymr
+          if(j.gt.0) then
           if(ycr(j).lt.yc(jc) .and. ycr(j+1).ge.yc(jc))then
             jrangc(jc) = j+1
+          endif
           endif
         enddo
       enddo
@@ -116,8 +121,10 @@
           endif
         enddo
         do k=krangc(kc-1),nzmr
+          if(k.gt.0) then
           if(zcr(k).lt.zc(kc) .and. zcr(k+1).ge.zc(kc))then
             krangc(kc) = k+1
+          endif
           endif
         enddo
       enddo

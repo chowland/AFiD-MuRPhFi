@@ -503,7 +503,7 @@
       integer :: comm, info
       integer :: ndims
 
-      real, intent(in), dimension(1:nx, &
+      real, intent(in), dimension(1:nxr, &
        xstartr(2)-lvlhalo:xendr(2)+lvlhalo, &
        xstartr(3)-lvlhalo:xendr(3)+lvlhalo)::qua
 

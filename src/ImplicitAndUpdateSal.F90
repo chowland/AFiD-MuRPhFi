@@ -69,7 +69,7 @@
        sal(1,xstartr(2):xendr(2),xstartr(3):xendr(3)) &
           = salbp(xstartr(2):xendr(2),xstartr(3):xendr(3))
 
-       sal(nx,xstartr(2):xendr(2),xstartr(3):xendr(3)) &
+       sal(nxr,xstartr(2):xendr(2),xstartr(3):xendr(3)) &
           = saltp(xstartr(2):xendr(2),xstartr(3):xendr(3))
 
 

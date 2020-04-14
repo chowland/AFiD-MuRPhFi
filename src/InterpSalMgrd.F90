@@ -19,13 +19,13 @@
       salc(:,:,:) = 0.d0
 
       do ic=xstart(3),xend(3)
-       icr = irangc(ic)-1
+       icr = krangs(ic)-1
 
        do jc=xstart(2),xend(2)
          jcr = jrangs(jc)-1
 
-         do kc=1,nxm
-          kcr = krangs(kc)-1
+         do kc=2,nxm
+          kcr = irangc(kc)-1
 
           qv3      = sal(kcr-1:kcr+2,jcr-1:jcr+2,icr-1:icr+2)
           qv2(:,:) = qv3(:,:,1)*czvxc(1,ic)+qv3(:,:,2)*czvxc(2,ic)&
@@ -35,6 +35,12 @@
           salc(kc,jc,ic) = sum(qv1(1:4)*cxvxc(1:4,kc))
 
          enddo
+       enddo
+      enddo
+
+      do ic=xstart(3),xend(3)
+       do jc=xstart(2),xend(2)
+          salc(1,jc,ic) = 0.d0
        enddo
       enddo
 

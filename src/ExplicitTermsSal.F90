@@ -29,7 +29,7 @@
 !$OMP   DEFAULT(none) &
 !$OMP   SHARED(xstartr,xendr,vzr,vyr,vxr,nxmr) &
 !$OMP   SHARED(kmv,kpv,am3sk,ac3sk,ap3sk,udzr) &
-!$OMP   SHARED(udyr,udzrq,udyrq,udx3c,sal,hsal) &
+!$OMP   SHARED(udyr,udzrq,udyrq,udx3cr,sal,hsal) &
 !$OMP   PRIVATE(ic,jc,kc,im,ip,km,kp,jm,jp) &
 !$OMP   PRIVATE(hsx,hsy,hsz,dyys,dzzs)
       do ic=xstartr(3),xendr(3)
@@ -75,7 +75,7 @@
 !
       hsx=((vxr(kp,jc,ic)+vxr(kc,jc,ic))*(sal(kp,jc,ic)+sal(kc,jc,ic))- &
            (vxr(kc,jc,ic)+vxr(km,jc,ic))*(sal(kc,jc,ic)+sal(km,jc,ic)) &
-          )*udx3c(kc)*0.25d0
+          )*udx3cr(kc)*0.25d0
 !
 !
 !   zz second derivatives of sal

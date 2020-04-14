@@ -193,6 +193,7 @@
       use hdf5
       use decomp_2d, only: xstartr,xendr,DECOMP_2D_COMM_CART_X
       use mgrd_arrays, only: vzr,vyr,vxr ! ,temp,pr
+      use local_arrays, only: sal
       implicit none
       character(70) namfile,xdmnam
       character(30) :: dsetname
@@ -206,7 +207,7 @@
       integer(HID_T) :: filespace
       integer(HID_T) :: slabspace
       integer(HID_T) :: memspace
-      integer(HID_T) :: dset_vx,dset_vy,dset_vz
+      integer(HID_T) :: dset_vx,dset_vy,dset_vz,dset_sal
       integer(HID_T) :: plist_id
       integer(HSIZE_T) :: dims(2)
       integer(HSIZE_T), dimension(2) :: data_count  
@@ -255,6 +256,7 @@
          call h5dcreate_f(file_id, 'vxr', H5T_NATIVE_DOUBLE,filespace,dset_vx, hdf_error)
          call h5dcreate_f(file_id, 'vyr', H5T_NATIVE_DOUBLE,filespace,dset_vy, hdf_error)
          call h5dcreate_f(file_id, 'vzr', H5T_NATIVE_DOUBLE,filespace,dset_vz, hdf_error)
+         call h5dcreate_f(file_id, 'sal', H5T_NATIVE_DOUBLE,filespace,dset_sal, hdf_error)
          ! call h5dcreate_f(file_id, 'fi', H5T_NATIVE_DOUBLE,filespace,dset_fi, hdf_error)
 
          call h5screate_simple_f(ndims, data_count, memspace, hdf_error) 
@@ -283,6 +285,14 @@
             call h5dwrite_f(dset_vz, H5T_NATIVE_DOUBLE,vzr(1:nxr,ic,xstartr(3):xendr(3)), dims,  hdf_error, file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
             call h5pclose_f(plist_id, hdf_error)
 
+            !-- sal
+            call h5dget_space_f(dset_sal, filespace, hdf_error)
+            call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
+            call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+            call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
+            call h5dwrite_f(dset_sal, H5T_NATIVE_DOUBLE,sal(1:nxr,ic,xstartr(3):xendr(3)), dims,  hdf_error, file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
+            call h5pclose_f(plist_id, hdf_error)
+
             !!-- fi
             !call h5dget_space_f(dset_fi, filespace, hdf_error)
             !call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
@@ -294,6 +304,7 @@
          call h5dclose_f(dset_vx, hdf_error)
          call h5dclose_f(dset_vy, hdf_error)
          call h5dclose_f(dset_vz, hdf_error)
+         call h5dclose_f(dset_sal, hdf_error)
          !call h5dclose_f(dset_fi, hdf_error)
          call h5sclose_f(memspace, hdf_error)
          call h5fclose_f(file_id, hdf_error)
@@ -337,6 +348,12 @@
       write(45,'("<Attribute Name=""vzr"" AttributeType=""Scalar"" Center=""Node"">")')
       write(45,'("<DataItem Dimensions=""",i4," ",i4,""" NumberType=""Float"" Precision=""4"" Format=""HDF"">")')nzmr,nxr
       write(45,'("frame_",i5.5,"_ycutr.h5:/vzr")') itime
+      write(45,'("</DataItem>")')
+      write(45,'("</Attribute>")')
+
+      write(45,'("<Attribute Name=""sal"" AttributeType=""Scalar"" Center=""Node"">")')
+      write(45,'("<DataItem Dimensions=""",i4," ",i4,""" NumberType=""Float"" Precision=""4"" Format=""HDF"">")')nzmr,nxr
+      write(45,'("frame_",i5.5,"_ycutr.h5:/sal")') itime
       write(45,'("</DataItem>")')
       write(45,'("</Attribute>")')
 

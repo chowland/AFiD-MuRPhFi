@@ -162,12 +162,14 @@
       call CreateMgrdStencil
 
 !CS   Interpolate initial values
-      call InterpVelMgrd  !TODO
+      call InterpVelMgrd
+      call InterpSalMgrd
 
 !EP   Update all relevant halos
       call update_halo(vxr,lvlhalo)
       call update_halo(vyr,lvlhalo)
       call update_halo(vzr,lvlhalo)
+      call update_halo(salc,lvlhalo)
 
 !EP   Check divergence. Should be reduced to machine precision after the first
 !phcalc. Here it can still be high.
