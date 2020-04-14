@@ -22,7 +22,7 @@
 !     The coefficients are normalized to prevent floating
 !     point errors.
 
-      betadx=0.5d0*al*dt/pec
+      betadx=0.5d0*al*dt/pect
 
       amkl(1)=0.d0
       apkl(1)=0.d0

@@ -46,7 +46,6 @@
 
 !------------------------------------
       qmaxr =-huge(0.0)
-
 ! !$OMP  PARALLEL DO &
 ! !$OMP   DEFAULT(none) &
 ! !$OMP   SHARED(xstartr,xendr,nxmr,vzr,vyr,vxr,dzr,dyr,udx3mr) &

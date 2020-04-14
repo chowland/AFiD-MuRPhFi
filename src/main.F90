@@ -65,12 +65,12 @@
       call ResetLogs
 !m====================================================
       write(6,112)ylen/alx3,zlen/alx3
-  112 format(//,20x,'Plane Couette Flow ',//,10x, &
+  112 format(//,20x,'Double Diffusive Convection ',//,10x, &
        '3D Cell with aspect-ratio:  D1/H = ',f5.2,' D2/H = ',f5.2)
       write(6,142) 
   142 format(//,8x,'Periodic lateral wall boundary condition')
-      write(6,202) ren,pra
-  202 format(/,5x,'Parameters: ',' Re=',e10.3,' Pr= ',e10.3)
+      write(6,202) rayt,prat,rays,pras
+  202 format(/,5x,'Parameters: ',' RaT=',e10.3,' PrT= ',e10.3,' RaS=',e10.3,' PrS= ',e10.3)
       if(variabletstep) then
          write(6,204) limitCFL
   204 format(/,5x,'Variable dt and fixed cfl= ', &

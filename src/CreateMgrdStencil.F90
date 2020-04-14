@@ -17,7 +17,7 @@
       integer :: jc,kc,ic,i,j,k
       integer :: icr, jcr, kcr
 
-      real xxl(0:nxr), yyl(0:nyr), zzl(0:nzr)
+      real xxl(0:nxr), yyl(-1:nyr), zzl(-1:nzr)
       real xxs(-1:nx+1), yys(-1:ny+1), zzs(-1:nz+1)
       real h00, h01, h10, h11
       real lxm,lxp, lym,lyp, lzm,lzp, lxa,lya,lza
@@ -654,6 +654,7 @@
       !-- Set-up large (l) and small (s) arrays
       zzl(1:nzmr) = zmr(1:nzmr)
       zzl(0) = 2.d0*zzl(1) - zzl(2)
+      zzl(-1) = 2.d0*zzl(0) - zzl(1)
       zzl(nzr) = 2.d0*zzl(nzmr) - zzl(nzmr-1)
       zzs(1:nzm) = zm(1:nzm)
       zzs(0) = 2.d0*zzs(1) - zzs(2)
@@ -663,6 +664,7 @@
 
       yyl(1:nymr) = ymr(1:nymr)
       yyl(0) = 2.d0*yyl(1) - yyl(2)
+      yyl(-1) = 2.d0*yyl(0) - yyl(1)
       yyl(nyr) = 2.d0*yyl(nymr) - yyl(nymr-1)
       yys(1:nym) = ym(1:nym)
       yys(0) = 2.d0*yys(1) - yys(2)

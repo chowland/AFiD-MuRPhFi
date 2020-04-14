@@ -22,8 +22,8 @@
 
       udzr=dzr*0.25
       udyr=dyr*0.25
-      udzrq=dzq/pec !TODO
-      udyrq=dyq/pec !TODO
+      udzrq=dzq/pecs
+      udyrq=dyq/pecs
 
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &

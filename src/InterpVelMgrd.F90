@@ -50,8 +50,10 @@
         !               -(vz( 0,jc,ip)-vz( 0,jc,ic))*dz 
         tpdv( 0,jc,ic)=-(-vy( 1,jp,ic)+vy( 1,jc,ic))*dy &
                        -(-vz( 1,jc,ip)+vz( 1,jc,ic))*dz 
-        tpdv(nx,jc,ic)=-(vy(nx,jp,ic)-vy(nx,jc,ic))*dy &
-                       -(vz(nx,jc,ip)-vz(nx,jc,ic))*dz 
+        !tpdv(nx,jc,ic)=-(vy(nx,jp,ic)-vy(nx,jc,ic))*dy &
+        !               -(vz(nx,jc,ip)-vz(nx,jc,ic))*dz 
+        tpdv(nx,jc,ic)=-(-vy(nxm,jp,ic)+vy(nxm,jc,ic))*dy &
+                       -(-vz(nxm,jc,ip)+vz(nxm,jc,ic))*dz 
 
        enddo
       enddo

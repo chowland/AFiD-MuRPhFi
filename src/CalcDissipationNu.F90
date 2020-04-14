@@ -43,7 +43,7 @@
 !$OMP  PARALLEL DO &
 !$OMP  DEFAULT(none) &
 !$OMP  SHARED(xstart,xend,vz,vy,vx,temp) &
-!$OMP  SHARED(nxm,ren,pec,pra) &
+!$OMP  SHARED(nxm,ren,pect,prat) &
 !$OMP  SHARED(dxc,dxm,lec,lem) &
 !$OMP  SHARED(disste,dissth) &
 !$OMP  PRIVATE(i,j,k,ip,jp,kp) &
@@ -79,7 +79,7 @@
        dissipte  = (hxx*hxx+hxy*hxy+hxz*hxz) 
        dissipte2 = (hyx*hyx+hyy*hyy+hyz*hyz)+(hzx*hzx+hzy*hzy+hzz*hzz)
 
-       nu_mu = nu_mu + dissipte*lem(k)*pra+dissipte2*lec(k)*pra 
+       nu_mu = nu_mu + dissipte*lem(k)*prat+dissipte2*lec(k)*prat
 
 !      Thermal gradient dissipation rate
 !                       1  |         | 2

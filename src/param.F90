@@ -13,7 +13,7 @@
         real      :: alx3,str3
         integer   :: istr3
         real      :: ylen,zlen
-        real      :: ray,pra,dt,resid
+        real      :: rayt,prat,rays,pras,dt,resid
         integer   :: inslws,inslwn
         real      :: xminusU,xplusU
         integer   :: starea,tsta
@@ -61,7 +61,8 @@
 !******* Other variables ***********************************
         integer  :: nxm, nym, nzm
         integer  :: nxmr, nymr, nzmr   !CS mgrd
-        real :: ren, pec
+        real :: ren, pect, pecs, lew
+        real :: rhop, byct, bycs
         real :: pi
         real :: al,ga,ro
         real :: beta
@@ -112,6 +113,7 @@
         real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs, czvxc
         real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
         real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
+        real,allocatable,dimension(:,:,:) :: salc
       end module mgrd_arrays
 !===============================================================
       module stat_arrays

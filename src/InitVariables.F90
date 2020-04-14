@@ -83,6 +83,10 @@
       call AllocateReal1DArray(ac3ckr,1,nxr)
       call AllocateReal1DArray(am3ckr,1,nxr)
 
+      call AllocateReal1DArray(ap3sskr,1,nxr)
+      call AllocateReal1DArray(ac3sskr,1,nxr)
+      call AllocateReal1DArray(am3sskr,1,nxr)
+
       call AllocateInt1dArray(kmcr,1,nxr)
       call AllocateInt1dArray(kpcr,1,nxr)
       call AllocateInt1dArray(kmvr,1,nxr)
@@ -113,8 +117,8 @@
       call AllocateReal2DArray(czrs,1,4,0,nzr)
 
       call AllocateReal2DArray(cxvxc,1,4,0,nx)
-      call AllocateReal2DArray(cyvxc,1,4,0,nx)
-      call AllocateReal2DArray(czvxc,1,4,0,nx)
+      call AllocateReal2DArray(cyvxc,1,4,0,ny)
+      call AllocateReal2DArray(czvxc,1,4,0,nz)
 
 !-------------------------------------------------
 ! Arrays for temperature boundary conditions    
@@ -209,8 +213,10 @@
       call AllocateReal3DArray(vxr,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
 
       call AllocateReal3DArray(tpdv,-1,nx+1,xstart(2)-2,xend(2)+2,xstart(3)-2,xend(3)+2)
-      !CS  For tpdvr, larger array needed to prevent memory overflow in InterpVelMgrd
-      call AllocateReal3DArray(tpdvr,1,nxmr,xstartr(2)-2,xendr(2)+2,xstartr(3)-2,xendr(3)+2) !CS Something here causing blowup
-      !call AllocateReal3DArray(tpdvr,1,nxmr,xstartr(2),xendr(2),xstartr(3),xendr(3))
+!CS   For tpdvr, larger array needed to prevent memory overflow in InterpVelMgrd
+      call AllocateReal3DArray(tpdvr,1,nxmr,xstartr(2)-2,xendr(2)+2,xstartr(3)-2,xendr(3)+2)
+
+      call AllocateReal3DArray(salc,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
+
       return 
       end   

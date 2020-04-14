@@ -20,7 +20,7 @@
       real    :: alpec,dxxs
       real    :: app,acc,amm
 
-      alpec=al/pec
+      alpec=al/pecs
 
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &

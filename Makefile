@@ -54,7 +54,7 @@ FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
 	  Mkmov_ycut.F90 Mkmov_zcut.F90 Init_ycut.F90 Init_zcut.F90\
 	  SpecRoutines.F90\
 	  CalcPlateCf.F90 CalcWriteQ.F90\
-	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90
+	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90 InterpSalMgrd.F90
 
 #=======================================================================
 #  Files that create modules:

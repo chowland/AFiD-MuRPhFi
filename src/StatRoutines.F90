@@ -214,12 +214,20 @@
        dsetname = trim('X_cordin')
        call HdfSerialWriteReal1D(dsetname,filnam,xm,nxm)
 
-       dsetname = trim('Reynolds Number')
-       call HdfSerialWriteRealScalar(dsetname,filnam,ren)
+       dsetname = trim('X_cordin_fine')
+       call HdfSerialWriteReal1D(dsetname,filnam,xmr,nxmr)
 
-       dsetname = trim('Prandtl Number')
-       call HdfSerialWriteRealScalar(dsetname,filnam,pra)
+       dsetname = trim('Thermal Rayleigh Number')
+       call HdfSerialWriteRealScalar(dsetname,filnam,rayt)
 
+       dsetname = trim('Salinity Rayleigh Number')
+       call HdfSerialWriteRealScalar(dsetname,filnam,rays)
+
+       dsetname = trim('Thermal Prandtl Number')
+       call HdfSerialWriteRealScalar(dsetname,filnam,prat)
+
+       dsetname = trim('Salinity Prandtl Number')
+       call HdfSerialWriteRealScalar(dsetname,filnam,pras)
 
       endif
 

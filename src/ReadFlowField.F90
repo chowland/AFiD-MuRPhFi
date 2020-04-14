@@ -19,7 +19,7 @@
       integer :: nzom,nyom,nxo,nyo,nzo
       integer :: xs2og,xe2og,xs3og,xe3og
       integer :: istro3
-      integer :: vxflag,vyflag,vzflag,teflag
+      integer :: vxflag,vyflag,vzflag,teflag,saflag
 !     integer (kind=MPI_ADDRESS_KIND) :: extent,lb
       real :: stro3
       real, allocatable, dimension(:,:,:) :: tempold,vyold,vxold,vzold
@@ -62,6 +62,7 @@
       vyflag = 2
       vzflag = 3
       teflag = 4
+      saflag = 5
       
 !EP   Check whether grid specifications have been updated
       if(nyo.ne.ny.or.nxo.ne.nx.or.nzo.ne.nz &
@@ -166,8 +167,10 @@
      & ,xstart(3),xend(3),vyflag,vy)
       call HdfReadContinua(nz,ny,nx,xstart(2),xend(2) &
      & ,xstart(3),xend(3),vxflag,vx)
-!      call HdfReadContinua(nz,ny,nx,xstart(2),xend(2) &
-!     & ,xstart(3),xend(3),teflag,temp)
+      call HdfReadContinua(nz,ny,nx,xstart(2),xend(2) &
+     & ,xstart(3),xend(3),teflag,temp)
+      call HdfReadContinua(nzr,nyr,nxr,xstartr(2),xendr(2) &
+     & ,xstartr(3),xendr(3),saflag,sal)
 
       endif
 

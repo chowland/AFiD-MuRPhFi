@@ -11,12 +11,13 @@
       subroutine ExplicitTermsVX
       use param
       use local_arrays, only: vz,vy,vx,temp,qcap
+      use mgrd_arrays, only: salc
       use decomp_2d, only: xstart,xend
       implicit none
       integer :: jc,kc
       integer :: km,kp,jmm,jpp,ic,imm,ipp
       real    :: hxx,hxy,hxz
-      real    :: udz,udy,tempit
+      real    :: udz,udy,tempit,salit
       real    :: udzq,udyq
       real    :: dzzvx,dyyvx
 
@@ -83,6 +84,7 @@
 !  add the buoyancy term
 !
           tempit=temp(kc,jc,ic) !0.d0
+          salit=0.d0 !salc(kc,jc,ic)
 
 !
 !   z second derivatives of vx
@@ -98,7 +100,7 @@
                  +vx(kc,jpp,ic))*udyq
 
 
-          qcap(kc,jc,ic) =-(hxx+hxy+hxz)+dyyvx+dzzvx+tempit
+          qcap(kc,jc,ic) =-(hxx+hxy+hxz)+dyyvx+dzzvx + byct*tempit - bycs*salit
             
       enddo
       enddo

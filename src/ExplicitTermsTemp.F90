@@ -21,8 +21,8 @@
 
       udz=dz*0.25
       udy=dy*0.25
-      udzq=dzq/pec
-      udyq=dyq/pec
+      udzq=dzq/pect
+      udyq=dyq/pect
 
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &

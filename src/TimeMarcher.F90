@@ -13,7 +13,7 @@
       subroutine TimeMarcher
       use param
       use local_arrays
-      use mgrd_arrays, only: vxr,vyr,vzr
+      use mgrd_arrays, only: vxr,vyr,vzr,salc
       use mpih
       use decomp_2d
       implicit none
@@ -35,14 +35,14 @@
         call ExplicitTermsVZ
         call ExplicitTermsTemp
         !if(flag_second_scalar) call ExplicitTermsSal !Refined
-        call ExplicitTermsSal !Refined
+        !call ExplicitTermsSal !Refined
 
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ
         call ImplicitAndUpdateTemp
         !if(flag_second_scalar) call ImplicitAndUpdateSal !Refined
-        call ImplicitAndUpdateSal !Refined
+        !call ImplicitAndUpdateSal !Refined
 
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
@@ -74,11 +74,12 @@
         call update_halo(vz,lvlhalo)
         call update_halo(pr,lvlhalo)
         call update_halo(temp,lvlhalo)
+        !call update_halo(sal,lvlhalo)
 
         !call InterpVelMgrd !Vel from base mesh to refined mesh
-        update_halo(vxr,lvlhalo)
-        update_halo(vyr,lvlhalo)
-        update_halo(vzr,lvlhalo)
+        !call update_halo(vxr,lvlhalo)
+        !call update_halo(vyr,lvlhalo)
+        !call update_halo(vzr,lvlhalo)
         !call InterpSalMgrd !Sal from refined mesh to base mesh
         !call update_halo(salc,lvlhalo)
 

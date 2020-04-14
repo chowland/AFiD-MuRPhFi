@@ -25,7 +25,7 @@
         read(15,301) dummy
         read(15,*) ylen,zlen
         read(15,301) dummy
-        read(15,*) ray,pra,dt,resid,limitCFL
+        read(15,*) rayt,prat,rays,pras,dt,resid,limitCFL
         read(15,301) dummy
         read(15,*) flagstat,flagbal,tsta,starea
         read(15,301) dummy
@@ -52,9 +52,17 @@
 !
 !     DEFINITIONS FOR THE NATURAL CONVECTION
 !
-      ren = dsqrt(ray/pra)  !CS Ren for pCF only
-      pec = dsqrt(pra*ray)
-      pi=2.d0*dasin(1.d0)                          
+      lew = pras/prat
+      rhop = rays*prat / (rayt*pras)
+
+      ren = dsqrt(rayt/prat)  !CS Ren for pCF only
+      pect = dsqrt(prat*rayt)
+      pecs = dsqrt(pras*rays)*lew
+      pi=2.d0*dasin(1.d0)
+
+      ! Buoyancy coefs
+      byct = 1.d0
+      bycs = rhop
 !                                                                       
 !
       if(flagstat.ne.0) statcal = .true.
