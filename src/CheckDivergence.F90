@@ -13,7 +13,7 @@
       use local_arrays, only: vy,vx,vz
       use mgrd_arrays, only: vyr,vxr,vzr
       use mpih
-      use decomp_2d, only: xstart,xend,xstartr,xendr
+      use decomp_2d, only: xstart,xend,xstartr,xendr,nrank
       implicit none
       real,intent(out) :: qmax,qmaxr
       integer :: jc,kc,kp,jp,ic,ip
@@ -46,6 +46,7 @@
 
 !------------------------------------
       qmaxr =-huge(0.0)
+!      if(nrank.eq.0) write(*,*) "I   J   K   RANK"
 ! !$OMP  PARALLEL DO &
 ! !$OMP   DEFAULT(none) &
 ! !$OMP   SHARED(xstartr,xendr,nxmr,vzr,vyr,vxr,dzr,dyr,udx3mr) &
@@ -61,6 +62,14 @@
               dqcap= (vzr(kc,jc,ip)-vzr(kc,jc,ic))*dzr &
                     +(vyr(kc,jp,ic)-vyr(kc,jc,ic))*dyr &
                     +(vxr(kp,jc,ic)-vxr(kc,jc,ic))*udx3mr(kc)
+            !if (abs(dqcap).gt.resid) then
+            !write(*,*) ic,jc,kc,nrank
+            !write(*,*) "vz",(vz(kc,jc,ip)-vz(kc,jc,ic))*dz
+            !write(*,*) "vy",(vy(kc,jp,ic)-vy(kc,jc,ic))*dy
+            !write(*,*) "vx",(vx(kp,jc,ic)-vx(kc,jc,ic))*udx3m(kc)
+            !write(*,*) "vym",ic,jc,kc,vy(kc,jc,ic)
+            !write(*,*) "vyp",ic,jp,kc,vy(kc,jp,ic)
+            !endif
               qmaxr = max(abs(dqcap),qmaxr)
       enddo
       enddo

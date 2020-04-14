@@ -74,65 +74,49 @@
         enddo
       endif
 
-!CS !
-!CS !     OPTION 4: HYPERBOLIC TANGENT-TYPE CLUSTERING
-!CS !
-!CS 
-!CS         tstr3=tanh(str3)
-!CS 
-!CS         if (istr3.eq.4) then
-!CS          xc(1)=0.0d0
-!CS          do kc=2,nx
-!CS           z2dp=float(2*kc-nx-1)/float(nxm)
-!CS           xc(kc)=(1+tanh(str3*z2dp)/tstr3)*0.5*alx3
-!CS           if(xc(kc).lt.0.or.xc(kc).gt.alx3)then
-!CS            write(*,*)'Grid is too streched: ','zc(',kc,')=',xc(kc)
-!CS            stop
-!CS           endif
-!CS          end do
-!CS         end if
+!
+!     OPTION 4: HYPERBOLIC TANGENT-TYPE CLUSTERING
+!
 
-!CS !
-!CS !     OPTION 6: CLIPPED CHEBYCHEV-TYPE CLUSTERING
-!CS !
-!CS 
-!CS 
-!CS       if(istr3r.eq.6) then
-!CS       nclip = int(str3)
-!CS       nxmo = nx+nclip+nclip
-!CS       do kc=1,nxmo
-!CS         etazm(kc)=+cos(pi*(float(kc)-0.5)/float(nxmo))
-!CS       end do
-!CS       do kc=1,nx
-!CS         etaz(kc)=etazm(kc+nclip)
-!CS       end do
-!CS       delet = etaz(1)-etaz(nx)
-!CS       etain = etaz(1)
-!CS       do kc=1,nx
-!CS         etaz(kc)=etaz(kc)/(0.5*delet)
-!CS       end do
-!CS       xc(1) = 0.
-!CS       do kc=2,nxm
-!CS         xc(kc) = alx3*(1.-etaz(kc))*0.5
-!CS       end do
-!CS       xc(nx) = alx3
-!CS       endif
+        tstr3=tanh(str3)
 
-!       if(istr3.eq.99) then
-!         if (ismaster) write(6,*) 'Reading custom xc ... '
-!         inquire(file='./xccor.in', exist=fexist) 
-!         if(fexist) then
-!          if (ismaster) write(6,*) 'xccor.in found'
-!         else
-!          if (ismaster) write(6,*) 'Warning: xccor.in not found!'
-!          call MpiAbort
-!         end if
-!         open(unit=78,file='xccor.in',status='old')
-!         do kc=1,nx
-!           read(78,*) xc(kc)
-!         end do
-!         close(78)
-!       endif
+        if (istr3r.eq.4) then
+         xcr(1)=0.0d0
+         do kc=2,nxr
+          z2dp=float(2*kc-nxr-1)/float(nxmr)
+          xcr(kc)=(1+tanh(str3*z2dp)/tstr3)*0.5*alx3
+          if(xcr(kc).lt.0.or.xcr(kc).gt.alx3)then
+           write(*,*)'Refined grid is too streched: ','zc(',kc,')=',xcr(kc)
+           stop
+          endif
+         end do
+        end if
+
+!
+!     OPTION 6: CLIPPED CHEBYCHEV-TYPE CLUSTERING
+!
+
+
+      if(istr3r.eq.6) then
+      nclip = int(str3)
+      nxmo = nxr+nclip+nclip
+      do kc=1,nxmo
+        etazm(kc)=+cos(pi*(float(kc)-0.5)/float(nxmo))
+      end do
+      do kc=1,nxr
+        etaz(kc)=etazm(kc+nclip)
+      end do
+      delet = etaz(1)-etaz(nxr)
+      etain = etaz(1)
+      do kc=1,nxr
+        etaz(kc)=etaz(kc)/(0.5*delet)
+      end do
+      xcr(1) = 0.
+      do kc=2,nxmr
+        xcr(kc) = alx3*(1.-etaz(kc))*0.5
+      end do
+      xcr(nxr) = alx3
+      endif
 
       call DestroyReal1DArray(etaz)
       call DestroyReal1DArray(etazm)

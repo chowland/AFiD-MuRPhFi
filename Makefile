@@ -14,7 +14,7 @@ FC += -r8 -O3
 LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 
 ## Cartesius
-# FFTW3_LIBS = -L/nfs/admin/hpc/sw/fftw3-3.3.3-intel-impi/lib
+# FFTW3_LIBS = -L/nfs/admin/hpc/sw/fftw3-3.3.3-intel-impi/lib -lfftw3
 # BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
 # HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
 # # LDFLAGS = -L$(LD_LIBRARY_PATH) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
