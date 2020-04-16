@@ -2,7 +2,7 @@
       use mpih
       use param
       use local_arrays, only: vx,vy,vz,temp,pr,sal
-      use mgrd_arrays!, only: vxr
+      use mgrd_arrays, only: vxr,vyr,vzr,salc
       use AuxiliaryRoutines
       use hdf5
       use decomp_2d
@@ -97,9 +97,9 @@
       call Init_zcut
       call Init_zcutr
 
-!CS      call InitSpec
-!CS
-!CS      if (dumpslabs) call InitializeSlabDump
+      !call InitSpec
+
+      !if (dumpslabs) call InitializeSlabDump
 
 !m===================================                                                      
 !m===================================
@@ -231,7 +231,6 @@
         endif
 
         call TimeMarcher
-        !call InterpVelMgrd
 
         !call CalcGlobalStats
         if(ismaster) then
@@ -249,52 +248,35 @@
         endif
 
         if(mod(time,tframe).lt.dt) then
-          ! call InterpVelMgrd !Vel from base mesh to refined mesh
-          ! call update_halo(vxr,lvlhalo)
-          ! call update_halo(vyr,lvlhalo)
-          ! call update_halo(vzr,lvlhalo)
-          ! if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-          ! !call CalcWriteQ
-          ! call Mkmov_ycut
-          ! call Mkmov_ycutr
-          ! call Mkmov_zcut
-          ! call Mkmov_zcutr
-        endif
-
-        time=time+dt
-
-        if(ntime.eq.1.or.mod(time,tout).lt.dt) then
-!          call GlobalQuantities
-!          if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
-
-          call InterpVelMgrd !Vel from base mesh to refined mesh
-          call update_halo(vxr,lvlhalo)
-          call update_halo(vyr,lvlhalo)
-          call update_halo(vzr,lvlhalo)
           if(ismaster)  write(6,*) 'Write slice ycut and zcut'
           !call CalcWriteQ
           call Mkmov_ycut
           call Mkmov_ycutr
           call Mkmov_zcut
           call Mkmov_zcutr
+        endif
+
+        time=time+dt
+
+        if(ntime.eq.1.or.mod(time,tout).lt.dt) then
+           !call GlobalQuantities
+           !if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
 
            call CalcMaxCFL(instCFL)
            call CheckDivergence(dmax,dmaxr)
            call CalcPlateNu
-!            call CalcPlateCf
-!
-!            if(time.gt.tsta) then
-!
-!             if (statcal)  call CalcStats
-!!             if (statcal.and.ntime.gt.1)  call WriteSpec
-!             if (dumpslabs) call SlabDumper
-!             if (disscal.and.statcal) call CalcDissipationNu
-!
-!            endif
-!
-            if(.not.variabletstep) instCFL=instCFL*dt
+           !call CalcPlateCf
 
-            if(abs(dmax).gt.resid) errorcode = 169
+           !if(time.gt.tsta) then
+           !  if (statcal)  call CalcStats
+           !  !if (statcal.and.ntime.gt.1)  call WriteSpec
+           !  if (dumpslabs) call SlabDumper
+           !  if (disscal.and.statcal) call CalcDissipationNu
+           !endif
+
+           if(.not.variabletstep) instCFL=instCFL*dt
+
+           if(abs(dmax).gt.resid) errorcode = 169
 
         endif
 

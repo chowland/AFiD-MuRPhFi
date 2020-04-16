@@ -55,16 +55,15 @@
       lew = pras/prat
       rhop = rays*prat / (rayt*pras)
 
-      ren = dsqrt(rayt/prat)  !CS Ren for pCF only
+      ren = dsqrt(rayt/prat)
       pect = dsqrt(prat*rayt)
-      pecs = dsqrt(pras*rays)*lew
-      pi=2.d0*dasin(1.d0)
+      pecs = dsqrt(prat*rayt)*lew
+      pi = 2.d0*dasin(1.d0)
 
       ! Buoyancy coefs
       byct = 1.d0
       bycs = rhop
-!                                                                       
-!
+
       if(flagstat.ne.0) statcal = .true.
       if(idtv.eq.0) variabletstep = .false.
       if(flagbal.ne.0) disscal = .true.
@@ -80,12 +79,10 @@
        end if
       endif
 
-
       if(starea.ne.0) then 
         readstats = .true.
         if (.not. readflow) write(6,*) 'Warning: Restarting flowfield with statistics read'
       endif
-
 
       return 
       end
