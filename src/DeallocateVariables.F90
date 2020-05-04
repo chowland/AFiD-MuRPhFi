@@ -49,6 +49,10 @@
       call DestroyReal1DArray(ac3ck)
       call DestroyReal1DArray(am3ck)
 
+      call DestroyReal1DArray(ap3ckr)  !CS mgrd
+      call DestroyReal1DArray(ac3ckr)  !CS mgrd
+      call DestroyReal1DArray(am3ckr)  !CS mgrd
+
       call DestroyReal1DArray(ap3sk)
       call DestroyReal1DArray(ac3sk)
       call DestroyReal1DArray(am3sk)
@@ -56,6 +60,10 @@
       call DestroyReal1DArray(ap3ssk)
       call DestroyReal1DArray(ac3ssk)
       call DestroyReal1DArray(am3ssk)
+
+      call DestroyReal1DArray(ap3sskr)  !CS mgrd
+      call DestroyReal1DArray(ac3sskr)  !CS mgrd
+      call DestroyReal1DArray(am3sskr)  !CS mgrd
 
       call DestroyReal1DArray(amphk)
       call DestroyReal1DArray(acphk)
@@ -111,6 +119,10 @@
       call DestroyInt1dArray(irangs)   !CS mgrd
       call DestroyInt1dArray(jrangs)   !CS mgrd
       call DestroyInt1dArray(krangs)   !CS mgrd
+
+      call DestroyInt1dArray(irangc)   !CS mgrd
+      call DestroyInt1dArray(jrangc)   !CS mgrd
+      call DestroyInt1dArray(krangc)   !CS mgrd
 
       call DestroyReal2DArray(cxvx) !CS mgrd
       call DestroyReal2DArray(cxvy) !CS mgrd

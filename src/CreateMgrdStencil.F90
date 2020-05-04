@@ -577,8 +577,8 @@
                h01=(1.d0+2.d0*lxp)*lxm*lxm
                h11=-lxp*lxm*lxm
                cxrs(1,icr)=0.d0
-               cxrs(2,icr)=lzp  !h00-h10-h11*dlp/(dlp+dlc)
-               cxrs(3,icr)=lzm  !h10+h01+h11*(dlp-dlc)/dlp
+               cxrs(2,icr)=lxp  !h00-h10-h11*dlp/(dlp+dlc)
+               cxrs(3,icr)=lxm  !h10+h01+h11*(dlp-dlc)/dlp
                cxrs(4,icr)=0.d0 !h11*dlc*dlc/dlp/(dlp+dlc)
             enddo
          elseif(ic.eq.nxm)then
@@ -593,8 +593,8 @@
                h01=(1.d0+2.d0*lxp)*lxm*lxm
                h11=-lxp*lxm*lxm
                cxrs(1,icr)=0.d0 !-h10*dlc*dlc/dlm/(dlc+dlm)
-               cxrs(2,icr)=lzp  !h00-h11+h10*(dlc-dlm)/dlm
-               cxrs(3,icr)=lzm  !h01+h11+h10*dlm/(dlm+dlc)
+               cxrs(2,icr)=lxp  !h00-h11+h10*(dlc-dlm)/dlm
+               cxrs(3,icr)=lxm  !h01+h11+h10*dlm/(dlm+dlc)
                cxrs(4,icr)=0.d0
             enddo
          else
