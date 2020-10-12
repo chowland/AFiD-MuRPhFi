@@ -47,7 +47,7 @@
           tempmax = max(tempmax,temp(kc,jc,ic))
           tempmin = min(tempmin,temp(kc,jc,ic))
           vxcen = (vx(kc,jc,ic)+vx(kp,jc,ic))*0.5d0
-          tempcen = (temp(kc,jc,ic)+temp(kp,jc,ic))*0.5d0
+          tempcen = temp(kc,jc,ic)
           anusin=anusin+tempcen*vxcen*fac2
           tempm=tempm+tempcen*fac2
           vx_rms_vol = vx_rms_vol + fac2*vx(kc,jc,ic)**2

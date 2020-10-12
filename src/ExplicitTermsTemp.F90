@@ -19,8 +19,8 @@
       real    :: udzq,udyq
       real    :: dyyt,dzzt
 
-      udz=dz*0.25
-      udy=dy*0.25
+      udz=dz*0.5d0
+      udy=dy*0.5d0
       udzq=dzq/pect
       udyq=dyq/pect
 
@@ -37,7 +37,7 @@
        do jc=xstart(2),xend(2)
         jm=jc-1
         jp=jc+1
-        do kc=2,nxm
+        do kc=1,nxm
          km=kc-1
          kp=kc+1
 !
@@ -49,8 +49,8 @@
 !             -----------
 !                d   z      
 !
-      htz=((vz(km,jc,ip)+vz(kc,jc,ip))*(temp(kc,jc,ip)+temp(kc,jc,ic))- &
-           (vz(km,jc,ic)+vz(kc,jc,ic))*(temp(kc,jc,ic)+temp(kc,jc,im)) &
+      htz=(vz(kc,jc,ip)*(temp(kc,jc,ip)+temp(kc,jc,ic))- &
+           vz(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc,jc,im)) &
           )*udz
 !
 !
@@ -61,8 +61,8 @@
 !             -----------
 !                d   y      
 !
-      hty=((vy(kc,jp,ic)+vy(km,jp,ic))*(temp(kc,jp,ic)+temp(kc,jc,ic))- &
-           (vy(kc,jc,ic)+vy(km,jc,ic))*(temp(kc,jc,ic)+temp(kc,jm,ic)) &
+      hty=(vy(kc,jp,ic)*(temp(kc,jp,ic)+temp(kc,jc,ic))- &
+           vy(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc,jm,ic)) &
           )*udy
 !
 !    rho vx term
@@ -72,9 +72,9 @@
 !                -----------
 !                 d   x      
 !
-      htx=((vx(kp,jc,ic)+vx(kc,jc,ic))*(temp(kp,jc,ic)+temp(kc,jc,ic))- &
-           (vx(kc,jc,ic)+vx(km,jc,ic))*(temp(kc,jc,ic)+temp(km,jc,ic)) &
-          )*udx3c(kc)*0.25d0
+      htx=(vx(kp,jc,ic)*(temp(kp,jc,ic)+temp(kc,jc,ic))- &
+           vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(km,jc,ic)) &
+          )*udx3m(kc)*0.5d0
 !
 !
 !   zz second derivatives of temp

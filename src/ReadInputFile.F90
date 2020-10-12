@@ -29,8 +29,8 @@
         read(15,301) dummy
         read(15,*) flagstat,flagbal,tsta,starea
         read(15,301) dummy
-        read(15,*) inslws,inslwn
-        read(15,301) dummy       
+        read(15,*) inslws,inslwn,TfixS,TfixN
+        read(15,301) dummy
         read(15,*) idtv,dtmin,dtmax,limitVel
         read(15,301) dummy       
         read(15,*) stst3flag

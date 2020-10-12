@@ -14,7 +14,7 @@
         integer   :: istr3
         real      :: ylen,zlen
         real      :: rayt,prat,rays,pras,dt,resid
-        integer   :: inslws,inslwn
+        integer   :: inslws,inslwn,TfixS,TfixN !CJH option for fixed T
         real      :: xminusU,xplusU
         integer   :: starea,tsta
         real      :: dtmin,dtmax,limitCFL,limitVel

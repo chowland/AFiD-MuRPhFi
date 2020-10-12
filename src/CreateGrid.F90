@@ -241,29 +241,51 @@
       ap3sk(kc)=0.d0
       ac3sk(kc)=-(a33m+inslwn*a33p*2.d0)
 
-      am3ssk(1)=0.d0
-      ap3ssk(1)=0.d0
-      ac3ssk(1)=1.d0
+      ! am3ssk(1)=0.d0
+      ! ap3ssk(1)=0.d0
+      ! ac3ssk(1)=1.d0
 
 !
-!    TEMPERATURE DIFFERENTIATION (CENTERED VARIABLE)
+!    TEMPERATURE DIFFERENTIATION
+!CJH (now staggered!)
 !
 
 
-      do kc=2,nxm
+      do kc=2,nxm-1
        kp=kc+1
        km=kc-1
-       a33=dxq/g3rc(kc)
-       a33p=1.d0/g3rm(kc)
-       a33m=1.d0/g3rm(km)
+       a33=dxq/g3rm(kc)
+       a33p=1.d0/g3rc(kp)
+       a33m=1.d0/g3rc(kc)
        ap3ssk(kc)=a33*a33p
        am3ssk(kc)=a33*a33m
        ac3ssk(kc)=-(ap3ssk(kc)+am3ssk(kc))
       enddo
 
-      am3ssk(nx)=0.d0
-      ap3ssk(nx)=0.d0
-      ac3ssk(nx)=1.d0
+      !CJH Lower wall BC
+      kc = 1
+      kp = kc + 1
+      a33 = dxq/g3rm(kc)
+      a33p = a33/g3rc(kp)
+      a33m = a33/g3rc(kc)
+      ap3ssk(kc) = a33p
+      am3ssk(kc) = 0.d0
+      ac3ssk(kc) = -(a33p + TfixS*2.d0*a33m)
+
+      !CJH Upper wall BC
+      kc = nxm
+      kp = kc + 1
+      a33 = dxq/g3rm(kc)
+      a33p = a33/g3rc(kp)
+      a33m = a33/g3rc(kc)
+      am3ssk(kc) = a33m
+      am3ssk(kc) = 0.d0
+      ac3ssk(kc) = -(a33m + TfixN*2.d0*a33p)
+
+
+      ! am3ssk(nx)=0.d0
+      ! ap3ssk(nx)=0.d0
+      ! ac3ssk(nx)=1.d0
 
       return                                                            
       end                                                               

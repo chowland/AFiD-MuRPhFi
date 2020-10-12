@@ -83,7 +83,7 @@
 !
 !  add the buoyancy term
 !
-          tempit=temp(kc,jc,ic) !0.d0
+          tempit=0.5d0*(temp(kc,jc,ic)+temp(km,jc,ic)) !0.d0
           salit=0.d0!salc(kc,jc,ic)
 
 !

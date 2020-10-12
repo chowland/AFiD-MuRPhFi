@@ -41,22 +41,22 @@
         enddo
       enddo
 
-      !assign linear temperature profile in the nodes k=2 to k=nxm
+      !assign linear temperature profile in the nodes k=1 to k=nxm
       do i=xstart(3),xend(3)
       do j=xstart(2),xend(2)
-      do k=2,nxm
-      temp(k,j,i)=tempbp(j,i)-(tempbp(j,i)-temptp(j,i))*xc(k)/xc(nx)
+      do k=1,nxm
+      temp(k,j,i)=tempbp(j,i)+(temptp(j,i)-tempbp(j,i))*xm(k)/xc(nx)
       enddo
       enddo
       enddo
 
       !assign the boundary conditions at k=1 and k=nx
-      do i=xstart(3),xend(3)
-      do j=xstart(2),xend(2)
-      temp(1 ,j,i) = tempbp(j,i)
-      temp(nx,j,i) = temptp(j,i)
-      end do
-      end do
+      ! do i=xstart(3),xend(3)
+      ! do j=xstart(2),xend(2)
+      ! temp(1 ,j,i) = tempbp(j,i)
+      ! temp(nx,j,i) = temptp(j,i)
+      ! end do
+      ! end do
 
       !assign linear salinity profile in the nodes k=2 to k=nxm
       do i=xstartr(3),xendr(3)

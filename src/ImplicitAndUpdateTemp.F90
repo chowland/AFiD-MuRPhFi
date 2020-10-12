@@ -33,14 +33,25 @@
 !$OMP   PRIVATE(dxxt)
       do ic=xstart(3),xend(3)
       do jc=xstart(2),xend(2)
-      do kc=2,nxm
+      do kc=1,nxm
 
 !   Calculate second derivative of temperature in the x-direction.
 !   This is the only term calculated implicitly for temperature.
-
+            if (kc.eq.1) then       !CJH Apply lower BC
+                  dxxt = temp(kc+1,jc,ic)*ap3ck(kc) &
+                        +temp(kc  ,jc,ic)*ac3ck(kc) &
+                        +temp(kc-1,jc,ic)*am3ck(kc) &
+                        -(ap3ck(kc)+ac3ck(kc))*tempbp(jc,ic)*TfixS
+            elseif(kc.eq.nxm) then  !CJH Apply upper BC
+                  dxxt = temp(kc+1,jc,ic)*ap3ck(kc) &
+                  +temp(kc  ,jc,ic)*ac3ck(kc) &
+                  +temp(kc-1,jc,ic)*am3ck(kc) &
+                  -(am3ck(kc)+ac3ck(kc))*temptp(jc,ic)*TfixN
+            else
                dxxt= temp(kc+1,jc,ic)*ap3ck(kc) &
                     +temp(kc  ,jc,ic)*ac3ck(kc) &
                     +temp(kc-1,jc,ic)*am3ck(kc)
+            end if
 
 
 !    Calculate right hand side of Eq. 5 (VO96)
@@ -66,11 +77,11 @@
 !  Set boundary conditions on the temperature field at top
 !  and bottom plates. This seems necessary.
 
-       temp(1,xstart(2):xend(2),xstart(3):xend(3)) &
-          = tempbp(xstart(2):xend(2),xstart(3):xend(3))
+      !  temp(1,xstart(2):xend(2),xstart(3):xend(3)) &
+      !     = tempbp(xstart(2):xend(2),xstart(3):xend(3))
 
-       temp(nx,xstart(2):xend(2),xstart(3):xend(3)) &
-          = temptp(xstart(2):xend(2),xstart(3):xend(3))
+      !  temp(nx,xstart(2):xend(2),xstart(3):xend(3)) &
+      !     = temptp(xstart(2):xend(2),xstart(3):xend(3))
 
 
       return

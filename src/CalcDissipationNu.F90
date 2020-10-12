@@ -86,7 +86,7 @@
 !                     ---- | nabla  T|
 !                      Pe  |         |
 
-       tx=(temp(kp,j,i)-temp(k,j,i))*dxc(k)
+       tx=(temp(kp,j,i)-temp(k,j,i))*dxm(k)
        ty=(temp(k,jp,i)-temp(k,j,i))*dy
        tz=(temp(k,j,ip)-temp(k,j,i))*dz
 

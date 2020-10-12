@@ -21,8 +21,8 @@
 
       nuslow = 0.d0
       nusupp = 0.d0
-      del  = 1.0/(xc(2)-xc(1))
-      deln = 1.0/(xc(nx)-xc(nxm))
+      del  = 1.0/(xm(1)-xc(1))
+      deln = 1.0/(xc(nx)-xm(nxm))
 
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &
@@ -33,8 +33,8 @@
 !$OMP   REDUCTION(+:nusupp)
       do i=xstart(3),xend(3)
          do j=xstart(2),xend(2)
-           nuslow = nuslow + (temp(1,j,i)-temp(2,j,i))*del
-           nusupp = nusupp + (temp(nxm,j,i)-temp(nx,j,i))*deln
+           nuslow = nuslow + (temp(1,j,i)-TvalS)*del
+           nusupp = nusupp + (TvalN-temp(nxm,j,i))*deln
         enddo
       end do
 !$OMP END PARALLEL DO
