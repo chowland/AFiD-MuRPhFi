@@ -1,9 +1,9 @@
  NXM    NYM   NZM    NSST(>1=RK,else AB) NREAD
- 216    288   2      3                   0
+ 128    128   2      3                   0
  NXMR   NYMR  NZMR (Ignored if ISTR3R>0)
- 432    288   2  
+ 512    256   2  
  NTST   WALLTIMEMAX  TOUT   TMAX   IRESET
- 1      83000        5e-2   50.0   1
+ 15000  83000        2e-1   100.0  1
  ALX3D  ISTR3 STR3   ISTR3R
  1.0    6     12.0   0
  YLEN   ZLEN 
@@ -12,8 +12,8 @@
  1e7    7.0    1e7   7.0    1e-3   1.e-3    0.2
  STATON  BALANCEON  TSTA  STAREAD
  1       1          0     0
- inslws   inslwn 
- 1        1   
+ inslws   inslwn    TfixS   TfixN
+ 1        1         1       1
  IDTV(0=dt fixed,1=var.)   DTMIN(for dt var.)  DTMAX(for dt var.)     VLIM
  1                         1e-8                0.01                   1e3
  SLABDUMP(STST3)
@@ -21,4 +21,4 @@
  xplusU  xminusU
  0.d0   0.d0
  TFRAME
- 5e-2
+ 2e-1
