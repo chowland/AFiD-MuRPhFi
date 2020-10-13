@@ -20,10 +20,10 @@
       real    :: udzrq,udyrq
       real    :: dyys,dzzs
 
-      udzr=dzr*0.25
-      udyr=dyr*0.25
-      udzrq=dzq/pecs
-      udyrq=dyq/pecs
+      udzr=dzr*0.5d0
+      udyr=dyr*0.5d0
+      udzrq=dzqr/pecs
+      udyrq=dyqr/pecs
 
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &
@@ -38,7 +38,7 @@
        do jc=xstartr(2),xendr(2)
         jm=jc-1
         jp=jc+1
-        do kc=2,nxmr
+        do kc=1,nxmr
          km=kc-1
          kp=kc+1
 !
@@ -50,8 +50,8 @@
 !             -----------
 !                d   z      
 !
-      hsz=((vzr(km,jc,ip)+vzr(kc,jc,ip))*(sal(kc,jc,ip)+sal(kc,jc,ic))- &
-           (vzr(km,jc,ic)+vzr(kc,jc,ic))*(sal(kc,jc,ic)+sal(kc,jc,im)) &
+      hsz=(vzr(kc,jc,ip)*(sal(kc,jc,ip)+sal(kc,jc,ic))- &
+           vzr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc,jc,im)) &
           )*udzr
 !
 !
@@ -62,8 +62,8 @@
 !             -----------
 !                d   y      
 !
-      hsy=((vyr(kc,jp,ic)+vyr(km,jp,ic))*(sal(kc,jp,ic)+sal(kc,jc,ic))- &
-           (vyr(kc,jc,ic)+vyr(km,jc,ic))*(sal(kc,jc,ic)+sal(kc,jm,ic)) &
+      hsy=(vyr(kc,jp,ic)*(sal(kc,jp,ic)+sal(kc,jc,ic))- &
+           vyr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc,jm,ic)) &
           )*udyr
 !
 !    sal vxr term
@@ -73,9 +73,9 @@
 !                -----------
 !                 d   x      
 !
-      hsx=((vxr(kp,jc,ic)+vxr(kc,jc,ic))*(sal(kp,jc,ic)+sal(kc,jc,ic))- &
-           (vxr(kc,jc,ic)+vxr(km,jc,ic))*(sal(kc,jc,ic)+sal(km,jc,ic)) &
-          )*udx3cr(kc)*0.25d0
+      hsx=(vxr(kp,jc,ic)*(sal(kp,jc,ic)+sal(kc,jc,ic))- &
+           vxr(kc,jc,ic)*(sal(kc,jc,ic)+sal(km,jc,ic)) &
+          )*udx3mr(kc)*0.5d0
 !
 !
 !   zz second derivatives of sal

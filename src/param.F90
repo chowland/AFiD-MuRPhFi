@@ -16,7 +16,7 @@
         real      :: ylen,zlen
         real      :: rayt,prat,rays,pras,dt,resid
         integer   :: inslws,inslwn
-        integer   :: TfixS,TfixN        !CJH option for fixed T
+        integer   :: TfixS,TfixN,SfixS,SfixN        !CJH option for fixed T/S BCs
         integer   :: gAxis      !CJH option to choose gravity axis
         real      :: xminusU,xplusU
         integer   :: starea,tsta

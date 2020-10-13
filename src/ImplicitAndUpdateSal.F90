@@ -33,14 +33,25 @@
 !$OMP   PRIVATE(dxxs)
       do ic=xstartr(3),xendr(3)
       do jc=xstartr(2),xendr(2)
-      do kc=2,nxmr
+      do kc=1,nxmr
 
 !   Calculate second derivative of salinty in the x-direction.
 !   This is the only term calculated implicitly for salinity.
-
-               dxxs= sal(kc+1,jc,ic)*ap3ckr(kc) &
-                    +sal(kc  ,jc,ic)*ac3ckr(kc) &
-                    +sal(kc-1,jc,ic)*am3ckr(kc)
+            if (kc.eq.1) then       !CJH Apply lower BC
+                  dxxs = sal(kc+1,jc,ic)*ap3sskr(kc) &
+                        +sal(kc  ,jc,ic)*ac3sskr(kc) &
+                        +sal(kc-1,jc,ic)*am3sskr(kc) &
+                        -(ap3sskr(kc)+ac3sskr(kc))*salbp(jc,ic)*SfixS
+            elseif(kc.eq.nxmr) then !CJH Apply upper BC
+                  dxxs = sal(kc+1,jc,ic)*ap3sskr(kc) &
+                  +sal(kc  ,jc,ic)*ac3sskr(kc) &
+                  +sal(kc-1,jc,ic)*am3sskr(kc) &
+                  -(am3sskr(kc)+ac3sskr(kc))*saltp(jc,ic)*SfixN
+            else
+               dxxs= sal(kc+1,jc,ic)*ap3sskr(kc) &
+                    +sal(kc  ,jc,ic)*ac3sskr(kc) &
+                    +sal(kc-1,jc,ic)*am3sskr(kc)
+            end if
 
 
 !    Calculate right hand side of Eq. 5 (VO96)
@@ -66,11 +77,11 @@
 !  Set boundary conditions on the salinity field at top
 !  and bottom plates. This seems necessary.
 
-       sal(1,xstartr(2):xendr(2),xstartr(3):xendr(3)) &
-          = salbp(xstartr(2):xendr(2),xstartr(3):xendr(3))
+      !  sal(1,xstartr(2):xendr(2),xstartr(3):xendr(3)) &
+      !     = salbp(xstartr(2):xendr(2),xstartr(3):xendr(3))
 
-       sal(nxr,xstartr(2):xendr(2),xstartr(3):xendr(3)) &
-          = saltp(xstartr(2):xendr(2),xstartr(3):xendr(3))
+      !  sal(nxr,xstartr(2):xendr(2),xstartr(3):xendr(3)) &
+      !     = saltp(xstartr(2):xendr(2),xstartr(3):xendr(3))
 
 
       return

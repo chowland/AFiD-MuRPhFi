@@ -58,22 +58,22 @@
       ! end do
       ! end do
 
-      !assign linear salinity profile in the nodes k=2 to k=nxm
+      !assign linear salinity profile in the nodes k=1 to k=nxmr
       do i=xstartr(3),xendr(3)
       do j=xstartr(2),xendr(2)
-      do k=2,nxmr
-      sal(k,j,i)=salbp(j,i)-(salbp(j,i)-saltp(j,i))*xcr(k)/xcr(nxr)
+      do k=1,nxmr
+      sal(k,j,i)=salbp(j,i)-(salbp(j,i)-saltp(j,i))*xmr(k)/xcr(nxr)
       enddo
       enddo
       enddo
 
       !assign the boundary conditions at k=1 and k=nx
-      do i=xstartr(3),xendr(3)
-      do j=xstartr(2),xendr(2)
-      sal(1  ,j,i) = salbp(j,i)
-      sal(nxr,j,i) = saltp(j,i)
-      end do
-      end do
+      ! do i=xstartr(3),xendr(3)
+      ! do j=xstartr(2),xendr(2)
+      ! sal(1  ,j,i) = salbp(j,i)
+      ! sal(nxr,j,i) = saltp(j,i)
+      ! end do
+      ! end do
 
       return
       end

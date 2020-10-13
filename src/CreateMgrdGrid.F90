@@ -183,23 +183,23 @@
 !    Q3 DIFFERENTIATION (CENTERED VARIABLE)
 !
 
-      am3ckr(1)=0.d0
-      ap3ckr(1)=0.d0
-      ac3ckr(1)=1.d0
-      am3ckr(nxr)=0.d0
-      ap3ckr(nxr)=0.d0
-      ac3ckr(nxr)=1.d0
+      ! am3ckr(1)=0.d0
+      ! ap3ckr(1)=0.d0
+      ! ac3ckr(1)=1.d0
+      ! am3ckr(nxr)=0.d0
+      ! ap3ckr(nxr)=0.d0
+      ! ac3ckr(nxr)=1.d0
 
-      do kc=2,nxmr
-       km=kc-1
-       kp=kc+1
-       a33=dxqr/g3rcr(kc)
-       a33p=1.d0/g3rmr(kc)
-       a33m=1.d0/g3rmr(km)
-       ap3ckr(kc)=a33*a33p
-       am3ckr(kc)=a33*a33m
-       ac3ckr(kc)=-(ap3ckr(kc)+am3ckr(kc))
-      enddo
+      ! do kc=2,nxmr
+      !  km=kc-1
+      !  kp=kc+1
+      !  a33=dxqr/g3rcr(kc)
+      !  a33p=1.d0/g3rmr(kc)
+      !  a33m=1.d0/g3rmr(km)
+      !  ap3ckr(kc)=a33*a33p
+      !  am3ckr(kc)=a33*a33m
+      !  ac3ckr(kc)=-(ap3ckr(kc)+am3ckr(kc))
+      ! enddo
 
 !CS !
 !CS !    Q1/Q2 DIFFERENTIATION (STAGGERED VARIABLE)
@@ -241,29 +241,50 @@
 !CS       ap3sk(kc)=0.d0
 !CS       ac3sk(kc)=-(a33m+inslwn*a33p*2.d0)
 
-      am3sskr(1)=0.d0
-      ap3sskr(1)=0.d0
-      ac3sskr(1)=1.d0
+      ! am3sskr(1)=0.d0
+      ! ap3sskr(1)=0.d0
+      ! ac3sskr(1)=1.d0
 
 !
-!    SALINITY DIFFERENTIATION (CENTERED VARIABLE)
+!    SALINITY DIFFERENTIATION
+      !CJH (now staggered!)
 !
 
 
-      do kc=2,nxmr
+      do kc=2,nxmr-1
        kp=kc+1
        km=kc-1
-       a33=dxqr/g3rcr(kc)
-       a33p=1.d0/g3rmr(kc)
-       a33m=1.d0/g3rmr(km)
+       a33=dxqr/g3rmr(kc)
+       a33p=1.d0/g3rcr(kp)
+       a33m=1.d0/g3rcr(kc)
        ap3sskr(kc)=a33*a33p
        am3sskr(kc)=a33*a33m
        ac3sskr(kc)=-(ap3sskr(kc)+am3sskr(kc))
       enddo
 
-      am3sskr(nxr)=0.d0
-      ap3sskr(nxr)=0.d0
-      ac3sskr(nxr)=1.d0
+      !CJH Lower wall BC
+      kc = 1
+      kp = kc + 1
+      a33 = dxqr/g3rmr(kc)
+      a33p = a33/g3rcr(kp)
+      a33m = a33/g3rcr(kc)
+      ap3sskr(kc) = a33p
+      am3sskr(kc) = 0.d0
+      ac3sskr(kc) = -(a33p + SfixS*2.d0*a33m)
+
+      !CJH Upper wall BC
+      kc = nxmr
+      kp = kc + 1
+      a33 = dxqr/g3rmr(kc)
+      a33p = a33/g3rcr(kp)
+      a33m = a33/g3rcr(kc)
+      ap3sskr(kc) = 0.d0
+      am3sskr(kc) = a33m
+      ac3sskr(kc) = -(a33m + SfixN*2.d0*a33p)
+
+      ! am3sskr(nxr)=0.d0
+      ! ap3sskr(nxr)=0.d0
+      ! ac3sskr(nxr)=1.d0
 
       return                                                            
       end                                                               
