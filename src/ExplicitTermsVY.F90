@@ -18,6 +18,7 @@
       real    :: udzq,udyq
       real    :: udy,udz,hyx,hyy,hyz 
       real    :: dyyvy, dzzvy
+      real    :: tempit, salit
 
 
       udyq=dyq/ren
@@ -96,9 +97,25 @@
 
 
             dph(kc,jc,ic)=-(hyx+hyy+hyz)+dyyvy+dzzvy
+
       enddo
       enddo
       enddo
+
+      !CJH Add the buoyancy term if y is chosen gAxis
+      if (gAxis.eq.2) then
+        do ic=xstart(3),xend(3)
+          do jc=xstart(2),xend(2)
+            jmm=jc-1
+            do kc=1,nxm
+              tempit=0.5d0*(temp(kc,jc,ic)+temp(kc,jmm,ic)) !0.d0
+              salit=0.d0!salc(kc,jc,ic)
+
+              dph(kc,jc,ic) = dph(kc,jc,ic) + byct*tempit - bycs*salit
+            end do
+          end do
+        end do
+      end if
 !$OMP END PARALLEL DO
 
       return

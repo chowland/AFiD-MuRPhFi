@@ -8,13 +8,16 @@
 !==========================================================
         integer   :: nx, ny, nz
         integer   :: nxr, nyr, nzr, istr3r  !CS mgrd
-        integer   :: nsst, nread, ntst, ireset, tscaleT !CJH alternate nondim option
+        integer   :: nsst, nread, ntst, ireset
+        integer   :: tscaleT    !CJH alternate nondim option
         real      :: walltimemax,tout,tmax
         real      :: alx3,str3
         integer   :: istr3
         real      :: ylen,zlen
         real      :: rayt,prat,rays,pras,dt,resid
-        integer   :: inslws,inslwn,TfixS,TfixN !CJH option for fixed T
+        integer   :: inslws,inslwn
+        integer   :: TfixS,TfixN        !CJH option for fixed T
+        integer   :: gAxis      !CJH option to choose gravity axis
         real      :: xminusU,xplusU
         integer   :: starea,tsta
         real      :: dtmin,dtmax,limitCFL,limitVel

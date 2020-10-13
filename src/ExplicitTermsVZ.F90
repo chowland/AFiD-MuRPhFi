@@ -18,6 +18,7 @@
       real    :: hzx,hzy,hzz,udy,udz
       real    :: udyq,udzq
       real    :: dzzvz,dyyvz
+      real    :: tempit, salit
 
 !
       udyq=dyq/ren
@@ -103,6 +104,21 @@
       enddo
       enddo
       enddo
+
+      !CJH Add the buoyancy term if z is chosen gAxis
+      if (gAxis.eq.3) then
+        do ic=xstart(3),xend(3)
+          imm=ic-1
+          do jc=xstart(2),xend(2)
+            do kc=1,nxm
+              tempit=0.5d0*(temp(kc,jc,ic)+temp(kc,jc,imm)) !0.d0
+              salit=0.d0!salc(kc,jc,ic)
+
+              dq(kc,jc,ic) = dq(kc,jc,ic) + byct*tempit - bycs*salit
+            end do
+          end do
+        end do
+      end if
 !$OMP END PARALLEL DO
 
       return

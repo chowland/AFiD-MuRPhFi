@@ -80,11 +80,6 @@
       hxx=((vx(kp,jc,ic)+vx(kc,jc,ic))*(vx(kp,jc,ic)+vx(kc,jc,ic)) &
           -(vx(kc,jc,ic)+vx(km,jc,ic))*(vx(kc,jc,ic)+vx(km,jc,ic)) &
           )*udx3c(kc)*0.25d0
-!
-!  add the buoyancy term
-!
-          tempit=0.5d0*(temp(kc,jc,ic)+temp(km,jc,ic)) !0.d0
-          salit=0.d0!salc(kc,jc,ic)
 
 !
 !   z second derivatives of vx
@@ -100,11 +95,27 @@
                  +vx(kc,jpp,ic))*udyq
 
 
-          qcap(kc,jc,ic) =-(hxx+hxy+hxz)+dyyvx+dzzvx + byct*tempit - bycs*salit
-            
+          qcap(kc,jc,ic) =-(hxx+hxy+hxz)+dyyvx+dzzvx
+
       enddo
       enddo
       enddo
+
+      !CJH Add the buoyancy term if x is chosen gAxis
+      if (gAxis.eq.1) then
+        do ic=xstart(3),xend(3)
+          do jc=xstart(2),xend(2)
+            do kc=2,nxm
+              km=kc-1
+              tempit=0.5d0*(temp(kc,jc,ic)+temp(km,jc,ic)) !0.d0
+              salit=0.d0!salc(kc,jc,ic)
+
+              qcap(kc,jc,ic) = qcap(kc,jc,ic) + byct*tempit - bycs*salit
+            end do
+          end do
+        end do
+      end if
+      
 !$OMP END PARALLEL DO
 
       return
