@@ -10,7 +10,8 @@
 
       subroutine ExplicitTermsVZ
       use param
-      use local_arrays, only: vx,vy,vz,dq
+      use local_arrays, only: vx,vy,vz,dq,temp
+      use mgrd_arrays, only: salc
       use decomp_2d, only: xstart,xend
       implicit none
       integer :: kc,kp,jpp,jmm,jc,ic,imm,ipp
