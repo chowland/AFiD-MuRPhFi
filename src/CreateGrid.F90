@@ -279,7 +279,7 @@
       a33p = a33/g3rc(kp)
       a33m = a33/g3rc(kc)
       am3ssk(kc) = a33m
-      am3ssk(kc) = 0.d0
+      ap3ssk(kc) = 0.d0
       ac3ssk(kc) = -(a33m + TfixN*2.d0*a33p)
 
 
