@@ -53,16 +53,21 @@
 !     DEFINITIONS FOR THE NATURAL CONVECTION
 !
       lew = pras/prat
-      rhop = rays*prat / (rayt*pras)
+      rhop = rayt*pras / (rays*prat) !CJH inverted to match literature
 
-      ren = dsqrt(rayt/prat)
-      pect = dsqrt(prat*rayt)
-      pecs = dsqrt(prat*rayt)*lew
+      if (tscaleT.eq.1) then        !CJH nondim. velocity with thermal free-fall scale
+            ren = dsqrt(rayt/prat)
+            byct = 1.d0
+            bycs = 1.d0/rhop
+      else                          !CJH nondim. velocity with salinity free-fall scale
+            ren = dsqrt(rays/pras)
+            byct = rhop
+            bycs = 1.d0
+      end if
+
+      pect = ren/prat
+      pecs = ren/pras
       pi = 2.d0*dasin(1.d0)
-
-      ! Buoyancy coefs
-      byct = 1.d0
-      bycs = rhop
 
       if(flagstat.ne.0) statcal = .true.
       if(idtv.eq.0) variabletstep = .false.

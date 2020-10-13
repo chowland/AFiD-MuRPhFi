@@ -8,7 +8,7 @@
 !==========================================================
         integer   :: nx, ny, nz
         integer   :: nxr, nyr, nzr, istr3r  !CS mgrd
-        integer   :: nsst, nread, ntst, ireset
+        integer   :: nsst, nread, ntst, ireset, tscaleT !CJH alternate nondim option
         real      :: walltimemax,tout,tmax
         real      :: alx3,str3
         integer   :: istr3

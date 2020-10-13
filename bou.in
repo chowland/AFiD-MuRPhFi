@@ -2,8 +2,8 @@
  128    128   2      3                   0
  NXMR   NYMR  NZMR (Ignored if ISTR3R>0)
  512    256   2  
- NTST   WALLTIMEMAX  TOUT   TMAX   IRESET
- 15000  83000        2e-1   100.0  1
+ NTST   WALLTIMEMAX  TOUT   TMAX   IRESET   tscaleT
+ 15000  83000        2e-1   100.0  1        1
  ALX3D  ISTR3 STR3   ISTR3R
  1.0    6     12.0   0
  YLEN   ZLEN 
