@@ -132,6 +132,12 @@
 
         call ReadFlowField
 
+        if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+        call Mkmov_ycut
+        call Mkmov_ycutr
+        call Mkmov_zcut
+        call Mkmov_zcutr
+
       else
 
         if(ismaster) write(6,*) 'Creating initial condition'
@@ -247,7 +253,7 @@
          endif
         endif
 
-        if(mod(time,tframe).lt.dt) then
+        if((mod(time,tframe).lt.dt) .and. (nint(time/tframe).ne.0)) then
           if(ismaster)  write(6,*) 'Write slice ycut and zcut'
           !call CalcWriteQ
           call Mkmov_ycut
