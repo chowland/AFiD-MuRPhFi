@@ -48,6 +48,8 @@
        do i=1,nzmr
          zmr(i)=(zcr(i)+zcr(i+1))*0.5d0
        end do
+       zmr(0)=2.d0*zmr(1)-zmr(2)
+       zmr(nzr)=2.d0*zmr(nzmr)-zmr(nzmr-1)
 
        do j=1,nyr
         x2=real(j-1)/real(nymr)
@@ -57,6 +59,8 @@
        do j=1,nymr
         ymr(j)=(ycr(j)+ycr(j+1))*0.5d0
        end do
+       ymr(0)=2.d0*ymr(1)-ymr(2)
+       ymr(nyr)=2.d0*ymr(nymr)-ymr(nymr-1)
 
 !
 !     VERTICAL COORDINATE DEFINITION
@@ -144,6 +148,9 @@
         xmr(kc)=(xcr(kc)+xcr(kc+1))*0.5d0
         g3rmr(kc)=(xcr(kc+1)-xcr(kc))*dxr
       enddo
+      xmr(0)=2.d0*xmr(1)-xmr(2)
+      xmr(nxr)=2.d0*xmr(nxmr)-xmr(nxmr-1)
+
       do kc=2,nxmr
         g3rcr(kc)=(xcr(kc+1)-xcr(kc-1))*dxr*0.5d0
       enddo

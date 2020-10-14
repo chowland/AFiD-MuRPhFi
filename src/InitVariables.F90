@@ -65,13 +65,13 @@
 !-------------------------------------------------
 
       call AllocateReal1DArray(zcr,1,nzr)
-      call AllocateReal1DArray(zmr,1,nzr)
+      call AllocateReal1DArray(zmr,0,nzr+1) !CS mgrd
 
       call AllocateReal1DArray(ycr,1,nyr)
-      call AllocateReal1DArray(ymr,1,nyr)
+      call AllocateReal1DArray(ymr,0,nyr+1) !CS mgrd
 
       call AllocateReal1DArray(xcr,1,nxr)
-      call AllocateReal1DArray(xmr,1,nxr)
+      call AllocateReal1DArray(xmr,0,nxr) !CS mgrd
 
       call AllocateReal1DArray(g3rcr,1,nxr)
       call AllocateReal1DArray(g3rmr,1,nxr)

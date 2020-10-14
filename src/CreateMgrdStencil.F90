@@ -18,7 +18,7 @@
       integer :: jc,kc,ic,i,j,k
       integer :: icr, jcr, kcr
 
-      real xxl(0:nxr), yyl(-1:nyr), zzl(-1:nzr)
+      real xxl(-2:nxr+2), yyl(-1:nyr), zzl(-1:nzr)  !CS xxl extended for str+uni
       real xxs(-1:nx+1), yys(-1:ny+1), zzs(-1:nz+1)
       real h00, h01, h10, h11
       real lxm,lxp, lym,lyp, lzm,lzp, lxa,lya,lza
@@ -29,13 +29,13 @@
       !===================================================
       !-- irangs, jrangs, krangs are at staggered location
       !-- irangc, jrangc, krangc are at cell-face location
-      IF(nxm.eq.nxmr) then
+      IF(nxm.eq.nxmr .AND. istr3.eq.istr3r) then
 
       irangs(0) = 1
       irangc(0) = 1
       do ic=1,nxm  
         irangs(ic) = ic
-        irangc(ic) = ic !CHECK
+        irangc(ic) = ic
       enddo
       irangs(nx) = nx
       irangc(nx) = nx
@@ -45,16 +45,14 @@
       irangs(0) = 1
       irangc(0) = 1
       do ic=1,nxm
-        do i=irangs(ic-1),nxmr
+        do i=0,nxmr
           if(xmr(i).lt.xm(ic) .and. xmr(i+1).ge.xm(ic))then
             irangs(ic) = i+1
           endif
         enddo
-        do i=irangc(ic-1),nxmr
-          if(i.gt.0) then
+        do i=1,nxmr
           if(xcr(i).lt.xc(ic) .and. xcr(i+1).ge.xc(ic))then
             irangc(ic) = i+1
-          endif
           endif
         enddo
       enddo
@@ -70,7 +68,7 @@
       jrangc(0) = 1
       do jc=1,nym
        jrangs(jc) = jc
-       jrangc(jc) = jc !CHECK
+       jrangc(jc) = jc
       enddo
       jrangs(ny) = nyr
       jrangc(ny) = nyr
@@ -80,16 +78,14 @@
       jrangs(0) = 1
       jrangc(0) = 1
       do jc=1,nym
-        do j=jrangs(jc-1),nymr
+        do j=0,nyr
           if(ymr(j).lt.ym(jc) .and. ymr(j+1).ge.ym(jc))then
             jrangs(jc) = j+1
           endif
         enddo
-        do j=jrangc(jc-1),nymr
-          if(j.gt.0) then
+        do j=1,nymr
           if(ycr(j).lt.yc(jc) .and. ycr(j+1).ge.yc(jc))then
             jrangc(jc) = j+1
-          endif
           endif
         enddo
       enddo
@@ -115,16 +111,14 @@
       krangs(0) = 1
       krangc(0) = 1
       do kc=1,nzm
-        do k=krangs(kc-1),nzmr
+        do k=0,nzr
           if(zmr(k).lt.zm(kc) .and. zmr(k+1).ge.zm(kc))then
             krangs(kc) = k+1
           endif
         enddo
-        do k=krangc(kc-1),nzmr
-          if(k.gt.0) then
+        do k=1,nzmr
           if(zcr(k).lt.zc(kc) .and. zcr(k+1).ge.zc(kc))then
             krangc(kc) = k+1
-          endif
           endif
         enddo
       enddo
@@ -655,6 +649,7 @@
          enddo
       enddo
 
+      !CS Code below needs to be updated
       !==============================================
       !--- Interpolate Coefficients for Coarse Vx ---
       !==============================================
