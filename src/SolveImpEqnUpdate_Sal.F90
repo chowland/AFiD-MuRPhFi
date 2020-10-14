@@ -16,7 +16,7 @@
       real, dimension(nxr) :: amkl,apkl,ackl
       integer :: jc,kc,info,ipkv(nxr),ic,nrhs
       real :: betadx,ackl_b
-      real :: amkT(nxr-1),ackT(nxr),apkT(nxr-1),appk(nxr-2)
+      real :: amkT(nxmr-1),ackT(nxmr),apkT(nxmr-1),appk(nxmr-2)
 
 !     Calculate the coefficients of the tridiagonal matrix
 !     The coefficients are normalized to prevent floating
