@@ -15,8 +15,8 @@
 
       do ic=1,nzm
        do jc=1,nym
-        temptp(jc,ic)=0.d0
-        tempbp(jc,ic)=1.d0
+        temptp(jc,ic)=-0.5d0
+        tempbp(jc,ic)=0.5d0
        enddo
       enddo
 
