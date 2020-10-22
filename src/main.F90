@@ -253,7 +253,7 @@
          endif
         endif
 
-        if((mod(time,tframe).lt.dt) .and. (nint(time/tframe).ne.0)) then
+        if((mod(time,tframe).lt.dt) .and. (floor(time/tframe).ne.0)) then
           if(ismaster)  write(6,*) 'Write slice ycut and zcut'
           !call CalcWriteQ
           call Mkmov_ycut
