@@ -35,10 +35,12 @@
         real, allocatable, dimension(:) :: yc,ym
         real, allocatable, dimension(:) :: zc,zm
         real, allocatable, dimension(:) :: g3rc,g3rm
+        real, allocatable, dimension(:) :: d3xc, d3xm    !CJH modified derivatives
         real, allocatable, dimension(:) :: xcr,xmr       !CS mgrd    
         real, allocatable, dimension(:) :: ycr,ymr       !CS mgrd
         real, allocatable, dimension(:) :: zcr,zmr       !CS mgrd
         real, allocatable, dimension(:) :: g3rcr,g3rmr   !CS mgrd
+        real, allocatable, dimension(:) :: d3xcr, d3xmr  !CJH modified derivatives
 !====================================================
 !******* QUANTITIES FOR DERIVATIVES******************
         real, allocatable, dimension(:) :: udx3c,udx3m

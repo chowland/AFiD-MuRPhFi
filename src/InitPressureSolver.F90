@@ -52,7 +52,7 @@
         kp=kpv(kc)
         a33icc=kmc(kc)*dxq/g3rc(kc)
         a33icp=kpc(kc)*dxq/g3rc(kp)
-        ugmmm=1.0d0/g3rm(kc)
+        ugmmm=1.0d0/d3xc(kc)
         amphk(kc)=a33icc*ugmmm
         apphk(kc)=a33icp*ugmmm
         acphk(kc)=-(amphk(kc)+apphk(kc))

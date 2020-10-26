@@ -142,18 +142,26 @@
 
       do kc=1,nxm
         xm(kc)=(xc(kc)+xc(kc+1))*0.5d0
-        g3rm(kc)=(xc(kc+1)-xc(kc))*dx
       enddo
+      xm(nx) = 2*xc(nx) - xm(nxm)
       do kc=2,nxm
         g3rc(kc)=(xc(kc+1)-xc(kc-1))*dx*0.5d0
+        g3rm(kc)=(xm(kc+1)-xm(kc-1))*dx*0.5d0
       enddo
+      !CJH virtual xm(0) = 2*xc(1) - xm(1)
+      g3rm(1) = (xm(2)-(2*xc(1)-xm(1)))*dx*0.5d0
       g3rc(1)=(xc(2)-xc(1))*dx
       g3rc(nx)= (xc(nx)-xc(nxm))*dx
+      
+      do kc=1,nxm
+        d3xc(kc) = (xc(kc+1) - xc(kc))*dx
+        d3xm(kc) = (xm(kc+1) - xm(kc))*dx
+      end do
 !
 !     WRITE GRID INFORMATION
 !
       do kc=1,nxm
-        udx3m(kc) = dx/g3rm(kc)
+        udx3m(kc) = dx/d3xc(kc)
         udx3c(kc) = dx/g3rc(kc)
       end do
       udx3c(nx) = dx/g3rc(nx)
@@ -192,10 +200,9 @@
 
       do kc=2,nxm
        km=kc-1
-       kp=kc+1
        a33=dxq/g3rc(kc)
-       a33p=1.d0/g3rm(kc)
-       a33m=1.d0/g3rm(km)
+       a33p=1.d0/d3xc(kc)
+       a33m=1.d0/d3xc(km)
        ap3ck(kc)=a33*a33p
        am3ck(kc)=a33*a33m
        ac3ck(kc)=-(ap3ck(kc)+am3ck(kc))
@@ -207,14 +214,13 @@
 !
 
       do kc=2,nxm-1
-      kp=kc+1
-      km=kc-1
-      a33=dxq/g3rm(kc)
-      a33p= +a33/g3rc(kp)
-      a33m= +a33/g3rc(kc)
-      ap3sk(kc)=a33p
-      am3sk(kc)=a33m
-      ac3sk(kc)=-(ap3sk(kc)+am3sk(kc))
+        km=kc-1
+        a33=dxq/g3rm(kc)
+        a33p=1.d0/d3xm(kc)
+        a33m=1.d0/d3xm(km)
+        ap3sk(kc)=a33*a33p
+        am3sk(kc)=a33*a33m
+        ac3sk(kc)=-(ap3sk(kc)+am3sk(kc))
       enddo
 !    
 !    LOWER WALL BOUNDARY CONDITIONS (INSLWS SETS NO-SLIP vs STRESS-FREE WALL)
@@ -222,11 +228,11 @@
       kc=1
       kp=kc+1
       a33=dxq/g3rm(kc)
-      a33p= +a33/g3rc(kp)
-      a33m= +a33/g3rc(kc)
-      ap3sk(kc)=a33p
+      a33p=1.d0/d3xm(kc)
+      a33m=1.d0/dx/2.d0/(xm(kc)-xc(kc))
+      ap3sk(kc)=a33*a33p
       am3sk(kc)=0.d0
-      ac3sk(kc)=-(a33p+inslws*a33m*2.d0)
+      ac3sk(kc)=-a33*(a33p+2.d0*inslws*a33m)
 
 !    
 !    UPPER WALL BOUNDARY CONDITIONS (INSLWN SETS NO-SLIP vs STRESS-FREE WALL)
@@ -235,57 +241,42 @@
       kc=nxm
       kp=kc+1
       a33=dxq/g3rm(kc)
-      a33p= +a33/g3rc(kp)
-      a33m= +a33/g3rc(kc)
-      am3sk(kc)=a33m
+      a33p=1.d0/dx/2.d0/(xc(kp)-xm(kc))
+      a33m=1.d0/d3xm(kc)
       ap3sk(kc)=0.d0
-      ac3sk(kc)=-(a33m+inslwn*a33p*2.d0)
-
-      ! am3ssk(1)=0.d0
-      ! ap3ssk(1)=0.d0
-      ! ac3ssk(1)=1.d0
+      am3sk(kc)=a33m
+      ac3sk(kc)=-a33*(2.d0*inslwn*a33p+a33m)
 
 !
 !    TEMPERATURE DIFFERENTIATION
 !CJH (now staggered!)
 !
 
-
       do kc=2,nxm-1
-       kp=kc+1
-       km=kc-1
-       a33=dxq/g3rm(kc)
-       a33p=1.d0/g3rc(kp)
-       a33m=1.d0/g3rc(kc)
-       ap3ssk(kc)=a33*a33p
-       am3ssk(kc)=a33*a33m
-       ac3ssk(kc)=-(ap3ssk(kc)+am3ssk(kc))
+        ap3ssk(kc)=ap3sk(kc)
+        am3ssk(kc)=am3sk(kc)
+        ac3ssk(kc)=ac3sk(kc)
       enddo
 
       !CJH Lower wall BC
       kc = 1
       kp = kc + 1
       a33 = dxq/g3rm(kc)
-      a33p = a33/g3rc(kp)
-      a33m = a33/g3rc(kc)
-      ap3ssk(kc) = a33p
+      a33p = 1.d0/d3xm(kc)
+      a33m = 1.d0/dx/2.d0/(xm(kc)-xc(kc))
+      ap3ssk(kc) = a33*a33p
       am3ssk(kc) = 0.d0
-      ac3ssk(kc) = -(a33p + TfixS*2.d0*a33m)
+      ac3ssk(kc) = -a33*(a33p + 2.d0*TfixS*a33m)
 
       !CJH Upper wall BC
       kc = nxm
       kp = kc + 1
       a33 = dxq/g3rm(kc)
-      a33p = a33/g3rc(kp)
-      a33m = a33/g3rc(kc)
+      a33p = 1.d0/dx/2.d0/(xc(kp)-xm(kc))
+      a33m = 1.d0/d3xm(kc)
       ap3ssk(kc) = 0.d0
-      am3ssk(kc) = a33m
-      ac3ssk(kc) = -(a33m + TfixN*2.d0*a33p)
-
-
-      ! am3ssk(nx)=0.d0
-      ! ap3ssk(nx)=0.d0
-      ! ac3ssk(nx)=1.d0
+      am3ssk(kc) = a33*a33m
+      ac3ssk(kc) = -a33*(a33m + 2.d0*TfixN*a33p)
 
       return                                                            
       end                                                               

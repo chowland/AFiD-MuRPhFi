@@ -34,6 +34,9 @@
       call DestroyReal1DArray(udx3c)
       call DestroyReal1DArray(udx3m)
 
+      call DestroyReal1DArray(d3xc)
+      call DestroyReal1DArray(d3xm)
+
       call DestroyReal1DArray(zcr)     !CS mgrd
       call DestroyReal1DArray(zmr)     !CS mgrd
       call DestroyReal1DArray(ycr)     !CS mgrd
@@ -44,6 +47,8 @@
       call DestroyReal1DArray(g3rmr)   !CS mgrd
       call DestroyReal1DArray(udx3cr)  !CS mgrd
       call DestroyReal1DArray(udx3mr)  !CS mgrd
+      call DestroyReal1DArray(d3xcr)
+      call DestroyReal1DArray(d3xmr)
 
       call DestroyReal1DArray(ap3ck)
       call DestroyReal1DArray(ac3ck)

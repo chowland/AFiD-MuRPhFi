@@ -146,16 +146,22 @@
 
       do kc=1,nxmr
         xmr(kc)=(xcr(kc)+xcr(kc+1))*0.5d0
-        g3rmr(kc)=(xcr(kc+1)-xcr(kc))*dxr
       enddo
       xmr(0)=2.d0*xmr(1)-xmr(2)
       xmr(nxr)=2.d0*xmr(nxmr)-xmr(nxmr-1)
 
       do kc=2,nxmr
         g3rcr(kc)=(xcr(kc+1)-xcr(kc-1))*dxr*0.5d0
+        g3rmr(kc)=(xmr(kc+1)-xmr(kc-1))*dxr*0.5d0
       enddo
+      g3rmr(1) = (xmr(2)-(2*xcr(1)-xmr(1)))*dxr*0.5d0
       g3rcr(1)=(xcr(2)-xcr(1))*dxr
       g3rcr(nxr)= (xcr(nxr)-xcr(nxmr))*dxr
+
+      do kc=1,nxmr
+        d3xcr(kc) = (xcr(kc+1) - xcr(kc))*dxr
+        d3xmr(kc) = (xmr(kc+1) - xmr(kc))*dxr
+      end do
 !
 !     WRITE GRID INFORMATION
 !
@@ -257,41 +263,36 @@
       !CJH (now staggered!)
 !
 
-
       do kc=2,nxmr-1
-       kp=kc+1
-       km=kc-1
-       a33=dxqr/g3rmr(kc)
-       a33p=1.d0/g3rcr(kp)
-       a33m=1.d0/g3rcr(kc)
-       ap3sskr(kc)=a33*a33p
-       am3sskr(kc)=a33*a33m
-       ac3sskr(kc)=-(ap3sskr(kc)+am3sskr(kc))
+        kp=kc+1
+        km=kc-1
+        a33=dxqr/g3rmr(kc)
+        a33p=1.d0/d3xmr(kc)
+        a33m=1.d0/d3xmr(km)
+        ap3sskr(kc)=a33*a33p
+        am3sskr(kc)=a33*a33m
+        ac3sskr(kc)=-(ap3sskr(kc)+am3sskr(kc))
       enddo
 
       !CJH Lower wall BC
       kc = 1
       kp = kc + 1
       a33 = dxqr/g3rmr(kc)
-      a33p = a33/g3rcr(kp)
-      a33m = a33/g3rcr(kc)
-      ap3sskr(kc) = a33p
-      am3sskr(kc) = 0.d0
-      ac3sskr(kc) = -(a33p + SfixS*2.d0*a33m)
+      a33p=1.d0/d3xmr(kc)
+      a33m=1.d0/dxr/2.d0/(xmr(kc)-xcr(kc))
+      ap3sskr(kc)=a33*a33p
+      am3sskr(kc)=0.d0
+      ac3sskr(kc)=-a33*(a33p + 2.d0*SfixS*a33m)
 
       !CJH Upper wall BC
       kc = nxmr
       kp = kc + 1
       a33 = dxqr/g3rmr(kc)
-      a33p = a33/g3rcr(kp)
-      a33m = a33/g3rcr(kc)
-      ap3sskr(kc) = 0.d0
-      am3sskr(kc) = a33m
-      ac3sskr(kc) = -(a33m + SfixN*2.d0*a33p)
-
-      ! am3sskr(nxr)=0.d0
-      ! ap3sskr(nxr)=0.d0
-      ! ac3sskr(nxr)=1.d0
+      a33p=1.d0/dxr/2.d0/(xcr(kp)-xmr(kc))
+      a33m=1.d0/d3xmr(kc)
+      ap3sskr(kc)=0.d0
+      am3sskr(kc)=a33*a33m
+      ac3sskr(kc)=-a33*(2.d0*SfixN*a33p + a33m)
 
       return                                                            
       end                                                               
