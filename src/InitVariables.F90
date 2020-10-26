@@ -80,6 +80,10 @@
       call AllocateReal1DArray(g3rcr,1,nxr)
       call AllocateReal1DArray(g3rmr,1,nxr)
 
+      !CJH New terms for modified derivatives
+      call AllocateReal1DArray(d3xcr,1,nxr)
+      call AllocateReal1DArray(d3xmr,1,nxr)
+
       call AllocateReal1DArray(udx3cr,1,nxr)
       call AllocateReal1DArray(udx3mr,1,nxr)
 
