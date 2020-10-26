@@ -43,10 +43,13 @@
       enddo
 
       !assign linear temperature profile in the nodes k=1 to k=nxm
+      eps=1d-2
       do i=xstart(3),xend(3)
       do j=xstart(2),xend(2)
       do k=1,nxm
-      temp(k,j,i)=tempbp(j,i)+(temptp(j,i)-tempbp(j,i))*xm(k)/xc(nx)
+        call random_number(varptb)
+        temp(k,j,i)=tempbp(j,i)+(temptp(j,i)-tempbp(j,i))*xm(k)/xc(nx)
+        temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
       enddo
       enddo
       enddo
