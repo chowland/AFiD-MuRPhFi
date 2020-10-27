@@ -166,7 +166,7 @@
 !     WRITE GRID INFORMATION
 !
       do kc=1,nxmr
-        udx3mr(kc) = dxr/g3rmr(kc)
+        udx3mr(kc) = dxr/d3xcr(kc)
         udx3cr(kc) = dxr/g3rcr(kc)
       end do
       udx3cr(nxr) = dxr/g3rcr(nxr)
