@@ -50,9 +50,9 @@
       do kc=1,nxm
         km=kmv(kc)
         kp=kpv(kc)
-        a33icc=kmc(kc)*dxq/g3rc(kc)
-        a33icp=kpc(kc)*dxq/g3rc(kp)
-        ugmmm=1.0d0/d3xc(kc)
+        a33icc=kmc(kc)*dxq/d3xm(km)
+        a33icp=kpc(kc)*dxq/d3xm(kc)
+        ugmmm=1.0d0/g3rm(kc)
         amphk(kc)=a33icc*ugmmm
         apphk(kc)=a33icp*ugmmm
         acphk(kc)=-(amphk(kc)+apphk(kc))
