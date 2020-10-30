@@ -238,7 +238,7 @@
 !    
 
       kc=nxm
-      km=kc+1
+      km=kc-1
       a33=dxq/g3rm(kc)
       a33p=1.d0/d3xm(kc)
       a33m=1.d0/d3xm(km)
@@ -259,7 +259,6 @@
 
       !CJH Lower wall BC
       kc = 1
-      kp = kc + 1
       a33 = dxq/g3rm(kc)
       a33p = 1.d0/d3xm(kc)
       a33m = 1.d0/g3rc(kc) ! equivalent to virtual 1/d3xm(0)
@@ -269,7 +268,7 @@
 
       !CJH Upper wall BC
       kc = nxm
-      kp = kc + 1
+      km = kc - 1
       a33 = dxq/g3rm(kc)
       a33p = 1.d0/d3xm(kc)
       a33m = 1.d0/d3xm(km)

@@ -264,7 +264,6 @@
 !
 
       do kc=2,nxmr-1
-        kp=kc+1
         km=kc-1
         a33=dxqr/g3rmr(kc)
         a33p=1.d0/d3xmr(kc)
@@ -285,7 +284,7 @@
 
       !CJH Upper wall BC
       kc = nxmr
-      kp = kc + 1
+      km = kc - 1
       a33 = dxqr/g3rmr(kc)
       a33p=1.d0/d3xmr(kc)
       a33m=1.d0/d3xmr(km)
