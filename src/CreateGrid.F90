@@ -226,10 +226,9 @@
 !    LOWER WALL BOUNDARY CONDITIONS (INSLWS SETS NO-SLIP vs STRESS-FREE WALL)
 !    
       kc=1
-      kp=kc+1
       a33=dxq/g3rm(kc)
       a33p=1.d0/d3xm(kc)
-      a33m=1.d0/dx/2.d0/(xm(kc)-xc(kc))
+      a33m=1.d0/g3rc(kc) ! equivalent to virtual 1/d3xm(0)
       ap3sk(kc)=a33*a33p
       am3sk(kc)=0.d0
       ac3sk(kc)=-a33*(a33p+2.d0*inslws*a33m)
@@ -239,12 +238,12 @@
 !    
 
       kc=nxm
-      kp=kc+1
+      km=kc+1
       a33=dxq/g3rm(kc)
-      a33p=1.d0/dx/2.d0/(xc(kp)-xm(kc))
-      a33m=1.d0/d3xm(kc)
+      a33p=1.d0/d3xm(kc)
+      a33m=1.d0/d3xm(km)
       ap3sk(kc)=0.d0
-      am3sk(kc)=a33m
+      am3sk(kc)=a33*a33m
       ac3sk(kc)=-a33*(2.d0*inslwn*a33p+a33m)
 
 !
@@ -263,7 +262,7 @@
       kp = kc + 1
       a33 = dxq/g3rm(kc)
       a33p = 1.d0/d3xm(kc)
-      a33m = 1.d0/dx/2.d0/(xm(kc)-xc(kc))
+      a33m = 1.d0/g3rc(kc) ! equivalent to virtual 1/d3xm(0)
       ap3ssk(kc) = a33*a33p
       am3ssk(kc) = 0.d0
       ac3ssk(kc) = -a33*(a33p + 2.d0*TfixS*a33m)
@@ -272,8 +271,8 @@
       kc = nxm
       kp = kc + 1
       a33 = dxq/g3rm(kc)
-      a33p = 1.d0/dx/2.d0/(xc(kp)-xm(kc))
-      a33m = 1.d0/d3xm(kc)
+      a33p = 1.d0/d3xm(kc)
+      a33m = 1.d0/d3xm(km)
       ap3ssk(kc) = 0.d0
       am3ssk(kc) = a33*a33m
       ac3ssk(kc) = -a33*(a33m + 2.d0*TfixN*a33p)

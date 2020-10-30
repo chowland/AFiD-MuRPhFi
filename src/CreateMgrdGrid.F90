@@ -276,10 +276,9 @@
 
       !CJH Lower wall BC
       kc = 1
-      kp = kc + 1
       a33 = dxqr/g3rmr(kc)
       a33p=1.d0/d3xmr(kc)
-      a33m=1.d0/dxr/2.d0/(xmr(kc)-xcr(kc))
+      a33m=1.d0/g3rcr(kc) ! equivalent to virtual 1/d3xmr(0)
       ap3sskr(kc)=a33*a33p
       am3sskr(kc)=0.d0
       ac3sskr(kc)=-a33*(a33p + 2.d0*SfixS*a33m)
@@ -288,8 +287,8 @@
       kc = nxmr
       kp = kc + 1
       a33 = dxqr/g3rmr(kc)
-      a33p=1.d0/dxr/2.d0/(xcr(kp)-xmr(kc))
-      a33m=1.d0/d3xmr(kc)
+      a33p=1.d0/d3xmr(kc)
+      a33m=1.d0/d3xmr(km)
       ap3sskr(kc)=0.d0
       am3sskr(kc)=a33*a33m
       ac3sskr(kc)=-a33*(2.d0*SfixN*a33p + a33m)
