@@ -65,17 +65,6 @@
            vy(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc,jm,ic)) &
           )*udy
 !
-!    rho vx term
-!
-!
-!                 d  rho q_x 
-!                -----------
-!                 d   x      
-!
-      htx=(vx(kp,jc,ic)*(temp(kp,jc,ic)+temp(kc,jc,ic))- &
-           vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(km,jc,ic)) &
-          )*udx3m(kc)*0.5d0
-!
 !
 !   zz second derivatives of temp
 !
@@ -90,9 +79,39 @@
              -2.0*temp(kc,jc,ic) &
                  +temp(kc,jm,ic))*udyq
 !
-            hro(kc,jc,ic) = -(htx+hty+htz)+dyyt+dzzt
-      enddo
-      enddo
+            hro(kc,jc,ic) = -(hty+htz)+dyyt+dzzt
+          enddo
+          do kc=2,nxm-1
+      !
+      !    rho vx term
+      !
+      !
+      !                 d  rho q_x 
+      !                -----------
+      !                 d   x      
+      !
+            htx=(vx(kp,jc,ic)*(temp(kp,jc,ic)+temp(kc,jc,ic))- &
+                 vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(km,jc,ic)) &
+                )*udx3m(kc)*0.5d0
+
+            hro(kc,jc,ic) = hro(kc,jc,ic) - htx
+          end do
+
+          !CJH lower boundary, T0 + T1 = 2*Tbp
+          kc = 1
+          htx=(vx(kc+1,jc,ic)*(temp(kc+1,jc,ic)+temp(kc,jc,ic))- &
+               vx(kc,jc,ic)*2.d0*tempbp(jc,ic) &
+              )*udx3m(kc)*0.5d0
+          hro(kc,jc,ic) = hro(kc,jc,ic) - htx
+
+          !CJH upper boundary, Tnxm + Tnx = 2*Ttp
+          kc=nxm
+          htx=(vx(kc+1,jc,ic)*2.d0*temptp(jc,ic)- &
+               vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc-1,jc,ic)) &
+              )*udx3m(kc)*0.5d0
+          hro(kc,jc,ic) = hro(kc,jc,ic) - htx
+          
+        enddo
       enddo
 !$OMP  END PARALLEL DO
 
