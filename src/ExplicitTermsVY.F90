@@ -111,7 +111,7 @@
             do kc=1,nxm
               tempit=0.5d0*(temp(kc,jc,ic)+temp(kc,jmm,ic)) !0.d0
               !CJH: InterpSalMgrd & CreateMgrdStencil need updating before S can be active
-              salit=0.d0!salc(kc,jc,ic)
+              salit=salc(kc,jc,ic)
 
               dph(kc,jc,ic) = dph(kc,jc,ic) + byct*tempit - bycs*salit
             end do
