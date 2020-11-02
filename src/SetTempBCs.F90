@@ -41,16 +41,16 @@
       saltp(:,-1) = saltp(:,nzmr-1)
       saltp(nyr  ,:) = saltp(1,:)
       saltp(nyr+1,:) = saltp(2,:)
-      saltp(:,nyr  ) = saltp(:,1)
-      saltp(:,nyr+1) = saltp(:,2)
+      saltp(:,nzr  ) = saltp(:,1)
+      saltp(:,nzr+1) = saltp(:,2)
       salbp(0 ,:) = salbp(nymr,:)
       salbp(-1,:) = salbp(nymr-1,:)
       salbp(:, 0) = salbp(:,nzmr)
       salbp(:,-1) = salbp(:,nzmr-1)
       salbp(nyr  ,:) = salbp(1,:)
       salbp(nyr+1,:) = salbp(2,:)
-      salbp(:,nyr  ) = salbp(:,1)
-      salbp(:,nyr+1) = salbp(:,2)
+      salbp(:,nzr  ) = salbp(:,1)
+      salbp(:,nzr+1) = salbp(:,2)
 
       return
       end
