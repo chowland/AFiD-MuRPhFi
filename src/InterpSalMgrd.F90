@@ -2,7 +2,7 @@
 
       use param
       use local_arrays, only: sal
-      use mgrd_arrays, only: salc,cxsalc,cysalc,czsalc,irangc,jrangs,krangs
+      use mgrd_arrays, only: salc,cxsalc,cysalc,czsalc,irangs,jrangs,krangs
       use mpih
       use decomp_2d
       use AuxiliaryRoutines
@@ -25,7 +25,7 @@
          jcr = jrangs(jc)-1
 
          do kc=1,nxm
-          kcr = irangc(kc)-1
+          kcr = irangs(kc)-1
 
           if (kcr==1) then
             if (SfixS==1) then    !CJH apply lower fixed value BC
