@@ -15,8 +15,8 @@
 
       do ic=1,nzm
        do jc=1,nym
-        temptp(jc,ic)=-0.5d0
-        tempbp(jc,ic)=0.5d0
+        temptp(jc,ic)=0.5d0
+        tempbp(jc,ic)=-0.5d0
        enddo
       enddo
 
@@ -30,8 +30,8 @@
 
       do ic=1,nzmr
        do jc=1,nymr
-        saltp(jc,ic)=1.d0
-        salbp(jc,ic)=0.d0
+        saltp(jc,ic)=0.5d0
+        salbp(jc,ic)=-0.5d0
        enddo
       enddo
       !CJH Add halo for interpolation routine
