@@ -40,13 +40,11 @@
             if (kc.eq.1) then       !CJH Apply lower BC
                   dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
                         +temp(kc  ,jc,ic)*ac3ssk(kc) &
-                        +temp(kc-1,jc,ic)*am3ssk(kc) &
                         -(ap3ssk(kc)+ac3ssk(kc))*tempbp(jc,ic)*TfixS
             elseif(kc.eq.nxm) then  !CJH Apply upper BC
-                  dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
-                  +temp(kc  ,jc,ic)*ac3ssk(kc) &
-                  +temp(kc-1,jc,ic)*am3ssk(kc) &
-                  -(am3ssk(kc)+ac3ssk(kc))*temptp(jc,ic)*TfixN
+                  dxxt = temp(kc  ,jc,ic)*ac3ssk(kc) &
+                        +temp(kc-1,jc,ic)*am3ssk(kc) &
+                        -(am3ssk(kc)+ac3ssk(kc))*temptp(jc,ic)*TfixN
             else
                dxxt= temp(kc+1,jc,ic)*ap3ssk(kc) &
                     +temp(kc  ,jc,ic)*ac3ssk(kc) &

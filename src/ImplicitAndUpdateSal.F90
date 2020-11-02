@@ -40,13 +40,11 @@
             if (kc.eq.1) then       !CJH Apply lower BC
                   dxxs = sal(kc+1,jc,ic)*ap3sskr(kc) &
                         +sal(kc  ,jc,ic)*ac3sskr(kc) &
-                        +sal(kc-1,jc,ic)*am3sskr(kc) &
                         -(ap3sskr(kc)+ac3sskr(kc))*salbp(jc,ic)*SfixS
             elseif(kc.eq.nxmr) then !CJH Apply upper BC
-                  dxxs = sal(kc+1,jc,ic)*ap3sskr(kc) &
-                  +sal(kc  ,jc,ic)*ac3sskr(kc) &
-                  +sal(kc-1,jc,ic)*am3sskr(kc) &
-                  -(am3sskr(kc)+ac3sskr(kc))*saltp(jc,ic)*SfixN
+                  dxxs = sal(kc  ,jc,ic)*ac3sskr(kc) &
+                        +sal(kc-1,jc,ic)*am3sskr(kc) &
+                        -(am3sskr(kc)+ac3sskr(kc))*saltp(jc,ic)*SfixN
             else
                dxxs= sal(kc+1,jc,ic)*ap3sskr(kc) &
                     +sal(kc  ,jc,ic)*ac3sskr(kc) &
