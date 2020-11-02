@@ -98,18 +98,30 @@
             hsal(kc,jc,ic) = hsal(kc,jc,ic) - hsx
           end do
 
-          !CJH lower boundary, S0 + S1 = 2*Sbp
+          !CJH lower boundary
           kc = 1
-          hsx=(vxr(kc+1,jc,ic)*(sal(kc+1,jc,ic)+sal(kc,jc,ic))- &
+          if (SfixS.eq.1) then      ! S0 + S1 = 2*Sbp
+            hsx=(vxr(kc+1,jc,ic)*(sal(kc+1,jc,ic)+sal(kc,jc,ic))- &
                vxr(kc,jc,ic)*2.d0*salbp(jc,ic) &
               )*udx3mr(kc)*0.5d0
+          else                      ! S0 = S1
+            hsx=(vxr(kc+1,jc,ic)*(sal(kc+1,jc,ic)+sal(kc,jc,ic))- &
+               vxr(kc,jc,ic)*2.d0*sal(kc,jc,ic) &
+              )*udx3mr(kc)*0.5d0
+          end if
           hsal(kc,jc,ic) = hsal(kc,jc,ic) - hsx
 
-          !CJH upper boundary, Snxmr + Snxr = 2*Stp
+          !CJH upper boundary
           kc=nxmr
-          hsx=(vxr(kc+1,jc,ic)*2.d0*saltp(jc,ic)- &
+          if (SfixN.eq.1) then      ! Snxmr + Snxr = 2*Stp
+            hsx=(vxr(kc+1,jc,ic)*2.d0*saltp(jc,ic)- &
                vxr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc-1,jc,ic)) &
               )*udx3mr(kc)*0.5d0
+          else                      ! Snxmr = Snxr
+            hsx=(vxr(kc+1,jc,ic)*2.d0*sal(kc,jc,ic)- &
+               vxr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc-1,jc,ic)) &
+              )*udx3mr(kc)*0.5d0
+          end if
           hsal(kc,jc,ic) = hsal(kc,jc,ic) - hsx
           
         enddo
