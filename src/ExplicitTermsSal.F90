@@ -41,6 +41,17 @@
         do kc=1,nxmr
          km=kc-1
          kp=kc+1
+         !
+         !    sal vxr term
+         !
+         !
+         !                 d  sal q_x 
+         !                -----------
+         !                 d   x      
+         !
+                     hsx=(vxr(kp,jc,ic)*(sal(kp,jc,ic)+sal(kc,jc,ic))- &
+                          vxr(kc,jc,ic)*(sal(kc,jc,ic)+sal(km,jc,ic)) &
+                         )*udx3mr(kc)*0.5d0
 !
 !
 !    sal vz term
@@ -80,50 +91,8 @@
              -2.0*sal(kc,jc,ic) &
                  +sal(kc,jm,ic))*udyrq
 !
-            hsal(kc,jc,ic) = -(hsy+hsz)+dyys+dzzs
+            hsal(kc,jc,ic) = -(hsx+hsy+hsz)+dyys+dzzs
           enddo
-          do kc=2,nxmr-1
-            
-!
-!    sal vxr term
-!
-!
-!                 d  sal q_x 
-!                -----------
-!                 d   x      
-!
-            hsx=(vxr(kp,jc,ic)*(sal(kp,jc,ic)+sal(kc,jc,ic))- &
-                 vxr(kc,jc,ic)*(sal(kc,jc,ic)+sal(km,jc,ic)) &
-                )*udx3mr(kc)*0.5d0
-            hsal(kc,jc,ic) = hsal(kc,jc,ic) - hsx
-          end do
-
-          !CJH lower boundary
-          kc = 1
-          if (SfixS.eq.1) then      ! S0 + S1 = 2*Sbp
-            hsx=(vxr(kc+1,jc,ic)*(sal(kc+1,jc,ic)+sal(kc,jc,ic))- &
-               vxr(kc,jc,ic)*2.d0*salbp(jc,ic) &
-              )*udx3mr(kc)*0.5d0
-          else                      ! S0 = S1
-            hsx=(vxr(kc+1,jc,ic)*(sal(kc+1,jc,ic)+sal(kc,jc,ic))- &
-               vxr(kc,jc,ic)*2.d0*sal(kc,jc,ic) &
-              )*udx3mr(kc)*0.5d0
-          end if
-          hsal(kc,jc,ic) = hsal(kc,jc,ic) - hsx
-
-          !CJH upper boundary
-          kc=nxmr
-          if (SfixN.eq.1) then      ! Snxmr + Snxr = 2*Stp
-            hsx=(vxr(kc+1,jc,ic)*2.d0*saltp(jc,ic)- &
-               vxr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc-1,jc,ic)) &
-              )*udx3mr(kc)*0.5d0
-          else                      ! Snxmr = Snxr
-            hsx=(vxr(kc+1,jc,ic)*2.d0*sal(kc,jc,ic)- &
-               vxr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc-1,jc,ic)) &
-              )*udx3mr(kc)*0.5d0
-          end if
-          hsal(kc,jc,ic) = hsal(kc,jc,ic) - hsx
-          
         enddo
       enddo
 !$OMP  END PARALLEL DO

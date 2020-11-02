@@ -40,6 +40,17 @@
         do kc=1,nxm
          km=kc-1
          kp=kc+1
+         !
+         !    rho vx term
+         !
+         !
+         !                 d  rho q_x 
+         !                -----------
+         !                 d   x      
+         !
+               htx=(vx(kp,jc,ic)*(temp(kp,jc,ic)+temp(kc,jc,ic))- &
+                    vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(km,jc,ic)) &
+                   )*udx3m(kc)*0.5d0
 !
 !
 !    rho vz term
@@ -79,50 +90,8 @@
              -2.0*temp(kc,jc,ic) &
                  +temp(kc,jm,ic))*udyq
 !
-            hro(kc,jc,ic) = -(hty+htz)+dyyt+dzzt
+            hro(kc,jc,ic) = -(htx+hty+htz)+dyyt+dzzt
           enddo
-          do kc=2,nxm-1
-      !
-      !    rho vx term
-      !
-      !
-      !                 d  rho q_x 
-      !                -----------
-      !                 d   x      
-      !
-            htx=(vx(kp,jc,ic)*(temp(kp,jc,ic)+temp(kc,jc,ic))- &
-                 vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(km,jc,ic)) &
-                )*udx3m(kc)*0.5d0
-
-            hro(kc,jc,ic) = hro(kc,jc,ic) - htx
-          end do
-
-          !CJH lower boundary
-          kc = 1
-          if (TfixS.eq.1) then      ! T0 + T1 = 2*Tbp
-            htx=(vx(kc+1,jc,ic)*(temp(kc+1,jc,ic)+temp(kc,jc,ic))- &
-               vx(kc,jc,ic)*2.d0*tempbp(jc,ic) &
-              )*udx3m(kc)*0.5d0
-          else                      ! T0 = T1
-            htx=(vx(kc+1,jc,ic)*(temp(kc+1,jc,ic)+temp(kc,jc,ic))- &
-               vx(kc,jc,ic)*2.d0*temp(kc,jc,ic) &
-              )*udx3m(kc)*0.5d0
-          end if
-          hro(kc,jc,ic) = hro(kc,jc,ic) - htx
-
-          !CJH upper boundary
-          kc=nxm
-          if (TfixN.eq.1) then      ! Tnxm + Tnx = 2*Ttp
-            htx=(vx(kc+1,jc,ic)*2.d0*temptp(jc,ic)- &
-               vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc-1,jc,ic)) &
-              )*udx3m(kc)*0.5d0
-          else                      ! Tnxm = Tnx
-            htx=(vx(kc+1,jc,ic)*2.d0*temp(kc,jc,ic)- &
-               vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc-1,jc,ic)) &
-              )*udx3m(kc)*0.5d0
-          end if
-          hro(kc,jc,ic) = hro(kc,jc,ic) - htx
-          
         enddo
       enddo
 !$OMP  END PARALLEL DO
