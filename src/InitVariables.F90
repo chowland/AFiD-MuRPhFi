@@ -124,9 +124,9 @@
       call AllocateReal2DArray(cyrs,1,4,0,nyr)
       call AllocateReal2DArray(czrs,1,4,0,nzr)
 
-      call AllocateReal2DArray(cxvxc,1,4,0,nx)
-      call AllocateReal2DArray(cyvxc,1,4,0,ny)
-      call AllocateReal2DArray(czvxc,1,4,0,nz)
+      call AllocateReal2DArray(cxsalc,1,4,0,nx)
+      call AllocateReal2DArray(cysalc,1,4,0,ny)
+      call AllocateReal2DArray(czsalc,1,4,0,nz)
 
 !-------------------------------------------------
 ! Arrays for temperature boundary conditions    
@@ -136,8 +136,8 @@
       call AllocateReal2DArray(temptp,1,ny,1,nz)
 
       !-- For salinity
-      call AllocateReal2DArray(salbp,1,nyr,1,nzr)
-      call AllocateReal2DArray(saltp,1,nyr,1,nzr)
+      call AllocateReal2DArray(salbp,1-lvlhalo,nyr+lvlhalo,1-lvlhalo,nzr+lvlhalo)
+      call AllocateReal2DArray(saltp,1-lvlhalo,nyr+lvlhalo,1-lvlhalo,nzr+lvlhalo)
 
 !-------------------------------------------------
 ! Arrays for statistics    

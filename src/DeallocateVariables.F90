@@ -145,6 +145,10 @@
       call DestroyReal2DArray(cyrs) !CS mgrd
       call DestroyReal2DArray(czrs) !CS mgrd
 
+      call DestroyReal2DArray(cxsalc)
+      call DestroyReal2DArray(cysalc)
+      call DestroyReal2DArray(czsalc)
+
       call DestroyReal3DArray(tpdv)
       !call DestroyReal3DArray(tpdvr)  !CS BUG: ERROR WHILE DEALLOCATING
 

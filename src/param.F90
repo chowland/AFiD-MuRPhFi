@@ -113,9 +113,9 @@
         implicit none
         integer,allocatable,dimension(:) :: irangs,jrangs,krangs
         integer,allocatable,dimension(:) :: irangc,jrangc,krangc
-        real,allocatable,dimension(:,:) :: cxvx, cxvy, cxvz, cxrs, cxvxc
-        real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs, cyvxc
-        real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs, czvxc
+        real,allocatable,dimension(:,:) :: cxvx, cxvy, cxvz, cxrs, cxsalc
+        real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs, cysalc
+        real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs, czsalc
         real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
         real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
         real,allocatable,dimension(:,:,:) :: salc
