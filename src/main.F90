@@ -238,6 +238,8 @@
 
         call TimeMarcher
 
+        time=time+dt
+
         !call CalcGlobalStats
         if(ismaster) then
           open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
@@ -261,8 +263,6 @@
           call Mkmov_zcut
           call Mkmov_zcutr
         endif
-
-        time=time+dt
 
         if(ntime.eq.1.or.mod(time,tout).lt.dt) then
            !call GlobalQuantities
