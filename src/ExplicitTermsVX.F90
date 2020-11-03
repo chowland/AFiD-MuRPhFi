@@ -108,8 +108,7 @@
             do kc=2,nxm
               km=kc-1
               tempit=0.5d0*(temp(kc,jc,ic)+temp(km,jc,ic)) !0.d0
-              !CJH: InterpSalMgrd & CreateMgrdStencil need updating before S can be active
-              salit=salc(kc,jc,ic)
+              salit =0.5d0*(salc(kc,jc,ic)+salc(km,jc,ic))
 
               qcap(kc,jc,ic) = qcap(kc,jc,ic) + byct*tempit - bycs*salit
             end do

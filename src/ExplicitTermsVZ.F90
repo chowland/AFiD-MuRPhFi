@@ -113,8 +113,7 @@
           do jc=xstart(2),xend(2)
             do kc=1,nxm
               tempit=0.5d0*(temp(kc,jc,ic)+temp(kc,jc,imm)) !0.d0
-              !CJH: InterpSalMgrd & CreateMgrdStencil need updating before S can be active
-              salit=salc(kc,jc,ic)
+              salit =0.5d0*(salc(kc,jc,ic)+salc(kc,jc,imm))
 
               dq(kc,jc,ic) = dq(kc,jc,ic) + byct*tempit - bycs*salit
             end do
