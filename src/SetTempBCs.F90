@@ -13,12 +13,22 @@
       implicit none
       integer :: ic,jc
 
-      do ic=1,nzm
-       do jc=1,nym
-        temptp(jc,ic)=0.5d0
-        tempbp(jc,ic)=-0.5d0
-       enddo
-      enddo
+      if (rayt>=0) then ! unstable T gradient
+        do ic=1,nzm
+          do jc=1,nym
+            temptp(jc,ic)=-0.5d0
+            tempbp(jc,ic)=0.5d0
+          end do
+        end do
+      else              ! stable T gradient
+        do ic=1,nzm
+          do jc=1,nym
+            temptp(jc,ic)=0.5d0
+            tempbp(jc,ic)=-0.5d0
+          end do
+        end do
+      end if
+
 
       return
       end
@@ -28,12 +38,21 @@
       implicit none
       integer :: ic,jc
 
-      do ic=1,nzmr
-       do jc=1,nymr
-        saltp(jc,ic)=0.5d0
-        salbp(jc,ic)=-0.5d0
-       enddo
-      enddo
+      if (rays>=0) then ! unstable S gradient
+        do ic=1,nzmr
+          do jc=1,nymr
+            saltp(jc,ic)=0.5d0
+            salbp(jc,ic)=-0.5d0
+          enddo
+        enddo
+      else              ! stable S gradient
+        do ic=1,nzmr
+          do jc=1,nymr
+            saltp(jc,ic)=-0.5d0
+            salbp(jc,ic)=0.5d0
+          enddo
+        enddo
+      end if
       !CJH Add halo for interpolation routine
       saltp(0 ,:) = saltp(nymr,:)
       saltp(-1,:) = saltp(nymr-1,:)

@@ -53,14 +53,14 @@
 !     DEFINITIONS FOR THE NATURAL CONVECTION
 !
       lew = pras/prat
-      rhop = rayt*pras / (rays*prat) !CJH inverted to match literature
+      rhop = abs(rayt)*pras / (abs(rays)*prat) !CJH inverted to match literature
 
       if (tscaleT.eq.1) then        !CJH nondim. velocity with thermal free-fall scale
-            ren = dsqrt(rayt/prat)
+            ren = dsqrt(abs(rayt)/prat)
             byct = 1.d0
             bycs = 1.d0/rhop
       else                          !CJH nondim. velocity with salinity free-fall scale
-            ren = dsqrt(rays/pras)
+            ren = dsqrt(abs(rays)/pras)
             byct = rhop
             bycs = 1.d0
       end if
@@ -76,7 +76,7 @@
       if(ireset.ne.0) resetlogstime = .true.
 
       if(stst3flag.ne.0) then
-       inquire(file='./stst3.in', exist=fexist) 
+       inquire(file='./stst3.in', exist=fexist)
        if(fexist) then
         dumpslabs = .true.
        else

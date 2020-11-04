@@ -76,14 +76,14 @@
 !EP   Write logs
       if(ismaster) then
 
-      anusin=1.d0 + dsqrt(prat*rayt)*anusin*vol
+      anusin=1.d0 + dsqrt(prat*abs(rayt))*anusin*vol
 
       open(95,file='outputdir/nu_vol.out',status='unknown',access='sequential', &
         position='append')
       write(95,*) time, anusin
       close(95)
 
-      rradpr=dsqrt(rayt/prat)
+      rradpr=dsqrt(abs(rayt)/prat)
       tempm=tempm*vol
       vx_rms_vol=dsqrt(vx_rms_vol*vol)*rradpr
       vy_rms_vol=dsqrt(vy_rms_vol*vol)*rradpr
