@@ -132,11 +132,11 @@
 
         call ReadFlowField
 
-        if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-        call Mkmov_ycut
-        call Mkmov_ycutr
-        call Mkmov_zcut
-        call Mkmov_zcutr
+      !   if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+      !   call Mkmov_ycut
+      !   call Mkmov_ycutr
+      !   call Mkmov_zcut
+      !   call Mkmov_zcutr
 
       else
 
@@ -148,11 +148,11 @@
         
         call CreateInitialConditions
 
-        if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-        call Mkmov_ycut
-        call Mkmov_ycutr
-        call Mkmov_zcut
-        call Mkmov_zcutr
+      !   if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+      !   call Mkmov_ycut
+      !   call Mkmov_ycutr
+      !   call Mkmov_zcut
+      !   call Mkmov_zcutr
 
       endif                                                             
 
@@ -176,6 +176,14 @@
       call update_halo(vyr,lvlhalo)
       call update_halo(vzr,lvlhalo)
       call update_halo(salc,lvlhalo)
+
+      
+      if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+      call Mkmov_ycut
+      call Mkmov_ycutr
+      call Mkmov_zcut
+      call Mkmov_zcutr
+
 
 !EP   Check divergence. Should be reduced to machine precision after the first
 !phcalc. Here it can still be high.
