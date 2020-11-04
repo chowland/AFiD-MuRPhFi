@@ -25,9 +25,9 @@
            vz(k,j,i)=0.0d0
            yyy=xm(k) 
            xxx=yc(j)            
-           call random_number(varptb)
-           varptb=0.d0
-           vy(k,j,i)=-yyy*(1.d0-yyy)*(2.d0*yyy-1.d0)*sin(pi*xxx)/pi
+          !  call random_number(varptb)
+          !  varptb=0.d0
+           vy(k,j,i)=-yyy*(1.d0-yyy)*(2.d0*yyy-1.d0)*sin(2.d0*pi*xxx/ylen)/pi
           !  vy(k,j,i)=(xm(k))+0.3*(2.d0*varptb-1.d0)+ &
 !           vy(k,j,i)=+0.3*(2.d0*varptb-1.d0)+ &
 !     &                  (2.0d0*yyy-6.0d0*yyy**2+4.0d0*yyy**3) &
@@ -35,7 +35,7 @@
 
            yyy=xc(k)          
            xxx=ym(j)
-           vx(k,j,i)=-yyy**2*(1.0d0-yyy)**2*cos(pi*xxx)*eps
+           vx(k,j,i)=-yyy**2*(1.0d0-yyy)**2*cos(2.d0*pi*xxx/ylen)*eps
 !           vx(k,j,i)=1.d0 ! -yyy**2*(1.0d0-yyy)**2*cos(3.1*xxx)*eps
 
          enddo
@@ -43,7 +43,7 @@
       enddo
 
       !assign linear temperature profile in the nodes k=1 to k=nxm
-      eps=1d-2
+      eps=5d-2
       do i=xstart(3),xend(3)
       do j=xstart(2),xend(2)
       do k=1,nxm
@@ -66,7 +66,9 @@
       do i=xstartr(3),xendr(3)
       do j=xstartr(2),xendr(2)
       do k=1,nxmr
-      sal(k,j,i)=salbp(j,i)-(salbp(j,i)-saltp(j,i))*xmr(k)/xcr(nxr)
+        call random_number(varptb)
+        sal(k,j,i)=salbp(j,i)-(salbp(j,i)-saltp(j,i))*xmr(k)/xcr(nxr)
+        sal(k,j,i) = sal(k,j,i) + eps*(2.d0*varptb - 1.d0)
       enddo
       enddo
       enddo
