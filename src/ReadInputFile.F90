@@ -65,8 +65,8 @@
             bycs = 1.d0
       end if
 
-      pect = ren/prat
-      pecs = ren/pras
+      pect = ren*prat
+      pecs = ren*pras
       pi = 2.d0*dasin(1.d0)
 
       if(flagstat.ne.0) statcal = .true.
