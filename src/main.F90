@@ -261,6 +261,7 @@
           write(6,*) ' -------------------------------------------------- '
           write(6,'(a,E11.4,a,i9,a,E11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
          endif
+         call CalcMeanProfiles
         endif
 
         if((mod(time,tframe).lt.dt) .and. (floor(time/tframe).ne.0)) then
