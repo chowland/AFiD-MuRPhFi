@@ -12,7 +12,7 @@ FC += -r8 -O3 -xAVX -axCORE-AVX2#-mcmodel=large -traceback
 #======================================================================
 # Common build flags
 ##  MacOS
-# LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+#LDFLAGS = -L$(HOME)/lib_afid/fftw/lib -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 
 ## Cartesius
 # FFTW3_LIBS = -L/nfs/admin/hpc/sw/fftw3-3.3.3-intel-impi/lib -lfftw3
@@ -56,7 +56,8 @@ FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
 	  Mkmov_ycut.F90 Mkmov_zcut.F90 Init_ycut.F90 Init_zcut.F90\
 	  SpecRoutines.F90\
 	  CalcPlateCf.F90 CalcWriteQ.F90\
-	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90 InterpSalMgrd.F90
+	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90 InterpSalMgrd.F90\
+	  CalcMeanProfiles.F90
 
 #=======================================================================
 #  Files that create modules:
