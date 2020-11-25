@@ -85,8 +85,8 @@ subroutine CalcMeanProfiles
     do i=xstart(3),xend(3)
         do j=xstart(2),xend(2)
             do k=1,nxm
-                chiT(k) = chiT(k) + ((temp(k,j,i+1)-temp(k,j,i-1))*0.5*dz)**2*inym*inzm
-                chiT(k) = chiT(k) + ((temp(k,j+1,i)-temp(k,j-1,i))*0.5*dy)**2*inym*inzm
+                chiT(k) = chiT(k) + ((temp(k,j,i+1)-temp(k,j,i-1))*0.5*dz)**2*inym*inzm &
+                                & + ((temp(k,j+1,i)-temp(k,j-1,i))*0.5*dy)**2*inym*inzm
             end do
             tdx = 0.5*dx/g3rm(1)
             chiT(1) = chiT(1) + ((temp(2,j,i)-temp(1,j,i)+2.0*TfixS*(temp(1,j,i)-tempbp(j,i)))&
@@ -102,6 +102,33 @@ subroutine CalcMeanProfiles
     end do
 
     call MpiAllSumReal1D(chiT,nxm)
+
+    do i=xstart(3),xend(3)
+        do j=xstart(2),xend(2)
+            do k=1,nxm
+                epsilon(k) = epsilon(k) + ((vz(k,j,i+1)-vz(k,j,i))*dz)**2*inym*inzm &   ! (dw/dz)^2
+                                      & + (0.25*(vy(k,j+1,i+1)+vy(k,j,i+1)-vy(k,j+1,i-1)-vy(k,j,i-1))*dz)**2*inym*inzm & ! (dv/dz)^2
+                                      & + (0.25*(vx(k+1,j,i+1)+vx(k,j,i+1)-vx(k+1,j,i-1)-vx(k,j,i-1))*dz)**2*inym*inzm & ! (du/dz)^2
+                                      & + (0.25*(vz(k,j+1,i+1)+vz(k,j+1,i)-vz(k,j-1,i+1)-vz(k,j-1,i))*dy)**2*inym*inzm & ! (dw/dy)^2
+                                      & + ((vy(k,j+1,i)-vy(k,j,i))*dy)**2*inym*inzm &   ! (dv/dy)^2
+                                      & + (0.25*(vx(k+1,j+1,i)+vx(k,j+1,i)-vx(k+1,j-1,i)-vx(k,j-1,i))*dy)**2*inym*inzm & ! (du/dy)^2
+                                      & + ((vx(k+1,j,i)-vx(k,j,i))*udx3m(k))**2*inym*inzm   ! (du/dx)^2
+            end do
+            tdx = 0.25*dx/g3rm(1)
+            epsilon(1) = epsilon(1) + ((vz(2,j,i+1)+vz(2,j,i)+vz(1,j,i+1)+vz(1,j,i)          )*tdx)**2*inym*inzm &  
+                                  & + ((vy(2,j+1,i)+vy(2,j,i)+vy(1,j+1,i)+vy(1,j,i)-2*xminusU)*tdx)**2*inym*inzm
+            do k=2,nxm-1
+                tdx = 0.25*dx/g3rm(k)
+                epsilon(k) = epsilon(k) + ((vz(k+1,j,i+1)+vz(k+1,j,i)-vz(k-1,j,i+1)-vz(k-1,j,i))*tdx)**2*inym*inzm &    ! (dw/dx)^2
+                                      & + ((vy(k+1,j+1,i)+vy(k+1,j,i)-vy(k-1,j+1,i)-vy(k-1,j,i))*tdx)**2*inym*inzm      ! (dv/dx)^2
+            end do
+            tdx = 0.25*dx/g3rm(nxm)
+            epsilon(nxm) = epsilon(nxm) + ((        -vz(nxm-1,j,i+1)-vz(nxm-1,j,i)-vz(nxm,j,i+1)-vz(nxm,j,i))*tdx)**2*inym*inzm &
+                                      & + ((2*xplusU-vy(nxm-1,j+1,i)-vy(nxm-1,j,i)-vy(nxm,j+1,i)-vy(nxm,j,i))*tdx)**2*inym*inzm
+        end do
+    end do
+
+    call MpiAllSumReal1D(epsilon,nxm)
 
     inymr = 1.d0/nymr
     inzmr = 1.d0/nzmr
@@ -189,6 +216,9 @@ subroutine CalcMeanProfiles
         call HdfSerialWriteReal1D(dsetname,filename,vzrms,nxm)
 
         dsetname = trim("chiT/"//nstat)
+        call HdfSerialWriteReal1D(dsetname,filename,chiT,nxm)
+        
+        dsetname = trim("epsilon/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,chiT,nxm)
         
         dsetname = trim("Sbar/"//nstat)
