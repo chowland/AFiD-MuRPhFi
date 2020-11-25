@@ -35,6 +35,15 @@ subroutine CalcMeanProfiles
 
     tii(1) = MPI_WTIME()
 
+    Tbar(:) =0.0;   vybar(:)=0.0;   vzbar(:)=0.0
+    vxT(:)  =0.0;   vyT(:)  =0.0;   vzT(:)  =0.0
+    vxrms(:)=0.0;   vyrms(:)=0.0;   vzrms(:)=0.0
+    Trms(:) =0.0;   vxvy(:) =0.0;   vxvz(:) =0.0
+    chiT(:) =0.0;   epsilon(:)=0.0
+
+    Sbar(:)=0.0;    Srms(:)=0.0;    chiS(:)=0.0
+    vxS(:) =0.0;    vyS(:) =0.0;    vzS(:) =0.0
+
     inym = 1.d0/nym
     inzm = 1.d0/nzm
 
@@ -144,60 +153,60 @@ subroutine CalcMeanProfiles
     inquire(file=filename,exist=fexist)
     if (.not.fexist) then
         if (ismaster) then
-            call HdfCreateBlankFile(filename)
+            call HdfCreateMeansFile(filename)
         end if
     end if
 
     if (ismaster) then
-        dsetname = trim("Tbar"//nstat)
+        dsetname = trim("Tbar/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,Tbar,nxm)
 
-        dsetname = trim("vybar"//nstat)
+        dsetname = trim("vybar/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vybar,nxm)
 
-        dsetname = trim("vzbar"//nstat)
+        dsetname = trim("vzbar/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vzbar,nxm)
 
-        dsetname = trim("vxT"//nstat)
+        dsetname = trim("vxT/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vxT,nxm)
 
-        dsetname = trim("vyT"//nstat)
+        dsetname = trim("vyT/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vyT,nxm)
 
-        dsetname = trim("vzT"//nstat)
+        dsetname = trim("vzT/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vzT,nxm)
 
-        dsetname = trim("Trms"//nstat)
+        dsetname = trim("Trms/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,Trms,nxm)
 
-        dsetname = trim("vxrms"//nstat)
+        dsetname = trim("vxrms/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vxrms,nxm)
         
-        dsetname = trim("vyrms"//nstat)
+        dsetname = trim("vyrms/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vyrms,nxm)
 
-        dsetname = trim("vzrms"//nstat)
+        dsetname = trim("vzrms/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vzrms,nxm)
 
-        dsetname = trim("chiT"//nstat)
+        dsetname = trim("chiT/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,chiT,nxm)
         
-        dsetname = trim("Sbar"//nstat)
+        dsetname = trim("Sbar/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,Sbar,nxmr)
 
-        dsetname = trim("vxS"//nstat)
+        dsetname = trim("vxS/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vxS,nxmr)
 
-        dsetname = trim("vyS"//nstat)
+        dsetname = trim("vyS/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vyS,nxmr)
 
-        dsetname = trim("vzS"//nstat)
+        dsetname = trim("vzS/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vzS,nxmr)
 
-        dsetname = trim("Srms"//nstat)
+        dsetname = trim("Srms/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,Srms,nxmr)
 
-        dsetname = trim("chiS"//nstat)
+        dsetname = trim("chiS/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,chiS,nxmr)
     end if
 
@@ -207,3 +216,96 @@ subroutine CalcMeanProfiles
     if (ismaster) write(*,"(a,f8.3,a)") "Profile save duration: ",tii(2)-tii(1),"s"
 
 end subroutine
+
+
+! Subroutine for creating HDF5 file with structure to contain mean profiles
+
+subroutine HdfCreateMeansFile(filename)
+    use hdf5
+    
+    implicit none
+
+    character(30),intent(in) :: filename
+    integer(HID_T) :: file_id, group_id
+    integer :: hdf_error
+
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, file_id, hdf_error)
+
+    call h5gcreate_f(file_id,"Tbar",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vybar",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vzbar",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vxT",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vyT",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vzT",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"Trms",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vxrms",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vyrms",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vzrms",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"chiT",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"epsilon",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"Sbar",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vxS",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vyS",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vzS",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"Srms",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"chiS",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    
+    call h5fclose_f(file_id, hdf_error)
+end subroutine HdfCreateMeansFile
+
+! subroutine HdfSerialWriteProfile1D(grpname,filename,var,sz)
+    
+!     use hdf5
+!     use param
+
+!     implicit none
+
+!     character(30),intent(in) :: grpname, filename
+!     integer, intent(in) :: sz
+!     real, dimension(sz), intent(in) :: var
+!     integer(HID_T) :: file_id, group_id
+!     integer(HID_T) :: dset, filespace
+!     integer :: hdf_error
+!     integer(HSIZE_T) :: dims(1)
+!     character(5) :: dsetname
+!     logical :: linkexists
+
+!     call h5fopen_f(filename, H5F_ACC_RDWR_F, file_id, hdf_error)
+!     call h5gopen_f(file_id, grpname, group_id, hdf_error)
+
+!     dims(1)=sz
+
+!     write(dsetname,"(i5.5)")nint(time/tframe)
+
+!     call h5screate_simple_f(1, dims, filespace, hdf_error)
+!     call h5lexists_f(group_id, dsetname, linkexists, hdf_error)
+!     if (linkexists) call h5ldelete_f(group_id, dsetname, hdf_error)
+
+!     call h5dcreate_f(group_id, dsetname, H5T_NATIVE_DOUBLE, &
+!                         & filespace, dset, hdf_error)
+!     call h5dwrite_f(dset, H5T_NATIVE_DOUBLE, var(1:sz), dims, hdf_error)
+!     call h5dclose_f(dset, hdf_error)
+
+!     call h5sclose_f(filespace, hdf_error)
+!     call h5gclose_f(group_id, hdf_error)
+!     call h5fclose_f(file_id, hdf_error)
+
+! end subroutine HdfSerialWriteProfile1D
