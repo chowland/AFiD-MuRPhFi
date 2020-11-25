@@ -2,7 +2,8 @@
 #  Compiler options
 #=======================================================================
 FC = h5pfc -fpp
-FC += -r8 -O3
+# Cartesius
+FC += -r8 -O3 -xAVX -axCORE-AVX2#-mcmodel=large -traceback
 # FC += -r8 -O0 -g -traceback -check bounds 
 # FC += -DSHM -DSHM_DEBUG
 
@@ -11,14 +12,15 @@ FC += -r8 -O3
 #======================================================================
 # Common build flags
 ##  MacOS
-LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+# LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 
 ## Cartesius
 # FFTW3_LIBS = -L/nfs/admin/hpc/sw/fftw3-3.3.3-intel-impi/lib -lfftw3
-# BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
-# HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
-# # LDFLAGS = -L$(LD_LIBRARY_PATH) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
-# LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
+FFTW3_LIBS = -lfftw3
+BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
+#LDFLAGS = -L$(LD_LIBRARY_PATH) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
+LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
 
 
 ## MareNostrum
