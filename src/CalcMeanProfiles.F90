@@ -97,7 +97,7 @@ subroutine CalcMeanProfiles
             end do
             tdx = 0.5*dx/g3rm(nxm)
             chiT(nxm) = chiT(nxm) + ((temp(nxm,j,i)-temp(nxm-1,j,i)+2.0*TfixN*(temptp(j,i)-temp(nxm,j,i)))&
-            & *tdx)**2*inym*inzm
+                            & *tdx)**2*inym*inzm
         end do
     end do
 
@@ -161,14 +161,14 @@ subroutine CalcMeanProfiles
             end do
             tdxr = 0.5*dxr/g3rmr(1)
             chiS(1) = chiS(1) + ((sal(2,j,i)-sal(1,j,i)+2.0*SfixS*(sal(1,j,i)-salbp(j,i)))&
-                            & *tdx)**2*inymr*inzmr
+                            & *tdxr)**2*inymr*inzmr
             do k=2,nxmr-1
-                tdx = 0.5*dxr/g3rmr(k)
-                chiS(k) = chiS(k) + ((sal(k+1,j,i)-sal(k-1,j,i)) * tdx)**2*inymr*inzmr
+                tdxr = 0.5*dxr/g3rmr(k)
+                chiS(k) = chiS(k) + ((sal(k+1,j,i)-sal(k-1,j,i)) * tdxr)**2*inymr*inzmr
             end do
-            tdx = 0.5*dxr/g3rmr(nxmr)
+            tdxr = 0.5*dxr/g3rmr(nxmr)
             chiS(nxmr) = chiS(nxmr) + ((sal(nxmr,j,i)-sal(nxmr-1,j,i)+2.0*SfixN*(saltp(j,i)-sal(nxmr,j,i)))&
-            & *tdx)**2*inymr*inzmr
+                            & *tdxr)**2*inymr*inzmr
         end do
     end do
 
@@ -300,42 +300,3 @@ subroutine HdfCreateMeansFile(filename)
     
     call h5fclose_f(file_id, hdf_error)
 end subroutine HdfCreateMeansFile
-
-! subroutine HdfSerialWriteProfile1D(grpname,filename,var,sz)
-    
-!     use hdf5
-!     use param
-
-!     implicit none
-
-!     character(30),intent(in) :: grpname, filename
-!     integer, intent(in) :: sz
-!     real, dimension(sz), intent(in) :: var
-!     integer(HID_T) :: file_id, group_id
-!     integer(HID_T) :: dset, filespace
-!     integer :: hdf_error
-!     integer(HSIZE_T) :: dims(1)
-!     character(5) :: dsetname
-!     logical :: linkexists
-
-!     call h5fopen_f(filename, H5F_ACC_RDWR_F, file_id, hdf_error)
-!     call h5gopen_f(file_id, grpname, group_id, hdf_error)
-
-!     dims(1)=sz
-
-!     write(dsetname,"(i5.5)")nint(time/tframe)
-
-!     call h5screate_simple_f(1, dims, filespace, hdf_error)
-!     call h5lexists_f(group_id, dsetname, linkexists, hdf_error)
-!     if (linkexists) call h5ldelete_f(group_id, dsetname, hdf_error)
-
-!     call h5dcreate_f(group_id, dsetname, H5T_NATIVE_DOUBLE, &
-!                         & filespace, dset, hdf_error)
-!     call h5dwrite_f(dset, H5T_NATIVE_DOUBLE, var(1:sz), dims, hdf_error)
-!     call h5dclose_f(dset, hdf_error)
-
-!     call h5sclose_f(filespace, hdf_error)
-!     call h5gclose_f(group_id, hdf_error)
-!     call h5fclose_f(file_id, hdf_error)
-
-! end subroutine HdfSerialWriteProfile1D
