@@ -18,27 +18,32 @@
       real :: xxx,yyy,eps,varptb
 
       call random_seed()
-      eps=0.5d0
+      eps=1d-2
       do i=xstart(3),xend(3)
-      do j=xstart(2),xend(2)
-      do k=1,nxm
-           vz(k,j,i)=0.0d0
-           yyy=xm(k) 
-           xxx=yc(j)            
-          !  call random_number(varptb)
+        do j=xstart(2),xend(2)
+          do k=1,nxm
+            call random_number(varptb)
+            vz(k,j,i)=eps*(2.d0*varptb - 1.d0)
+            yyy=xm(k) 
+            xxx=yc(j)            
+            call random_number(varptb)
           !  varptb=0.d0
-           vy(k,j,i)=-yyy*(1.d0-yyy)*(2.d0*yyy-1.d0)*sin(2.d0*pi*xxx/ylen)/pi
+          !  vy(k,j,i)=-yyy*(1.d0-yyy)*(2.d0*yyy-1.d0)*sin(2.d0*pi*xxx/ylen)/pi
           !  vy(k,j,i)=(xm(k))+0.3*(2.d0*varptb-1.d0)+ &
 !           vy(k,j,i)=+0.3*(2.d0*varptb-1.d0)+ &
 !     &                  (2.0d0*yyy-6.0d0*yyy**2+4.0d0*yyy**3) &
 !     &                  *sin(3*xxx)*eps
 
-           yyy=xc(k)          
-           xxx=ym(j)
-           vx(k,j,i)=-yyy**2*(1.0d0-yyy)**2*cos(2.d0*pi*xxx/ylen)*eps
+          !  yyy=xc(k)          
+          !  xxx=ym(j)
+          !  vx(k,j,i)=-yyy**2*(1.0d0-yyy)**2*cos(2.d0*pi*xxx/ylen)*eps
 !           vx(k,j,i)=1.d0 ! -yyy**2*(1.0d0-yyy)**2*cos(3.1*xxx)*eps
-
-         enddo
+            !CJH Laminar vertical convection as Batchelor (54) + noise
+            vy(k,j,i) = ren*yyy*(2*yyy-1)*(yyy-1) + eps*(2.d0*varptb - 1.d0)
+            call random_number(varptb)
+            vx(k,j,i) = eps*(2.d0*varptb - 1.d0)
+          enddo
+          vx(1,j,i) = 0.d0   !CJH Enforce no-slip BC at x=0
         enddo
       enddo
 
