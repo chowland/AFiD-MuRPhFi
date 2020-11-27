@@ -219,7 +219,7 @@ subroutine CalcMeanProfiles
         call HdfSerialWriteReal1D(dsetname,filename,chiT,nxm)
         
         dsetname = trim("epsilon/"//nstat)
-        call HdfSerialWriteReal1D(dsetname,filename,chiT,nxm)
+        call HdfSerialWriteReal1D(dsetname,filename,epsilon,nxm)
         
         dsetname = trim("Sbar/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,Sbar,nxmr)
