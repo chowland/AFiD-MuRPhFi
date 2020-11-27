@@ -39,7 +39,7 @@
           !  vx(k,j,i)=-yyy**2*(1.0d0-yyy)**2*cos(2.d0*pi*xxx/ylen)*eps
 !           vx(k,j,i)=1.d0 ! -yyy**2*(1.0d0-yyy)**2*cos(3.1*xxx)*eps
             !CJH Laminar vertical convection as Batchelor (54) + noise
-            vy(k,j,i) = ren*/12.d0*yyy*(2*yyy-1)*(yyy-1) + eps*(2.d0*varptb - 1.d0)
+            vy(k,j,i) = ren/12.d0*yyy*(2*yyy-1)*(yyy-1) + eps*(2.d0*varptb - 1.d0)
             call random_number(varptb)
             vx(k,j,i) = eps*(2.d0*varptb - 1.d0)
           enddo
