@@ -10,11 +10,14 @@
 
       subroutine CorrectVelocity
       use param
-      use local_arrays, only: vy,vx,dphhalo,vz
-      use decomp_2d, only: xstart,xend
+      use local_arrays, only: vy,vx,dphhalo,vz,temp,sal
+      use decomp_2d, only: xstart,xend,xstartr,xendr
+      use mpih
       implicit none
       integer :: jc,jm,kc,km,ic,im
       real    :: usukm,udy,udz,locdph
+      real, dimension(nym) :: vxbar
+      real :: vybulk, vzbulk, Tbulk, Sbulk, idx
 
       udy = al*dt*dy
       udz = al*dt*dz
@@ -43,6 +46,68 @@
        enddo
       enddo
 !$OMP END PARALLEL DO
+
+      !CJH Remove mean mass flux
+      vxbar(:)=0.d0
+      vybulk = 0.d0; vzbulk = 0.d0; Tbulk = 0.d0
+      do ic=xstart(3),xend(3)
+        do jc=xstart(2),xend(2)
+          do kc=2,nxm
+            vxbar(kc) = vxbar(kc) + vx(kc,jc,ic)
+          end do
+          do kc=1,nxm
+            idx = 1/udx3m(kc)
+            vybulk = vybulk + vy(kc,jc,ic)*idx
+            vzbulk = vzbulk + vz(kc,jc,ic)*idx
+            Tbulk = Tbulk + temp(kc,jc,ic)*idx
+          end do
+        end do
+      end do
+
+      call MpiAllSumReal1D(vxbar,nxm)
+      call MpiAllSumRealScalar(vybulk)
+      call MpiAllSumRealScalar(vzbulk)
+      call MpiAllSumRealScalar(Tbulk)
+
+      Sbulk = 0.d0
+      do ic=xstartr(3),xendr(3)
+        do jc=xstartr(2),xendr(2)
+          do kc=1,nxmr
+            idx = 1/udx3mr(kc)
+            Sbulk = Sbulk + sal(kc,jc,ic)*idx
+          end do
+        end do
+      end do
+
+      call MpiAllSumRealScalar(Sbulk)
+
+      Sbulk = Sbulk/nymr/nzmr
+      Tbulk = Tbulk/nym/nzm
+      vzbulk = vzbulk/nym/nzm
+      vybulk = vybulk/nym/nzm
+      do kc=1,nxm
+        vxbar(kc) = vxbar(kc)/nym/nzm
+      end do
+
+      do ic=xstart(3),xend(3)
+        do jc=xstart(2),xend(2)
+          do kc=2,nxm
+            vx(kc,jc,ic) = vx(kc,jc,ic) - vxbar(kc)
+          end do
+          do kc=1,nxm
+            vy(kc,jc,ic) = vy(kc,jc,ic) - vybulk
+            vz(kc,jc,ic) = vz(kc,jc,ic) - vzbulk
+            temp(kc,jc,ic) = temp(kc,jc,ic) - Tbulk
+          end do
+        end do
+      end do
+      do ic=xstartr(3),xendr(3)
+        do jc=xstartr(2),xendr(2)
+          do kc=1,nxmr
+            sal(kc,jc,ic) = sal(kc,jc,ic) - Sbulk
+          end do
+        end do
+      end do
 
       return
       end
