@@ -177,7 +177,7 @@
       call update_halo(vzr,lvlhalo)
       call update_halo(salc,lvlhalo)
 
-      
+      call CalcMeanProfiles
       if(ismaster)  write(6,*) 'Write slice ycut and zcut'
       call Mkmov_ycut
       call Mkmov_ycutr
