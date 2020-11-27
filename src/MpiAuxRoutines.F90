@@ -55,6 +55,21 @@
       return
       end subroutine MpiSumRealScalar
 !==============================================================================
+!CJH Added AllSum routine
+subroutine MpiAllSumRealScalar(var)
+      use mpih
+      implicit none
+      real, intent(inout) :: var
+      real :: buf
+            
+      call MPI_ALLREDUCE(var,buf,1, &
+              MPI_DOUBLE_PRECISION,MPI_SUM,MPI_COMM_WORLD,ierr)
+      
+      var = buf
+      
+      return
+end subroutine MpiAllSumRealScalar
+!==============================================================================
 
       subroutine MpiMaxRealScalar(var)
       use mpih
