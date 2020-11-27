@@ -174,7 +174,7 @@ subroutine CalcMeanProfiles
 
     call MpiAllSumReal1D(chiS,nxmr)
 
-    write(nstat,"(i5.5)")nint(time/tframe)
+    write(nstat,"(i5.5)")nint(time/tout)
     filename = trim("outputdir/means.h5")
     
     inquire(file=filename,exist=fexist)
