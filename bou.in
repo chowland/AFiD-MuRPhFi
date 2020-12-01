@@ -3,13 +3,13 @@
  NXMR   NYMR  NZMR (Ignored if ISTR3R>0)
  256    256   1  
  NTST   WALLTIMEMAX  TOUT   TMAX   IRESET   tscaleT
- 30000  600          5e-1   100.0  1        1
+ 1e6    1200         5e-1   100.0  1        0
  ALX3D  ISTR3 STR3   ISTR3R
  1.0    6     12.0   6
- YLEN   ZLEN 
+ YLEN   ZLEN
  2.0    0.05
  RAYT   PRAT   RAYS  PRAS   DT     RESID    CFLMAX
- 1e5    1.0    1e5   1.0    1e-3   1.e-3    0.2
+-1e6    1.0    1e7   10.0   1e-3   1.e-3    0.2
  STATON  BALANCEON  TSTA  STAREAD
  1       1          0     0
  inslws   inslwn    TfixS   TfixN   SfixS   SfixN   gAxis
@@ -18,7 +18,7 @@
  1                         1e-8                0.01                   1e3
  SLABDUMP(STST3)
  0
- xplusU  xminusU
- 0.d0   0.d0
+ xplusU  xminusU    dPdz
+ 0.d0   0.d0        1.d0
  TFRAME
- 1.0
+ 1e0

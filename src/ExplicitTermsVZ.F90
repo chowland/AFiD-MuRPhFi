@@ -122,6 +122,17 @@
       end if
 !$OMP END PARALLEL DO
 
+      !CJH Add a mean pressure gradient
+      if (dPdz.ne.0) then
+        do ic=xstart(3),xend(3)
+          do jc=xstart(2),xend(2)
+            do kc=1,nxm
+              dq(kc,jc,ic) = dq(kc,jc,ic) - dPdz
+            end do
+          end do
+        end do
+      end if
+      
       return
       end
 !

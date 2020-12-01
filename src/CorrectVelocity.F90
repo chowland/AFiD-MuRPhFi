@@ -96,11 +96,19 @@
           end do
           do kc=1,nxm
             vy(kc,jc,ic) = vy(kc,jc,ic) - vybulk
-            vz(kc,jc,ic) = vz(kc,jc,ic) - vzbulk
             temp(kc,jc,ic) = temp(kc,jc,ic) - Tbulk
           end do
         end do
       end do
+      if (dPdz.eq.0) then
+        do ic=xstart(3),xend(3)
+          do jc=xstart(2),xend(2)
+            do kc=1,nxm
+              vz(kc,jc,ic) = vz(kc,jc,ic) - vzbulk
+            end do
+          end do
+        end do
+      end if
       do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
           do kc=1,nxmr

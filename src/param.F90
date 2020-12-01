@@ -18,7 +18,7 @@
         integer   :: inslws,inslwn
         integer   :: TfixS,TfixN,SfixS,SfixN        !CJH option for fixed T/S BCs
         integer   :: gAxis      !CJH option to choose gravity axis
-        real      :: xminusU,xplusU
+        real      :: xminusU,xplusU,dPdz
         integer   :: starea,tsta
         real      :: dtmin,dtmax,limitCFL,limitVel
         integer   :: nson,idtv
