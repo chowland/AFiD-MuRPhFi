@@ -215,6 +215,12 @@ subroutine CalcMeanProfiles
         dsetname = trim("vzrms/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vzrms,nxm)
 
+        dsetname = trim("vxvy/"//nstat)
+        call HdfSerialWriteReal1D(dsetname,filename,vxvy,nxm)
+
+        dsetname = trim("vxvz/"//nstat)
+        call HdfSerialWriteReal1D(dsetname,filename,vxvz,nxm)
+
         dsetname = trim("chiT/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,chiT,nxm)
         
@@ -280,6 +286,10 @@ subroutine HdfCreateMeansFile(filename)
     call h5gcreate_f(file_id,"vyrms",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"vzrms",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vxvy",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vxvz",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"chiT",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
