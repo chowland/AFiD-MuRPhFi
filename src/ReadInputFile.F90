@@ -19,7 +19,7 @@
         read(15,301) dummy
         read(15,*) nxmr,nymr,nzmr
         read(15,301) dummy
-        read(15,*) ntst,walltimemax,tout,tmax,ireset
+        read(15,*) ntst,walltimemax,tout,tmax,ireset,tscaleT
         read(15,301) dummy
         read(15,*) alx3,istr3,str3,istr3r
         read(15,301) dummy
