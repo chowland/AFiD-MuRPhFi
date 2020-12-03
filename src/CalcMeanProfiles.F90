@@ -60,8 +60,8 @@ subroutine CalcMeanProfiles
 
                 Trms(k) = Trms(k) + temp(k,j,i)**2*inym*inzm
                 vxrms(k) = vxrms(k) + (0.5*(vx(k,j,i)+vx(k+1,j,i)))**2*inym*inzm
-                vyrms(k) = vyrms(k) + (0.5*(vx(k,j,i)+vx(k+1,j,i)))**2*inym*inzm
-                vzrms(k) = vzrms(k) + (0.5*(vx(k,j,i)+vx(k+1,j,i)))**2*inym*inzm
+                vyrms(k) = vyrms(k) + (0.5*(vy(k,j,i)+vy(k,j+1,i)))**2*inym*inzm
+                vzrms(k) = vzrms(k) + (0.5*(vz(k,j,i)+vz(k,j,i+1)))**2*inym*inzm
 
                 vxvy(k) = vxvy(k) + 0.25*(vx(k,j,i)+vx(k+1,j,i))*(vy(k,j,i)+vy(k,j+1,i))*inym*inzm
                 vxvz(k) = vxvz(k) + 0.25*(vx(k,j,i)+vx(k+1,j,i))*(vz(k,j,i)+vz(k,j,i+1))*inym*inzm
@@ -81,6 +81,13 @@ subroutine CalcMeanProfiles
     call MpiAllSumReal1D(vzrms,nxm)
     call MpiAllSumReal1D(vxvy,nxm)
     call MpiAllSumReal1D(vxvz,nxm)
+
+    do k=1,nxm
+        Trms(k) = sqrt(Trms(k))
+        vxrms(k) = sqrt(vxrms(k))
+        vyrms(k) = sqrt(vyrms(k))
+        vzrms(k) = sqrt(vzrms(k))
+    end do
 
     do i=xstart(3),xend(3)
         do j=xstart(2),xend(2)
@@ -130,6 +137,11 @@ subroutine CalcMeanProfiles
 
     call MpiAllSumReal1D(epsilon,nxm)
 
+    do k=1,nxm
+        epsilon(k) = epsilon(k)/ren
+        chiT(k) = chiT(k)/pect
+    end do
+
     inymr = 1.d0/nymr
     inzmr = 1.d0/nzmr
 
@@ -153,6 +165,10 @@ subroutine CalcMeanProfiles
     call MpiAllSumReal1D(vzS,nxmr)
     call MpiAllSumReal1D(Srms,nxmr)
 
+    do k=1,nxmr
+        Srms(k) = sqrt(Srms(k))
+    end do
+
     do i=xstartr(3),xendr(3)
         do j=xstartr(2),xendr(2)
             do k=1,nxmr
@@ -173,6 +189,10 @@ subroutine CalcMeanProfiles
     end do
 
     call MpiAllSumReal1D(chiS,nxmr)
+
+    do k=1,nxmr
+        chiS(k) = chiS(k)/pecs
+    end do
 
     write(nstat,"(i5.5)")nint(time/tout)
     filename = trim("outputdir/means.h5")
