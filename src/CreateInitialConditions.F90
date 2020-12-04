@@ -15,7 +15,7 @@
       use mpih
       implicit none
       integer :: j,k,i
-      real :: xxx,yyy,eps,varptb
+      real :: xxx,yyy,eps,varptb,amp
 
       call random_seed()
       eps=1d-2
@@ -54,7 +54,12 @@
       do k=1,nxm
         call random_number(varptb)
         temp(k,j,i)=tempbp(j,i)+(temptp(j,i)-tempbp(j,i))*xm(k)/xc(nx)
-        temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
+        if (abs(xm(k)-0.5) + eps > 0.5) then
+          amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
+          temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
+        else
+          temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
+        end if
       enddo
       enddo
       enddo
@@ -73,7 +78,12 @@
       do k=1,nxmr
         call random_number(varptb)
         sal(k,j,i)=salbp(j,i)-(salbp(j,i)-saltp(j,i))*xmr(k)/xcr(nxr)
-        sal(k,j,i) = sal(k,j,i) + eps*(2.d0*varptb - 1.d0)
+        if (abs(xmr(k)-0.5) + eps > 0.5) then
+          amp = 0.5 - abs(xmr(k)-0.5) ! CJH Prevent values of |S| exceeding 0.5
+          sal(k,j,i) = sal(k,j,i) + amp*(2.d0*varptb - 1.d0)
+        else
+          sal(k,j,i) = sal(k,j,i) + eps*(2.d0*varptb - 1.d0)
+        end if
       enddo
       enddo
       enddo
