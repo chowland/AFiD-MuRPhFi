@@ -78,14 +78,14 @@ subroutine ReadFlowInterp
         call MpiAbort
     end if
 
-    if (ismaster) then
-        write(*,*) "nx, nxo: ", nx, nxo
-        write(*,*) "ny, nyo: ", ny, nyo
-        write(*,*) "nz, nzo: ", nz, nzo
-        write(*,*) "nxr, nxro: ", nxr, nxro
-        write(*,*) "nyr, nyro: ", nyr, nyro
-        write(*,*) "nzr, nzro: ", nzr, nzro
-    end if
+    ! if (ismaster) then
+    !     write(*,*) "nx, nxo: ", nx, nxo
+    !     write(*,*) "ny, nyo: ", ny, nyo
+    !     write(*,*) "nz, nzo: ", nz, nzo
+    !     write(*,*) "nxr, nxro: ", nxr, nxro
+    !     write(*,*) "nyr, nyro: ", nyr, nyro
+    !     write(*,*) "nzr, nzro: ", nzr, nzro
+    ! end if
 
     ! Check whether we are using a new grid
     if ((nx.ne.nxo) .or. (ny.ne.nyo) .or. (nz.ne.nzo) .or. &
@@ -110,27 +110,41 @@ subroutine ReadFlowInterp
 
         call CreateOldGrid
 
-        if (ismaster) then
-            call HdfCreateBlankFile("grids_test.h5")
-            call HdfSerialWriteReal1D("xco", "grids_test.h5", xco, nxo)
-            call HdfSerialWriteReal1D("xcro", "grids_test.h5", xcro, nxro)
-            call HdfSerialWriteReal1D("xmo", "grids_test.h5", xmo, nxo)
-            call HdfSerialWriteReal1D("xmro", "grids_test.h5", xmro, nxro)
-            call HdfSerialWriteReal1D("ycro", "grids_test.h5", ycro, nyro)
-            call HdfSerialWriteReal1D("ymro", "grids_test.h5", ymro, nyro)
-        end if
+        ! if (ismaster) then
+        !     filnam = trim("grids_test.h5")
+        !     call HdfCreateBlankFile(filnam)
+        !     dsetname = trim("xco")
+        !     call HdfSerialWriteReal1D(dsetname, filnam, xco, nxo)
+        !     dsetname = trim("xcro")
+        !     call HdfSerialWriteReal1D(dsetname, filnam, xcro, nxro)
+        !     dsetname = trim("xmo")
+        !     call HdfSerialWriteReal1D(dsetname, filnam, xmo, nxo)
+        !     dsetname = trim("xmro")
+        !     call HdfSerialWriteReal1D(dsetname, filnam, xmro, nxro)
+        !     dsetname = trim("ycro")
+        !     call HdfSerialWriteReal1D(dsetname, filnam, ycro, nyro)
+        !     dsetname = trim("ymro")
+        !     call HdfSerialWriteReal1D(dsetname, filnam, ymro, nyro)
+        ! end if
 
         call CreateInputStencil
 
-        if (ismaster) then
-            call HdfCreateBlankFile("itp_range.h5")
-            call HdfSerialWriteInt1D("irangs", "itp_range.h5", irangs, nx+1)
-            call HdfSerialWriteInt1D("jrangs", "itp_range.h5", jrangs, ny+1)
-            call HdfSerialWriteInt1D("krangs", "itp_range.h5", krangs, nz+1)
-            call HdfSerialWriteInt1D("irangc", "itp_range.h5", irangc, nx+1)
-            call HdfSerialWriteInt1D("jrangc", "itp_range.h5", jrangc, ny+1)
-            call HdfSerialWriteInt1D("krangc", "itp_range.h5", krangc, nz+1)
-        end if
+        ! if (ismaster) then
+        !     filnam = trim("itp_range.h5")
+        !     call HdfCreateBlankFile(filnam)
+        !     dsetname = trim("irangs")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, irangs, nx+1)
+        !     dsetname = trim("jrangs")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, jrangs, ny+1)
+        !     dsetname = trim("krangs")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, krangs, nz+1)
+        !     dsetname = trim("irangc")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, irangc, nx+1)
+        !     dsetname = trim("jrangc")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, jrangc, ny+1)
+        !     dsetname = trim("krangc")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, krangc, nz+1)
+        ! end if
 
         call MpiBarrier
         xs2o = ceiling(real((xstart(2) - 1)*nymo/nym)) + 1
@@ -142,9 +156,9 @@ subroutine ReadFlowInterp
         xs3o = max(xs3o, 1)
         xe3o = min(xe3o, nzmo)
 
-        write(*,*) "xs2o, xe2o: ",xs2o, xe2o
-        write(*,*) "xs2, xe2: ", xstart(2), xend(2)
-        write(*,*) "xs3o, xe3o: ",xs3o, xe3o
+        ! write(*,*) "xs2o, xe2o: ",xs2o, xe2o
+        ! write(*,*) "xs2, xe2: ", xstart(2), xend(2)
+        ! write(*,*) "xs3o, xe3o: ",xs3o, xe3o
 
         call InterpInputVel
 
@@ -152,15 +166,21 @@ subroutine ReadFlowInterp
 
         call CreateSalStencil
 
-        if (ismaster) then
-            ! call HdfCreateBlankFile("itp_range.h5")
-            call HdfSerialWriteInt1D("irangsr", "itp_range.h5", irangs, nx+1)
-            call HdfSerialWriteInt1D("jrangsr", "itp_range.h5", jrangs, ny+1)
-            call HdfSerialWriteInt1D("krangsr", "itp_range.h5", krangs, nz+1)
-            call HdfSerialWriteInt1D("irangcr", "itp_range.h5", irangc, nx+1)
-            call HdfSerialWriteInt1D("jrangcr", "itp_range.h5", jrangc, ny+1)
-            call HdfSerialWriteInt1D("krangcr", "itp_range.h5", krangc, nz+1)
-        end if
+        ! if (ismaster) then
+        !     filnam = trim("itp_range.h5")
+        !     dsetname = trim("irangsr")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, irangs, nx+1)
+        !     dsetname = trim("jrangsr")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, jrangs, ny+1)
+        !     dsetname = trim("krangsr")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, krangs, nz+1)
+        !     dsetname = trim("irangcr")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, irangc, nx+1)
+        !     dsetname = trim("jrangcr")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, jrangc, ny+1)
+        !     dsetname = trim("krangcr")
+        !     call HdfSerialWriteInt1D(dsetname, filnam, krangc, nz+1)
+        ! end if
  
         call MpiBarrier
         xs2o = ceiling(real((xstartr(2) - 1)*nymro/nymr)) + 1
@@ -172,9 +192,9 @@ subroutine ReadFlowInterp
         xs3o = max(xs3o, 1)
         xe3o = min(xe3o, nzmro)
 
-        write(*,*) "Rxs2o, xe2o: ",xs2o, xe2o
-        write(*,*) "Rxs2, xe2: ", xstartr(2), xendr(2)
-        write(*,*) "Rxs3o, xe3o: ",xs3o, xe3o
+        ! write(*,*) "Rxs2o, xe2o: ",xs2o, xe2o
+        ! write(*,*) "Rxs2, xe2: ", xstartr(2), xendr(2)
+        ! write(*,*) "Rxs3o, xe3o: ",xs3o, xe3o
 
         call InterpInputSal
 
