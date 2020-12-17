@@ -3,7 +3,7 @@
 #=======================================================================
 FC = h5pfc -fpp
 # Cartesius
-FC += -r8 -O3 -xAVX -axCORE-AVX2#-mcmodel=large -traceback
+FC += -r8 -O3 #-xAVX -axCORE-AVX2#-mcmodel=large -traceback
 # FC += -r8 -O0 -g -traceback -check bounds 
 # FC += -DSHM -DSHM_DEBUG
 
@@ -12,15 +12,15 @@ FC += -r8 -O3 -xAVX -axCORE-AVX2#-mcmodel=large -traceback
 #======================================================================
 # Common build flags
 ##  MacOS
-#LDFLAGS = -L$(HOME)/lib_afid/fftw/lib -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+LDFLAGS = -L$(HOME)/lib_afid/fftw/lib -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 
 ## Cartesius
 # FFTW3_LIBS = -L/nfs/admin/hpc/sw/fftw3-3.3.3-intel-impi/lib -lfftw3
-FFTW3_LIBS = -lfftw3
-BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
-HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
+# FFTW3_LIBS = -lfftw3
+# BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+# HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
 #LDFLAGS = -L$(LD_LIBRARY_PATH) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
-LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
+# LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
 
 
 ## MareNostrum
@@ -57,7 +57,9 @@ FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
 	  SpecRoutines.F90\
 	  CalcPlateCf.F90 CalcWriteQ.F90\
 	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90 InterpSalMgrd.F90\
-	  CalcMeanProfiles.F90
+	  CalcMeanProfiles.F90\
+	  ReadFlowInterp.F90 CreateOldGrid.F90 CreateInputStencil.F90 CreateSalStencil.F90\
+	  InterpInputSal.F90 InterpInputVel.F90
 
 #=======================================================================
 #  Files that create modules:
