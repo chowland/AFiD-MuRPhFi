@@ -96,6 +96,46 @@
       end subroutine HdfSerialWriteIntScalar
 
 !====================================================================
+      subroutine HdfSerialWriteInt1D(dsetname,filename,var,sz)
+            use hdf5
+            implicit none
+            character*30,intent(in) :: dsetname,filename
+            integer, intent(in) :: sz
+            real, dimension(sz), intent(in) :: var
+            integer(HID_T) :: file_id
+            integer(HID_T) :: dset, filespace
+            integer :: hdf_error
+            integer(HSIZE_T) :: dims(1)
+            logical :: fileexists
+      
+      
+            call h5fopen_f(filename, H5F_ACC_RDWR_F, file_id, hdf_error)
+      
+            dims(1)=sz
+      
+            call h5screate_simple_f(1, dims, &
+           &                        filespace, hdf_error)
+      
+            call h5lexists_f(file_id,dsetname,fileexists,hdf_error)
+      
+            if(fileexists) call h5ldelete_f(file_id,dsetname,hdf_error)
+      
+            call h5dcreate_f(file_id, dsetname, H5T_NATIVE_INTEGER, &
+           &                filespace, dset, hdf_error)
+      
+      
+             call h5dwrite_f(dset, H5T_NATIVE_INTEGER, &
+           &   var(1:sz), dims, hdf_error)
+      
+      
+            call h5dclose_f(dset, hdf_error)
+      
+            call h5sclose_f(filespace, hdf_error)
+      
+            call h5fclose_f(file_id, hdf_error)
+            
+            end subroutine HdfSerialWriteInt1D
+!====================================================================
       subroutine HdfSerialWriteReal1D(dsetname,filename,var,sz)
       use hdf5
       implicit none
