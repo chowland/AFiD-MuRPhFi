@@ -133,6 +133,23 @@
        real :: vx_global, vy_global, vz_global
        integer :: nstatsamples
       end module stat_arrays
+!=====================================================
+      module input_grids !CJH Grids for input flow field
+        implicit none
+        integer :: nxo, nyo, nzo
+        integer :: nxmo, nymo, nzmo
+        integer :: nxro, nyro, nzro
+        integer :: nxmro, nymro, nzmro
+        integer :: istr3o, istr3ro
+        integer :: xs2o, xe2o, xs3o, xe3o
+        real :: str3o
+        real, allocatable, dimension(:) :: xco, xmo
+        real, allocatable, dimension(:) :: xcro, xmro
+        real, allocatable, dimension(:) :: yco, ymo
+        real, allocatable, dimension(:) :: ycro, ymro
+        real, allocatable, dimension(:) :: zco, zmo
+        real, allocatable, dimension(:) :: zcro, zmro
+      end module input_grids
 !=====================================================       
       module stat3_param
         implicit none

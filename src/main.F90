@@ -130,7 +130,8 @@
 
         if(ismaster) write(6,*) 'Reading initial condition from file'
 
-        call ReadFlowField
+      !   call ReadFlowField
+        call ReadFlowInterp
 
       !   if(ismaster)  write(6,*) 'Write slice ycut and zcut'
       !   call Mkmov_ycut
