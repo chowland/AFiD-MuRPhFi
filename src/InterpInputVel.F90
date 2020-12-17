@@ -361,8 +361,8 @@ subroutine InterpInputVel
 
     call update_halo(tempo, lvlhalo)
 
-    do ic=xs3o,xe3o
-        do jc=xs2o,xe2o
+    do ic=xs3o-lvlhalo,xe3o+lvlhalo
+        do jc=xs2o-lvlhalo,xe2o+lvlhalo
             !-- Boundary points
             !CJH ONLY WORKS FOR CONSTANT TEMP BCs CURRENTLY
             tempo(0,jc,ic) = tempbp(jc,ic)      ! at xco(0)

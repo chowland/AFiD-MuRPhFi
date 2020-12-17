@@ -32,8 +32,8 @@ subroutine InterpInputSal
 
     call update_halo(salo, lvlhalo)
 
-    do ic=xs3o,xe3o
-        do jc=xs2o,xe2o
+    do ic=xs3o-lvlhalo,xe3o+lvlhalo
+        do jc=xs2o-lvlhalo,xe2o+lvlhalo
             !-- Boundary points
             !CJH ONLY WORKS FOR CONSTANT SAL BCs CURRENTLY
             salo(0,jc,ic) = salbp(jc,ic)
