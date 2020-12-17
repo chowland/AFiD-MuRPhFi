@@ -37,7 +37,22 @@
        do jc=xstart(2),xend(2)
         jm=jc-1
         jp=jc+1
-        do kc=1,nxm
+        
+        kc = 1
+        kp = 2
+        htx=(vx(kp,jc,ic)*(temp(kp,jc,ic) + temp(kc,jc,ic)) - &
+             vx(kc,jc,ic)*2.d0*tempbp(jc,ic))*udx3m(kc)*0.5d0
+        htz=(vz(kc,jc,ip)*(temp(kc,jc,ip)+temp(kc,jc,ic))- &
+             vz(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc,jc,im)) &
+            )*udz
+        hty=(vy(kc,jp,ic)*(temp(kc,jp,ic)+temp(kc,jc,ic))- &
+             vy(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc,jm,ic)) &
+            )*udy
+        dzzt=(temp(kc,jc,ip) - 2.0*temp(kc,jc,ic) + temp(kc,jc,im))*udzq
+        dyyt=(temp(kc,jp,ic) - 2.0*temp(kc,jc,ic) + temp(kc,jm,ic))*udyq
+        hro(kc,jc,ic) = -(htx+hty+htz)+dyyt+dzzt
+
+        do kc=2,nxm-1
          km=kc-1
          kp=kc+1
          !
@@ -91,7 +106,24 @@
                  +temp(kc,jm,ic))*udyq
 !
             hro(kc,jc,ic) = -(htx+hty+htz)+dyyt+dzzt
-          enddo
+        enddo
+          
+        kc = nxm
+        kp = nx
+        km = nxm - 1
+        htx=(vx(kp,jc,ic)*2.d0*temptp(jc,ic) - &
+             vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(km,jc,ic)) &
+            )*udx3m(kc)*0.5d0
+        htz=(vz(kc,jc,ip)*(temp(kc,jc,ip)+temp(kc,jc,ic))- &
+             vz(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc,jc,im)) &
+            )*udz
+        hty=(vy(kc,jp,ic)*(temp(kc,jp,ic)+temp(kc,jc,ic))- &
+             vy(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc,jm,ic)) &
+            )*udy
+        dzzt=(temp(kc,jc,ip) - 2.0*temp(kc,jc,ic) + temp(kc,jc,im))*udzq
+        dyyt=(temp(kc,jp,ic) - 2.0*temp(kc,jc,ic) + temp(kc,jm,ic))*udyq
+        hro(kc,jc,ic) = -(htx+hty+htz)+dyyt+dzzt
+
         enddo
       enddo
 !$OMP  END PARALLEL DO
