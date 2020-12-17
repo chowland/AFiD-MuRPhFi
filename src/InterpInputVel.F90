@@ -34,8 +34,8 @@ subroutine InterpInputVel
     vy(:,:,:) = 0.d0
     vz(:,:,:) = 0.d0
 
-    dyo = yco(2) - yco(1)
-    dzo = zco(2) - zco(1)
+    dyo = 1.d0/(yco(2) - yco(1))
+    dzo = 1.d0/(zco(2) - zco(1))
 
 !=========================================================
 !     Interpolation of vx
