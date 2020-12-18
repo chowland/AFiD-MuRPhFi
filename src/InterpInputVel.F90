@@ -359,10 +359,8 @@ subroutine InterpInputVel
     call HdfReadContinua(nzo, nyo, nxo, xs2o, xe2o, xs3o, xe3o, 4, &
             tempo(1:nxo, xs2o-lvlhalo:xe2o+lvlhalo, xs3o-lvlhalo:xe3o+lvlhalo))
 
-    call update_halo(tempo, lvlhalo)
-
-    do ic=xs3o-lvlhalo,xe3o+lvlhalo
-        do jc=xs2o-lvlhalo,xe2o+lvlhalo
+    do ic=xs3o,xe3o
+        do jc=xs2o,xe2o
             !-- Boundary points
             !CJH ONLY WORKS FOR CONSTANT TEMP BCs CURRENTLY
             tempo(0,jc,ic) = tempbp(jc,ic)      ! at xco(0)
@@ -370,6 +368,8 @@ subroutine InterpInputVel
         end do
     end do
     
+    call update_halo(tempo, lvlhalo)
+
     !-- Interpolate temperature to refined grid
     do ic=xs3o-1,xe3o
         do jc=xs2o-1,xe2o

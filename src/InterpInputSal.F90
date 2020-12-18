@@ -30,16 +30,16 @@ subroutine InterpInputSal
     call HdfReadContinua(nzro, nyro, nxro, xs2o, xe2o, xs3o, xe3o, 5, &
             salo(1:nxro, xs2o-lvlhalo:xe2o+lvlhalo, xs3o-lvlhalo:xe3o+lvlhalo))
 
-    call update_halo(salo, lvlhalo)
-
-    do ic=xs3o-lvlhalo,xe3o+lvlhalo
-        do jc=xs2o-lvlhalo,xe2o+lvlhalo
+    do ic=xs3o,xe3o
+        do jc=xs2o,xe2o
             !-- Boundary points
             !CJH ONLY WORKS FOR CONSTANT SAL BCs CURRENTLY
             salo(0,jc,ic) = salbp(jc,ic)
             salo(nxro,jc,ic) = saltp(jc,ic)
         end do
     end do
+
+    call update_halo(salo, lvlhalo)
 
     !-- Interpolate salinity to refined grid
     do ic=xs3o-1,xe3o
