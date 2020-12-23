@@ -38,6 +38,8 @@
       enddo
       enddo
       enddo
+
+      call MpiBarrier
       
       return     
       end         
