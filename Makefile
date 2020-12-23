@@ -47,12 +47,12 @@ FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
 	  ImplicitAndUpdateVX.F90 ImplicitAndUpdateVY.F90 ImplicitAndUpdateVZ.F90\
 	  InitPressureSolver.F90 InitTimeMarchScheme.F90 InitVariables.F90\
           LocateLargeDivergence.F90 MpiAuxRoutines.F90 QuitRoutine.F90\
-	  ReadFlowField.F90 ReadInputFile.F90 ResetLogs.F90 SetTempBCs.F90\
+	  ReadInputFile.F90 ResetLogs.F90 SetTempBCs.F90\
           SlabDumpRoutines.F90 SolveImpEqnUpdate_Temp.F90 SolveImpEqnUpdate_Sal.F90\
 	  SolveImpEqnUpdate_X.F90 SolveImpEqnUpdate_YZ.F90 SolvePressureCorrection.F90\
           StatReadReduceWrite.F90 StatRoutines.F90\
 	  TimeMarcher.F90 WriteFlowField.F90 WriteGridInfo.F90 factorize.F90\
-          interp.F90 main.F90\
+          main.F90\
 	  Mkmov_ycut.F90 Mkmov_zcut.F90 Init_ycut.F90 Init_zcut.F90\
 	  SpecRoutines.F90\
 	  CalcPlateCf.F90 CalcWriteQ.F90\
