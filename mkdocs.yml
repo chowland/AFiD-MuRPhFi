@@ -1,0 +1,22 @@
+site_name: AFiD (MultiRes) Documentation
+repo_url: https://github.com/chowland/AFiD_MultiRes
+site_author: Chris Howland
+markdown_extensions:
+    - markdown_katex:
+        no_inline_svg: True
+        insert_fonts_css: True
+        macro-file: docs/macros.tex
+theme: readthedocs
+nav:
+    - 'index.md'
+    - Usage:
+        - 'prerequisites.md'
+        - 'inputs.md'
+        - 'outputs.md'
+        - 'pluto.md'
+        - 'jupyter.md'
+        - 'paraview.md'
+    - 'Technical Details':
+        - 'equations.md'
+        - 'interpolation.md'
+        - 'stretched_grids.md'
