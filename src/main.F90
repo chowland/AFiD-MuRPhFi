@@ -12,7 +12,7 @@
 !$    use omp_lib
       implicit none
       integer :: errorcode, nthreads, i, j, k
-      real    :: instCFL,dmax,dmaxr
+      real    :: instCFL,CFLmr,dmax,dmaxr
       real    :: ti(2), tin(3), minwtdt
       real :: ts, varptb,chksum
       integer :: prow=0,pcol=0
@@ -51,7 +51,7 @@
 
       if (ismaster) write(6,*) 'MPI tasks=', nproc
 
-!$    if (ismaster) then 
+!$    if (ismaster) then
 !$OMP PARALLEL
 !$OMP MASTER
 !$        nthreads = omp_get_num_threads()
@@ -61,24 +61,24 @@
 !$    end if
 
       if(ismaster) then
-!m==========================================    
+!m==========================================
       call ResetLogs
 !m====================================================
       write(6,112)ylen/alx3,zlen/alx3
   112 format(//,20x,'Double Diffusive Convection ',//,10x, &
        '3D Cell with aspect-ratio:  D1/H = ',f5.2,' D2/H = ',f5.2)
-      write(6,142) 
+      write(6,142)
   142 format(//,8x,'Periodic lateral wall boundary condition')
       write(6,202) rayt,prat,rays,pras
   202 format(/,5x,'Parameters: ',' RaT=',e10.3,' PrT= ',e10.3,' RaS=',e10.3,' PrS= ',e10.3)
       if(variabletstep) then
          write(6,204) limitCFL
   204 format(/,5x,'Variable dt and fixed cfl= ', &
-       e11.4,/ )            
-      else 
+       e11.4,/ )
+      else
          write(6,205) dtmax,limitCFL
   205 format(/,5x,'Fixed dt= ',e11.4,' and maximum cfl=', &
-        e11.4,/ )            
+        e11.4,/ )
       endif
       endif
 
@@ -101,13 +101,13 @@
 
       !if (dumpslabs) call InitializeSlabDump
 
-!m===================================                                                      
+!m===================================
 !m===================================
 !m===================================
 
       if(ismaster) then
-      write(6,754)nx,ny,nz                                              
-  754 format(/,5x,'grid resolution: ',' nx = ',i5,' ny = ',i5,' nz = ',i5)                       
+      write(6,754)nx,ny,nz
+  754 format(/,5x,'grid resolution: ',' nx = ',i5,' ny = ',i5,' nz = ',i5)
       write(6,756)nxr,nyr,nzr
   756 format(5x,'grid resolution: ',' nxr= ',i5,' nyr= ',i5,' nzr= ',i5)
       write(6,755) 1.d0/dx,1.d0/dy,1.d0/dz,1.d0/dxr,1.d0/dyr,1.d0/dzr,dt,ntst
@@ -117,8 +117,8 @@
       endif
 
 !m===================================
-!m===================================     
-      
+!m===================================
+
       time=0.d0
       if(statcal) nstatsamples = 0
 
@@ -143,10 +143,10 @@
 
         if(ismaster) write(6,*) 'Creating initial condition'
 
-        ntime=0                                                         
+        ntime=0
         time=0.d0
         instCFL=0.d0
-        
+
         call CreateInitialConditions
 
       !   if(ismaster)  write(6,*) 'Write slice ycut and zcut'
@@ -155,7 +155,7 @@
       !   call Mkmov_zcut
       !   call Mkmov_zcutr
 
-      endif                                                             
+      endif
 
 !EP   Update all relevant halos
       call update_halo(vx,lvlhalo)
@@ -201,10 +201,10 @@
 !      end if
 !
 
-     if(ismaster) then                  
-       tin(2) = MPI_WTIME()             
+     if(ismaster) then
+       tin(2) = MPI_WTIME()
        write(6,'(a,f6.2,a)') 'Initialization Time = ', tin(2) -tin(1), ' sec.'
-     endif 
+     endif
 
 !  ********* starts the time dependent calculation ***
       errorcode = 0 !EP set errocode to 0 (OK)
@@ -218,31 +218,31 @@
       lfactor=max(lfactor,lfactor2)
       call Factorize(nzm,lfactor2)
       lfactor=max(lfactor,lfactor2)
-      ! if largest factor larger than 7 quit the simulation     
+      ! if largest factor larger than 7 quit the simulation
       ! if (lfactor>7) errorcode=444
 
-      do ntime=0,ntst                                           
+      do ntime=0,ntst
         ti(1) = MPI_WTIME()
 
 !EP   Determine timestep size
-        call CalcMaxCFL(instCFL)
+        call CalcMaxCFL(instCFL,CFLmr)
 
         if(variabletstep) then
           if(ntime.gt.1) then
-            if(instCFL.lt.1.0d-8) then !EP prevent fp-overflow
+            if(CFLmr.lt.1.0d-8) then !EP prevent fp-overflow
               dt=dtmax
             else
-              dt=limitCFL/instCFL
+              dt=limitCFL/CFLmr
             endif
             if(dt.gt.dtmax) dt=dtmax
           else
-            dt=dtmin
+            dt=dt !CJH First time step: use dt defined in bou.in
           endif
             if(dt.lt.dtmin) errorcode = 166
-        else  
+        else
 !RO    fixed time-step
-          instCFL=instCFL*dt
-          if(instCFL.gt.limitCFL) errorcode = 165
+            CFLmr=CFLmr*dt
+          if(CFLmr.gt.limitCFL) errorcode = 165
         endif
 
         call TimeMarcher
@@ -314,7 +314,7 @@
 
        if( (ti(2) - tin(1)) .gt. walltimemax) errorcode = 334
 
-       if( ntime .eq. ntst ) errorcode = 555 
+       if( ntime .eq. ntst ) errorcode = 555
 
       call MpiBcastInt(errorcode)
 
@@ -324,12 +324,12 @@
 !EP    dt too small
         if(errorcode.eq.166) call QuitRoutine(tin,.false.,errorcode)
 
-!EP   cfl too high    
+!EP   cfl too high
         if(errorcode.eq.165) call QuitRoutine(tin,.false.,errorcode)
-      
+
 !EP   velocities diverged
         if(errorcode.eq.266) call QuitRoutine(tin,.false.,errorcode)
-          
+
 !EP   mass not conserved
         if(errorcode.eq.169) call QuitRoutine(tin,.false.,errorcode)
 
@@ -346,7 +346,7 @@
         if(errorcode.eq.555) call QuitRoutine(tin,.true.,errorcode)
 
         errorcode = 100 !EP already finalized
-      
+
         exit
 
       endif
@@ -354,6 +354,6 @@
       enddo !EP main loop
 
       call QuitRoutine(tin,.true.,errorcode)
-      
-      end                                                               
+
+      end
 
