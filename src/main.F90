@@ -278,7 +278,7 @@
            !call GlobalQuantities
            !if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
 
-           call CalcMaxCFL(instCFL)
+           call CalcMaxCFL(instCFL,CFLmr)
            call CheckDivergence(dmax,dmaxr)
            call CalcPlateNu
            !call CalcPlateCf
