@@ -47,7 +47,7 @@
           end do
       end do
 
-      call dgttrs('N',nxm,nrhs,amkT,ackT,apkT,appk,ipkv,rhs,nx,info)
+      call dgttrs('N',nxm,nrhs,amkT,ackT,apkT,appk,ipkv,rhs(1:nxm,:,:),nxm,info)
 
        do ic=xstart(3),xend(3)
          do jc=xstart(2),xend(2)

@@ -29,9 +29,9 @@
       ackl(1)=1.d0
       do kc=2,nxm
         ackl_b=1.0d0/(1.0d0-ac3ck(kc)*betadx)
-        amkl(kc)=-am3ssk(kc)*betadx*ackl_b
+        amkl(kc)=-am3ck(kc)*betadx*ackl_b
         ackl(kc)=1.0d0
-        apkl(kc)=-ap3ssk(kc)*betadx*ackl_b
+        apkl(kc)=-ap3ck(kc)*betadx*ackl_b
       enddo
       amkl(nx)=0.d0
       apkl(nx)=0.d0
@@ -52,6 +52,9 @@
             end do
          end do
       end do
+
+      rhs(1,:,:) = 0.d0
+      rhs(nx,:,:) = 0.d0
 
       call dgttrs('N',nx,nrhs,amkT,ackT,apkT,appk,ipkv,rhs,nx,info)
 
