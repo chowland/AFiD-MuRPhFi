@@ -253,7 +253,7 @@ subroutine InterpInputVel
     
             !-- Boundary points, enforce zero velocity
             tpdvo(0,jc,ic) = 0.d0
-            tpdvo(nxmo,jc,ic)=0.d0
+            tpdvo(nxo,jc,ic)=0.d0
 
         enddo
     enddo
