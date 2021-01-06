@@ -62,8 +62,8 @@ subroutine InterpInputVel
             enddo
             ! CJH du/dx=0 on boundaries
             !-- Boundary points, enforce continuity
-            tpdvo(0,jc,ic)=-tpdvo(1,jc,ic)
-            tpdvo(nxo,jc,ic)=-tpdvo(nxmo,jc,ic)
+            tpdvo(0,jc,ic) = 0.d0
+            tpdvo(nxo,jc,ic) = 0.d0
     
         enddo
     enddo
