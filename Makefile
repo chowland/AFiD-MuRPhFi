@@ -2,8 +2,13 @@
 #  Compiler options
 #=======================================================================
 FC = h5pfc -fpp
-# Cartesius
-FC += -r8 -O3 #-xAVX -axCORE-AVX2#-mcmodel=large -traceback
+## Laptop
+FC += -r8 -O3
+## Cartesius
+# FC += -r8 -O3 -xAVX -axCORE-AVX2
+## Irene
+# FC += -r8 -O3 -mavx2 $(FFTW3_FFLAGS)
+## Traceback / Debug
 # FC += -r8 -O0 -g -traceback -check bounds 
 # FC += -DSHM -DSHM_DEBUG
 
@@ -11,17 +16,20 @@ FC += -r8 -O3 #-xAVX -axCORE-AVX2#-mcmodel=large -traceback
 #  Library
 #======================================================================
 # Common build flags
-##  MacOS
+##  Laptop
 LDFLAGS = -L$(HOME)/lib_afid/fftw/lib -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 
-## Cartesius
-# FFTW3_LIBS = -L/nfs/admin/hpc/sw/fftw3-3.3.3-intel-impi/lib -lfftw3
+## Cartesius (Before compiling, load modules 2019 intel/2018b HDF5 FFTW)
 # FFTW3_LIBS = -lfftw3
 # BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
 # HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
-#LDFLAGS = -L$(LD_LIBRARY_PATH) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
 # LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
 
+## Irene (Before compiling, load modules flavor/hdf5/parallel hdf5 fftw3/gnu)
+# FFTW3_LIBS = $(FFTW3_LDFLAGS)
+# BLAS_LIBS = $(MKL_LDFLAGS)
+# HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
+# LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
 
 ## MareNostrum
 # FFTW3_LIBS = -L/apps/FFTW/3.3.6/INTEL/IMPI/lib -lfftw3
