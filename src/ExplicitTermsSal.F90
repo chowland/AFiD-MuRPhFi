@@ -53,7 +53,7 @@
         dyys=(sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
         hsal(kc,jc,ic) = -(hsx+hsy+hsz)+dyys+dzzs
 
-        do kc=2,nxmr
+        do kc=2,nxmr-1
          km=kc-1
          kp=kc+1
          !
