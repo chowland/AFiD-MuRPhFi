@@ -46,14 +46,9 @@
         enddo
 
         !-- Boundary points, enforce continuity
-        !tpdv( 0,jc,ic)=-(vy( 0,jp,ic)-vy( 0,jc,ic))*dy &
-        !               -(vz( 0,jc,ip)-vz( 0,jc,ic))*dz 
-        tpdv( 0,jc,ic)=-(-vy( 1,jp,ic)+vy( 1,jc,ic))*dy &
-                       -(-vz( 1,jc,ip)+vz( 1,jc,ic))*dz 
-        !tpdv(nx,jc,ic)=-(vy(nx,jp,ic)-vy(nx,jc,ic))*dy &
-        !               -(vz(nx,jc,ip)-vz(nx,jc,ic))*dz 
-        tpdv(nx,jc,ic)=-(-vy(nxm,jp,ic)+vy(nxm,jc,ic))*dy &
-                       -(-vz(nxm,jc,ip)+vz(nxm,jc,ic))*dz 
+        !CJH Note indices 0 & nx are AT boundaries in CreateMgrdStencil
+        tpdv( 0,jc,ic) = 0.d0
+        tpdv(nx,jc,ic) = 0.d0
 
        enddo
       enddo
@@ -114,8 +109,8 @@
         enddo
 
         !-- Boundary points, enforce zero velocity
-        tpdv(0,jc,ic)=(-vy(1,jp,ic)+vy(1,jc,ic))*dy
-        tpdv(nx,jc,ic)=(-vy(nxm,jp,ic)+vy(nxm,jc,ic))*dy
+        tpdv( 0,jc,ic) = 0.d0
+        tpdv(nx,jc,ic) = 0.d0
 
        enddo
       enddo
@@ -228,8 +223,8 @@
         enddo
 
         !-- Boundary points, enforce zero velocity
-        tpdv(0,jc,ic)=(-vz(1,jc,ip)+vz(1,jc,ic))*dz
-        tpdv(nx,jc,ic)=(-vz(nxm,jc,ip)+vz(nxm,jc,ic))*dz
+        tpdv( 0,jc,ic) = 0.d0
+        tpdv(nx,jc,ic) = 0.d0
 
        enddo
       enddo
