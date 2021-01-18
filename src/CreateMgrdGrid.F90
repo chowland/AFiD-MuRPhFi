@@ -147,8 +147,8 @@
       do kc=1,nxmr
         xmr(kc)=(xcr(kc)+xcr(kc+1))*0.5d0
       enddo
-      xmr(0)=2.d0*xmr(1)-xmr(2)
-      xmr(nxr)=2.d0*xmr(nxmr)-xmr(nxmr-1)
+      xmr(0)=2.d0*xcr(1)-xmr(1)
+      xmr(nxr)=2.d0*xcr(nxr)-xmr(nxmr)
 
       do kc=2,nxmr
         g3rcr(kc)=(xcr(kc+1)-xcr(kc-1))*dxr*0.5d0
