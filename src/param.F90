@@ -78,8 +78,8 @@
         integer, parameter:: ndv=3
         real, dimension(1:ndv) :: vmax
         real, dimension(1:3) :: gam,rom,alm
-        real, allocatable, dimension(:,:) :: tempbp,temptp
-        real, allocatable, dimension(:,:) :: salbp,saltp
+        real, allocatable, dimension(:,:,:) :: tempbp,temptp !CJH make BCs 3D arrays so we can use update_halo
+        real, allocatable, dimension(:,:,:) :: salbp,saltp
               
         logical :: dumpslabs=.false.
         logical :: statcal=.false.
@@ -89,6 +89,7 @@
         logical :: ismaster=.false.
         logical :: resetlogstime=.false.
         logical :: variabletstep=.true.
+        logical :: melt=.false.
 
         integer :: lvlhalo=2
 
@@ -119,6 +120,7 @@
         real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
         real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
         real,allocatable,dimension(:,:,:) :: salc
+        real,allocatable,dimension(:,:) :: tempr
       end module mgrd_arrays
 !===============================================================
       module stat_arrays

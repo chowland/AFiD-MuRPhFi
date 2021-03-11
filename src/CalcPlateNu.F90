@@ -33,8 +33,8 @@
 !$OMP   REDUCTION(+:nusupp)
       do i=xstart(3),xend(3)
          do j=xstart(2),xend(2)
-           nuslow = nuslow + (temp(1,j,i)-tempbp(j,i))*del
-           nusupp = nusupp + (temptp(j,i)-temp(nxm,j,i))*deln
+           nuslow = nuslow + (temp(1,j,i)-tempbp(1,j,i))*del
+           nusupp = nusupp + (temptp(1,j,i)-temp(nxm,j,i))*deln
         enddo
       end do
 !$OMP END PARALLEL DO

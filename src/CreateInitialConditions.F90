@@ -47,13 +47,25 @@
         enddo
       enddo
 
+      if (melt) then
+        do i=xstart(3),xend(3)
+          do j=xstart(2),xend(2)
+            do k=1,nxm
+              vx(k,j,i) = 0.d0
+              vy(k,j,i) = 0.d0
+              vz(k,j,i) = 0.d0
+            end do
+          end do
+        end do
+      end if
+
       !assign linear temperature profile in the nodes k=1 to k=nxm
       eps=5d-2
       do i=xstart(3),xend(3)
       do j=xstart(2),xend(2)
       do k=1,nxm
         call random_number(varptb)
-        temp(k,j,i)=tempbp(j,i)+(temptp(j,i)-tempbp(j,i))*xm(k)/xc(nx)
+        temp(k,j,i)=tempbp(1,j,i)+(temptp(1,j,i)-tempbp(1,j,i))*xm(k)/xc(nx)
         if (abs(xm(k)-0.5) + eps > 0.5) then
           amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
           temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
@@ -64,11 +76,22 @@
       enddo
       enddo
 
+      if (melt) then
+        do i=xstart(3),xend(3)
+          do j=xstart(2),xend(2)
+            do k=1,nxm
+              call random_number(varptb)
+              temp(k,j,i) = eps*(2.d0*varptb - 1.d0) * exp(-xm(k)/0.1)
+            end do
+          end do
+        end do
+      end if
+
       !assign the boundary conditions at k=1 and k=nx
       ! do i=xstart(3),xend(3)
       ! do j=xstart(2),xend(2)
-      ! temp(1 ,j,i) = tempbp(j,i)
-      ! temp(nx,j,i) = temptp(j,i)
+      ! temp(1 ,j,i) = tempbp(1,j,i)
+      ! temp(nx,j,i) = temptp(1,j,i)
       ! end do
       ! end do
 
@@ -77,7 +100,7 @@
       do j=xstartr(2),xendr(2)
       do k=1,nxmr
         call random_number(varptb)
-        sal(k,j,i)=salbp(j,i)-(salbp(j,i)-saltp(j,i))*xmr(k)/xcr(nxr)
+        sal(k,j,i)=salbp(1,j,i)-(salbp(1,j,i)-saltp(1,j,i))*xmr(k)/xcr(nxr)
         if (abs(xmr(k)-0.5) + eps > 0.5) then
           amp = 0.5 - abs(xmr(k)-0.5) ! CJH Prevent values of |S| exceeding 0.5
           sal(k,j,i) = sal(k,j,i) + amp*(2.d0*varptb - 1.d0)
@@ -88,11 +111,22 @@
       enddo
       enddo
 
+      if (melt) then
+        do i=xstartr(3),xendr(3)
+          do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+              call random_number(varptb)
+              sal(k,j,i) = eps*(2.d0*varptb - 1.d0) * exp(-xmr(k)/0.1)
+            end do
+          end do
+        end do
+      end if
+
       !assign the boundary conditions at k=1 and k=nx
       ! do i=xstartr(3),xendr(3)
       ! do j=xstartr(2),xendr(2)
-      ! sal(1  ,j,i) = salbp(j,i)
-      ! sal(nxr,j,i) = saltp(j,i)
+      ! sal(1  ,j,i) = salbp(1,j,i)
+      ! sal(nxr,j,i) = saltp(1,j,i)
       ! end do
       ! end do
 

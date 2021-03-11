@@ -84,8 +84,11 @@
       call DestroyInt1dArray(kmvr)  !CS mgrd
       call DestroyInt1dArray(kpvr)  !CS mgrd
 
-      call DestroyReal2DArray(tempbp)
-      call DestroyReal2DArray(temptp)
+      call DestroyReal3DArray(tempbp)
+      call DestroyReal3DArray(temptp)
+
+      call DestroyReal3DArray(salbp)
+      call DestroyReal3DArray(saltp)
 
       call DestroyReal1DArray(vx_me)
       call DestroyReal1DArray(vy_me)
@@ -151,6 +154,10 @@
 
       call DestroyReal3DArray(tpdv)
       !call DestroyReal3DArray(tpdvr)  !CS BUG: ERROR WHILE DEALLOCATING
+
+      if (melt) then
+        call DestroyReal2DArray(tempr) !CJH Needed for melt BC
+      end if
 
       return 
       end   

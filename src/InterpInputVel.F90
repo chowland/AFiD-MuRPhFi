@@ -363,8 +363,8 @@ subroutine InterpInputVel
         do jc=xs2o,xe2o
             !-- Boundary points
             !CJH ONLY WORKS FOR CONSTANT TEMP BCs CURRENTLY
-            tempo(0,jc,ic) = tempbp(jc,ic)      ! at xco(0)
-            tempo(nxo,jc,ic) = temptp(jc,ic)    ! at xco(nxo)
+            tempo(0,jc,ic) = tempbp(1,jc,ic)      ! at xco(0)
+            tempo(nxo,jc,ic) = temptp(1,jc,ic)    ! at xco(nxo)
         end do
     end do
     

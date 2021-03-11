@@ -30,6 +30,8 @@
         ga=gam(ns)
         ro=rom(ns)
 
+        if (melt) call UpdateBCs
+
         call ExplicitTermsVX
         call ExplicitTermsVY
         call ExplicitTermsVZ

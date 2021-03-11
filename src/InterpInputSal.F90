@@ -34,8 +34,8 @@ subroutine InterpInputSal
         do jc=xs2o,xe2o
             !-- Boundary points
             !CJH ONLY WORKS FOR CONSTANT SAL BCs CURRENTLY
-            salo(0,jc,ic) = salbp(jc,ic)
-            salo(nxro,jc,ic) = saltp(jc,ic)
+            salo(0,jc,ic) = salbp(1,jc,ic)
+            salo(nxro,jc,ic) = saltp(1,jc,ic)
         end do
     end do
 

@@ -40,11 +40,11 @@
             if (kc.eq.1) then       !CJH Apply lower BC
                   dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
                         +temp(kc  ,jc,ic)*ac3ssk(kc) &
-                        -(ap3ssk(kc)+ac3ssk(kc))*tempbp(jc,ic)*TfixS
+                        -(ap3ssk(kc)+ac3ssk(kc))*tempbp(1,jc,ic)*TfixS
             elseif(kc.eq.nxm) then  !CJH Apply upper BC
                   dxxt = temp(kc  ,jc,ic)*ac3ssk(kc) &
                         +temp(kc-1,jc,ic)*am3ssk(kc) &
-                        -(am3ssk(kc)+ac3ssk(kc))*temptp(jc,ic)*TfixN
+                        -(am3ssk(kc)+ac3ssk(kc))*temptp(1,jc,ic)*TfixN
             else
                dxxt= temp(kc+1,jc,ic)*ap3ssk(kc) &
                     +temp(kc  ,jc,ic)*ac3ssk(kc) &
@@ -76,10 +76,10 @@
 !  and bottom plates. This seems necessary.
 
       !  temp(1,xstart(2):xend(2),xstart(3):xend(3)) &
-      !     = tempbp(xstart(2):xend(2),xstart(3):xend(3))
+      !     = tempbp(1,xstart(2):xend(2),xstart(3):xend(3))
 
       !  temp(nx,xstart(2):xend(2),xstart(3):xend(3)) &
-      !     = temptp(xstart(2):xend(2),xstart(3):xend(3))
+      !     = temptp(1,xstart(2):xend(2),xstart(3):xend(3))
 
 
       return

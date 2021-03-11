@@ -41,7 +41,7 @@
         kc = 1
         kp = 2
         htx=(vx(kp,jc,ic)*(temp(kp,jc,ic) + temp(kc,jc,ic)) - &
-             vx(kc,jc,ic)*2.d0*tempbp(jc,ic))*udx3m(kc)*0.5d0
+             vx(kc,jc,ic)*2.d0*tempbp(1,jc,ic))*udx3m(kc)*0.5d0
         htz=(vz(kc,jc,ip)*(temp(kc,jc,ip)+temp(kc,jc,ic))- &
              vz(kc,jc,ic)*(temp(kc,jc,ic)+temp(kc,jc,im)) &
             )*udz
@@ -111,7 +111,7 @@
         kc = nxm
         kp = nx
         km = nxm - 1
-        htx=(vx(kp,jc,ic)*2.d0*temptp(jc,ic) - &
+        htx=(vx(kp,jc,ic)*2.d0*temptp(1,jc,ic) - &
              vx(kc,jc,ic)*(temp(kc,jc,ic)+temp(km,jc,ic)) &
             )*udx3m(kc)*0.5d0
         htz=(vz(kc,jc,ip)*(temp(kc,jc,ip)+temp(kc,jc,ic))- &

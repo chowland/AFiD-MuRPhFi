@@ -132,12 +132,12 @@
 ! Arrays for temperature boundary conditions    
 !-------------------------------------------------
 
-      call AllocateReal2DArray(tempbp,1,ny,1,nz)
-      call AllocateReal2DArray(temptp,1,ny,1,nz)
+      call AllocateReal3DArray(tempbp,1,1,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
+      call AllocateReal3DArray(temptp,1,1,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
 
       !-- For salinity
-      call AllocateReal2DArray(salbp,1-lvlhalo,nyr+lvlhalo,1-lvlhalo,nzr+lvlhalo)
-      call AllocateReal2DArray(saltp,1-lvlhalo,nyr+lvlhalo,1-lvlhalo,nzr+lvlhalo)
+      call AllocateReal3DArray(salbp,1,1,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+      call AllocateReal3DArray(saltp,1,1,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
 
 !-------------------------------------------------
 ! Arrays for statistics    
@@ -225,6 +225,10 @@
       call AllocateReal3DArray(tpdvr,1,nxmr,xstartr(2)-2,xendr(2)+2,xstartr(3)-2,xendr(3)+2)
 
       call AllocateReal3DArray(salc,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
+      !CJH Needed for melt boundary condition
+      if (melt) then
+        call AllocateReal2DArray(tempr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+      end if
 
       return 
       end   

@@ -29,7 +29,7 @@
 
           if (kcr==1) then
             if (SfixS==1) then    !CJH apply lower fixed value BC
-              qv3(1,:,:) = 2.d0*salbp(jcr-1:jcr+2,icr-1:icr+2) &
+              qv3(1,:,:) = 2.d0*salbp(1,jcr-1:jcr+2,icr-1:icr+2) &
                             - sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
             else    !CJH apply no flux BC
               qv3(1,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
@@ -38,7 +38,7 @@
           else if (kcr==nxmr) then
             qv3(1:3,:,:) = sal(kcr-1:kcr+1,jcr-1:jcr+2,icr-1:icr+2)
             if (SfixN==1) then    !CJH apply upper fixed value BC
-              qv3(4,:,:) = 2.d0*saltp(jcr-1:jcr+2,icr-1:icr+2) &
+              qv3(4,:,:) = 2.d0*saltp(1,jcr-1:jcr+2,icr-1:icr+2) &
                             - sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
             else    !CJH apply no flux BC
               qv3(4,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)

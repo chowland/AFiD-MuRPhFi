@@ -42,7 +42,7 @@
         kc = 1
         kp = 2
         hsx=(vxr(kp,jc,ic)*(sal(kp,jc,ic)+sal(kc,jc,ic))- &
-             vxr(kc,jc,ic)*2.d0*salbp(jc,ic))*udx3mr(kc)*0.5d0
+             vxr(kc,jc,ic)*2.d0*salbp(1,jc,ic))*udx3mr(kc)*0.5d0
         hsz=(vzr(kc,jc,ip)*(sal(kc,jc,ip)+sal(kc,jc,ic))- &
              vzr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc,jc,im)) &
             )*udzr
@@ -112,7 +112,7 @@
         kc = nxmr
         kp = nxr
         km = nxmr - 1
-        hsx=(vxr(kp,jc,ic)*2.d0*saltp(jc,ic)- &
+        hsx=(vxr(kp,jc,ic)*2.d0*saltp(1,jc,ic)- &
              vxr(kc,jc,ic)*(sal(kc,jc,ic)+sal(km,jc,ic)) &
             )*udx3mr(kc)*0.5d0
         hsz=(vzr(kc,jc,ip)*(sal(kc,jc,ip)+sal(kc,jc,ic))- &

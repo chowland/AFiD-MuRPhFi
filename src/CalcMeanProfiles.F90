@@ -96,14 +96,14 @@ subroutine CalcMeanProfiles
                                 & + ((temp(k,j+1,i)-temp(k,j-1,i))*0.5*dy)**2*inym*inzm
             end do
             tdx = 0.5*dx/g3rm(1)
-            chiT(1) = chiT(1) + ((temp(2,j,i)-temp(1,j,i)+2.0*TfixS*(temp(1,j,i)-tempbp(j,i)))&
+            chiT(1) = chiT(1) + ((temp(2,j,i)-temp(1,j,i)+2.0*TfixS*(temp(1,j,i)-tempbp(1,j,i)))&
                             & *tdx)**2*inym*inzm
             do k=2,nxm-1
                 tdx = 0.5*dx/g3rm(k)
                 chiT(k) = chiT(k) + ((temp(k+1,j,i)-temp(k-1,j,i)) * tdx)**2*inym*inzm
             end do
             tdx = 0.5*dx/g3rm(nxm)
-            chiT(nxm) = chiT(nxm) + ((temp(nxm,j,i)-temp(nxm-1,j,i)+2.0*TfixN*(temptp(j,i)-temp(nxm,j,i)))&
+            chiT(nxm) = chiT(nxm) + ((temp(nxm,j,i)-temp(nxm-1,j,i)+2.0*TfixN*(temptp(1,j,i)-temp(nxm,j,i)))&
                             & *tdx)**2*inym*inzm
         end do
     end do
@@ -176,14 +176,14 @@ subroutine CalcMeanProfiles
                 chiS(k) = chiS(k) + ((sal(k,j+1,i)-sal(k,j-1,i))*0.5*dyr)**2*inymr*inzmr
             end do
             tdxr = 0.5*dxr/g3rmr(1)
-            chiS(1) = chiS(1) + ((sal(2,j,i)-sal(1,j,i)+2.0*SfixS*(sal(1,j,i)-salbp(j,i)))&
+            chiS(1) = chiS(1) + ((sal(2,j,i)-sal(1,j,i)+2.0*SfixS*(sal(1,j,i)-salbp(1,j,i)))&
                             & *tdxr)**2*inymr*inzmr
             do k=2,nxmr-1
                 tdxr = 0.5*dxr/g3rmr(k)
                 chiS(k) = chiS(k) + ((sal(k+1,j,i)-sal(k-1,j,i)) * tdxr)**2*inymr*inzmr
             end do
             tdxr = 0.5*dxr/g3rmr(nxmr)
-            chiS(nxmr) = chiS(nxmr) + ((sal(nxmr,j,i)-sal(nxmr-1,j,i)+2.0*SfixN*(saltp(j,i)-sal(nxmr,j,i)))&
+            chiS(nxmr) = chiS(nxmr) + ((sal(nxmr,j,i)-sal(nxmr-1,j,i)+2.0*SfixN*(saltp(1,j,i)-sal(nxmr,j,i)))&
                             & *tdxr)**2*inymr*inzmr
         end do
     end do

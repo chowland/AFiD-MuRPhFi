@@ -48,6 +48,8 @@
 !$OMP END PARALLEL DO
 
       !CJH Remove mean mass flux
+      if(.not.melt) then
+
       vxbar(:)=0.d0
       vybulk = 0.d0; vzbulk = 0.d0; Tbulk = 0.d0
       do ic=xstart(3),xend(3)
@@ -116,6 +118,8 @@
           end do
         end do
       end do
+
+      end if
 
       return
       end

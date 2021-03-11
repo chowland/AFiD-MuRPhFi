@@ -19,6 +19,6 @@
  SLABDUMP(STST3)
  0
  xplusU  xminusU    dPdz
- 0.d0   0.d0        1.d0
- TFRAME
- 1e0
+ 0.d0   0.d0        0.d0
+ TFRAME     MELT
+ 1e0        1

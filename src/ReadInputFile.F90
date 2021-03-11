@@ -10,7 +10,7 @@
       use param
       implicit none
       character(len=4) :: dummy
-      integer flagstat,flagbal,stst3flag
+      integer flagstat,flagbal,stst3flag,flagmelt
       logical fexist
 
       open(unit=15,file='bou.in',status='old')
@@ -37,7 +37,7 @@
         read(15,301) dummy       
         read(15,*) xplusU,xminusU,dPdz
         read(15,301) dummy    
-        read(15,*) tframe
+        read(15,*) tframe,flagmelt
 301     format(a4)                
       close(15)
 
@@ -74,6 +74,7 @@
       if(flagbal.ne.0) disscal = .true.
       if(nread.ne.0) readflow = .true.
       if(ireset.ne.0) resetlogstime = .true.
+      if(flagmelt.ne.0) melt = .true.
 
       if(stst3flag.ne.0) then
        inquire(file='./stst3.in', exist=fexist)
