@@ -67,7 +67,7 @@ FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
 	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90 InterpSalMgrd.F90\
 	  CalcMeanProfiles.F90\
 	  ReadFlowInterp.F90 CreateOldGrid.F90 CreateInputStencil.F90 CreateSalStencil.F90\
-	  InterpInputSal.F90 InterpInputVel.F90
+	  InterpInputSal.F90 InterpInputVel.F90 UpdateScalarBCs.F90
 
 #=======================================================================
 #  Files that create modules:
