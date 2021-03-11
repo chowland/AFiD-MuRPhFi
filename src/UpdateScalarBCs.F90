@@ -72,8 +72,8 @@ subroutine UpdateBCs
     end do
 
     !CJH Add halo for interpolation routine
-    call update_halo(salbp)
-    call update_halo(saltp)
+    call update_halo(salbp,lvlhalo)
+    call update_halo(saltp,lvlhalo)
 
     return
 end subroutine UpdateBCs
