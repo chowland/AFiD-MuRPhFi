@@ -72,7 +72,7 @@ subroutine Mkmov_xcut
         adims=1
         call h5screate_f(H5S_SCALAR_F,tspace,hdf_error)
         call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,hdf_error)
-        call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, adims, hdf_error)
+        call h5awrite_f(aid, H5T_NATIVE_FLOAT, time, adims, hdf_error)
         call h5aclose_f(aid, hdf_error)
         call h5sclose_f(tspace, hdf_error)
     end if
