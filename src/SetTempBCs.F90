@@ -10,6 +10,7 @@
 
       subroutine SetTempBCs
       use param
+      use decomp_2d, only: xstart,xend
       implicit none
       integer :: ic,jc
 
@@ -35,6 +36,7 @@
 !
       subroutine SetSalBCs
       use param
+      use decomp_2d
       implicit none
       integer :: ic,jc
 

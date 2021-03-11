@@ -12,7 +12,7 @@ subroutine UpdateBCs
     use param
     use local_arrays, only: temp
     use mgrd_arrays
-    use decomp_2d, only: xstart,xend,xstartr,xendr
+    use decomp_2d
     implicit none
     integer :: ic, jc, icr, jcr
     real, dimension(4,4) :: qv2
