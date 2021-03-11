@@ -67,15 +67,15 @@ subroutine Mkmov_xcut
     call h5fcreate_f(namfile, H5F_ACC_TRUNC_F, file_id, hdf_error, access_prp=plist_id)
     call h5pclose_f(plist_id, hdf_error)
 
-    ! Write time as attribute to file
-    if (ismaster) then
-        adims=1
-        call h5screate_f(H5S_SCALAR_F,tspace,hdf_error)
-        call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,hdf_error)
-        call h5awrite_f(aid, H5T_NATIVE_FLOAT, time, adims, hdf_error)
-        call h5aclose_f(aid, hdf_error)
-        call h5sclose_f(tspace, hdf_error)
-    end if
+    ! Write time as attribute to file ! NOT WORKING...
+    ! if (ismaster) then
+    !     adims=1
+    !     call h5screate_f(H5S_SCALAR_F,tspace,hdf_error)
+    !     call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,hdf_error)
+    !     call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, adims, hdf_error)
+    !     call h5aclose_f(aid, hdf_error)
+    !     call h5sclose_f(tspace, hdf_error)
+    ! end if
 
     call h5dcreate_f(file_id, "vx", H5T_NATIVE_DOUBLE, filespace, dset_vx, hdf_error)
     call h5dcreate_f(file_id, "vy", H5T_NATIVE_DOUBLE, filespace, dset_vy, hdf_error)
@@ -208,14 +208,14 @@ subroutine Mkmov_xcutr
     call h5fcreate_f(namfile, H5F_ACC_TRUNC_F, file_id, hdf_error, access_prp=plist_id)
     call h5pclose_f(plist_id, hdf_error)
 
-    ! Write time as attribute to file
-    if (ismaster) then
-        call h5screate_f(H5S_SCALAR_F,tspace,hdf_error)
-        call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,hdf_error)
-        call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, 1, hdf_error)
-        call h5aclose_f(aid, hdf_error)
-        call h5sclose_f(tspace, hdf_error)
-    end if
+    ! Write time as attribute to file !NOT WORKING
+    ! if (ismaster) then
+    !     call h5screate_f(H5S_SCALAR_F,tspace,hdf_error)
+    !     call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,hdf_error)
+    !     call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, 1, hdf_error)
+    !     call h5aclose_f(aid, hdf_error)
+    !     call h5sclose_f(tspace, hdf_error)
+    ! end if
 
     ! call h5dcreate_f(file_id, "vxr", H5T_NATIVE_DOUBLE, filespace, dset_vx, hdf_error)
     ! call h5dcreate_f(file_id, "vyr", H5T_NATIVE_DOUBLE, filespace, dset_vy, hdf_error)
