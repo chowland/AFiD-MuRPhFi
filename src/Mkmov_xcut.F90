@@ -69,11 +69,11 @@ subroutine Mkmov_xcut
 
     ! Write time as attribute to file
     if (ismaster) then
-        call h5screate_f(H5S_SCALAR_F,tspace,error)
-        call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,error)
-        call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, 1, error)
-        call h5aclose_f(aid, error)
-        call h5sclose_f(tspace, error)
+        call h5screate_f(H5S_SCALAR_F,tspace,hdf_error)
+        call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,hdf_error)
+        call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, 1, hdf_error)
+        call h5aclose_f(aid, hdf_error)
+        call h5sclose_f(tspace, hdf_error)
     end if
 
     call h5dcreate_f(file_id, "vx", H5T_NATIVE_DOUBLE, filespace, dset_vx, hdf_error)
@@ -209,11 +209,11 @@ subroutine Mkmov_xcutr
 
     ! Write time as attribute to file
     if (ismaster) then
-        call h5screate_f(H5S_SCALAR_F,tspace,error)
-        call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,error)
-        call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, 1, error)
-        call h5aclose_f(aid, error)
-        call h5sclose_f(tspace, error)
+        call h5screate_f(H5S_SCALAR_F,tspace,hdf_error)
+        call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,hdf_error)
+        call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, 1, hdf_error)
+        call h5aclose_f(aid, hdf_error)
+        call h5sclose_f(tspace, hdf_error)
     end if
 
     ! call h5dcreate_f(file_id, "vxr", H5T_NATIVE_DOUBLE, filespace, dset_vx, hdf_error)
