@@ -180,6 +180,8 @@
 
       call CalcMeanProfiles
       if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+      call Mkmov_xcut
+      call Mkmov_xcutr
       call Mkmov_ycut
       call Mkmov_ycutr
       call Mkmov_zcut
@@ -268,6 +270,8 @@
         if((mod(time,tframe).lt.dt) .and. (floor(time/tframe).ne.0)) then
           if(ismaster)  write(6,*) 'Write slice ycut and zcut'
           !call CalcWriteQ
+          call Mkmov_xcut
+          call Mkmov_xcutr
           call Mkmov_ycut
           call Mkmov_ycutr
           call Mkmov_zcut

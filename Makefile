@@ -61,7 +61,7 @@ FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
           StatReadReduceWrite.F90 StatRoutines.F90\
 	  TimeMarcher.F90 WriteFlowField.F90 WriteGridInfo.F90 factorize.F90\
           main.F90\
-	  Mkmov_ycut.F90 Mkmov_zcut.F90 Init_ycut.F90 Init_zcut.F90\
+	  Mkmov_xcut.F90 Mkmov_ycut.F90 Mkmov_zcut.F90 Init_ycut.F90 Init_zcut.F90\
 	  SpecRoutines.F90\
 	  CalcPlateCf.F90 CalcWriteQ.F90\
 	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90 InterpSalMgrd.F90\
