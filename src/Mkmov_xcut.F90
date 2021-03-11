@@ -28,9 +28,9 @@ subroutine Mkmov_xcut
     integer(HID_T) :: memspace,tspace,aid
     integer(HID_T) :: dset_vx,dset_vy,dset_vz,dset_temp
     integer(HID_T) :: plist_id
-    integer(HSIZE_T) :: dims(2)
+    integer(HSIZE_T) :: dims(2), adims
     integer(HSIZE_T), dimension(2) :: data_count  
-    integer(HSSIZE_T), dimension(2) :: data_offset
+    integer(HSIZE_T), dimension(2) :: data_offset
     integer :: hdf_error, ndims
     integer :: comm, info, ierror
 
@@ -69,9 +69,10 @@ subroutine Mkmov_xcut
 
     ! Write time as attribute to file
     if (ismaster) then
+        adims=1
         call h5screate_f(H5S_SCALAR_F,tspace,hdf_error)
         call h5acreate_f(file_id,"Time",H5T_IEEE_F64LE,tspace,aid,hdf_error)
-        call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, 1, hdf_error)
+        call h5awrite_f(aid, H5T_NATIVE_DOUBLE, time, adims, hdf_error)
         call h5aclose_f(aid, hdf_error)
         call h5sclose_f(tspace, hdf_error)
     end if
@@ -170,7 +171,7 @@ subroutine Mkmov_xcutr
     integer(HID_T) :: plist_id
     integer(HSIZE_T) :: dims(2)
     integer(HSIZE_T), dimension(2) :: data_count  
-    integer(HSSIZE_T), dimension(2) :: data_offset 
+    integer(HSIZE_T), dimension(2) :: data_offset 
     integer :: hdf_error, ndims
     integer :: comm, info, ierror
 
