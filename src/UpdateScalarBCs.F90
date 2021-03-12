@@ -41,11 +41,11 @@ subroutine UpdateBCs
     ! dS/dx = b * S * m
     ! T = c_1 * S + c_2
     ! and update boundary values
-    delT = 35.0*7.86e-4/3.87e-5*rhop
-    a = 920.0/1025.0*3974.0/3.35e5/delT*pect
-    b = 920.0/1025.0*pecs*25 ! 25 factor to get Sc=2500
-    c1 = -5.73e-2 * 35.0 /delT
-    c2 = c1 + (8.32e-2 + 7.61e-2)/delT - 1.0
+    ! delT = 35.0*7.86e-4/3.87e-5*rhop
+    a = 25.2    !920.0/1025.0*3974.0/3.35e5/delT*pect
+    b = 22.4    !920.0/1025.0*pecs*25 ! 25 factor to get Sc=2500
+    c1 = -0.38      !-5.73e-2 * 35.0 /delT
+    c2 = -1.28      !c1 + (8.32e-2 + 7.61e-2)/delT - 1.0
     do icr=xstartr(3),xendr(3)
         do jcr=xstartr(2),xendr(2)
             aa = dxb * dxbr * a * b
