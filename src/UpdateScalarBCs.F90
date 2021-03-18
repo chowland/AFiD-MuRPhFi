@@ -17,7 +17,7 @@ subroutine UpdateBCs
     integer :: ic, jc, icr, jcr
     real, dimension(4,4) :: qv2
     real, dimension(4) :: qv1
-    real :: dxb, dxbr, delT, a, b, c1, c2, aa, bb, cc, m
+    real :: dxb, dxbr, delT, a, b, c1, c2, aa, bb, cc, m, S0
 
     ! Interpolate (T(1,:,:) to refined grid in y and z)
     do ic=xstart(3)-1,xend(3)
