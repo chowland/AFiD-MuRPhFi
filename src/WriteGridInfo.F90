@@ -39,7 +39,7 @@
        dsetname = trim('ymr')
        call HdfSerialWriteReal1D(dsetname,namfile,ymr(1:nymr),nymr)
        dsetname = trim('zmr')
-       call HdfSerialWriteReal1D(dsetname,namfile,zmr(1:nymr),nzmr)
+       call HdfSerialWriteReal1D(dsetname,namfile,zmr(1:nzmr),nzmr)
 
       endif
 

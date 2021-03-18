@@ -156,7 +156,7 @@
       !call DestroyReal3DArray(tpdvr)  !CS BUG: ERROR WHILE DEALLOCATING
 
       if (melt) then
-        call DestroyReal2DArray(tempr) !CJH Needed for melt BC
+        call DestroyReal3DArray(tempr) !CJH Needed for melt BC
       end if
 
       return 

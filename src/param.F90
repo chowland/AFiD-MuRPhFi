@@ -120,7 +120,7 @@
         real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
         real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
         real,allocatable,dimension(:,:,:) :: salc
-        real,allocatable,dimension(:,:) :: tempr
+        real,allocatable,dimension(:,:,:) :: tempr
       end module mgrd_arrays
 !===============================================================
       module stat_arrays

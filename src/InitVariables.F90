@@ -227,7 +227,7 @@
       call AllocateReal3DArray(salc,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
       !CJH Needed for melt boundary condition
       if (melt) then
-        call AllocateReal2DArray(tempr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+        call AllocateReal3DArray(tempr,1,1,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
       end if
 
       return 
