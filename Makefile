@@ -1,9 +1,11 @@
 #=======================================================================
 #  Compiler options
 #=======================================================================
-FC = h5pfc -fpp
+FC = h5pfc -fpp		# ifort preprocessor
+# FC = h5pfc -cpp		# gfortran preprocessor
 ## Laptop
-FC += -r8 -O3
+FC += -r8 -O3		# ifort options
+# FC += -fdefault-real-8 -fdefault-double-8 -O3		# gfortran options
 ## Cartesius
 # FC += -r8 -O3 -xAVX -axCORE-AVX2
 ## Irene
@@ -16,8 +18,10 @@ FC += -r8 -O3
 #  Library
 #======================================================================
 # Common build flags
-##  Laptop
-LDFLAGS = -L$(HOME)/lib_afid/fftw/lib -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+##  Laptop (with intel libraries)
+LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+## Laptop (with GNU libraries)
+# LDFLAGS = -lfftw3 -llapack -lblas -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 
 ## Cartesius (Before compiling, load modules 2019 intel/2018b HDF5 FFTW)
 # FFTW3_LIBS = -lfftw3
@@ -36,6 +40,12 @@ LDFLAGS = -L$(HOME)/lib_afid/fftw/lib -lfftw3 -lmkl_intel_lp64 -lmkl_sequential 
 # BLAS_LIBS = -L/apps/INTEL/2018.4.057/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
 # HDF5_LIBS = -lhdf5_fortran -lhdf5  -lsz -lz -ldl -lm
 # LDFLAGS = -L$(LD_LIBRARY_PATH) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
+
+## SuperMUC-NG (Before compiling, load modules fftw hdf5 szip)
+# BLAS_LIBS = $(MKL_LIB)
+# FFTW3_LIBS = $(FFTW_LIB)
+# HDF5_LIBS = $(HDF5_F90_SHLIB) $(HDF5_SHLIB) -L$(SZIP_LIBDIR) -lz -ldl -lm
+# LDFLAGS = $(BLAS_LIBS) $(FFTW3_LIBS) $(HDF5_LIBS)
 
 #=======================================================================
 #  Non-module Fortran files to be compiled:
@@ -80,7 +90,10 @@ OUTDIR=outputdir outputdir/stst3 outputdir/stst outputdir/flowmov outputdir/flow
 OBJS  := $(FFILES:%.F90=$(OBJDIR)/%.o)
 MOBJS := $(MFILES:%.F90=$(OBJDIR)/%.o)
 
+# when using ifort compiler:
 FC += -module $(OBJDIR) 
+# when using gfortran:
+# FC += -J $(OBJDIR) 
 
 #============================================================================ 
 #  make PROGRAM   
