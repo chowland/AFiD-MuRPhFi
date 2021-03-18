@@ -39,20 +39,21 @@ subroutine UpdateBCs
     ! Calculate coefficients for equations
     ! dT/dx = a * m
     ! dS/dx = b * S * m
-    ! T = c_1 * S + c_2
+    ! T = c_1 * (S+S0) + c_2
     ! and update boundary values
     ! delT = 35.0*7.86e-4/3.87e-5*rhop
     a = 25.2    !920.0/1025.0*3974.0/3.35e5/delT*pect
-    b = 22.4    !920.0/1025.0*pecs*25 ! 25 factor to get Sc=2500
+    b = 160.3    !920.0/1025.0*pecs*25 ! 25 factor to get Sc=2500
     c1 = -0.38      !-5.73e-2 * 35.0 /delT
     c2 = -1.28      !c1 + (8.32e-2 + 7.61e-2)/delT - 1.0
+    S0 = 1.75
     do icr=xstartr(3),xendr(3)
         do jcr=xstartr(2),xendr(2)
             aa = dxb * dxbr * a * b
-            bb = dxb*a + dxbr*b*c2 - dxbr*b*tempr(1,jcr,icr)
+            bb = dxb*a + dxbr*b*c2 - dxbr*b*tempr(1,jcr,icr) - c1*dxbr*b*S0
             cc = c1*sal(1,jcr,icr) + c2 - tempr(1,jcr,icr)
             m = (-bb + sqrt(bb**2 - 4*aa*cc))/2/aa
-            salbp(1,jcr,icr) = (1-dxbr*b*m)/(1+dxbr*b*m)*sal(1,jcr,icr)
+            salbp(1,jcr,icr) = (sal(1,jcr,icr)-dxbr*b*m*S0)/(1+dxbr*b*m)
             saltp(1,jcr,icr) = 0.d0
             tempr(1,jcr,icr) =  tempr(1,jcr,icr) - 2*dxb*a*m
         end do
