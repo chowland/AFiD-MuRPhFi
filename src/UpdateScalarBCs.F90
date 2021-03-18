@@ -55,7 +55,7 @@ subroutine UpdateBCs
             m = (-bb + sqrt(bb**2 - 4*aa*cc))/2/aa
             salbp(1,jcr,icr) = (sal(1,jcr,icr)-dxbr*b*m*S0)/(1+dxbr*b*m)
             saltp(1,jcr,icr) = 0.d0
-            tempr(1,jcr,icr) =  tempr(1,jcr,icr) - 2*dxb*a*m
+            tempr(1,jcr,icr) =  tempr(1,jcr,icr) - dxb*a*m
         end do
     end do
 
