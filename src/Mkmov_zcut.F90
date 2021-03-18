@@ -271,40 +271,40 @@
          call h5fcreate_f(namfile, H5F_ACC_TRUNC_F, file_id, hdf_error,access_prp=plist_id)
          call h5pclose_f(plist_id, hdf_error)
 
-         call h5dcreate_f(file_id, 'vxr', H5T_NATIVE_DOUBLE,filespace,dset_vx, hdf_error)
-         call h5dcreate_f(file_id, 'vyr', H5T_NATIVE_DOUBLE,filespace,dset_vy, hdf_error)
-         call h5dcreate_f(file_id, 'vzr', H5T_NATIVE_DOUBLE,filespace,dset_vz, hdf_error)
+         ! call h5dcreate_f(file_id, 'vxr', H5T_NATIVE_DOUBLE,filespace,dset_vx, hdf_error)
+         ! call h5dcreate_f(file_id, 'vyr', H5T_NATIVE_DOUBLE,filespace,dset_vy, hdf_error)
+         ! call h5dcreate_f(file_id, 'vzr', H5T_NATIVE_DOUBLE,filespace,dset_vz, hdf_error)
          call h5dcreate_f(file_id, 'sal', H5T_NATIVE_DOUBLE,filespace,dset_sal, hdf_error)
          ! call h5dcreate_f(file_id, 'fi', H5T_NATIVE_DOUBLE,filespace,dset_fi, hdf_error)
 
          call h5screate_simple_f(ndims, data_count, memspace, hdf_error) 
 
-            !-- vx
-            call h5dget_space_f(dset_vx, filespace, hdf_error)
-            call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
-            call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
-            call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
-            call h5dwrite_f(dset_vx, H5T_NATIVE_DOUBLE,vxr(1:nxr,xstartr(2):xendr(2),ic), &
-               data_count,  hdf_error, file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
-            call h5pclose_f(plist_id, hdf_error)
+            ! !-- vx
+            ! call h5dget_space_f(dset_vx, filespace, hdf_error)
+            ! call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
+            ! call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+            ! call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
+            ! call h5dwrite_f(dset_vx, H5T_NATIVE_DOUBLE,vxr(1:nxr,xstartr(2):xendr(2),ic), &
+            !    data_count,  hdf_error, file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
+            ! call h5pclose_f(plist_id, hdf_error)
 
-            !-- vy
-            call h5dget_space_f(dset_vy, filespace, hdf_error)
-            call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
-            call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
-            call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
-            call h5dwrite_f(dset_vy, H5T_NATIVE_DOUBLE,vyr(1:nxr,xstartr(2):xendr(2),ic), &
-               data_count,  hdf_error, file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
-            call h5pclose_f(plist_id, hdf_error)
+            ! !-- vy
+            ! call h5dget_space_f(dset_vy, filespace, hdf_error)
+            ! call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
+            ! call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+            ! call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
+            ! call h5dwrite_f(dset_vy, H5T_NATIVE_DOUBLE,vyr(1:nxr,xstartr(2):xendr(2),ic), &
+            !    data_count,  hdf_error, file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
+            ! call h5pclose_f(plist_id, hdf_error)
 
-            !-- vz
-            call h5dget_space_f(dset_vz, filespace, hdf_error)
-            call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
-            call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
-            call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
-            call h5dwrite_f(dset_vz, H5T_NATIVE_DOUBLE,vzr(1:nxr,xstartr(2):xendr(2),ic), &
-               data_count,  hdf_error, file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
-            call h5pclose_f(plist_id, hdf_error)
+            ! !-- vz
+            ! call h5dget_space_f(dset_vz, filespace, hdf_error)
+            ! call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
+            ! call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+            ! call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
+            ! call h5dwrite_f(dset_vz, H5T_NATIVE_DOUBLE,vzr(1:nxr,xstartr(2):xendr(2),ic), &
+            !    data_count,  hdf_error, file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
+            ! call h5pclose_f(plist_id, hdf_error)
 
             !-- sal
             call h5dget_space_f(dset_sal, filespace, hdf_error)
@@ -324,9 +324,9 @@
                !data_count,  hdf_error, file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
             !call h5pclose_f(plist_id, hdf_error)
 
-         call h5dclose_f(dset_vx, hdf_error)
-         call h5dclose_f(dset_vy, hdf_error)
-         call h5dclose_f(dset_vz, hdf_error)
+         ! call h5dclose_f(dset_vx, hdf_error)
+         ! call h5dclose_f(dset_vy, hdf_error)
+         ! call h5dclose_f(dset_vz, hdf_error)
          call h5dclose_f(dset_sal, hdf_error)
          !call h5dclose_f(dset_fi, hdf_error)
          call h5sclose_f(memspace, hdf_error)
