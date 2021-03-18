@@ -121,7 +121,8 @@
         write(45,'("</Geometry>")')
 
         write(45,'("<Attribute Name=""Q"" AttributeType=""Scalar"" Center=""Node"">")')
-        write(45,'("<DataItem Dimensions=""",i4," ",i4," ",i4,""" NumberType=""Double"" Precision=""2"" Format=""HDF"">")') nzm,nym,nx
+        write(45,'("<DataItem Dimensions=""",i4," ",i4," ",i4,""" NumberType=""Double"" Precision=""2"" Format=""HDF"">")')&
+                  nzm,nym,nx
         write(45,*) trim(filnam)//':/var'
         write(45,'("</DataItem>")')
         write(45,'("</Attribute>")')
