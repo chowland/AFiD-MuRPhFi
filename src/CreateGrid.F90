@@ -118,9 +118,34 @@
       xc(nx) = alx3
       endif
 
+!
+!     OPTION 7: As option 6, but only for high resolution at one (lower) wall
+!
+
+
+      if(istr3.eq.7) then
+        nclip = int(str3)
+        nxmo = nx+nclip   !CJH only extend on one side
+        do kc=1,nxmo
+          etazm(kc)=+cos(pi*float(kc)/float(nxmo)/2.0)
+        end do
+        do kc=1,nx
+          etaz(kc)=etazm(kc+nclip)
+        end do
+        delet = etaz(1)
+        do kc=1,nx
+          etaz(kc)=etaz(kc)/delet
+        end do
+        xc(1) = 0.
+        do kc=2,nxm
+          xc(kc) = alx3*(1.0 - etaz(kc))
+        end do
+        xc(nx) = alx3
+      endif
+
       call DestroyReal1DArray(etaz)
       call DestroyReal1DArray(etazm)
-      
+
 !m-----------------------------------------
 !
 !     METRIC FOR UNIFORM DIRECTIONS
