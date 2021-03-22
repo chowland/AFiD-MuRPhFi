@@ -122,6 +122,31 @@
       xcr(nxr) = alx3
       endif
 
+!
+!     OPTION 7: As option 6, but only for high resolution at one (lower) wall
+!
+
+
+      if(istr3r.eq.7) then
+        nclip = int(str3)
+        nxmo = nxr+nclip   !CJH only extend on one side
+        do kc=1,nxmo
+          etazm(kc)=+cos(pi*float(kc)/float(nxmo)/2.0)
+        end do
+        do kc=1,nxr
+          etaz(kc)=etazm(kc+nclip)
+        end do
+        delet = etaz(1)
+        do kc=1,nxr
+          etaz(kc)=etaz(kc)/delet
+        end do
+        xcr(1) = 0.
+        do kc=2,nxmr
+          xcr(kc) = alx3*(1.0 - etaz(kc))
+        end do
+        xcr(nxr) = alx3
+      endif
+
       call DestroyReal1DArray(etaz)
       call DestroyReal1DArray(etazm)
       

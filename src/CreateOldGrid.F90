@@ -146,6 +146,46 @@ subroutine CreateOldGrid
         xcro(nxro) = alx3
     end if
 
+    ! Option 7: One-sided clipped Chebychev
+    if (istr3o.eq.7) then
+        nclip = int(str3o)
+        nxp = nxo + nclip
+        do k=1,nxp
+            etazm(k) = cos(pi*float(k)/float(nxp))
+        end do
+        do k=1,nxo
+            etaz(k) = etazm(k + nclip)
+        end do
+        delet = etaz(1)
+        do k=1,nxo
+            etaz(k) = etaz(k)/delet
+        end do
+        xco(1) = 0.d0
+        do k=2,nxmo
+            xco(k) = alx3*(1.d0 -  etaz(k))
+        end do
+        xco(nxo) = alx3
+    end if
+    if (istr3ro.eq.7) then
+        nclip = int(str3o)
+        nxp = nxro + nclip
+        do k=1,nxp
+            etazm(k) = cos(pi*float(k)/float(nxp))
+        end do
+        do k=1,nxro
+            etaz(k) = etazm(k + nclip)
+        end do
+        delet = etaz(1)
+        do k=1,nxro
+            etaz(k) = etaz(k)/delet
+        end do
+        xcro(1) = 0.d0
+        do k=2,nxmro
+            xcro(k) = alx3*(1.d0 -  etaz(k))
+        end do
+        xcro(nxro) = alx3
+    end if
+
     call DestroyReal1DArray(etaz)
     call DestroyReal1DArray(etazm)
 
