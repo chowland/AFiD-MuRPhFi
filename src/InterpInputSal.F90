@@ -30,14 +30,32 @@ subroutine InterpInputSal
     call HdfReadContinua(nzro, nyro, nxro, xs2o, xe2o, xs3o, xe3o, 5, &
             salo(1:nxro, xs2o-lvlhalo:xe2o+lvlhalo, xs3o-lvlhalo:xe3o+lvlhalo))
 
-    do ic=xs3o,xe3o
-        do jc=xs2o,xe2o
-            !-- Boundary points
-            !CJH ONLY WORKS FOR CONSTANT SAL BCs CURRENTLY
-            salo(0,jc,ic) = salbp(1,jc,ic)
-            salo(nxro,jc,ic) = saltp(1,jc,ic)
+    !-- Boundary points
+    if (melt) then
+        do ic=xs3o,xe3o
+            do jc=xs2o,xe2o
+                salo(0,jc,ic) = salo(1,jc,ic) - xmro(1)&
+                                *(salo(2,jc,ic) - salo(1,jc,ic))/(xmro(2)-xmro(1))
+                salo(nxro,jc,ic) = 0.d0
+            end do
         end do
-    end do
+    else
+        if (rays>=0) then
+            do ic=xs3o,xe3o
+                do jc=xs2o,xe2o
+                    salo(0,jc,ic) = -0.5d0
+                    salo(nxro,jc,ic) = 0.5d0
+                end do
+            end do
+        else
+            do ic=xs3o,xe3o
+                do jc=xs2o,xe2o
+                    salo(0,jc,ic) = 0.5d0
+                    salo(nxro,jc,ic) = -0.5d0
+                end do
+            end do
+        end if
+    end if
 
     call update_halo(salo, lvlhalo)
 
