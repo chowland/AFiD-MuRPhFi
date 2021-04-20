@@ -1,15 +1,18 @@
 #=======================================================================
 #  Compiler options
 #=======================================================================
-FC = h5pfc -fpp		# ifort preprocessor
-# FC = h5pfc -cpp		# gfortran preprocessor
+FC = h5pfc -fpp # ifort preprocessor
+# FC = h5pfc -cpp # gfortran preprocessor
 ## Laptop
-FC += -r8 -O3		# ifort options
-# FC += -fdefault-real-8 -fdefault-double-8 -O3		# gfortran options
+FC += -r8 -O3 # ifort options
+# FC += -fdefault-real-8 -fdefault-double-8 -O2 # gfortran options
+#FC += -fdefault-real-8 -fdefault-double-8 -O0 -g -fbacktrace -fbounds-check
 ## Cartesius
 # FC += -r8 -O3 -xAVX -axCORE-AVX2
 ## Irene
 # FC += -r8 -O3 -mavx2 $(FFTW3_FFLAGS)
+## MareNostrum
+# FC += -r8 -O3 $(FFTW_FFLAGS)
 ## Traceback / Debug
 # FC += -r8 -O0 -g -traceback -check bounds 
 # FC += -DSHM -DSHM_DEBUG
@@ -35,11 +38,11 @@ LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_
 # HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
 # LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
 
-## MareNostrum
-# FFTW3_LIBS = -L/apps/FFTW/3.3.6/INTEL/IMPI/lib -lfftw3
-# BLAS_LIBS = -L/apps/INTEL/2018.4.057/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+## MareNostrum (Before compiling, load modules fftw hdf5)
+# FFTW3_LIBS = $(FFTW_LIBS)
+# BLAS_LIBS = -L$(MKLROOT)/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
 # HDF5_LIBS = -lhdf5_fortran -lhdf5  -lsz -lz -ldl -lm
-# LDFLAGS = -L$(LD_LIBRARY_PATH) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
+# LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
 
 ## SuperMUC-NG (Before compiling, load modules fftw hdf5 szip)
 # BLAS_LIBS = $(MKL_LIB)
@@ -129,6 +132,6 @@ clean:
 objdir: $(OBJDIR) 
 $(OBJDIR): 
 	mkdir -p ${OBJDIR} 
-outdir: $(OUTDIR) 
-$(OUTDIR): 
-	mkdir -p ${OUTDIR} 
+#outdir: $(OUTDIR) 
+# $(OUTDIR): 
+# 	mkdir -p ${OUTDIR} 
