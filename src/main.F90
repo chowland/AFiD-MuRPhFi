@@ -316,6 +316,13 @@
           minwtdt = huge(0.0d0)
         endif
 
+        if ( mod(ti(2)-tin(1),3600.d0) .lt. (ti(2)-ti(1)) ) then
+          if(ismaster) write(6,*) '*** Writing data every hour ***'
+          call WriteFlowField
+          call MpiBarrier
+          if(ismaster) write(6,*) '************ Done *****************'
+        end if
+
        if( (ti(2) - tin(1)) .gt. walltimemax) errorcode = 334
 
        if( ntime .eq. ntst ) errorcode = 555
