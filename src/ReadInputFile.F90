@@ -38,6 +38,8 @@
         read(15,*) xplusU,xminusU,dPdz
         read(15,301) dummy    
         read(15,*) tframe,flagmelt
+        read(15,301) dummy
+        read(15,*) active_T, active_S
 301     format(a4)                
       close(15)
 

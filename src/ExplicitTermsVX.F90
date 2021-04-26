@@ -107,8 +107,8 @@
           do jc=xstart(2),xend(2)
             do kc=2,nxm
               km=kc-1
-              tempit=0.5d0*(temp(kc,jc,ic)+temp(km,jc,ic)) !0.d0
-              salit =0.5d0*(salc(kc,jc,ic)+salc(km,jc,ic))
+              tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(km,jc,ic)) !0.d0
+              salit =active_S*0.5d0*(salc(kc,jc,ic)+salc(km,jc,ic))
 
               qcap(kc,jc,ic) = qcap(kc,jc,ic) + byct*tempit - bycs*salit
             end do

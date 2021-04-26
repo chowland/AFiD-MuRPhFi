@@ -23,6 +23,7 @@
         real      :: dtmin,dtmax,limitCFL,limitVel
         integer   :: nson,idtv
         real      :: tframe !steven for slice
+        integer   :: active_T, active_S !CJH Option for passive scalars
 !=================================================
 !       end of input file
 !=================================================

@@ -109,8 +109,8 @@
           do jc=xstart(2),xend(2)
             jmm=jc-1
             do kc=1,nxm
-              tempit=0.5d0*(temp(kc,jc,ic)+temp(kc,jmm,ic)) !0.d0
-              salit =0.5d0*(salc(kc,jc,ic)+salc(kc,jmm,ic))
+              tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(kc,jmm,ic)) !0.d0
+              salit =active_S*0.5d0*(salc(kc,jc,ic)+salc(kc,jmm,ic))
 
               dph(kc,jc,ic) = dph(kc,jc,ic) + byct*tempit - bycs*salit
             end do
