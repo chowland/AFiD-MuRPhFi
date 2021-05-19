@@ -92,14 +92,7 @@
 
       call WriteGridInfo
 
-      ! call Init_ycut
-      ! call Init_ycutr
-      ! call Init_zcut
-      ! call Init_zcutr
-
       !call InitSpec
-
-      !if (dumpslabs) call InitializeSlabDump
 
 !m===================================
 !m===================================
@@ -271,11 +264,8 @@
           if(ismaster)  write(6,*) 'Write slice ycut and zcut'
           !call CalcWriteQ
           call Mkmov_xcut
-          ! call Mkmov_xcutr
           call Mkmov_ycut
-          ! call Mkmov_ycutr
           call Mkmov_zcut
-          ! call Mkmov_zcutr
         endif
 
         if(ntime.eq.1.or.mod(time,tout).lt.dt) then
@@ -284,15 +274,8 @@
 
            call CalcMaxCFL(instCFL,CFLmr)
            call CheckDivergence(dmax,dmaxr)
-           call CalcPlateNu
+          !  call CalcPlateNu
            !call CalcPlateCf
-
-           !if(time.gt.tsta) then
-           !  if (statcal)  call CalcStats
-           !  !if (statcal.and.ntime.gt.1)  call WriteSpec
-           !  if (dumpslabs) call SlabDumper
-           !  if (disscal.and.statcal) call CalcDissipationNu
-           !endif
 
            if(.not.variabletstep) instCFL=instCFL*dt
 

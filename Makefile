@@ -1,11 +1,11 @@
 #=======================================================================
 #  Compiler options
 #=======================================================================
-FC = h5pfc -fpp # ifort preprocessor
-# FC = h5pfc -cpp # gfortran preprocessor
+# FC = h5pfc -fpp # ifort preprocessor
+FC = h5pfc -cpp # gfortran preprocessor
 ## Laptop
-FC += -r8 -O3 # ifort options
-# FC += -fdefault-real-8 -fdefault-double-8 -O2 # gfortran options
+# FC += -r8 -O3 # ifort options
+FC += -fdefault-real-8 -fdefault-double-8 -O2 # gfortran options
 #FC += -fdefault-real-8 -fdefault-double-8 -O0 -g -fbacktrace -fbounds-check
 ## Cartesius
 # FC += -r8 -O3 -xAVX -axCORE-AVX2
@@ -22,9 +22,9 @@ FC += -r8 -O3 # ifort options
 #======================================================================
 # Common build flags
 ##  Laptop (with intel libraries)
-LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+# LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 ## Laptop (with GNU libraries)
-# LDFLAGS = -lfftw3 -llapack -lblas -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+LDFLAGS = -lfftw3 -llapack -lblas -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 
 ## Cartesius (Before compiling, load modules 2019 intel/2018b HDF5 FFTW)
 # FFTW3_LIBS = -lfftw3
@@ -57,30 +57,62 @@ EXTRA_DIST = transpose_z_to_x.F90 transpose_x_to_z.F90 transpose_x_to_y.F90\
 	     transpose_y_to_x.F90 transpose_y_to_z.F90 transpose_z_to_y.F90\
 	     factor.F90 halo.F90 fft_common.F90 alloc.F90 halo_common.F90
 
-FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
-	  CalcLocalDivergence.F90 CheckDivergence.F90 CorrectPressure.F90\
-          CorrectVelocity.F90 CreateGrid.F90 CreateInitialConditions.F90\
-	  DeallocateVariables.F90 DebugRoutines.F90\
-	  ExplicitTermsTemp.F90 ExplicitTermsSal.F90\
-	  ExplicitTermsVX.F90 ExplicitTermsVY.F90 ExplicitTermsVZ.F90\
-	  GlobalQuantities.F90 HdfReadContinua.F90 HdfRoutines.F90\
-	  ImplicitAndUpdateTemp.F90 ImplicitAndUpdateSal.F90\
-	  ImplicitAndUpdateVX.F90 ImplicitAndUpdateVY.F90 ImplicitAndUpdateVZ.F90\
-	  InitPressureSolver.F90 InitTimeMarchScheme.F90 InitVariables.F90\
-          LocateLargeDivergence.F90 MpiAuxRoutines.F90 QuitRoutine.F90\
-	  ReadInputFile.F90 ResetLogs.F90 SetTempBCs.F90\
-          SlabDumpRoutines.F90 SolveImpEqnUpdate_Temp.F90 SolveImpEqnUpdate_Sal.F90\
-	  SolveImpEqnUpdate_X.F90 SolveImpEqnUpdate_YZ.F90 SolvePressureCorrection.F90\
-          StatReadReduceWrite.F90 StatRoutines.F90\
-	  TimeMarcher.F90 WriteFlowField.F90 WriteGridInfo.F90 factorize.F90\
-          main.F90\
-	  MakeMovieXCut.F90 MakeMovieYCut.F90 MakeMovieZCut.F90\
-	  SpecRoutines.F90\
-	  CalcPlateCf.F90 CalcWriteQ.F90\
-	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90 InterpSalMgrd.F90\
-	  CalcMeanProfiles.F90\
-	  ReadFlowInterp.F90 CreateOldGrid.F90 CreateInputStencil.F90 CreateSalStencil.F90\
-	  InterpInputSal.F90 InterpInputVel.F90 UpdateScalarBCs.F90
+# Object files associated with standard flow solver
+OBJS = obj/main.o obj/CalcLocalDivergence.o obj/CalcMaxCFL.o \
+	obj/CalcMeanProfiles.o obj/CheckDivergence.o obj/CorrectPressure.o \
+	obj/CorrectVelocity.o obj/CreateGrid.o obj/CreateInitialConditions.o \
+	obj/DeallocateVariables.o obj/DebugRoutines.o obj/ExplicitTermsTemp.o \
+	obj/ExplicitTermsVX.o obj/ExplicitTermsVY.o obj/ExplicitTermsVZ.o \
+	obj/factorize.o obj/HdfReadContinua.o obj/HdfRoutines.o \
+	obj/ImplicitAndUpdateTemp.o obj/ImplicitAndUpdateVX.o obj/ImplicitAndUpdateVY.o \
+	obj/ImplicitAndUpdateVZ.o obj/InitPressureSolver.o obj/InitTimeMarchScheme.o \
+	obj/InitVariables.o obj/LocateLargeDivergence.o obj/MakeMovieXCut.o \
+	obj/MakeMovieYCut.o obj/MakeMovieZCut.o obj/MpiAuxRoutines.o \
+	obj/QuitRoutine.o obj/ReadInputFile.o obj/ResetLogs.o \
+	obj/SetTempBCs.o obj/SolveImpEqnUpdate_Temp.o obj/SolveImpEqnUpdate_X.o \
+	obj/SolveImpEqnUpdate_YZ.o obj/SolvePressureCorrection.o obj/SpecRoutines.o \
+	obj/TimeMarcher.o obj/WriteFlowField.o obj/WriteGridInfo.o \
+	obj/CalcWriteQ.o obj/GlobalQuantities.o obj/ReadFlowInterp.o
+
+# Object files associated with multiple resolution grids
+OBJS += obj/CreateMgrdGrid.o obj/CreateMgrdStencil.o
+
+# Object files associated with initial condition interpolation
+OBJS += obj/CreateInputStencil.o obj/CreateOldGrid.o obj/CreateSalStencil.o \
+	obj/InterpInputSal.o obj/InterpInputVel.o obj/InterpSalMgrd.o \
+	obj/InterpVelMgrd.o
+
+# Object files associated with the salinity field
+OBJS += obj/ExplicitTermsSal.o obj/ImplicitAndUpdateSal.o obj/SolveImpEqnUpdate_Sal.o \
+	obj/UpdateScalarBCs.o
+
+# Module object files
+MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o
+
+# FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
+# 	  CalcLocalDivergence.F90 CheckDivergence.F90 CorrectPressure.F90\
+#           CorrectVelocity.F90 CreateGrid.F90 CreateInitialConditions.F90\
+# 	  DeallocateVariables.F90 DebugRoutines.F90\
+# 	  ExplicitTermsTemp.F90 ExplicitTermsSal.F90\
+# 	  ExplicitTermsVX.F90 ExplicitTermsVY.F90 ExplicitTermsVZ.F90\
+# 	  GlobalQuantities.F90 HdfReadContinua.F90 HdfRoutines.F90\
+# 	  ImplicitAndUpdateTemp.F90 ImplicitAndUpdateSal.F90\
+# 	  ImplicitAndUpdateVX.F90 ImplicitAndUpdateVY.F90 ImplicitAndUpdateVZ.F90\
+# 	  InitPressureSolver.F90 InitTimeMarchScheme.F90 InitVariables.F90\
+#           LocateLargeDivergence.F90 MpiAuxRoutines.F90 QuitRoutine.F90\
+# 	  ReadInputFile.F90 ResetLogs.F90 SetTempBCs.F90\
+#           SlabDumpRoutines.F90 SolveImpEqnUpdate_Temp.F90 SolveImpEqnUpdate_Sal.F90\
+# 	  SolveImpEqnUpdate_X.F90 SolveImpEqnUpdate_YZ.F90 SolvePressureCorrection.F90\
+#           StatReadReduceWrite.F90 StatRoutines.F90\
+# 	  TimeMarcher.F90 WriteFlowField.F90 WriteGridInfo.F90 factorize.F90\
+#           main.F90\
+# 	  MakeMovieXCut.F90 MakeMovieYCut.F90 MakeMovieZCut.F90\
+# 	  SpecRoutines.F90\
+# 	  CalcPlateCf.F90 CalcWriteQ.F90\
+# 	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90 InterpSalMgrd.F90\
+# 	  CalcMeanProfiles.F90\
+# 	  ReadFlowInterp.F90 CreateOldGrid.F90 CreateInputStencil.F90 CreateSalStencil.F90\
+# 	  InterpInputSal.F90 InterpInputVel.F90 UpdateScalarBCs.F90
 
 #=======================================================================
 #  Files that create modules:
@@ -90,13 +122,13 @@ MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90
 # Object and module directory:
 OBJDIR=obj
 OUTDIR=outputdir outputdir/stst3 outputdir/stst outputdir/flowmov outputdir/flowmov3d
-OBJS  := $(FFILES:%.F90=$(OBJDIR)/%.o)
-MOBJS := $(MFILES:%.F90=$(OBJDIR)/%.o)
+# OBJS  := $(FFILES:%.F90=$(OBJDIR)/%.o)
+# MOBJS := $(MFILES:%.F90=$(OBJDIR)/%.o)
 
 # when using ifort compiler:
-FC += -module $(OBJDIR) 
+# FC += -module $(OBJDIR) 
 # when using gfortran:
-# FC += -J $(OBJDIR) 
+FC += -J $(OBJDIR) 
 
 #============================================================================ 
 #  make PROGRAM   
@@ -111,15 +143,25 @@ $(PROGRAM): $(MOBJS) $(OBJS)
 #============================================================================
 #  Dependencies 
 #============================================================================
-$(OBJDIR)/param.o: src/param.F90
+$(OBJDIR)/param.o: source/flow_solver/param.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/AuxiliaryRoutines.o: src/AuxiliaryRoutines.F90 
+$(OBJDIR)/AuxiliaryRoutines.o: source/flow_solver/AuxiliaryRoutines.F90 
 	$(FC) -c -o $@ $< $(LDFLAGS) 
-$(OBJDIR)/decomp_2d.o: src/decomp_2d.F90
+$(OBJDIR)/decomp_2d.o: source/flow_solver/2decomp/decomp_2d.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/decomp_2d_fft.o: src/decomp_2d_fft.F90
+$(OBJDIR)/decomp_2d_fft.o: source/flow_solver/2decomp/decomp_2d_fft.F90
 	$(FC) -c -o $@ $< $(LDFLAGS) 
-$(OBJDIR)/%.o: src/%.F90 $(MOBJS)
+$(OBJDIR)/%.o: source/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: source/flow_solver/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: source/multires/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: source/multires/IC_interpolation/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: source/multires/phase-field/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: source/multires/salinity/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 
 #============================================================================
