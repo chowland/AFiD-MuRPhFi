@@ -143,33 +143,33 @@
 ! Arrays for statistics    
 !-------------------------------------------------
 
-      if (statcal) then
-       call AllocateReal1DArray(vx_me,1,nxm)
-       call AllocateReal1DArray(vy_me,1,nxm)
-       call AllocateReal1DArray(vz_me,1,nxm)
+      ! if (statcal) then
+      !  call AllocateReal1DArray(vx_me,1,nxm)
+      !  call AllocateReal1DArray(vy_me,1,nxm)
+      !  call AllocateReal1DArray(vz_me,1,nxm)
  
-       call AllocateReal1DArray(vx_rms,1,nxm)
-       call AllocateReal1DArray(vy_rms,1,nxm)
-       call AllocateReal1DArray(vz_rms,1,nxm)
+      !  call AllocateReal1DArray(vx_rms,1,nxm)
+      !  call AllocateReal1DArray(vy_rms,1,nxm)
+      !  call AllocateReal1DArray(vz_rms,1,nxm)
  
-       call AllocateReal1DArray(vx_me_buf,1,nxm)
-       call AllocateReal1DArray(vy_me_buf,1,nxm)
-       call AllocateReal1DArray(vz_me_buf,1,nxm)
+      !  call AllocateReal1DArray(vx_me_buf,1,nxm)
+      !  call AllocateReal1DArray(vy_me_buf,1,nxm)
+      !  call AllocateReal1DArray(vz_me_buf,1,nxm)
  
-       call AllocateReal1DArray(vx_msq_buf,1,nxm)
-       call AllocateReal1DArray(vy_msq_buf,1,nxm)
-       call AllocateReal1DArray(vz_msq_buf,1,nxm)
+      !  call AllocateReal1DArray(vx_msq_buf,1,nxm)
+      !  call AllocateReal1DArray(vy_msq_buf,1,nxm)
+      !  call AllocateReal1DArray(vz_msq_buf,1,nxm)
 
-       call AllocateReal1DArray(temp_me,1,nxm)
-       call AllocateReal1DArray(temp_rms,1,nxm)
-       call AllocateReal1DArray(tempvx_me,1,nxm)
+      !  call AllocateReal1DArray(temp_me,1,nxm)
+      !  call AllocateReal1DArray(temp_rms,1,nxm)
+      !  call AllocateReal1DArray(tempvx_me,1,nxm)
 
-       call AllocateReal1DArray(vxvy_corr,1,nxm)
-       if (disscal) then
-        call AllocateReal1DArray(disste,1,nxm)
-        call AllocateReal1DArray(dissth,1,nxm)
-       end if
-      end if
+      !  call AllocateReal1DArray(vxvy_corr,1,nxm)
+      !  if (disscal) then
+      !   call AllocateReal1DArray(disste,1,nxm)
+      !   call AllocateReal1DArray(dissth,1,nxm)
+      !  end if
+      ! end if
 
       !-------------------------------------------------
       ! Arrays with ghost cells

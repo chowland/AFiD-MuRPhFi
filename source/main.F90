@@ -113,7 +113,7 @@
 !m===================================
 
       time=0.d0
-      if(statcal) nstatsamples = 0
+      ! if(statcal) nstatsamples = 0
 
       call InitPressureSolver
       call SetTempBCs

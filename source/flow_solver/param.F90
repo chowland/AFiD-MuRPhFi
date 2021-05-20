@@ -9,7 +9,6 @@
         integer   :: nx, ny, nz
         integer   :: nxr, nyr, nzr, istr3r  !CS mgrd
         integer   :: nsst, nread, ntst, ireset
-        integer   :: tscaleT    !CJH alternate nondim option
         real      :: walltimemax,tout,tmax
         real      :: alx3,str3
         integer   :: istr3
@@ -19,8 +18,8 @@
         integer   :: TfixS,TfixN,SfixS,SfixN        !CJH option for fixed T/S BCs
         integer   :: gAxis      !CJH option to choose gravity axis
         real      :: xminusU,xplusU,dPdz
-        integer   :: starea,tsta
-        real      :: dtmin,dtmax,limitCFL,limitVel
+        ! integer   :: starea,tsta
+        real      :: dtmin,dtmax,limitCFL
         integer   :: nson,idtv
         real      :: tframe !steven for slice
         integer   :: active_T, active_S !CJH Option for passive scalars
@@ -83,8 +82,8 @@
         real, allocatable, dimension(:,:,:) :: salbp,saltp
               
         logical :: dumpslabs=.false.
-        logical :: statcal=.false.
-        logical :: disscal=.false.
+        ! logical :: statcal=.false.
+        ! logical :: disscal=.false.
         logical :: readflow=.false.
         logical :: readstats=.false.
         logical :: ismaster=.false.

@@ -25,11 +25,11 @@
       close(97,status='delete')
 
 !EP   nusse3.out in CalcDissipationNu.F
-      if (disscal) then
-      open(92,file='outputdir/nu_diss.out',status='unknown',access='sequential', &
-       position='append')
-      close(92,status='delete')
-      end if
+      ! if (disscal) then
+      ! open(92,file='outputdir/nu_diss.out',status='unknown',access='sequential', &
+      !  position='append')
+      ! close(92,status='delete')
+      ! end if
 
 !EP   rms_vel.out in GlobalQuantities.F
        open(94,file='outputdir/rms_vel.out',status='unknown',position='append', &
