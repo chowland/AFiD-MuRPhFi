@@ -9,7 +9,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine CalcMeanProfiles
-    
+
     use param
     use local_arrays, only: vx,vy,vz,temp
     use mgrd_arrays, only: vxr,vyr,vzr,sal
@@ -142,57 +142,59 @@ subroutine CalcMeanProfiles
         chiT(k) = chiT(k)/pect
     end do
 
-    inymr = 1.d0/nymr
-    inzmr = 1.d0/nzmr
+    if (salinity) then
+        inymr = 1.d0/nymr
+        inzmr = 1.d0/nzmr
 
-    do i=xstartr(3),xendr(3)
-        do j=xstartr(2),xendr(2)
-            do k=1,nxmr
-                Sbar(k) = Sbar(k) + sal(k,j,i)*inymr*inzmr
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    Sbar(k) = Sbar(k) + sal(k,j,i)*inymr*inzmr
 
-                vxS(k) = vxS(k) + 0.5*(vxr(k,j,i)+vxr(k+1,j,i))*sal(k,j,i)*inymr*inzmr
-                vyS(k) = vyS(k) + 0.5*(vyr(k,j,i)+vyr(k,j+1,i))*sal(k,j,i)*inymr*inzmr
-                vzS(k) = vzS(k) + 0.5*(vzr(k,j,i)+vzr(k,j,i+1))*sal(k,j,i)*inymr*inzmr
+                    vxS(k) = vxS(k) + 0.5*(vxr(k,j,i)+vxr(k+1,j,i))*sal(k,j,i)*inymr*inzmr
+                    vyS(k) = vyS(k) + 0.5*(vyr(k,j,i)+vyr(k,j+1,i))*sal(k,j,i)*inymr*inzmr
+                    vzS(k) = vzS(k) + 0.5*(vzr(k,j,i)+vzr(k,j,i+1))*sal(k,j,i)*inymr*inzmr
 
-                Srms(k) = Srms(k) + sal(k,j,i)**2*inymr*inzmr
+                    Srms(k) = Srms(k) + sal(k,j,i)**2*inymr*inzmr
+                end do
             end do
         end do
-    end do
 
-    call MpiAllSumReal1D(Sbar,nxmr)
-    call MpiAllSumReal1D(vxS,nxmr)
-    call MpiAllSumReal1D(vyS,nxmr)
-    call MpiAllSumReal1D(vzS,nxmr)
-    call MpiAllSumReal1D(Srms,nxmr)
+        call MpiAllSumReal1D(Sbar,nxmr)
+        call MpiAllSumReal1D(vxS,nxmr)
+        call MpiAllSumReal1D(vyS,nxmr)
+        call MpiAllSumReal1D(vzS,nxmr)
+        call MpiAllSumReal1D(Srms,nxmr)
 
-    do k=1,nxmr
-        Srms(k) = sqrt(Srms(k))
-    end do
-
-    do i=xstartr(3),xendr(3)
-        do j=xstartr(2),xendr(2)
-            do k=1,nxmr
-                chiS(k) = chiS(k) + ((sal(k,j,i+1)-sal(k,j,i-1))*0.5*dzr)**2*inymr*inzmr
-                chiS(k) = chiS(k) + ((sal(k,j+1,i)-sal(k,j-1,i))*0.5*dyr)**2*inymr*inzmr
-            end do
-            tdxr = 0.5*dxr/g3rmr(1)
-            chiS(1) = chiS(1) + ((sal(2,j,i)-sal(1,j,i)+2.0*SfixS*(sal(1,j,i)-salbp(1,j,i)))&
-                            & *tdxr)**2*inymr*inzmr
-            do k=2,nxmr-1
-                tdxr = 0.5*dxr/g3rmr(k)
-                chiS(k) = chiS(k) + ((sal(k+1,j,i)-sal(k-1,j,i)) * tdxr)**2*inymr*inzmr
-            end do
-            tdxr = 0.5*dxr/g3rmr(nxmr)
-            chiS(nxmr) = chiS(nxmr) + ((sal(nxmr,j,i)-sal(nxmr-1,j,i)+2.0*SfixN*(saltp(1,j,i)-sal(nxmr,j,i)))&
-                            & *tdxr)**2*inymr*inzmr
+        do k=1,nxmr
+            Srms(k) = sqrt(Srms(k))
         end do
-    end do
 
-    call MpiAllSumReal1D(chiS,nxmr)
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    chiS(k) = chiS(k) + ((sal(k,j,i+1)-sal(k,j,i-1))*0.5*dzr)**2*inymr*inzmr
+                    chiS(k) = chiS(k) + ((sal(k,j+1,i)-sal(k,j-1,i))*0.5*dyr)**2*inymr*inzmr
+                end do
+                tdxr = 0.5*dxr/g3rmr(1)
+                chiS(1) = chiS(1) + ((sal(2,j,i)-sal(1,j,i)+2.0*SfixS*(sal(1,j,i)-salbp(1,j,i)))&
+                                & *tdxr)**2*inymr*inzmr
+                do k=2,nxmr-1
+                    tdxr = 0.5*dxr/g3rmr(k)
+                    chiS(k) = chiS(k) + ((sal(k+1,j,i)-sal(k-1,j,i)) * tdxr)**2*inymr*inzmr
+                end do
+                tdxr = 0.5*dxr/g3rmr(nxmr)
+                chiS(nxmr) = chiS(nxmr) + ((sal(nxmr,j,i)-sal(nxmr-1,j,i)+2.0*SfixN*(saltp(1,j,i)-sal(nxmr,j,i)))&
+                                & *tdxr)**2*inymr*inzmr
+            end do
+        end do
 
-    do k=1,nxmr
-        chiS(k) = chiS(k)/pecs
-    end do
+        call MpiAllSumReal1D(chiS,nxmr)
+
+        do k=1,nxmr
+            chiS(k) = chiS(k)/pecs
+        end do
+    end if
 
     write(nstat,"(i5.5)")nint(time/tout)
     filename = trim("outputdir/means.h5")
@@ -247,23 +249,25 @@ subroutine CalcMeanProfiles
         dsetname = trim("epsilon/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,epsilon,nxm)
         
-        dsetname = trim("Sbar/"//nstat)
-        call HdfSerialWriteReal1D(dsetname,filename,Sbar,nxmr)
+        if (salinity) then
+            dsetname = trim("Sbar/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,Sbar,nxmr)
 
-        dsetname = trim("vxS/"//nstat)
-        call HdfSerialWriteReal1D(dsetname,filename,vxS,nxmr)
+            dsetname = trim("vxS/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,vxS,nxmr)
 
-        dsetname = trim("vyS/"//nstat)
-        call HdfSerialWriteReal1D(dsetname,filename,vyS,nxmr)
+            dsetname = trim("vyS/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,vyS,nxmr)
 
-        dsetname = trim("vzS/"//nstat)
-        call HdfSerialWriteReal1D(dsetname,filename,vzS,nxmr)
+            dsetname = trim("vzS/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,vzS,nxmr)
 
-        dsetname = trim("Srms/"//nstat)
-        call HdfSerialWriteReal1D(dsetname,filename,Srms,nxmr)
+            dsetname = trim("Srms/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,Srms,nxmr)
 
-        dsetname = trim("chiS/"//nstat)
-        call HdfSerialWriteReal1D(dsetname,filename,chiS,nxmr)
+            dsetname = trim("chiS/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,chiS,nxmr)
+        end if
     end if
 
     call MpiBarrier
@@ -315,18 +319,20 @@ subroutine HdfCreateMeansFile(filename)
     call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"epsilon",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
-    call h5gcreate_f(file_id,"Sbar",group_id,hdf_error)
-    call h5gclose_f(group_id,hdf_error)
-    call h5gcreate_f(file_id,"vxS",group_id,hdf_error)
-    call h5gclose_f(group_id,hdf_error)
-    call h5gcreate_f(file_id,"vyS",group_id,hdf_error)
-    call h5gclose_f(group_id,hdf_error)
-    call h5gcreate_f(file_id,"vzS",group_id,hdf_error)
-    call h5gclose_f(group_id,hdf_error)
-    call h5gcreate_f(file_id,"Srms",group_id,hdf_error)
-    call h5gclose_f(group_id,hdf_error)
-    call h5gcreate_f(file_id,"chiS",group_id,hdf_error)
-    call h5gclose_f(group_id,hdf_error)
+    if (salinity) then
+        call h5gcreate_f(file_id,"Sbar",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+        call h5gcreate_f(file_id,"vxS",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+        call h5gcreate_f(file_id,"vyS",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+        call h5gcreate_f(file_id,"vzS",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+        call h5gcreate_f(file_id,"Srms",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+        call h5gcreate_f(file_id,"chiS",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+    end if
     
     call h5fclose_f(file_id, hdf_error)
 end subroutine HdfCreateMeansFile
