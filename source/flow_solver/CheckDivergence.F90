@@ -44,39 +44,44 @@
 
       call MpiMaxRealScalar(qmax)
 
+      if (multires) then
 !------------------------------------
-      qmaxr =-huge(0.0)
-!      if(nrank.eq.0) write(*,*) "I   J   K   RANK"
-! !$OMP  PARALLEL DO &
-! !$OMP   DEFAULT(none) &
-! !$OMP   SHARED(xstartr,xendr,nxmr,vzr,vyr,vxr,dzr,dyr,udx3mr) &
-! !$OMP   PRIVATE(ic,jc,kc,ip,jp,kp) &
-! !$OMP   PRIVATE(dqcap) &
-! !$OMP   REDUCTION(max:qmaxr)
-      do ic=xstartr(3),xendr(3)
+        qmaxr =-huge(0.0)
+  !      if(nrank.eq.0) write(*,*) "I   J   K   RANK"
+  ! !$OMP  PARALLEL DO &
+  ! !$OMP   DEFAULT(none) &
+  ! !$OMP   SHARED(xstartr,xendr,nxmr,vzr,vyr,vxr,dzr,dyr,udx3mr) &
+  ! !$OMP   PRIVATE(ic,jc,kc,ip,jp,kp) &
+  ! !$OMP   PRIVATE(dqcap) &
+  ! !$OMP   REDUCTION(max:qmaxr)
+        do ic=xstartr(3),xendr(3)
         ip=ic+1
         do jc=xstartr(2),xendr(2)
-          jp=jc+1
-            do kc=1,nxmr
-            kp=kc+1
+        jp=jc+1
+              do kc=1,nxmr
+              kp=kc+1
               dqcap= (vzr(kc,jc,ip)-vzr(kc,jc,ic))*dzr &
                     +(vyr(kc,jp,ic)-vyr(kc,jc,ic))*dyr &
                     +(vxr(kp,jc,ic)-vxr(kc,jc,ic))*udx3mr(kc)
-            !if (abs(dqcap).gt.resid) then
-            !write(*,*) ic,jc,kc,nrank
-            !write(*,*) "vz",(vz(kc,jc,ip)-vz(kc,jc,ic))*dz
-            !write(*,*) "vy",(vy(kc,jp,ic)-vy(kc,jc,ic))*dy
-            !write(*,*) "vx",(vx(kp,jc,ic)-vx(kc,jc,ic))*udx3m(kc)
-            !write(*,*) "vym",ic,jc,kc,vy(kc,jc,ic)
-            !write(*,*) "vyp",ic,jp,kc,vy(kc,jp,ic)
-            !endif
+              !if (abs(dqcap).gt.resid) then
+              !write(*,*) ic,jc,kc,nrank
+              !write(*,*) "vz",(vz(kc,jc,ip)-vz(kc,jc,ic))*dz
+              !write(*,*) "vy",(vy(kc,jp,ic)-vy(kc,jc,ic))*dy
+              !write(*,*) "vx",(vx(kp,jc,ic)-vx(kc,jc,ic))*udx3m(kc)
+              !write(*,*) "vym",ic,jc,kc,vy(kc,jc,ic)
+              !write(*,*) "vyp",ic,jp,kc,vy(kc,jp,ic)
+              !endif
               qmaxr = max(abs(dqcap),qmaxr)
-      enddo
-      enddo
-      enddo
-! !$OMP END PARALLEL DO
+        enddo
+        enddo
+        enddo
+  ! !$OMP END PARALLEL DO
 
-      call MpiMaxRealScalar(qmaxr)
+        call MpiMaxRealScalar(qmaxr)
+
+      else
+        qmaxr = qmax
+      end if
     
       
       return     

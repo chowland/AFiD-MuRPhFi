@@ -45,25 +45,29 @@
 
       call MpiAllMaxRealScalar(cflm)
 
-      ! Refined mesh
+      if (multires) then
+        ! Refined mesh
 
-      cflmr = 1.d-8
-      do i=xstartr(3),xendr(3)
-        ip = i + 1
-        do j=xstartr(2),xendr(2)
-          jp = j + 1
-          do k=1,nxmr
-            kp = k + 1
-            qcf=( abs((vzr(k,j,i) + vzr(k,j,ip))*0.5d0*dzr) &
-                 +abs((vyr(k,j,i) + vyr(k,jp,i))*0.5d0*dyr) &
-                 +abs((vxr(k,j,i) + vxr(kp,j,i))*0.5d0*udx3mr(k)))
+        cflmr = 1.d-8
+        do i=xstartr(3),xendr(3)
+          ip = i + 1
+          do j=xstartr(2),xendr(2)
+            jp = j + 1
+            do k=1,nxmr
+              kp = k + 1
+              qcf=( abs((vzr(k,j,i) + vzr(k,j,ip))*0.5d0*dzr) &
+                  +abs((vyr(k,j,i) + vyr(k,jp,i))*0.5d0*dyr) &
+                  +abs((vxr(k,j,i) + vxr(kp,j,i))*0.5d0*udx3mr(k)))
 
-            cflmr = max(cflmr,qcf)
+              cflmr = max(cflmr,qcf)
+            end do
           end do
         end do
-      end do
 
-      call MpiAllMaxRealScalar(cflmr)
+        call MpiAllMaxRealScalar(cflmr)
+      else
+        cflmr = cflm
+      end if
 
       return
       end
