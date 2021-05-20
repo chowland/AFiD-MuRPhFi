@@ -7,7 +7,7 @@
       use hdf5
       use decomp_2d
       use decomp_2d_fft
-      use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
+      ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
 !$    use omp_lib
       implicit none
@@ -104,10 +104,13 @@
   754 format(/,5x,'grid resolution: ',' nx = ',i5,' ny = ',i5,' nz = ',i5)
       write(6,756)nxr,nyr,nzr
   756 format(5x,'grid resolution: ',' nxr= ',i5,' nyr= ',i5,' nzr= ',i5)
-      write(6,755) 1.d0/dx,1.d0/dy,1.d0/dz,1.d0/dxr,1.d0/dyr,1.d0/dzr,dt,ntst
+      write(6,755) 1.d0/dx,1.d0/dy,1.d0/dz,dt,ntst
   755 format(/,2x,' dx=',e10.3,' dy=',e10.3,' dz=',e10.3, &
-                  ' dxr=',e10.3,' dyr=',e10.3,' dzr=',e10.3, &
                   ' dt=',e10.3,' ntst=',i7,/)
+      if (multires) then
+        write(6,757) 1.d0/dxr,1.d0/dyr,1.d0/dzr
+    757 format(/,2x,' dxr=',e10.3,' dyr=',e10.3,' dzr=',e10.3,/)
+      end if
       endif
 
 !m===================================
@@ -157,7 +160,7 @@
       call update_halo(vy,lvlhalo)
       call update_halo(vz,lvlhalo)
       call update_halo(temp,lvlhalo)
-      call update_halo(sal,lvlhalo)
+      if (salinity) call update_halo(sal,lvlhalo)
       call update_halo(pr,lvlhalo)
 
 !CS   Create multigrid stencil for interpolation
