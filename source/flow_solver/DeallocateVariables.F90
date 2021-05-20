@@ -37,26 +37,26 @@
       call DestroyReal1DArray(d3xc)
       call DestroyReal1DArray(d3xm)
 
-      call DestroyReal1DArray(zcr)     !CS mgrd
-      call DestroyReal1DArray(zmr)     !CS mgrd
-      call DestroyReal1DArray(ycr)     !CS mgrd
-      call DestroyReal1DArray(ymr)     !CS mgrd
-      call DestroyReal1DArray(xcr)     !CS mgrd
-      call DestroyReal1DArray(xmr)     !CS mgrd
-      call DestroyReal1DArray(g3rcr)   !CS mgrd
-      call DestroyReal1DArray(g3rmr)   !CS mgrd
-      call DestroyReal1DArray(udx3cr)  !CS mgrd
-      call DestroyReal1DArray(udx3mr)  !CS mgrd
-      call DestroyReal1DArray(d3xcr)
-      call DestroyReal1DArray(d3xmr)
+      ! call DestroyReal1DArray(zcr)     !CS mgrd
+      ! call DestroyReal1DArray(zmr)     !CS mgrd
+      ! call DestroyReal1DArray(ycr)     !CS mgrd
+      ! call DestroyReal1DArray(ymr)     !CS mgrd
+      ! call DestroyReal1DArray(xcr)     !CS mgrd
+      ! call DestroyReal1DArray(xmr)     !CS mgrd
+      ! call DestroyReal1DArray(g3rcr)   !CS mgrd
+      ! call DestroyReal1DArray(g3rmr)   !CS mgrd
+      ! call DestroyReal1DArray(udx3cr)  !CS mgrd
+      ! call DestroyReal1DArray(udx3mr)  !CS mgrd
+      ! call DestroyReal1DArray(d3xcr)
+      ! call DestroyReal1DArray(d3xmr)
 
       call DestroyReal1DArray(ap3ck)
       call DestroyReal1DArray(ac3ck)
       call DestroyReal1DArray(am3ck)
 
-      call DestroyReal1DArray(ap3ckr)  !CS mgrd
-      call DestroyReal1DArray(ac3ckr)  !CS mgrd
-      call DestroyReal1DArray(am3ckr)  !CS mgrd
+      ! call DestroyReal1DArray(ap3ckr)  !CS mgrd
+      ! call DestroyReal1DArray(ac3ckr)  !CS mgrd
+      ! call DestroyReal1DArray(am3ckr)  !CS mgrd
 
       call DestroyReal1DArray(ap3sk)
       call DestroyReal1DArray(ac3sk)
@@ -66,9 +66,9 @@
       call DestroyReal1DArray(ac3ssk)
       call DestroyReal1DArray(am3ssk)
 
-      call DestroyReal1DArray(ap3sskr)  !CS mgrd
-      call DestroyReal1DArray(ac3sskr)  !CS mgrd
-      call DestroyReal1DArray(am3sskr)  !CS mgrd
+      ! call DestroyReal1DArray(ap3sskr)  !CS mgrd
+      ! call DestroyReal1DArray(ac3sskr)  !CS mgrd
+      ! call DestroyReal1DArray(am3sskr)  !CS mgrd
 
       call DestroyReal1DArray(amphk)
       call DestroyReal1DArray(acphk)
@@ -79,39 +79,41 @@
       call DestroyInt1dArray(kmv)
       call DestroyInt1dArray(kpv)
 
-      call DestroyInt1dArray(kmcr)  !CS mgrd
-      call DestroyInt1dArray(kpcr)  !CS mgrd
-      call DestroyInt1dArray(kmvr)  !CS mgrd
-      call DestroyInt1dArray(kpvr)  !CS mgrd
+      ! call DestroyInt1dArray(kmcr)  !CS mgrd
+      ! call DestroyInt1dArray(kpcr)  !CS mgrd
+      ! call DestroyInt1dArray(kmvr)  !CS mgrd
+      ! call DestroyInt1dArray(kpvr)  !CS mgrd
 
       call DestroyReal3DArray(tempbp)
       call DestroyReal3DArray(temptp)
 
-      call DestroyReal3DArray(salbp)
-      call DestroyReal3DArray(saltp)
+      ! call DestroyReal3DArray(salbp)
+      ! call DestroyReal3DArray(saltp)
 
-      call DestroyReal1DArray(vx_me)
-      call DestroyReal1DArray(vy_me)
-      call DestroyReal1DArray(vz_me)
+      ! if (statcal) then
+      !   call DestroyReal1DArray(vx_me)
+      !   call DestroyReal1DArray(vy_me)
+      !   call DestroyReal1DArray(vz_me)
 
-      call DestroyReal1DArray(vx_rms)
-      call DestroyReal1DArray(vy_rms)
-      call DestroyReal1DArray(vz_rms)
+      !   call DestroyReal1DArray(vx_rms)
+      !   call DestroyReal1DArray(vy_rms)
+      !   call DestroyReal1DArray(vz_rms)
 
-      call DestroyReal1DArray(temp_me)
-      call DestroyReal1DArray(temp_rms)
-      call DestroyReal1DArray(tempvx_me)
+      !   call DestroyReal1DArray(temp_me)
+      !   call DestroyReal1DArray(temp_rms)
+      !   call DestroyReal1DArray(tempvx_me)
 
-      call DestroyReal1DArray(vxvy_corr)
+      !   call DestroyReal1DArray(vxvy_corr)
+      ! end if
 
       call DestroyReal3DArray(vx)
       call DestroyReal3DArray(vy)
       call DestroyReal3DArray(vz)
       call DestroyReal3DArray(temp)
 
-      call DestroyReal3DArray(vxr)  !CS mgrd
-      call DestroyReal3DArray(vyr)  !CS mgrd
-      call DestroyReal3DArray(vzr)  !CS mgrd
+      ! call DestroyReal3DArray(vxr)  !CS mgrd
+      ! call DestroyReal3DArray(vyr)  !CS mgrd
+      ! call DestroyReal3DArray(vzr)  !CS mgrd
 
       call DestroyReal3DArray(pr)
       call DestroyReal3DArray(rhs)
@@ -124,40 +126,40 @@
       call DestroyReal3DArray(ruz)
       call DestroyReal3DArray(rutemp)
 
-      call DestroyInt1dArray(irangs)   !CS mgrd
-      call DestroyInt1dArray(jrangs)   !CS mgrd
-      call DestroyInt1dArray(krangs)   !CS mgrd
+      ! call DestroyInt1dArray(irangs)   !CS mgrd
+      ! call DestroyInt1dArray(jrangs)   !CS mgrd
+      ! call DestroyInt1dArray(krangs)   !CS mgrd
 
-      call DestroyInt1dArray(irangc)   !CS mgrd
-      call DestroyInt1dArray(jrangc)   !CS mgrd
-      call DestroyInt1dArray(krangc)   !CS mgrd
+      ! call DestroyInt1dArray(irangc)   !CS mgrd
+      ! call DestroyInt1dArray(jrangc)   !CS mgrd
+      ! call DestroyInt1dArray(krangc)   !CS mgrd
 
-      call DestroyReal2DArray(cxvx) !CS mgrd
-      call DestroyReal2DArray(cxvy) !CS mgrd
-      call DestroyReal2DArray(cxvz) !CS mgrd
+      ! call DestroyReal2DArray(cxvx) !CS mgrd
+      ! call DestroyReal2DArray(cxvy) !CS mgrd
+      ! call DestroyReal2DArray(cxvz) !CS mgrd
 
-      call DestroyReal2DArray(cyvx) !CS mgrd
-      call DestroyReal2DArray(cyvy) !CS mgrd
-      call DestroyReal2DArray(cyvz) !CS mgrd
+      ! call DestroyReal2DArray(cyvx) !CS mgrd
+      ! call DestroyReal2DArray(cyvy) !CS mgrd
+      ! call DestroyReal2DArray(cyvz) !CS mgrd
 
-      call DestroyReal2DArray(czvx) !CS mgrd
-      call DestroyReal2DArray(czvy) !CS mgrd
-      call DestroyReal2DArray(czvz) !CS mgrd
+      ! call DestroyReal2DArray(czvx) !CS mgrd
+      ! call DestroyReal2DArray(czvy) !CS mgrd
+      ! call DestroyReal2DArray(czvz) !CS mgrd
 
-      call DestroyReal2DArray(cxrs) !CS mgrd
-      call DestroyReal2DArray(cyrs) !CS mgrd
-      call DestroyReal2DArray(czrs) !CS mgrd
+      ! call DestroyReal2DArray(cxrs) !CS mgrd
+      ! call DestroyReal2DArray(cyrs) !CS mgrd
+      ! call DestroyReal2DArray(czrs) !CS mgrd
 
-      call DestroyReal2DArray(cxsalc)
-      call DestroyReal2DArray(cysalc)
-      call DestroyReal2DArray(czsalc)
+      ! call DestroyReal2DArray(cxsalc)
+      ! call DestroyReal2DArray(cysalc)
+      ! call DestroyReal2DArray(czsalc)
 
-      call DestroyReal3DArray(tpdv)
-      !call DestroyReal3DArray(tpdvr)  !CS BUG: ERROR WHILE DEALLOCATING
+      ! call DestroyReal3DArray(tpdv)
+      ! !call DestroyReal3DArray(tpdvr)  !CS BUG: ERROR WHILE DEALLOCATING
 
-      if (melt) then
-        call DestroyReal3DArray(tempr) !CJH Needed for melt BC
-      end if
+      ! if (melt) then
+      !   call DestroyReal3DArray(tempr) !CJH Needed for melt BC
+      ! end if
 
       return 
       end   

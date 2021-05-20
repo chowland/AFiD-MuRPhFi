@@ -5,8 +5,8 @@
 FC = h5pfc -cpp # gfortran preprocessor
 ## Laptop
 # FC += -r8 -O3 # ifort options
-FC += -fdefault-real-8 -fdefault-double-8 -O2 # gfortran options
-#FC += -fdefault-real-8 -fdefault-double-8 -O0 -g -fbacktrace -fbounds-check
+# FC += -fdefault-real-8 -fdefault-double-8 -O2 # gfortran options
+FC += -fdefault-real-8 -fdefault-double-8 -O0 -g -fbacktrace -fbounds-check
 ## Cartesius
 # FC += -r8 -O3 -xAVX -axCORE-AVX2
 ## Irene
@@ -75,7 +75,8 @@ OBJS = obj/main.o obj/CalcLocalDivergence.o obj/CalcMaxCFL.o \
 	obj/CalcWriteQ.o obj/GlobalQuantities.o obj/ReadFlowInterp.o
 
 # Object files associated with multiple resolution grids
-OBJS += obj/CreateMgrdGrid.o obj/CreateMgrdStencil.o
+OBJS += obj/CreateMgrdGrid.o obj/CreateMgrdStencil.o obj/InitMgrdVariables.o \
+	obj/DeallocateMgrdVariables.o
 
 # Object files associated with initial condition interpolation
 OBJS += obj/CreateInputStencil.o obj/CreateOldGrid.o obj/CreateSalStencil.o \
@@ -84,7 +85,8 @@ OBJS += obj/CreateInputStencil.o obj/CreateOldGrid.o obj/CreateSalStencil.o \
 
 # Object files associated with the salinity field
 OBJS += obj/ExplicitTermsSal.o obj/ImplicitAndUpdateSal.o obj/SolveImpEqnUpdate_Sal.o \
-	obj/UpdateScalarBCs.o obj/CreateICSal.o
+	obj/UpdateScalarBCs.o obj/CreateICSal.o obj/InitSalVariables.o \
+	obj/DeallocateSalVariables.o
 
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o

@@ -85,7 +85,8 @@
       call InitTimeMarchScheme
 
       call InitVariables
-      call InitMgrdVariables  !CS mgrd
+      if (multires) call InitMgrdVariables  !CS mgrd
+      if (salinity) call InitSalVariables
 
       call CreateGrid
       call CreateMgrdGrid     !CS mgrd

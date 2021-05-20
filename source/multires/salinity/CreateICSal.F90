@@ -26,7 +26,7 @@ subroutine CreateICSal
                 call random_number(varptb)
                 sal(k,j,i) = salbp(1,j,i) - (salbp(1,j,i) - saltp(1,j,i))*xmr(j)/xcr(nxr)
                 if (abs(xmr(k)-0.5) + eps > 0.5) then
-                    amp = 0.5 - abs(xmr(k)-0.5)
+                    amp = 0.5 - abs(xmr(k)-0.5) ! CJH Prevent values of |S| exceeding 0.5
                     sal(k,j,i) = sal(k,j,i) + amp*(2.d0*varptb - 1.d0)
                 else
                     sal(k,j,i) = sal(k,j,i) + eps*(2.d0*varptb - 1.d0)
