@@ -90,6 +90,9 @@ module param
     logical :: resetlogstime=.false.
     logical :: variabletstep=.true.
     logical :: melt=.false.
+    logical :: multires=.false.
+    logical :: phasefield=.false.
+    logical :: salinity=.false.
 
     integer :: lvlhalo=2
 

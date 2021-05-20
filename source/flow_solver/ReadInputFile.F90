@@ -104,6 +104,9 @@
       if(nread.ne.0) readflow = .true.
       if(ireset.ne.0) resetlogstime = .true.
       if(flagmelt.ne.0) melt = .true.
+      if(flagMR.ne.0) multires = .true.
+      if(flagPF.ne.0) phasefield = .true.
+      if(flagsal.ne.0) salinity = .true.
 
       if(stst3flag.ne.0) then
        inquire(file='./stst3.in', exist=fexist)
