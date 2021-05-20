@@ -23,8 +23,10 @@
       call HdfWriteRealHalo3D(filnam1,vy)
       filnam1 = trim('outputdir/continua_vz.h5')
       call HdfWriteRealHalo3D(filnam1,vz)
-      filnam1 = trim('outputdir/continua_sal.h5')
-      call HdfWriteRealHalo3DR(filnam1,sal)
+      if (salinity) then
+        filnam1 = trim('outputdir/continua_sal.h5')
+        call HdfWriteRealHalo3DR(filnam1,sal)
+      end if
 
       if (ismaster) then !EP only write once
        filnam1 = trim('outputdir/continua_master.h5')
@@ -47,14 +49,16 @@
        dsetname = trim('str3')
        call HdfSerialWriteRealScalar(dsetname,filnam1,str3)
        !CS Mgrd
-       dsetname = trim('nxr')
-       call HdfSerialWriteIntScalar(dsetname,filnam1,nxr)
-       dsetname = trim('nyr')
-       call HdfSerialWriteIntScalar(dsetname,filnam1,nyr)
-       dsetname = trim('nzr')
-       call HdfSerialWriteIntScalar(dsetname,filnam1,nzr)
-       dsetname = trim('istr3r')
-       call HdfSerialWriteIntScalar(dsetname,filnam1,istr3r)
+       if (multires) then
+        dsetname = trim('nxr')
+        call HdfSerialWriteIntScalar(dsetname,filnam1,nxr)
+        dsetname = trim('nyr')
+        call HdfSerialWriteIntScalar(dsetname,filnam1,nyr)
+        dsetname = trim('nzr')
+        call HdfSerialWriteIntScalar(dsetname,filnam1,nzr)
+        dsetname = trim('istr3r')
+        call HdfSerialWriteIntScalar(dsetname,filnam1,istr3r)
+       end if
 
       endif
 
