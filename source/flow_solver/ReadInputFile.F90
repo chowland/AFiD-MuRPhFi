@@ -81,17 +81,16 @@
 !
 !     DEFINITIONS FOR THE NATURAL CONVECTION
 !
-      lew = pras/prat
-      rhop = abs(rayt)*pras / (abs(rays)*prat) !CJH inverted to match literature
+      Rrho = abs(rayt)*pras / (abs(rays)*prat) !CJH inverted to match literature
 
-      if (FFscaleS.eq.1) then       !CJH nondim. velocity with salinity free-fall scale
+      if (salinity .and. FFscaleS.eq.1) then    !CJH nondim. velocity with salinity free-fall scale
             ren = dsqrt(abs(rays)/pras)
-            byct = rhop
+            byct = Rrho
             bycs = 1.d0
       else                          !CJH nondim. velocity with thermal free-fall scale
             ren = dsqrt(abs(rayt)/prat)
             byct = 1.d0
-            bycs = 1.d0/rhop
+            bycs = 1.d0/Rrho
       end if
 
       pect = ren*prat

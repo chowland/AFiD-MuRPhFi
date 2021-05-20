@@ -41,7 +41,7 @@ subroutine UpdateBCs
     ! dS/dx = b * S * m
     ! T = c_1 * (S+S0) + c_2
     ! and update boundary values
-    ! delT = 35.0*7.86e-4/3.87e-5*rhop
+    ! delT = 35.0*7.86e-4/3.87e-5*Rrho
     a = 25.2    !920.0/1025.0*3974.0/3.35e5/delT*pect
     b = 160.3    !920.0/1025.0*pecs*25 ! 25 factor to get Sc=2500
     c1 = -0.38      !-5.73e-2 * 35.0 /delT

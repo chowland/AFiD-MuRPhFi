@@ -30,7 +30,7 @@ module param
     !******* Grid parameters**************************
     real :: dx,dy,dz,dxq,dyq,dzq
     real :: dxr,dyr,dzr,dxqr,dyqr,dzqr      !CS mgrd
-    !        
+    !
     real, allocatable, dimension(:) :: xc,xm
     real, allocatable, dimension(:) :: yc,ym
     real, allocatable, dimension(:) :: zc,zm
@@ -66,8 +66,8 @@ module param
     !******* Other variables ***********************************
     integer  :: nxm, nym, nzm
     integer  :: nxmr, nymr, nzmr   !CS mgrd
-    real :: ren, pect, pecs, lew
-    real :: rhop, byct, bycs
+    real :: ren, pect, pecs
+    real :: Rrho, byct, bycs
     real :: pi
     real :: al,ga,ro
     real :: beta
