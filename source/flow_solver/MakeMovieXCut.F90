@@ -157,50 +157,52 @@ subroutine Mkmov_xcut
     call h5sclose_f(memspace, hdf_error)
     call h5fclose_f(file_id, hdf_error)
 
-    !! Repeat on refined grid to save salinity
-    ! Select midplane index for refined grid
-    ic = 1
+    if (salinity) then
+        !! Repeat on refined grid to save salinity
+        ! Select midplane index for refined grid
+        ic = 1
 
-    ! Define dimension
-    ndims = 2
-    dims(1) = nymr
-    dims(2) = nzmr
-    
-    data_count(1) = xendr(2) - xstartr(2) + 1
-    data_count(2) = xendr(3) - xstartr(3) + 1
+        ! Define dimension
+        ndims = 2
+        dims(1) = nymr
+        dims(2) = nzmr
+        
+        data_count(1) = xendr(2) - xstartr(2) + 1
+        data_count(2) = xendr(3) - xstartr(3) + 1
 
-    data_offset(1) = xstartr(2) - 1
-    data_offset(2) = xstartr(3) - 1
+        data_offset(1) = xstartr(2) - 1
+        data_offset(2) = xstartr(3) - 1
 
-    call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
 
-    ! Begin HDF5
-    call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, hdf_error)
-    call h5pset_fapl_mpio_f(plist_id, comm, info, hdf_error)
-    call h5fopen_f(filename, H5F_ACC_RDWR_F, file_id, hdf_error, access_prp=plist_id)
-    call h5pclose_f(plist_id, hdf_error)
+        ! Begin HDF5
+        call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, hdf_error)
+        call h5pset_fapl_mpio_f(plist_id, comm, info, hdf_error)
+        call h5fopen_f(filename, H5F_ACC_RDWR_F, file_id, hdf_error, access_prp=plist_id)
+        call h5pclose_f(plist_id, hdf_error)
 
-    ! Create dataspace
-    call h5screate_simple_f(ndims, data_count, memspace, hdf_error)
+        ! Create dataspace
+        call h5screate_simple_f(ndims, data_count, memspace, hdf_error)
 
-    ! Create and write salinity data
-    dsetname = trim("sal/"//frame)
-    call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
-    if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
-    call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_sal, hdf_error)
-    call h5dget_space_f(dset_sal, filespace, hdf_error)
-    call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
-    call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
-    call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
-    call h5dwrite_f(&
-            dset_sal, H5T_NATIVE_DOUBLE,&
-            sal(ic,xstartr(2):xendr(2),xstartr(3):xendr(3)),&
-            data_count,  hdf_error, file_space_id = filespace,&
-            mem_space_id = memspace, xfer_prp = plist_id)
-    call h5pclose_f(plist_id, hdf_error)
-    call h5dclose_f(dset_sal, hdf_error)
-    
-    call h5sclose_f(memspace, hdf_error)
-    call h5fclose_f(file_id, hdf_error)
+        ! Create and write salinity data
+        dsetname = trim("sal/"//frame)
+        call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
+        call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_sal, hdf_error)
+        call h5dget_space_f(dset_sal, filespace, hdf_error)
+        call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
+        call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+        call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
+        call h5dwrite_f(&
+                dset_sal, H5T_NATIVE_DOUBLE,&
+                sal(ic,xstartr(2):xendr(2),xstartr(3):xendr(3)),&
+                data_count,  hdf_error, file_space_id = filespace,&
+                mem_space_id = memspace, xfer_prp = plist_id)
+        call h5pclose_f(plist_id, hdf_error)
+        call h5dclose_f(dset_sal, hdf_error)
+        
+        call h5sclose_f(memspace, hdf_error)
+        call h5fclose_f(file_id, hdf_error)
+    end if
 
 end subroutine Mkmov_xcut
