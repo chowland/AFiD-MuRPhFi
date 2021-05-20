@@ -10,7 +10,7 @@
       use param
       implicit none
       character(len=4) :: dummy
-      integer flagstat,flagbal,stst3flag,flagmelt
+      integer flagstat,flagbal,flagmelt
       integer :: flagMR, flagsal, flagPF
       integer :: FFscaleS
       logical fexist
@@ -106,15 +106,6 @@
       if(flagMR.ne.0) multires = .true.
       if(flagPF.ne.0) phasefield = .true.
       if(flagsal.ne.0) salinity = .true.
-
-      if(stst3flag.ne.0) then
-       inquire(file='./stst3.in', exist=fexist)
-       if(fexist) then
-        dumpslabs = .true.
-       else
-        write(6,*) "stst3.in not found, turning off slab dump"
-       end if
-      endif
 
       ! if(starea.ne.0) then 
       !   readstats = .true.
