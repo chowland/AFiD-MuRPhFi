@@ -89,7 +89,7 @@
       if (salinity) call InitSalVariables
 
       call CreateGrid
-      call CreateMgrdGrid     !CS mgrd
+      if (multires) call CreateMgrdGrid     !CS mgrd
 
       call WriteGridInfo
 
@@ -161,17 +161,19 @@
       call update_halo(pr,lvlhalo)
 
 !CS   Create multigrid stencil for interpolation
-      call CreateMgrdStencil
+      if (multires) call CreateMgrdStencil
 
 !CS   Interpolate initial values
-      call InterpVelMgrd
-      call InterpSalMgrd
+      if (multires) call InterpVelMgrd
+      if (salinity) call InterpSalMgrd
 
 !EP   Update all relevant halos
-      call update_halo(vxr,lvlhalo)
-      call update_halo(vyr,lvlhalo)
-      call update_halo(vzr,lvlhalo)
-      call update_halo(salc,lvlhalo)
+      if (multires) then
+        call update_halo(vxr,lvlhalo)
+        call update_halo(vyr,lvlhalo)
+        call update_halo(vzr,lvlhalo)
+      end if
+      if (salinity) call update_halo(salc,lvlhalo)
 
       call CalcMeanProfiles
       if(ismaster)  write(6,*) 'Write slice ycut and zcut'
