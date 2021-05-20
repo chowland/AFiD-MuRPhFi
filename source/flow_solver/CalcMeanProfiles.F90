@@ -282,7 +282,7 @@ end subroutine
 
 subroutine HdfCreateMeansFile(filename)
     use hdf5
-    
+    use param
     implicit none
 
     character(30),intent(in) :: filename
