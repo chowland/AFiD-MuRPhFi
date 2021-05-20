@@ -37,14 +37,14 @@
         call ExplicitTermsVZ
         call ExplicitTermsTemp
         !if(flag_second_scalar) call ExplicitTermsSal !Refined
-        call ExplicitTermsSal !Refined
+        if(salinity) call ExplicitTermsSal !Refined
 
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ
         call ImplicitAndUpdateTemp
         !if(flag_second_scalar) call ImplicitAndUpdateSal !Refined
-        call ImplicitAndUpdateSal !Refined
+        if (salinity) call ImplicitAndUpdateSal !Refined
 
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
@@ -76,14 +76,18 @@
         call update_halo(vz,lvlhalo)
         call update_halo(pr,lvlhalo)
         call update_halo(temp,lvlhalo)
-        call update_halo(sal,lvlhalo)
+        if (salinity) call update_halo(sal,lvlhalo)
 
-        call InterpVelMgrd !Vel from base mesh to refined mesh
-        call update_halo(vxr,lvlhalo)
-        call update_halo(vyr,lvlhalo)
-        call update_halo(vzr,lvlhalo)
-        call InterpSalMgrd !Sal from refined mesh to base mesh
-        call update_halo(salc,lvlhalo)
+        if (multires) then
+          call InterpVelMgrd !Vel from base mesh to refined mesh
+          call update_halo(vxr,lvlhalo)
+          call update_halo(vyr,lvlhalo)
+          call update_halo(vzr,lvlhalo)
+          if (salinity) then
+            call InterpSalMgrd !Sal from refined mesh to base mesh
+            call update_halo(salc,lvlhalo)
+          end if
+        end if
 
         enddo
 

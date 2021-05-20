@@ -118,7 +118,7 @@
 
       call InitPressureSolver
       call SetTempBCs
-      call SetSalBCs
+      if (salinity) call SetSalBCs
 
       if(readflow) then
 

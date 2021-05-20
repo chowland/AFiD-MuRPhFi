@@ -86,7 +86,7 @@ OBJS += obj/CreateInputStencil.o obj/CreateOldGrid.o obj/CreateSalStencil.o \
 # Object files associated with the salinity field
 OBJS += obj/ExplicitTermsSal.o obj/ImplicitAndUpdateSal.o obj/SolveImpEqnUpdate_Sal.o \
 	obj/UpdateScalarBCs.o obj/CreateICSal.o obj/InitSalVariables.o \
-	obj/DeallocateSalVariables.o
+	obj/DeallocateSalVariables.o obj/SetSalBCs.o
 
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o
