@@ -25,7 +25,7 @@ subroutine Mkmov_ycut
     integer(HSIZE_T), dimension(2) :: dims, data_count, data_offset
     integer :: ic, hdf_error, ndims, comm, info, ierror
 
-    logical :: fexist
+    logical :: fexist, dsetexists
 
     ! Select mid-plane
     ic = nym/2 + 1
@@ -90,6 +90,8 @@ subroutine Mkmov_ycut
         !! Create datasets and write data to file
         ! vx
         dsetname = trim("vx/"//frame)
+        call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
         call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_vx, hdf_error)
         call h5dget_space_f(dset_vx, filespace, hdf_error)
         call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
@@ -105,6 +107,8 @@ subroutine Mkmov_ycut
         
         ! vy
         dsetname = trim("vy/"//frame)
+        call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
         call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_vy, hdf_error)
         call h5dget_space_f(dset_vy, filespace, hdf_error)
         call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
@@ -120,6 +124,8 @@ subroutine Mkmov_ycut
         
         ! vz
         dsetname = trim("vz/"//frame)
+        call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
         call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_vz, hdf_error)
         call h5dget_space_f(dset_vz, filespace, hdf_error)
         call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
@@ -135,6 +141,8 @@ subroutine Mkmov_ycut
         
         ! temp
         dsetname = trim("temp/"//frame)
+        call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
         call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_temp, hdf_error)
         call h5dget_space_f(dset_temp, filespace, hdf_error)
         call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
@@ -182,6 +190,8 @@ subroutine Mkmov_ycut
 
         ! Create and write salinity data
         dsetname = trim("sal/"//frame)
+        call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
         call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_sal, hdf_error)
         call h5dget_space_f(dset_sal, filespace, hdf_error)
         call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
