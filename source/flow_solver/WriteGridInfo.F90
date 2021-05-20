@@ -32,14 +32,16 @@
        dsetname = trim('zm')
        call HdfSerialWriteReal1D(dsetname,namfile,zm,nzm)
 
-       dsetname = trim('xmr')
-       call HdfSerialWriteReal1D(dsetname,namfile,xmr(1:nxmr),nxmr)
-       dsetname = trim('xcr')
-       call HdfSerialWriteReal1D(dsetname,namfile,xcr,nxr)
-       dsetname = trim('ymr')
-       call HdfSerialWriteReal1D(dsetname,namfile,ymr(1:nymr),nymr)
-       dsetname = trim('zmr')
-       call HdfSerialWriteReal1D(dsetname,namfile,zmr(1:nzmr),nzmr)
+       if (multires) then
+        dsetname = trim('xmr')
+        call HdfSerialWriteReal1D(dsetname,namfile,xmr(1:nxmr),nxmr)
+        dsetname = trim('xcr')
+        call HdfSerialWriteReal1D(dsetname,namfile,xcr,nxr)
+        dsetname = trim('ymr')
+        call HdfSerialWriteReal1D(dsetname,namfile,ymr(1:nymr),nymr)
+        dsetname = trim('zmr')
+        call HdfSerialWriteReal1D(dsetname,namfile,zmr(1:nzmr),nzmr)
+       end if
 
       endif
 
