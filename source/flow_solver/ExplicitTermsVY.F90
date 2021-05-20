@@ -109,13 +109,24 @@
           do jc=xstart(2),xend(2)
             jmm=jc-1
             do kc=1,nxm
-              tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(kc,jmm,ic)) !0.d0
-              salit =active_S*0.5d0*(salc(kc,jc,ic)+salc(kc,jmm,ic))
-
-              dph(kc,jc,ic) = dph(kc,jc,ic) + byct*tempit - bycs*salit
+              tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(kc,jmm,ic))
+              dph(kc,jc,ic) = dph(kc,jc,ic) + byct*tempit
             end do
           end do
         end do
+
+        !CJH Add salinity component of buoyancy if used
+        if (salinity) then
+          do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+              jmm=jc-1
+              do kc=1,nxm
+                salit =active_S*0.5d0*(salc(kc,jc,ic)+salc(kc,jmm,ic))
+                dph(kc,jc,ic) = dph(kc,jc,ic) - bycs*salit
+              end do
+            end do
+          end do
+        end if
       end if
 !$OMP END PARALLEL DO
 
