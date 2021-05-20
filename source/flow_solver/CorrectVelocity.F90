@@ -72,19 +72,21 @@
       call MpiAllSumRealScalar(vzbulk)
       call MpiAllSumRealScalar(Tbulk)
 
-      Sbulk = 0.d0
-      do ic=xstartr(3),xendr(3)
-        do jc=xstartr(2),xendr(2)
-          do kc=1,nxmr
-            idx = 1/udx3mr(kc)
-            Sbulk = Sbulk + sal(kc,jc,ic)*idx
+      if (salinity) then
+        Sbulk = 0.d0
+        do ic=xstartr(3),xendr(3)
+          do jc=xstartr(2),xendr(2)
+            do kc=1,nxmr
+              idx = 1/udx3mr(kc)
+              Sbulk = Sbulk + sal(kc,jc,ic)*idx
+            end do
           end do
         end do
-      end do
 
-      call MpiAllSumRealScalar(Sbulk)
+        call MpiAllSumRealScalar(Sbulk)
 
-      Sbulk = Sbulk/nymr/nzmr
+        Sbulk = Sbulk/nymr/nzmr
+      end if
       Tbulk = Tbulk/nym/nzm
       vzbulk = vzbulk/nym/nzm
       vybulk = vybulk/nym/nzm
@@ -112,13 +114,15 @@
           end do
         end do
       end if
-      do ic=xstartr(3),xendr(3)
-        do jc=xstartr(2),xendr(2)
-          do kc=1,nxmr
-            sal(kc,jc,ic) = sal(kc,jc,ic) - Sbulk
+      if (salinity) then
+        do ic=xstartr(3),xendr(3)
+          do jc=xstartr(2),xendr(2)
+            do kc=1,nxmr
+              sal(kc,jc,ic) = sal(kc,jc,ic) - Sbulk
+            end do
           end do
         end do
-      end do
+      end if
 
       end if
 
