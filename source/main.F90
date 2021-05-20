@@ -141,6 +141,7 @@
         instCFL=0.d0
 
         call CreateInitialConditions
+        if (salinity) call CreateICSal
 
       !   if(ismaster)  write(6,*) 'Write slice ycut and zcut'
       !   call Mkmov_ycut
