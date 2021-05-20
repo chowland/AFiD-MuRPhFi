@@ -12,7 +12,7 @@
 
       subroutine ImplicitAndUpdateSal
       use param
-      use local_arrays, only: sal,hsal,rhsr,rusal
+      use mgrd_arrays, only: sal,hsal,rhsr,rusal
       use decomp_2d, only: xstartr,xendr
       implicit none
       integer :: jc,kc,ic

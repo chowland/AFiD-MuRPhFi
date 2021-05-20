@@ -11,8 +11,8 @@
 subroutine CalcMeanProfiles
     
     use param
-    use local_arrays, only: vx,vy,vz,temp,sal
-    use mgrd_arrays, only: vxr,vyr,vzr
+    use local_arrays, only: vx,vy,vz,temp
+    use mgrd_arrays, only: vxr,vyr,vzr,sal
     use mpih
     use decomp_2d, only: xstart,xend,xstartr,xendr
     

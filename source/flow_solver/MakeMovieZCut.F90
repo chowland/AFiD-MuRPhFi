@@ -12,7 +12,8 @@ subroutine Mkmov_zcut
     use mpih
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
-    use local_arrays, only: vz,vy,vx,temp,sal
+    use local_arrays, only: vz,vy,vx,temp
+    use mgrd_arrays, only: sal
     implicit none
     character(70) :: filename
     character(30) :: dsetname

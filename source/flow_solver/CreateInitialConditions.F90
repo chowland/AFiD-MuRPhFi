@@ -10,7 +10,8 @@
 
       subroutine CreateInitialConditions
       use param
-      use local_arrays, only: vy,vx,temp,vz,sal
+      use local_arrays, only: vy,vx,temp,vz
+      use mgrd_arrays, only: sal
       use decomp_2d, only: xstart,xend,xstartr,xendr
       use mpih
       implicit none

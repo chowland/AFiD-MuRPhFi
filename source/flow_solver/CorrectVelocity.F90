@@ -10,7 +10,8 @@
 
       subroutine CorrectVelocity
       use param
-      use local_arrays, only: vy,vx,dphhalo,vz,temp,sal
+      use local_arrays, only: vy,vx,dphhalo,vz,temp
+      use mgrd_arrays, only: sal
       use decomp_2d, only: xstart,xend,xstartr,xendr
       use mpih
       implicit none

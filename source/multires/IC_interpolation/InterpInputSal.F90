@@ -2,7 +2,6 @@ subroutine InterpInputSal
     
     use param
     use input_grids
-    use local_arrays, only: sal
     use mgrd_arrays
     use mpih
     use decomp_2d

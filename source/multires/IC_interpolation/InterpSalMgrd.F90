@@ -1,8 +1,7 @@
       subroutine InterpSalMgrd
 
       use param
-      use local_arrays, only: sal
-      use mgrd_arrays, only: salc,cxsalc,cysalc,czsalc,irangs,jrangs,krangs
+      use mgrd_arrays, only: sal,salc,cxsalc,cysalc,czsalc,irangs,jrangs,krangs
       use mpih
       use decomp_2d
       use AuxiliaryRoutines

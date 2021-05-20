@@ -10,7 +10,7 @@
 
       subroutine SolveImpEqnUpdate_Sal
       use param
-      use local_arrays, only: sal,rhsr
+      use mgrd_arrays, only: sal,rhsr
       use decomp_2d, only: xstartr,xendr
       implicit none
       real, dimension(nxr) :: amkl,apkl,ackl

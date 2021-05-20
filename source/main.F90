@@ -1,8 +1,8 @@
       program AFiD
       use mpih
       use param
-      use local_arrays, only: vx,vy,vz,temp,pr,sal
-      use mgrd_arrays, only: vxr,vyr,vzr,salc
+      use local_arrays, only: vx,vy,vz,temp,pr
+      use mgrd_arrays, only: vxr,vyr,vzr,salc,sal
       use AuxiliaryRoutines
       use hdf5
       use decomp_2d

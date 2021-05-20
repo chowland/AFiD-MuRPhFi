@@ -13,7 +13,7 @@
       subroutine TimeMarcher
       use param
       use local_arrays
-      use mgrd_arrays, only: vxr,vyr,vzr,salc
+      use mgrd_arrays, only: vxr,vyr,vzr,salc,sal
       use mpih
       use decomp_2d
       implicit none

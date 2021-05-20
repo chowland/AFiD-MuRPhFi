@@ -10,8 +10,7 @@
 
       subroutine ExplicitTermsSal
       use param
-      use mgrd_arrays, only: vxr,vyr,vzr
-      use local_arrays, only: sal,hsal
+      use mgrd_arrays, only: vxr,vyr,vzr,sal,hsal
       use decomp_2d, only: xstartr,xendr
       implicit none
       integer :: jc,kc,ic

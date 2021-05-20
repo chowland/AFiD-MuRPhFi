@@ -10,7 +10,8 @@
 
       subroutine WriteFlowField
       use param
-      use local_arrays, only: vz,vy,vx,temp,sal
+      use local_arrays, only: vz,vy,vx,temp
+      use mgrd_arrays, only: sal
       implicit none
       character*30 :: filnam1,dsetname
 

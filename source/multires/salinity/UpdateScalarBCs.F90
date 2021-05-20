@@ -10,7 +10,7 @@
 
 subroutine UpdateBCs
     use param
-    use local_arrays, only: temp, sal
+    use local_arrays, only: temp
     use mgrd_arrays
     use decomp_2d
     implicit none
