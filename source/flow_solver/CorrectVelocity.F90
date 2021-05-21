@@ -17,7 +17,7 @@
       implicit none
       integer :: jc,jm,kc,km,ic,im
       real    :: usukm,udy,udz,locdph
-      real, dimension(nym) :: vxbar
+      real, dimension(nxm) :: vxbar
       real :: vybulk, vzbulk, Tbulk, Sbulk, idx
 
       udy = al*dt*dy
