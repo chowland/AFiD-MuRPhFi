@@ -21,14 +21,14 @@ subroutine CalcMeanProfiles
     integer :: i, j, k
     real :: inym, inzm, inymr, inzmr, tdx, tdxr
     real :: tii(2)
-    real, dimension(nym) :: Tbar, Trms, chiT
-    real, dimension(nym) :: vxT, vyT, vzT
-    real, dimension(nym) :: vxrms, vyrms, vzrms
-    real, dimension(nym) :: vybar, vzbar
-    real, dimension(nym) :: epsilon
-    real, dimension(nym) :: vxvy, vxvz
-    real, dimension(nymr) :: Sbar, Srms, chiS
-    real, dimension(nymr) :: vxS, vyS, vzS
+    real, dimension(nxm) :: Tbar, Trms, chiT
+    real, dimension(nxm) :: vxT, vyT, vzT
+    real, dimension(nxm) :: vxrms, vyrms, vzrms
+    real, dimension(nxm) :: vybar, vzbar
+    real, dimension(nxm) :: epsilon
+    real, dimension(nxm) :: vxvy, vxvz
+    real, dimension(nxmr) :: Sbar, Srms, chiS
+    real, dimension(nxmr) :: vxS, vyS, vzS
     character(5) :: nstat
     character(30) :: dsetname,filename
     logical :: fexist
