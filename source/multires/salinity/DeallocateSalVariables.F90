@@ -32,7 +32,7 @@ subroutine DeallocateSalVariables
 
     ! Extra T slice for melt condition
     if (melt) then
-        call DestroyReal3DArray(tempr)
+        call DestroyReal3DArray(Tplaner)
     end if
 
     return
