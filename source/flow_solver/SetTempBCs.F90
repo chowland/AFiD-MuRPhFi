@@ -10,7 +10,7 @@
 
       subroutine SetTempBCs
       use param
-      use decomp_2d, only: xstart,xend
+      use decomp_2d
       implicit none
       integer :: ic,jc
 
@@ -30,6 +30,17 @@
         end do
       end if
 
+      if (phasefield) then
+        do ic=xstart(3),xend(3)
+          do jc=xstart(2),xend(2)
+            temptp(1,jc,ic) = 0.d0
+            tempbp(1,jc,ic) = 1.d0
+          end do
+        end do
+      end if
+
+      call update_halo(temptp,lvlhalo)
+      call update_halo(tempbp,lvlhalo)
 
       return
       end
