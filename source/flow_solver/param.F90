@@ -18,6 +18,7 @@ module param
     integer   :: TfixS,TfixN,SfixS,SfixN        !CJH option for fixed T/S BCs
     integer   :: gAxis      !CJH option to choose gravity axis
     real      :: xminusU,xplusU,dPdz
+    real      :: pf_A, pf_eps, pf_C, pf_S
     ! integer   :: starea,tsta
     real      :: dtmin,dtmax,limitCFL
     integer   :: nson,idtv
@@ -124,7 +125,8 @@ module mgrd_arrays
     real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
     real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
     real,allocatable,dimension(:,:,:) :: salc
-    real,allocatable,dimension(:,:,:) :: tempr
+    real,allocatable,dimension(:,:,:) :: tempr,Tplaner
+    real,allocatable,dimension(:,:,:) :: phi,phic,ruphi,hphi
 end module mgrd_arrays
 !===============================================================
 module stat_arrays

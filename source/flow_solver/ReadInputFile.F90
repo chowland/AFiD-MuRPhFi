@@ -67,6 +67,10 @@
         read(15,301) dummy
         read(15,301) dummy
         read(15,*) xplusU, xminusU, dPdz, flagmelt
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) pf_A, pf_eps, pf_C, pf_S
 301     format(a4)                
       close(15)
 
@@ -96,6 +100,8 @@
       pect = ren*prat
       pecs = ren*pras
       pi = 2.d0*dasin(1.d0)
+
+      pf_A = pf_A/pect
 
       ! if(flagstat.ne.0) statcal = .true.
       if(idtv.eq.0) variabletstep = .false.

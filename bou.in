@@ -8,7 +8,7 @@ MULTIRES    NXMR    NYMR    NZMR
 
 Salinity and Phase-field (on/off)
 FLAGSAL     FLAGPF
-1           0
+0           1
 
 Read flow / Reset logs
 NREAD       IRESET
@@ -20,7 +20,7 @@ NTST        WALLTIMEMAX     TMAX
 
 Time interval for saving stats/movie frames
 TOUT    TFRAME
-0.01    0.1
+0.1     0.1
 
 Domain size (keep ALX3 = 1.0)
 ALX3   YLEN   ZLEN
@@ -28,15 +28,15 @@ ALX3   YLEN   ZLEN
 
 Grid stretching parameters
 ISTR3   STR3    ISTR3R
-6       12.0    6
+6       12.0    0
 
 Physical flow parameters / Free-fall timescale
 RAYT    PRAT    RAYS    PRAS    FFscaleS
--1e6    1.0     1e7     10.0    1
+1e6     10.0    1e7     10.0    0
 
 Time stepping parameters
 IDTV    DT      RESID   CFLMAX  DTMIN   DTMAX
-1       1e-3    1.e-3   1.0     1e-8    0.01
+1       1e-3    1.e-3   1.0     1e-8    5e-3
 
 Dirichlet/Neumann BC flag on upper(N) and lower(S) walls
 inslwS  inslwN  TfixS   TfixN   SfixS   SfixN
@@ -49,3 +49,7 @@ active_T    active_S    gAxis
 Wall velocity / Pressure gradient / Melt boundary condition
 xplusU  xminusU     dPdz    MELT
 0.d0    0.d0        0.d0    0
+
+Phase-field parameters
+pf_A(*Pe)   pf_eps      pf_C    pf_S
+1.0         1e-2        10.0    1.0
