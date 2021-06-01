@@ -1,4 +1,4 @@
-# AFiD (MultiRes) Quick Start Guide
+# AFiD-MuRPhFi Quick Start Guide
 
 AFiD is a highly parallel application for simulating canonical flows in a channel domain.
 More technical details can be found in [van der Poel et al (2015)](https://doi.org/10.1016/j.compfluid.2015.04.007).
@@ -8,6 +8,9 @@ In addition to the method described in [van der Poel et al (2015)](https://doi.o
 This scalar field is simulated on a refined grid to allow for low diffusivity values or high Schmidt numbers.
 The multi-resolution method applied is detailed in [Ostilla-Monico et al (2015)](https://doi.org/10.1016/j.jcp.2015.08.031) and was implemented into AFiD by Chong Shen Ng.
 Interpolation between the two grids is performed using a two-point Hermite interpolation scheme, further details of which can be found [here](interpolation.md).
+
+The high resolution grid can also be used to simulate a melting (or dissolving) solid by the phase-field method of [Hester et al (2020)](https://doi.org/10.1098/rspa.2020.0508).
+The implementation of this technique is currently under development, and details of the implementation will be forthcoming.
 
 This code is not fully described by either of the existing publications ([van der Poel et al (2015)](https://doi.org/10.1016/j.compfluid.2015.04.007) or [Ostilla-Monico et al (2015)](https://doi.org/10.1016/j.jcp.2015.08.031)).
 For clarity, the key differences between this code and those papers is described below.

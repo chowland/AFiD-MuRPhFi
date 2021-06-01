@@ -1,7 +1,8 @@
-site_name: AFiD (MultiRes) Documentation
-repo_url: https://github.com/chowland/AFiD_MultiRes
+site_name: AFiD-MuRPhFi Documentation
+repo_url: https://github.com/chowland/AFiD-MuRPhFi
 site_author: Chris Howland
 markdown_extensions:
+    - tables
     - markdown_katex:
         no_inline_svg: True
         insert_fonts_css: True
@@ -18,5 +19,6 @@ nav:
         - 'paraview.md'
     - 'Technical Details':
         - 'equations.md'
+        - 'numerics.md'
         - 'interpolation.md'
         - 'stretched_grids.md'
