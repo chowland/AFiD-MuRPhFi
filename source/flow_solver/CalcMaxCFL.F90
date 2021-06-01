@@ -45,7 +45,7 @@
 
       call MpiAllMaxRealScalar(cflm)
 
-      if (multires) then
+      if (salinity) then
         ! Refined mesh
 
         cflmr = 1.d-8

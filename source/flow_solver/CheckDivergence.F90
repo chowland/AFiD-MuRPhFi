@@ -44,7 +44,7 @@
 
       call MpiMaxRealScalar(qmax)
 
-      if (multires) then
+      if (salinity) then
 !------------------------------------
         qmaxr =-huge(0.0)
   !      if(nrank.eq.0) write(*,*) "I   J   K   RANK"
