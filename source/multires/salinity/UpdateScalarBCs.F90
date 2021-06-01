@@ -27,7 +27,7 @@ subroutine UpdateBCs
                 qv1(:) = qv2(:,1)*czrs(1,icr) + qv2(:,2)*czrs(2,icr) &
                         +qv2(:,3)*czrs(3,icr) + qv2(:,4)*czrs(4,icr)
                 do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
-                    tempr(1,jcr,icr) = sum(qv1(1:4)*cyrs(1:4,jcr))
+                    Tplaner(1,jcr,icr) = sum(qv1(1:4)*cyrs(1:4,jcr))
                 end do
             end do
         end do
@@ -50,17 +50,17 @@ subroutine UpdateBCs
     do icr=xstartr(3),xendr(3)
         do jcr=xstartr(2),xendr(2)
             aa = dxb * dxbr * a * b
-            bb = dxb*a + dxbr*b*c2 - dxbr*b*tempr(1,jcr,icr) - c1*dxbr*b*S0
-            cc = c1*sal(1,jcr,icr) + c2 - tempr(1,jcr,icr)
+            bb = dxb*a + dxbr*b*c2 - dxbr*b*Tplaner(1,jcr,icr) - c1*dxbr*b*S0
+            cc = c1*sal(1,jcr,icr) + c2 - Tplaner(1,jcr,icr)
             m = (-bb + sqrt(bb**2 - 4*aa*cc))/2/aa
             salbp(1,jcr,icr) = (sal(1,jcr,icr)-dxbr*b*m*S0)/(1+dxbr*b*m)
             saltp(1,jcr,icr) = 0.d0
-            tempr(1,jcr,icr) =  tempr(1,jcr,icr) - dxb*a*m
+            Tplaner(1,jcr,icr) =  Tplaner(1,jcr,icr) - dxb*a*m
         end do
     end do
 
     !CJH Update halos for accurate interpolation
-    call update_halo(tempr,lvlhalo)
+    call update_halo(Tplaner,lvlhalo)
     call update_halo(salbp,lvlhalo)
     call update_halo(saltp,lvlhalo)
 
@@ -69,7 +69,7 @@ subroutine UpdateBCs
         icr = krangs(ic) - 1
         do jc=xstart(2),xend(2)
             jcr = jrangs(jc) - 1
-            qv2(:,:) = tempr(1,jcr-1:jcr+2,icr-1:icr+2)
+            qv2(:,:) = Tplaner(1,jcr-1:jcr+2,icr-1:icr+2)
             qv1(:) = qv2(:,1)*czsalc(1,ic) + qv2(:,2)*czsalc(2,ic) &
                     +qv2(:,3)*czsalc(3,ic) + qv2(:,4)*czsalc(4,ic)
             tempbp(1,jc,ic) = sum(qv1(1:4) * cysalc(1:4,jc))
