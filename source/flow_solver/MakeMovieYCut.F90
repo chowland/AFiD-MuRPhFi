@@ -13,7 +13,7 @@ subroutine Mkmov_ycut
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
-    use mgrd_arrays, only: sal
+    use mgrd_arrays, only: sal,phi
     implicit none
     character(70) :: filename
     character(30) :: dsetname
@@ -34,31 +34,11 @@ subroutine Mkmov_ycut
     write(frame,"(i5.5)")nint(time/tframe)
     filename = trim("outputdir/flowmov/movie_ycut.h5")
 
-    ! Check if movie file already exists, and create it if not
-    ! inquire(file=filename,exist=fexist)
-    ! if (.not.fexist) then
-    !     if (ismaster) then
-    !         call HdfCreateBlankFile(filename)
-    !     end if
-    ! end if
-
     ! MPI
     call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false.,.true./), comm, ierror)
     info = MPI_INFO_NULL
 
     if (ic.le.xend(2) .and. ic.ge.xstart(2)) then
-        ! Define dimension
-        ndims = 2
-        dims(1) = nx
-        dims(2) = nzm
-        
-        data_count(1) = nx
-        data_count(2) = xend(3) - xstart(3) + 1
-
-        data_offset(1) = 0
-        data_offset(2) = xstart(3) - 1
-
-        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
 
         ! Begin HDF5
         call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, hdf_error)
@@ -78,13 +58,31 @@ subroutine Mkmov_ycut
             call h5gclose_f(group_id, hdf_error)
             call h5gcreate_f(file_id, "temp", group_id, hdf_error)
             call h5gclose_f(group_id, hdf_error)
-            call h5gcreate_f(file_id, "sal", group_id, hdf_error)
-            call h5gclose_f(group_id, hdf_error)
+            if (salinity) then
+                call h5gcreate_f(file_id, "sal", group_id, hdf_error)
+                call h5gclose_f(group_id, hdf_error)
+            end if
+            if (phasefield) then
+                call h5gcreate_f(file_id, "phi", group_id, hdf_error)
+                call h5gclose_f(group_id, hdf_error)
+            end if
         end if
  
         call h5pclose_f(plist_id, hdf_error)
+        
+        ! Define dimension
+        ndims = 2
+        dims(1) = nx
+        dims(2) = nzm
+        
+        data_count(1) = nx
+        data_count(2) = xend(3) - xstart(3) + 1
 
-        ! Create dataspace
+        data_offset(1) = 0
+        data_offset(2) = xstart(3) - 1
+
+        ! Create dataspace (file & memory)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
         call h5screate_simple_f(ndims, data_count, memspace, hdf_error)
 
         !! Create datasets and write data to file
@@ -104,7 +102,18 @@ subroutine Mkmov_ycut
                 mem_space_id = memspace, xfer_prp = plist_id)
         call h5pclose_f(plist_id, hdf_error)
         call h5dclose_f(dset_vx, hdf_error)
-        
+
+        call h5sclose_f(filespace, hdf_error)
+        call h5sclose_f(memspace, hdf_error)
+
+        ! Redefine dataspaces to match size of staggered grid arrays in x
+        dims(1) = nxm
+        data_count(1) = nxm
+
+        ! Create dataspace (file & memory)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5screate_simple_f(ndims, data_count, memspace, hdf_error)
+
         ! vy
         dsetname = trim("vy/"//frame)
         call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
@@ -116,7 +125,7 @@ subroutine Mkmov_ycut
         call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
         call h5dwrite_f(&
                 dset_vy, H5T_NATIVE_DOUBLE,&
-                vy(1:nx,ic,xstart(3):xend(3)),&
+                vy(1:nxm,ic,xstart(3):xend(3)),&
                 data_count,  hdf_error, file_space_id = filespace,&
                 mem_space_id = memspace, xfer_prp = plist_id)
         call h5pclose_f(plist_id, hdf_error)
@@ -133,7 +142,7 @@ subroutine Mkmov_ycut
         call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
         call h5dwrite_f(&
                 dset_vz, H5T_NATIVE_DOUBLE,&
-                vz(1:nx,ic,xstart(3):xend(3)),&
+                vz(1:nxm,ic,xstart(3):xend(3)),&
                 data_count,  hdf_error, file_space_id = filespace,&
                 mem_space_id = memspace, xfer_prp = plist_id)
         call h5pclose_f(plist_id, hdf_error)
@@ -150,13 +159,15 @@ subroutine Mkmov_ycut
         call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
         call h5dwrite_f(&
                 dset_temp, H5T_NATIVE_DOUBLE,&
-                temp(1:nx,ic,xstart(3):xend(3)),&
+                temp(1:nxm,ic,xstart(3):xend(3)),&
                 data_count,  hdf_error, file_space_id = filespace,&
                 mem_space_id = memspace, xfer_prp = plist_id)
         call h5pclose_f(plist_id, hdf_error)
         call h5dclose_f(dset_temp, hdf_error)
 
+        call h5sclose_f(filespace, hdf_error)
         call h5sclose_f(memspace, hdf_error)
+
         call h5fclose_f(file_id, hdf_error)
 
     end if
@@ -167,18 +178,6 @@ subroutine Mkmov_ycut
         ic = nymr/2 + 1
         
         if (ic.le.xendr(2) .and. ic.ge.xstartr(2)) then
-            ! Define dimension
-            ndims = 2
-            dims(1) = nxr
-            dims(2) = nzmr
-            
-            data_count(1) = nxr
-            data_count(2) = xendr(3) - xstartr(3) + 1
-
-            data_offset(1) = 0
-            data_offset(2) = xstartr(3) - 1
-
-            call h5screate_simple_f(ndims, dims, filespace, hdf_error)
 
             ! Begin HDF5
             call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, hdf_error)
@@ -186,9 +185,21 @@ subroutine Mkmov_ycut
             call h5fopen_f(filename, H5F_ACC_RDWR_F, file_id, hdf_error, access_prp=plist_id)
             call h5pclose_f(plist_id, hdf_error)
 
-            ! Create dataspace
-            call h5screate_simple_f(ndims, data_count, memspace, hdf_error)
+            ! Define dimension
+            ndims = 2
+            dims(1) = nxmr
+            dims(2) = nzmr
+            
+            data_count(1) = nxmr
+            data_count(2) = xendr(3) - xstartr(3) + 1
 
+            data_offset(1) = 0
+            data_offset(2) = xstartr(3) - 1
+
+            ! Create dataspace (file & memory)
+            call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+            call h5screate_simple_f(ndims, data_count, memspace, hdf_error)
+    
             ! Create and write salinity data
             dsetname = trim("sal/"//frame)
             call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
@@ -200,15 +211,71 @@ subroutine Mkmov_ycut
             call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
             call h5dwrite_f(&
                     dset_sal, H5T_NATIVE_DOUBLE,&
-                    sal(1:nxr,ic,xstartr(3):xendr(3)),&
+                    sal(1:nxmr,ic,xstartr(3):xendr(3)),&
                     data_count,  hdf_error, file_space_id = filespace,&
                     mem_space_id = memspace, xfer_prp = plist_id)
             call h5pclose_f(plist_id, hdf_error)
             call h5dclose_f(dset_sal, hdf_error)
-            
+
+            call h5sclose_f(filespace, hdf_error)
             call h5sclose_f(memspace, hdf_error)
+
             call h5fclose_f(file_id, hdf_error)
 
         end if
     end if
+
+    if (phasefield) then
+        !! Repeat on refined grid to save salinity
+        ! Select midplane index for refined grid
+        ic = nymr/2 + 1
+        
+        if (ic.le.xendr(2) .and. ic.ge.xstartr(2)) then
+
+            ! Begin HDF5
+            call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, hdf_error)
+            call h5pset_fapl_mpio_f(plist_id, comm, info, hdf_error)
+            call h5fopen_f(filename, H5F_ACC_RDWR_F, file_id, hdf_error, access_prp=plist_id)
+            call h5pclose_f(plist_id, hdf_error)
+
+            ! Define dimension
+            ndims = 2
+            dims(1) = nxmr
+            dims(2) = nzmr
+            
+            data_count(1) = nxmr
+            data_count(2) = xendr(3) - xstartr(3) + 1
+
+            data_offset(1) = 0
+            data_offset(2) = xstartr(3) - 1
+
+            ! Create dataspace (file & memory)
+            call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+            call h5screate_simple_f(ndims, data_count, memspace, hdf_error)
+    
+            ! Create and write salinity data
+            dsetname = trim("phi/"//frame)
+            call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
+            if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
+            call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_sal, hdf_error)
+            call h5dget_space_f(dset_sal, filespace, hdf_error)
+            call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
+            call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+            call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
+            call h5dwrite_f(&
+                    dset_sal, H5T_NATIVE_DOUBLE,&
+                    phi(1:nxmr,ic,xstartr(3):xendr(3)),&
+                    data_count,  hdf_error, file_space_id = filespace,&
+                    mem_space_id = memspace, xfer_prp = plist_id)
+            call h5pclose_f(plist_id, hdf_error)
+            call h5dclose_f(dset_sal, hdf_error)
+
+            call h5sclose_f(filespace, hdf_error)
+            call h5sclose_f(memspace, hdf_error)
+
+            call h5fclose_f(file_id, hdf_error)
+
+        end if
+    end if
+
 end subroutine Mkmov_ycut
