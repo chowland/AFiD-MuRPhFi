@@ -70,7 +70,7 @@
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy
-        read(15,*) pf_A, pf_eps, pf_C, pf_S, pf_Tm
+        read(15,*) pf_A, pf_C, pf_S, pf_Tm
 301     format(a4)                
       close(15)
 
@@ -102,6 +102,7 @@
       pi = 2.d0*dasin(1.d0)
 
       pf_A = pf_A/pect
+      pf_eps = 1.0/nxmr
 
       ! if(flagstat.ne.0) statcal = .true.
       if(idtv.eq.0) variabletstep = .false.

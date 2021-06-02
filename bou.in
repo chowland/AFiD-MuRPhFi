@@ -32,11 +32,11 @@ ISTR3   STR3    ISTR3R
 
 Physical flow parameters / Free-fall timescale
 RAYT    PRAT    RAYS    PRAS    FFscaleS
-1e6     10.0    1e7     10.0    0
+5e5     1.0     1e7     10.0    0
 
 Time stepping parameters
 IDTV    DT      RESID   CFLMAX  DTMIN   DTMAX
-1       1e-3    1.e-3   1.0     1e-8    2e-3
+1       1e-3    1.e-3   1.0     1e-8    1e-3
 
 Dirichlet/Neumann BC flag on upper(N) and lower(S) walls
 inslwS  inslwN  TfixS   TfixN   SfixS   SfixN
@@ -51,5 +51,5 @@ xplusU  xminusU     dPdz    MELT
 0.d0    0.d0        0.d0    0
 
 Phase-field parameters
-pf_A(*Pe)   pf_eps      pf_C    pf_S    pf_Tm
-1.0         2e-3        10.0    1.0     0.5
+pf_A(*Pe)   pf_C    pf_S    pf_Tm
+1.0         10.0    1.0     0.5
