@@ -70,7 +70,7 @@
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy
-        read(15,*) pf_A, pf_eps, pf_C, pf_S
+        read(15,*) pf_A, pf_eps, pf_C, pf_S, pf_Tm
 301     format(a4)                
       close(15)
 

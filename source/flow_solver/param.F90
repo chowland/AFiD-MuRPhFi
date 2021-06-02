@@ -18,7 +18,7 @@ module param
     integer   :: TfixS,TfixN,SfixS,SfixN        !CJH option for fixed T/S BCs
     integer   :: gAxis      !CJH option to choose gravity axis
     real      :: xminusU,xplusU,dPdz
-    real      :: pf_A, pf_eps, pf_C, pf_S
+    real      :: pf_A, pf_eps, pf_C, pf_S, pf_Tm
     ! integer   :: starea,tsta
     real      :: dtmin,dtmax,limitCFL
     integer   :: nson,idtv

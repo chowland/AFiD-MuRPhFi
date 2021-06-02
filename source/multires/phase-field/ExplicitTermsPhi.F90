@@ -40,7 +40,7 @@ subroutine ExplicitTermsPhi
                 dzzp = (phi(kc,jc,ip) - 2.0*phi(kc,jc,ic) + phi(kc,jc,im))*udzrq
                 ! Extra nonlinear terms
                 nlphi = pf_B*phi(kc,jc,ic)*(1.0 - phi(kc,jc,ic)) &
-                        *(1.0 - 2.0*phi(kc,jc,ic) + pf_C*(tempr(kc,jc,ic) - 0.2))
+                        *(1.0 - 2.0*phi(kc,jc,ic) + pf_C*(tempr(kc,jc,ic) - pf_Tm))
 
                 hphi(kc,jc,ic) = pf_A*(dyyp + dzzp) - nlphi
             end do
