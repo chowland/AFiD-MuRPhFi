@@ -1,5 +1,6 @@
-# AFiD_MultiRes_staggered
-[Documentation](https://physicsoffluids.github.io/AFiD_MultiRes_staggered/)
+# AFiD-MuRPhFi
+**A**dvanced **Fi**nite **D**ifference flow solver with **Mu**ltiple **R**esolution and **Ph**ase-**Fi**eld implementations
+[Documentation](https://chowland.github.io/AFiD-MuRPhFi/)
 
 AFiD is a highly parallel application for simulating canonical flows in a channel domain.
 More technical details can be found in [van der Poel et al (2015)](https://doi.org/10.1016/j.compfluid.2015.04.007).
@@ -12,6 +13,9 @@ Interpolation between the two grids is performed using a two-point Hermite inter
 
 One key difference from the original version of AFiD is that the scalar fields are evaluated at the mid-points of the computational cells.
 This staggered grid was implemented by Chris Howland and allows one to change the direction of gravity.
+
+The refined grid can also be used to evolve a phase-field variable to model the melting and dissolving of immersed solid objects.
+This implementation is currently under development.
 
 ## Contributing
 If you would like to contribute to bug fixing/feature development/documentation, please create a new branch, commit your changes and then submit a pull request.
