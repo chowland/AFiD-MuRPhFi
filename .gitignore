@@ -10,3 +10,4 @@ outputdir/*.h5
 outputdir/*.out
 outputdir/*
 continua/
+site/*
