@@ -22,7 +22,7 @@ subroutine CreateICPF
     do i=xstartr(3),xendr(3)
         do j=xstartr(2),xendr(2)
             do k=1,nxmr
-                phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - 0.2)/2/pf_eps))
+                phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - 0.5)/2/pf_eps))
             end do
         end do
     end do
