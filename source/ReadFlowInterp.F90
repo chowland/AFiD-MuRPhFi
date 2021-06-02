@@ -223,8 +223,14 @@ subroutine ReadFlowInterp
                                 xstart(3), xend(3), 3, vz)
         call HdfReadContinua(nz, ny, nx, xstart(2), xend(2), &
                                 xstart(3), xend(3), 4, temp)
-        call HdfReadContinua(nzr, nyr, nxr, xstartr(2), xendr(2), &
+        if (salinity) then
+            call HdfReadContinua(nzr, nyr, nxr, xstartr(2), xendr(2), &
                                 xstartr(3), xendr(3), 5, sal)
+        end if
+        if (phasefield) then
+            call HdfReadContinua(nzr, nyr, nxr, xstartr(2), xendr(2), &
+                                xstartr(3), xendr(3), 6, phi)
+        end if
     end if
 
     if (resetlogstime) time = 0.d0

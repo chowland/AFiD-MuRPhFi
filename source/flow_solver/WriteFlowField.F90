@@ -11,7 +11,7 @@
       subroutine WriteFlowField
       use param
       use local_arrays, only: vz,vy,vx,temp
-      use mgrd_arrays, only: sal
+      use mgrd_arrays, only: sal,phi
       implicit none
       character*30 :: filnam1,dsetname
 
@@ -26,6 +26,10 @@
       if (salinity) then
         filnam1 = trim('outputdir/continua_sal.h5')
         call HdfWriteRealHalo3DR(filnam1,sal)
+      end if
+      if (phasefield) then
+        filnam1 = trim('outputdir/continua_phi.h5')
+        call HdfWriteRealHalo3DR(filnam1,phi)
       end if
 
       if (ismaster) then !EP only write once

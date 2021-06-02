@@ -49,6 +49,8 @@
           filnam1 = trim('outputdir/continua_temp.h5')
         case (5)
           filnam1 = trim('outputdir/continua_sal.h5')
+        case (6)
+          filnam1 = trim('outputdir/continua_phi.h5')
       end select
 
 !RO   Set offsets and element counts
