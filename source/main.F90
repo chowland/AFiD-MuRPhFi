@@ -2,7 +2,7 @@
       use mpih
       use param
       use local_arrays, only: vx,vy,vz,temp,pr
-      use mgrd_arrays, only: vxr,vyr,vzr,salc,sal
+      use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phic,tempr,phi
       use AuxiliaryRoutines
       use hdf5
       use decomp_2d
@@ -87,6 +87,7 @@
       call InitVariables
       if (multires) call InitMgrdVariables  !CS mgrd
       if (salinity) call InitSalVariables
+      if (phasefield) call InitPFVariables
 
       call CreateGrid
       if (multires) call CreateMgrdGrid     !CS mgrd
@@ -146,6 +147,7 @@
 
         call CreateInitialConditions
         if (salinity) call CreateICSal
+        if (phasefield) call CreateICPF
 
       !   if(ismaster)  write(6,*) 'Write slice ycut and zcut'
       !   call Mkmov_ycut
@@ -161,22 +163,33 @@
       call update_halo(vz,lvlhalo)
       call update_halo(temp,lvlhalo)
       if (salinity) call update_halo(sal,lvlhalo)
+      if (phasefield) call update_halo(phi,lvlhalo)
       call update_halo(pr,lvlhalo)
 
 !CS   Create multigrid stencil for interpolation
       if (multires) call CreateMgrdStencil
 
 !CS   Interpolate initial values
-      if (multires) call InterpVelMgrd
-      if (salinity) call InterpSalMgrd
+      if (salinity) then
+        call InterpVelMgrd
+        call InterpSalMgrd
+      end if
+      if (phasefield) then
+        call InterpTempMgrd
+        call InterpPhiMgrd
+      end if
 
 !EP   Update all relevant halos
-      if (multires) then
+      if (salinity) then
         call update_halo(vxr,lvlhalo)
         call update_halo(vyr,lvlhalo)
         call update_halo(vzr,lvlhalo)
+        call update_halo(salc,lvlhalo)
       end if
-      if (salinity) call update_halo(salc,lvlhalo)
+      if (phasefield) then
+        call update_halo(tempr,lvlhalo)
+        call update_halo(phic,lvlhalo)
+      end if
 
       call CalcMeanProfiles
       if(ismaster)  write(6,*) 'Write slice ycut and zcut'
@@ -245,6 +258,7 @@
 !RO    fixed time-step
             CFLmr=CFLmr*dt
           if(CFLmr.gt.limitCFL) errorcode = 165
+          ! if (ismaster) write(*,*) "CFL value  ",CFLmr
         endif
 
         call TimeMarcher

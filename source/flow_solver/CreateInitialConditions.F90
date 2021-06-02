@@ -15,7 +15,7 @@
       use decomp_2d, only: xstart,xend!,xstartr,xendr
       use mpih
       implicit none
-      integer :: j,k,i
+      integer :: j,k,i,kmid
       real :: xxx,yyy,eps,varptb,amp
 
       call random_seed()
@@ -48,7 +48,8 @@
         enddo
       enddo
 
-      if (melt) then
+      if (melt .or. phasefield) then
+        kmid = nxm/2
         do i=xstart(3),xend(3)
           do j=xstart(2),xend(2)
             do k=1,nxm
@@ -56,12 +57,20 @@
               vy(k,j,i) = 0.d0
               vz(k,j,i) = 0.d0
             end do
+            call random_number(varptb)
+            vy(1,j,i) = eps*(2.d0*varptb - 1.d0)
+            do k=2,kmid
+              call random_number(varptb)
+              vx(k,j,i) = eps*(2.d0*varptb - 1.d0)
+              call random_number(varptb)
+              vy(k,j,i) = eps*(2.d0*varptb - 1.d0)
+            end do
           end do
         end do
       end if
 
       !assign linear temperature profile in the nodes k=1 to k=nxm
-      eps=5d-2
+      eps=0.d0!5d-2
       do i=xstart(3),xend(3)
       do j=xstart(2),xend(2)
       do k=1,nxm
@@ -84,6 +93,24 @@
               call random_number(varptb)
               temp(k,j,i) = eps*(2.d0*varptb - 1.d0) * exp(-xm(k)/0.1)
             end do
+          end do
+        end do
+      end if
+
+      if (phasefield) then
+        ! kmid = nxm/2
+        eps = 8.041
+        do i=xstart(3),xend(3)
+          do j=xstart(2),xend(2)
+            do k=1,nxm
+              temp(k,j,i) = (exp(-eps*(xm(k) - 1.0)) - 1.0)/(exp(eps) - 1.0)
+            end do
+            ! do k=1,kmid
+            !   temp(k,j,i) = 1.0 - 2.0*xm(k)
+            ! end do
+            ! do k=kmid+1,nxm
+            !   temp(k,j,i) = 0.1 - 0.2*xm(k)
+            ! end do
           end do
         end do
       end if

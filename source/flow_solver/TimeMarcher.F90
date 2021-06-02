@@ -13,7 +13,7 @@
       subroutine TimeMarcher
       use param
       use local_arrays
-      use mgrd_arrays, only: vxr,vyr,vzr,salc,sal
+      use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
       use mpih
       use decomp_2d
       implicit none
@@ -32,18 +32,22 @@
 
         if (melt) call UpdateBCs
 
+        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-explicit'
         call ExplicitTermsVX
         call ExplicitTermsVY
         call ExplicitTermsVZ
         call ExplicitTermsTemp
-        !if(flag_second_scalar) call ExplicitTermsSal !Refined
-        if(salinity) call ExplicitTermsSal !Refined
+        if (salinity) call ExplicitTermsSal !Refined
+        if (phasefield) call ExplicitTermsPhi
 
+        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-implicit'
+        if (phasefield) call ImplicitAndUpdatePhi
+        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI post-implicit'
+        if (phasefield) call AddLatentHeat
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ
         call ImplicitAndUpdateTemp
-        !if(flag_second_scalar) call ImplicitAndUpdateSal !Refined
         if (salinity) call ImplicitAndUpdateSal !Refined
 
         call update_halo(vy,lvlhalo)
@@ -77,17 +81,28 @@
         call update_halo(pr,lvlhalo)
         call update_halo(temp,lvlhalo)
         if (salinity) call update_halo(sal,lvlhalo)
+        if (phasefield) call update_halo(phi,lvlhalo)
 
-        if (multires) then
+        if (salinity) then
           call InterpVelMgrd !Vel from base mesh to refined mesh
           call update_halo(vxr,lvlhalo)
           call update_halo(vyr,lvlhalo)
           call update_halo(vzr,lvlhalo)
-          if (salinity) then
-            call InterpSalMgrd !Sal from refined mesh to base mesh
-            call update_halo(salc,lvlhalo)
-          end if
+          call InterpSalMgrd !Sal from refined mesh to base mesh
+          call update_halo(salc,lvlhalo)
         end if
+
+        if (phasefield) then
+          call InterpTempMgrd
+          call update_halo(tempr,lvlhalo)
+          call InterpPhiMgrd
+          call update_halo(phic,lvlhalo)
+        end if
+
+        iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX'
+        iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY'
+        iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ'
+        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI'
 
         enddo
 

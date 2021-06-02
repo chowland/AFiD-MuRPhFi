@@ -11,16 +11,17 @@
       subroutine ExplicitTermsVY
       use param
       use local_arrays, only: vx,vy,vz,dph,temp
-      use mgrd_arrays, only: salc
+      use mgrd_arrays, only: salc,phic
       use decomp_2d, only: xstart,xend
       implicit none
       integer :: kc,kp,jpp,jmm,jc,ic,imm,ipp
       integer :: kpp,kmm
       real    :: udzq,udyq
       real    :: udy,udz,hyx,hyy,hyz 
-      real    :: dyyvy, dzzvy
-      real    :: tempit, salit
+      real    :: dyyvy, dzzvy, pf_eta
+      real    :: tempit, salit, volpen
 
+      pf_eta = ren*(1.51044385*pf_eps)**2
 
       udyq=dyq/ren
       udzq=dzq/ren
@@ -127,6 +128,21 @@
             end do
           end do
         end if
+      end if
+
+      if (phasefield) then
+        do ic=xstart(3),xend(3)
+          do jc=xstart(2),xend(2)
+            jmm=jc-1
+            do kc=1,nxm
+              volpen = 0.5d0*(phic(kc,jc,ic) + phic(kc,jmm,ic))* &
+                        vy(kc,jc,ic)/pf_eta
+              ! volpen = 0.5*(1.0+tanh((xm(kc)-0.5)/2/pf_eps))* &
+              !           vy(kc,jc,ic)/pf_gamma
+              dph(kc,jc,ic) = dph(kc,jc,ic) - volpen
+            end do
+          end do
+        end do
       end if
 !$OMP END PARALLEL DO
 
