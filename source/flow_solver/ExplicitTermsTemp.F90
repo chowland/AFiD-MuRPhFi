@@ -37,7 +37,7 @@
        do jc=xstart(2),xend(2)
         jm=jc-1
         jp=jc+1
-        
+
         kc = 1
         kp = 2
         htx=(vx(kp,jc,ic)*(temp(kp,jc,ic) + temp(kc,jc,ic)) - &
@@ -51,6 +51,7 @@
         dzzt=(temp(kc,jc,ip) - 2.0*temp(kc,jc,ic) + temp(kc,jc,im))*udzq
         dyyt=(temp(kc,jp,ic) - 2.0*temp(kc,jc,ic) + temp(kc,jm,ic))*udyq
         hro(kc,jc,ic) = -(htx+hty+htz)+dyyt+dzzt
+     !    hro(kc,jc,ic) = dyyt+dzzt
 
         do kc=2,nxm-1
          km=kc-1
@@ -106,6 +107,7 @@
                  +temp(kc,jm,ic))*udyq
 !
             hro(kc,jc,ic) = -(htx+hty+htz)+dyyt+dzzt
+          !   hro(kc,jc,ic) = dyyt+dzzt
         enddo
           
         kc = nxm
@@ -123,6 +125,7 @@
         dzzt=(temp(kc,jc,ip) - 2.0*temp(kc,jc,ic) + temp(kc,jc,im))*udzq
         dyyt=(temp(kc,jp,ic) - 2.0*temp(kc,jc,ic) + temp(kc,jm,ic))*udyq
         hro(kc,jc,ic) = -(htx+hty+htz)+dyyt+dzzt
+     !    hro(kc,jc,ic) = dyyt+dzzt
 
         enddo
       enddo
