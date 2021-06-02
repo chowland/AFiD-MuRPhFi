@@ -101,10 +101,18 @@
           end do
           do kc=1,nxm
             vy(kc,jc,ic) = vy(kc,jc,ic) - vybulk
-            temp(kc,jc,ic) = temp(kc,jc,ic) - Tbulk
           end do
         end do
       end do
+      if (.not.phasefield) then
+        do ic=xstart(3),xend(3)
+          do jc=xstart(2),xend(2)
+            do kc=1,nxm
+              temp(kc,jc,ic) = temp(kc,jc,ic) - Tbulk
+            end do
+          end do
+        end do
+      end if
       if (dPdz.eq.0) then
         do ic=xstart(3),xend(3)
           do jc=xstart(2),xend(2)
