@@ -1,55 +1,55 @@
-      program AFiD
-      use mpih
-      use param
-      use local_arrays, only: vx,vy,vz,temp,pr
-      use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phic,tempr,phi
-      use AuxiliaryRoutines
-      use hdf5
-      use decomp_2d
-      use decomp_2d_fft
-      ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
+program AFiD
+    use mpih
+    use param
+    use local_arrays, only: vx,vy,vz,temp,pr
+    use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phic,tempr,phi
+    use AuxiliaryRoutines
+    use hdf5
+    use decomp_2d
+    use decomp_2d_fft
+    ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
 !$    use omp_lib
-      implicit none
-      integer :: errorcode, nthreads, i, j, k
-      real    :: instCFL,CFLmr,dmax,dmaxr
-      real    :: ti(2), tin(3), minwtdt
-      real :: ts, varptb,chksum
-      integer :: prow=0,pcol=0
-      integer :: lfactor,lfactor2
-      character(100) :: arg
-      logical :: nanexist
-      real,allocatable,dimension(:,:) :: dummy,dscan,dbot
-      integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
+    implicit none
+    integer :: errorcode, nthreads, i, j, k
+    real    :: instCFL,CFLmr,dmax,dmaxr
+    real    :: ti(2), tin(3), minwtdt
+    real :: ts, varptb,chksum
+    integer :: prow=0,pcol=0
+    integer :: lfactor,lfactor2
+    character(100) :: arg
+    logical :: nanexist
+    real,allocatable,dimension(:,:) :: dummy,dscan,dbot
+    integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
 !*******************************************************
 !******* Read input file bou.in by all processes********
 !*******************************************************
 !
-      call ReadInputFile
+    call ReadInputFile
 
-      if (command_argument_count().eq.2) then
+    if (command_argument_count().eq.2) then
         call get_command_argument(1,arg)
         read(arg,'(i10)') prow
         call get_command_argument(2,arg)
         read(arg,'(i10)') pcol
-      endif
+    endif
 
-      call decomp_2d_init(nxm ,nym ,nzm ,&
-                          nxmr,nymr,nzmr,&
-                          prow,pcol,&
-                          (/ .false.,.true.,.true. /))
+    call decomp_2d_init(nxm ,nym ,nzm ,&
+                        nxmr,nymr,nzmr,&
+                        prow,pcol,&
+                        (/ .false.,.true.,.true. /))
 
-      ts=MPI_WTIME()
-      tin(1) = MPI_WTIME()
+    ts=MPI_WTIME()
+    tin(1) = MPI_WTIME()
 
-      call MpiBarrier
+    call MpiBarrier
 
-      call HdfStart
+    call HdfStart
 
-      if (nrank.eq.master) ismaster = .true.
+    if (nrank.eq.master) ismaster = .true.
 
-      if (ismaster) write(6,*) 'MPI tasks=', nproc
+    if (ismaster) write(6,*) 'MPI tasks=', nproc
 
 !$    if (ismaster) then
 !$OMP PARALLEL
@@ -60,84 +60,75 @@
 !$        write(6,*) 'OMP threads=', nthreads
 !$    end if
 
-      if(ismaster) then
+    if(ismaster) then
 !m==========================================
-      call ResetLogs
+        call ResetLogs
 !m====================================================
-      write(6,112)ylen/alx3,zlen/alx3
-  112 format(//,20x,'Double Diffusive Convection ',//,10x, &
-       '3D Cell with aspect-ratio:  D1/H = ',f5.2,' D2/H = ',f5.2)
-      write(6,142)
-  142 format(//,8x,'Periodic lateral wall boundary condition')
-      write(6,202) rayt,prat,rays,pras
-  202 format(/,5x,'Parameters: ',' RaT=',e10.3,' PrT= ',e10.3,' RaS=',e10.3,' PrS= ',e10.3)
-      if(variabletstep) then
-         write(6,204) limitCFL
-  204 format(/,5x,'Variable dt and fixed cfl= ', &
-       e11.4,/ )
-      else
-         write(6,205) dtmax,limitCFL
-  205 format(/,5x,'Fixed dt= ',e11.4,' and maximum cfl=', &
-        e11.4,/ )
-      endif
-      endif
+        write(6,112)ylen/alx3,zlen/alx3
+    112 format(//,20x,'Double Diffusive Convection ',//,10x, &
+        '3D Cell with aspect-ratio:  D1/H = ',f5.2,' D2/H = ',f5.2)
+        write(6,142)
+    142 format(//,8x,'Periodic lateral wall boundary condition')
+        write(6,202) rayt,prat,rays,pras
+    202 format(/,5x,'Parameters: ',' RaT=',e10.3,' PrT= ',e10.3,' RaS=',e10.3,' PrS= ',e10.3)
+        if(variabletstep) then
+            write(6,204) limitCFL
+        204 format(/,5x,'Variable dt and fixed cfl= ', e11.4,/ )
+        else
+            write(6,205) dtmax,limitCFL
+        205 format(/,5x,'Fixed dt= ',e11.4,' and maximum cfl=', e11.4,/ )
+        endif
+    endif
 
-      call InitTimeMarchScheme
+    call InitTimeMarchScheme
 
-      call InitVariables
-      if (multires) call InitMgrdVariables  !CS mgrd
-      if (salinity) call InitSalVariables
-      if (phasefield) call InitPFVariables
+    call InitVariables
+    if (multires) call InitMgrdVariables  !CS mgrd
+    if (salinity) call InitSalVariables
+    if (phasefield) call InitPFVariables
 
-      call CreateGrid
-      if (multires) call CreateMgrdGrid     !CS mgrd
+    call CreateGrid
+    if (multires) call CreateMgrdGrid     !CS mgrd
 
-      call WriteGridInfo
+    call WriteGridInfo
 
-      !call InitSpec
+    !call InitSpec
 
 !m===================================
 !m===================================
 !m===================================
 
-      if(ismaster) then
-      write(6,754)nx,ny,nz
-  754 format(/,5x,'grid resolution: ',' nx = ',i5,' ny = ',i5,' nz = ',i5)
-      write(6,756)nxr,nyr,nzr
-  756 format(5x,'grid resolution: ',' nxr= ',i5,' nyr= ',i5,' nzr= ',i5)
-      write(6,755) 1.d0/dx,1.d0/dy,1.d0/dz,dt,ntst
-  755 format(/,2x,' dx=',e10.3,' dy=',e10.3,' dz=',e10.3, &
+    if(ismaster) then
+        write(6,754)nx,ny,nz
+    754 format(/,5x,'grid resolution: ',' nx = ',i5,' ny = ',i5,' nz = ',i5)
+        write(6,756)nxr,nyr,nzr
+    756 format(5x,'grid resolution: ',' nxr= ',i5,' nyr= ',i5,' nzr= ',i5)
+        write(6,755) 1.d0/dx,1.d0/dy,1.d0/dz,dt,ntst
+    755 format(/,2x,' dx=',e10.3,' dy=',e10.3,' dz=',e10.3, &
                   ' dt=',e10.3,' ntst=',i7,/)
-      if (multires) then
-        write(6,757) 1.d0/dxr,1.d0/dyr,1.d0/dzr
-    757 format(/,2x,' dxr=',e10.3,' dyr=',e10.3,' dzr=',e10.3,/)
-      end if
-      endif
+        if (multires) then
+            write(6,757) 1.d0/dxr,1.d0/dyr,1.d0/dzr
+        757 format(/,2x,' dxr=',e10.3,' dyr=',e10.3,' dzr=',e10.3,/)
+        end if
+    endif
 
 !m===================================
 !m===================================
 
-      time=0.d0
-      ! if(statcal) nstatsamples = 0
+    time=0.d0
+    ! if(statcal) nstatsamples = 0
 
-      call InitPressureSolver
-      call SetTempBCs
-      if (salinity) call SetSalBCs
+    call InitPressureSolver
+    call SetTempBCs
+    if (salinity) call SetSalBCs
 
-      if(readflow) then
+    if(readflow) then
 
         if(ismaster) write(6,*) 'Reading initial condition from file'
 
-      !   call ReadFlowField
         call ReadFlowInterp
 
-      !   if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-      !   call Mkmov_ycut
-      !   call Mkmov_ycutr
-      !   call Mkmov_zcut
-      !   call Mkmov_zcutr
-
-      else
+    else
 
         if(ismaster) write(6,*) 'Creating initial condition'
 
@@ -149,64 +140,54 @@
         if (salinity) call CreateICSal
         if (phasefield) call CreateICPF
 
-      !   if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-      !   call Mkmov_ycut
-      !   call Mkmov_ycutr
-      !   call Mkmov_zcut
-      !   call Mkmov_zcutr
-
-      endif
+    endif
 
 !EP   Update all relevant halos
-      call update_halo(vx,lvlhalo)
-      call update_halo(vy,lvlhalo)
-      call update_halo(vz,lvlhalo)
-      call update_halo(temp,lvlhalo)
-      if (salinity) call update_halo(sal,lvlhalo)
-      if (phasefield) call update_halo(phi,lvlhalo)
-      call update_halo(pr,lvlhalo)
+    call update_halo(vx,lvlhalo)
+    call update_halo(vy,lvlhalo)
+    call update_halo(vz,lvlhalo)
+    call update_halo(temp,lvlhalo)
+    if (salinity) call update_halo(sal,lvlhalo)
+    if (phasefield) call update_halo(phi,lvlhalo)
+    call update_halo(pr,lvlhalo)
 
 !CS   Create multigrid stencil for interpolation
-      if (multires) call CreateMgrdStencil
+    if (multires) call CreateMgrdStencil
 
 !CS   Interpolate initial values
-      if (salinity) then
+    if (salinity) then
         call InterpVelMgrd
         call InterpSalMgrd
-      end if
-      if (phasefield) then
+    end if
+    if (phasefield) then
         call InterpTempMgrd
         call InterpPhiMgrd
-      end if
+    end if
 
 !EP   Update all relevant halos
-      if (salinity) then
+    if (salinity) then
         call update_halo(vxr,lvlhalo)
         call update_halo(vyr,lvlhalo)
         call update_halo(vzr,lvlhalo)
         call update_halo(salc,lvlhalo)
-      end if
-      if (phasefield) then
+    end if
+    if (phasefield) then
         call update_halo(tempr,lvlhalo)
         call update_halo(phic,lvlhalo)
-      end if
+    end if
 
-      call CalcMeanProfiles
-      if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-      call Mkmov_xcut
-      ! call Mkmov_xcutr
-      call Mkmov_ycut
-      ! call Mkmov_ycutr
-      call Mkmov_zcut
-      ! call Mkmov_zcutr
-
+    call CalcMeanProfiles
+    if(ismaster)  write(6,*) 'Write plane slices'
+    call Mkmov_xcut
+    call Mkmov_ycut
+    call Mkmov_zcut
 
 !EP   Check divergence. Should be reduced to machine precision after the first
 !phcalc. Here it can still be high.
 
-      call CheckDivergence(dmax,dmaxr)
+    call CheckDivergence(dmax,dmaxr)
 
-      if(ismaster) write(6,*)' Initial maximum divergence: ',dmax,dmaxr
+    if(ismaster) write(6,*)' Initial maximum divergence: ',dmax,dmaxr
 
 !!EP   Write some values
 !      if(variabletstep) then
@@ -216,91 +197,89 @@
 !      end if
 !
 
-     if(ismaster) then
+    if(ismaster) then
        tin(2) = MPI_WTIME()
        write(6,'(a,f6.2,a)') 'Initialization Time = ', tin(2) -tin(1), ' sec.'
-     endif
+    endif
 
 !  ********* starts the time dependent calculation ***
-      errorcode = 0 !EP set errocode to 0 (OK)
-      minwtdt = huge(0.0d0) !EP initialize minimum time step walltime
+    errorcode = 0 !EP set errocode to 0 (OK)
+    minwtdt = huge(0.0d0) !EP initialize minimum time step walltime
 
-      ! Check input for efficient FFT
-      ! factorize input FFT directions. The largest factor should
-      ! be relatively small to have efficient FFT's
-      lfactor=2 ! initialize
-      call Factorize(nym,lfactor2) ! check nym
-      lfactor=max(lfactor,lfactor2)
-      call Factorize(nzm,lfactor2)
-      lfactor=max(lfactor,lfactor2)
-      ! if largest factor larger than 7 quit the simulation
-      ! if (lfactor>7) errorcode=444
+    ! Check input for efficient FFT
+    ! factorize input FFT directions. The largest factor should
+    ! be relatively small to have efficient FFT's
+    lfactor=2 ! initialize
+    call Factorize(nym,lfactor2) ! check nym
+    lfactor=max(lfactor,lfactor2)
+    call Factorize(nzm,lfactor2)
+    lfactor=max(lfactor,lfactor2)
+    ! if largest factor larger than 7 quit the simulation
+    ! if (lfactor>7) errorcode=444
 
-      do ntime=0,ntst
+    do ntime=0,ntst
         ti(1) = MPI_WTIME()
 
 !EP   Determine timestep size
         call CalcMaxCFL(instCFL,CFLmr)
 
         if(variabletstep) then
-          if(ntime.gt.1) then
-            if(CFLmr.lt.1.0d-8) then !EP prevent fp-overflow
-              dt=dtmax
+            if(ntime.gt.1) then
+                if(CFLmr.lt.1.0d-8) then !EP prevent fp-overflow
+                    dt=dtmax
+                else
+                    dt=limitCFL/CFLmr
+                endif
+                if(dt.gt.dtmax) dt=dtmax
             else
-              dt=limitCFL/CFLmr
+                dt=dt !CJH First time step: use dt defined in bou.in
             endif
-            if(dt.gt.dtmax) dt=dtmax
-          else
-            dt=dt !CJH First time step: use dt defined in bou.in
-          endif
             if(dt.lt.dtmin) errorcode = 166
         else
 !RO    fixed time-step
             CFLmr=CFLmr*dt
-          if(CFLmr.gt.limitCFL) errorcode = 165
-          ! if (ismaster) write(*,*) "CFL value  ",CFLmr
+            if(CFLmr.gt.limitCFL) errorcode = 165
+            ! if (ismaster) write(*,*) "CFL value  ",CFLmr
         endif
 
         call TimeMarcher
 
         time=time+dt
 
-        !call CalcGlobalStats
-        if(ismaster) then
-          open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
-          write(96,769) ntime,time,dt,instCFL*dt!,vx_global,vy_global,vz_global
-          close(96)
-        endif
-769     format(1x,i12,3(1x,ES20.8))
-
         if(mod(time,tout).lt.dt) then
-         if(ismaster) then
-          write(6,*) ' -------------------------------------------------- '
-          write(6,'(a,E11.4,a,i9,a,E11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
-         endif
-         call CalcMeanProfiles
+            if(ismaster) then
+                write(6,*) ' -------------------------------------------------- '
+                write(6,'(a,E11.4,a,i9,a,E11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
+            endif
+            call CalcMeanProfiles
+            if(ismaster) then
+                open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
+                write(96,769) ntime,time,dt,instCFL*dt!,vx_global,vy_global,vz_global
+                close(96)
+            endif
+        769 format(1x,i12,3(1x,ES20.8))
         endif
 
         if((mod(time,tframe).lt.dt) .and. (floor(time/tframe).ne.0)) then
-          if(ismaster)  write(6,*) 'Write slice ycut and zcut'
-          !call CalcWriteQ
-          call Mkmov_xcut
-          call Mkmov_ycut
-          call Mkmov_zcut
+            if(ismaster)  write(6,*) 'Write slice ycut and zcut'
+            !call CalcWriteQ
+            call Mkmov_xcut
+            call Mkmov_ycut
+            call Mkmov_zcut
         endif
 
         if(ntime.eq.1.or.mod(time,tout).lt.dt) then
-           !call GlobalQuantities
-           !if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
+            !call GlobalQuantities
+            !if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
 
-           call CalcMaxCFL(instCFL,CFLmr)
-           call CheckDivergence(dmax,dmaxr)
-          !  call CalcPlateNu
-           !call CalcPlateCf
+            call CalcMaxCFL(instCFL,CFLmr)
+            call CheckDivergence(dmax,dmaxr)
+            !  call CalcPlateNu
+            !call CalcPlateCf
 
-           if(.not.variabletstep) instCFL=instCFL*dt
+            if(.not.variabletstep) instCFL=instCFL*dt
 
-           if(abs(dmax).gt.resid) errorcode = 169
+            if(abs(dmax).gt.resid) errorcode = 169
 
         endif
 
@@ -309,66 +288,64 @@
         ti(2) = MPI_WTIME()
         minwtdt = min(minwtdt,ti(2) - ti(1))
         if(mod(time,tout).lt.dt) then
-          if(ismaster) then
-          write(6,*) ' Maximum divergence = ', dmax, dmaxr
-          !write(6,*)'ntime - time - vmax(1) - vmax(2) - vmax(3)  -&
-          !           tempm - tempmax - tempmin'
-          !write(6,*)ntime,time,vmax(1),vmax(2),vmax(3),tempm,tempmax,tempmin
-          write(6,'(a,f8.3,a)') '  Minimum Iteration Time = ', minwtdt, &
-                  ' sec.'
-          endif
-          minwtdt = huge(0.0d0)
+            if(ismaster) then
+                write(6,*) ' Maximum divergence = ', dmax, dmaxr
+                !write(6,*)'ntime - time - vmax(1) - vmax(2) - vmax(3)  -&
+                !           tempm - tempmax - tempmin'
+                !write(6,*)ntime,time,vmax(1),vmax(2),vmax(3),tempm,tempmax,tempmin
+                write(6,'(a,f8.3,a)') '  Minimum Iteration Time = ', minwtdt,' sec.'
+            endif
+            minwtdt = huge(0.0d0)
         endif
 
         if ( mod(ti(2)-tin(1),3600.d0) .lt. (ti(2)-ti(1)) ) then
-          if(ismaster) write(6,*) '*** Writing data every hour ***'
-          call WriteFlowField
-          call MpiBarrier
-          if(ismaster) write(6,*) '************ Done *****************'
+            if(ismaster) write(6,*) '*** Writing data every hour ***'
+            call WriteFlowField
+            call MpiBarrier
+            if(ismaster) write(6,*) '************ Done *****************'
         end if
 
-       if( (ti(2) - tin(1)) .gt. walltimemax) errorcode = 334
+        if( (ti(2) - tin(1)) .gt. walltimemax) errorcode = 334
 
-       if( ntime .eq. ntst ) errorcode = 555
+        if( ntime .eq. ntst ) errorcode = 555
 
-      call MpiBcastInt(errorcode)
+        call MpiBcastInt(errorcode)
 
 !EP   Conditional exits
-      if(errorcode.ne.0) then
+        if(errorcode.ne.0) then
 
 !EP    dt too small
-        if(errorcode.eq.166) call QuitRoutine(tin,.false.,errorcode)
+            if(errorcode.eq.166) call QuitRoutine(tin,.false.,errorcode)
 
 !EP   cfl too high
-        if(errorcode.eq.165) call QuitRoutine(tin,.false.,errorcode)
+            if(errorcode.eq.165) call QuitRoutine(tin,.false.,errorcode)
 
 !EP   velocities diverged
-        if(errorcode.eq.266) call QuitRoutine(tin,.false.,errorcode)
+            if(errorcode.eq.266) call QuitRoutine(tin,.false.,errorcode)
 
 !EP   mass not conserved
-        if(errorcode.eq.169) call QuitRoutine(tin,.false.,errorcode)
+            if(errorcode.eq.169) call QuitRoutine(tin,.false.,errorcode)
 
 !EP   Physical time exceeded tmax, no error; normal quit
-        if(errorcode.eq.333) call QuitRoutine(tin,.true.,errorcode)
+            if(errorcode.eq.333) call QuitRoutine(tin,.true.,errorcode)
 
 !EP   walltime exceeded walltimemax, no error; normal quit
-        if(errorcode.eq.334) call QuitRoutine(tin,.true.,errorcode)
+            if(errorcode.eq.334) call QuitRoutine(tin,.true.,errorcode)
 
 !RS   FFT input not correct
-        if(errorcode.eq.444) call QuitRoutine(tin,.false.,errorcode)
+            if(errorcode.eq.444) call QuitRoutine(tin,.false.,errorcode)
 
 !RS   maximum number of timesteps reached, no error; normal quit
-        if(errorcode.eq.555) call QuitRoutine(tin,.true.,errorcode)
+            if(errorcode.eq.555) call QuitRoutine(tin,.true.,errorcode)
 
-        errorcode = 100 !EP already finalized
+            errorcode = 100 !EP already finalized
 
-        exit
+            exit
 
-      endif
+        endif
 
-      enddo !EP main loop
+    enddo !EP main loop
 
-      call QuitRoutine(tin,.true.,errorcode)
+    call QuitRoutine(tin,.true.,errorcode)
 
-      end
-
+end
