@@ -91,35 +91,11 @@ OBJS += obj/ExplicitTermsSal.o obj/ImplicitAndUpdateSal.o obj/SolveImpEqnUpdate_
 # Object files associated with the phase-field method
 OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
 	obj/ImplicitAndUpdatePhi.o obj/InitPFVariables.o obj/InterpPhiMgrd.o \
-	obj/InterpTempMgrd.o obj/SolveImpEqnUpdate_Phi.o obj/CreateICPF.o
+	obj/InterpTempMgrd.o obj/SolveImpEqnUpdate_Phi.o obj/CreateICPF.o \
+	obj/ImmersedBoundary.o
 
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o
-
-# FFILES += CalcDissipationNu.F90 CalcMaxCFL.F90 CalcPlateNu.F90\
-# 	  CalcLocalDivergence.F90 CheckDivergence.F90 CorrectPressure.F90\
-#           CorrectVelocity.F90 CreateGrid.F90 CreateInitialConditions.F90\
-# 	  DeallocateVariables.F90 DebugRoutines.F90\
-# 	  ExplicitTermsTemp.F90 ExplicitTermsSal.F90\
-# 	  ExplicitTermsVX.F90 ExplicitTermsVY.F90 ExplicitTermsVZ.F90\
-# 	  GlobalQuantities.F90 HdfReadContinua.F90 HdfRoutines.F90\
-# 	  ImplicitAndUpdateTemp.F90 ImplicitAndUpdateSal.F90\
-# 	  ImplicitAndUpdateVX.F90 ImplicitAndUpdateVY.F90 ImplicitAndUpdateVZ.F90\
-# 	  InitPressureSolver.F90 InitTimeMarchScheme.F90 InitVariables.F90\
-#           LocateLargeDivergence.F90 MpiAuxRoutines.F90 QuitRoutine.F90\
-# 	  ReadInputFile.F90 ResetLogs.F90 SetTempBCs.F90\
-#           SlabDumpRoutines.F90 SolveImpEqnUpdate_Temp.F90 SolveImpEqnUpdate_Sal.F90\
-# 	  SolveImpEqnUpdate_X.F90 SolveImpEqnUpdate_YZ.F90 SolvePressureCorrection.F90\
-#           StatReadReduceWrite.F90 StatRoutines.F90\
-# 	  TimeMarcher.F90 WriteFlowField.F90 WriteGridInfo.F90 factorize.F90\
-#           main.F90\
-# 	  MakeMovieXCut.F90 MakeMovieYCut.F90 MakeMovieZCut.F90\
-# 	  SpecRoutines.F90\
-# 	  CalcPlateCf.F90 CalcWriteQ.F90\
-# 	  CreateMgrdGrid.F90 CreateMgrdStencil.F90 InterpVelMgrd.F90 InterpSalMgrd.F90\
-# 	  CalcMeanProfiles.F90\
-# 	  ReadFlowInterp.F90 CreateOldGrid.F90 CreateInputStencil.F90 CreateSalStencil.F90\
-# 	  InterpInputSal.F90 InterpInputVel.F90 UpdateScalarBCs.F90
 
 #=======================================================================
 #  Files that create modules:
