@@ -86,7 +86,8 @@
       end do
       !CJH Favier et al (2019) Appendix A3 Validation Case
       do k=1,kmid
-        temp(k,j,i) = temp(k,j,i) + eps*sin(4*pi*ym(j))*sin(2*pi*xm(k))**2
+        temp(k,j,i) = temp(k,j,i) &
+              + eps*sin(4*pi*ym(j))*cos(4*pi*zm(j))*sin(2*pi*xm(k))**2
       enddo
       enddo
       enddo
