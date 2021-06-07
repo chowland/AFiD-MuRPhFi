@@ -19,6 +19,7 @@ module param
     integer   :: gAxis      !CJH option to choose gravity axis
     real      :: xminusU,xplusU,dPdz
     real      :: pf_A, pf_eps, pf_C, pf_S, pf_Tm
+    logical   :: IBM
     ! integer   :: starea,tsta
     real      :: dtmin,dtmax,limitCFL
     integer   :: nson,idtv

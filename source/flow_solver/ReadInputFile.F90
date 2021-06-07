@@ -12,7 +12,7 @@
       character(len=4) :: dummy
       integer flagstat,flagbal,flagmelt
       integer :: flagMR, flagsal, flagPF
-      integer :: FFscaleS
+      integer :: FFscaleS, pf_IBM
       logical fexist
 
       open(unit=15,file='bou.in',status='old')
@@ -70,7 +70,7 @@
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy
-        read(15,*) pf_A, pf_C, pf_S, pf_Tm
+        read(15,*) pf_A, pf_C, pf_S, pf_Tm, pf_IBM
 301     format(a4)                
       close(15)
 
@@ -103,6 +103,8 @@
 
       pf_A = pf_A/pect
       pf_eps = 1.0/nxmr
+
+      if (pf_IBM.ne.0) IBM = .true.
 
       ! if(flagstat.ne.0) statcal = .true.
       if(idtv.eq.0) variabletstep = .false.

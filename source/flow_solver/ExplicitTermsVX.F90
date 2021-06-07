@@ -129,7 +129,7 @@
         end if
       end if
 
-      if (phasefield) then
+      if (phasefield .and. .not.IBM) then
         do ic=xstart(3),xend(3)
           do jc=xstart(2),xend(2)
             do kc=2,nxm
