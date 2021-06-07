@@ -124,10 +124,10 @@ T - T_m = \Gamma K = \frac{\gamma T_m}{\rho_s L} K.
 ```
 $`\gamma`$ is the surface energy and $`\rho_s`$ is the density of the solid.
 
-We now non-dimensionalise the phase-field equation using the same scales as before, while also ensuring that the equilibrium melting point is associated with $`T=0`$ in dimensionless form.
+We now non-dimensionalise the phase-field equation using the same scales as before.
 This results in the evolution equation
 ```math
-\pd_t \phi = A \nabla^2 \phi - B \phi (1 - \phi) (1 - 2\phi + CT) ,
+\pd_t \phi = A \nabla^2 \phi - B \phi (1 - \phi) (1 - 2\phi + C(T - T_m)) ,
 ```
 where the dimensionless coefficients are given by
 ```math
@@ -204,6 +204,29 @@ A = \frac{6}{5\mathcal{S}RePr} \approx 6\times 10^{-4}, \quad B = \frac{A}{\eps^
 Such a rescaling would also modify Couston et al's time step restriction to $`\Delta t \leq 1.4\times 10^{-3}`$.
 
 ### Double-diffusive melting
+Following Hester et al. (2020), we can also simulate the ablation of ice in salt water.
+In this case, the velocity of the ice-water boundary depends on the gradients of both temperature and salinity at the interface.
+In our non-dimensionalization (using the free-fall velocity scale for temperature), the full collection of equations reads as follows:
+```math
+\pd_t \bu + (\bu \cdot \grad) \bu = - \grad p + (T - {R_\rho}^{-1} S) \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\nabla^2 \bu ,
+```
+```math
+\pd_t T + (\bu \cdot \grad) T = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T + \mathcal{S} \partial_t \phi ,
+```
+```math
+\pd_t S + (\bu \cdot \grad) S = \frac{\tau}{\sqrt{Ra_T Pr}} \left(\nabla^2 S - \frac{\grad \phi \cdot \grad S}{1 - \phi + \delta}\right) + \frac{S\partial_t \phi}{1 - \phi + \delta},
+```
+```math
+\pd_t \phi = A \nabla^2 \phi - B \phi (1 - \phi) (1 - 2\phi + C(T - T_m +\Lambda S)) .
+```
 
+Two new dimensionless parameters have appeared in the equations.
+$`\delta \ll 1`$ is a small parameter that is solely present to stabilise the terms on the right hand side of the salinity equation.
+In the phase-field equation, we obtain a new physical parameter defined as
+```math
+\Lambda = \frac{\lambda \Delta S}{\Delta T} ,
+```
+where $`\Delta S`$ and $`\Delta T`$ are the previously used scales for salinity and temperature, and $`\lambda`$ is the liquidus slope.
+This refects how the presence of salinity at the ice-water interface lowers the local melting temperature.
 
 ## Boundary conditions
