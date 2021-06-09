@@ -81,7 +81,8 @@ OBJS += obj/CreateMgrdGrid.o obj/CreateMgrdStencil.o obj/InitMgrdVariables.o \
 # Object files associated with initial condition interpolation
 OBJS += obj/CreateInputStencil.o obj/CreateOldGrid.o obj/CreateSalStencil.o \
 	obj/InterpInputSal.o obj/InterpInputVel.o obj/InterpSalMgrd.o \
-	obj/InterpVelMgrd.o
+	obj/InterpVelMgrd.o obj/InitInputVars.o obj/DeallocateInputVars.o \
+	obj/InterpInputPhi.o
 
 # Object files associated with the salinity field
 OBJS += obj/ExplicitTermsSal.o obj/ImplicitAndUpdateSal.o obj/SolveImpEqnUpdate_Sal.o \
