@@ -30,12 +30,12 @@ subroutine ImplicitAndUpdatePhi
 !   This is the only term calculated implicitly for phi.
                 if (kc.eq.1) then       !CJH Apply lower BC (fluid phi=0)
                     dxxp = phi(kc+1,jc, ic)*ap3sskr(kc) &
-                          +phi(kc  ,jc, ic)*ac3sskr(kc) &
-                          -(ap3sskr(kc)+ac3sskr(kc))*0.d0!*phibp(1,jc,ic) ! to be implemented
+                          +phi(kc  ,jc, ic)*ac3sskr(kc) !& !CJH try dphi/dx=0
+                        !   -(ap3sskr(kc)+ac3sskr(kc))*0.d0!*phibp(1,jc,ic) ! to be implemented
                 elseif(kc.eq.nxmr) then !CJH Apply upper BC (solid phi=1)
                     dxxp = phi(kc  ,jc,ic)*ac3sskr(kc) &
-                          +phi(kc-1,jc,ic)*am3sskr(kc) &
-                          -(am3sskr(kc)+ac3sskr(kc))*1.d0!*phitp(1,jc,ic) ! to be implemented
+                          +phi(kc-1,jc,ic)*am3sskr(kc) !& !CJH try dphi/dx=0
+                        !   -(am3sskr(kc)+ac3sskr(kc))*1.d0!*phitp(1,jc,ic) ! to be implemented
                 else
                     dxxp= phi(kc+1,jc,ic)*ap3sskr(kc) &
                          +phi(kc  ,jc,ic)*ac3sskr(kc) &
