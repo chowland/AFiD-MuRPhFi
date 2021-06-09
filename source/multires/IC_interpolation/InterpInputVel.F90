@@ -368,6 +368,13 @@ subroutine InterpInputVel
                 tempo(nxo,jc,ic) = 0.d0
             end do
         end do
+    else if (phasefield) then
+        do ic=xs3o,xe3o
+            do jc=xs2o,xe2o
+                tempo(0,jc,ic) = 1.d0
+                tempo(nxo,jc,ic) = 0.d0
+            end do
+        end do
     else
         if (rayt>=0) then
             do ic=xs3o,xe3o

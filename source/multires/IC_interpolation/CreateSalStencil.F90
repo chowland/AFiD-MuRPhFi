@@ -13,114 +13,77 @@ subroutine CreateSalStencil
     real lxm,lxp, lym,lyp, lzm,lzp, lxa,lya,lza
     real dlc, dlm, dlp
 
-    irangs(:) = 0
-    irangc(:) = 0
-    jrangs(:) = 0
-    jrangc(:) = 0
-    krangs(:) = 0
-    krangc(:) = 0
+    irangsr(:) = 0
+    jrangsr(:) = 0
+    krangsr(:) = 0
 
     !===================================================
     !  First create index look-up arrays for fine grid
     !===================================================
-    !-- irangs, jrangs, krangs are at staggered location
-    !-- irangc, jrangc, krangc are at cell-face location
+    !-- irangsr, jrangsr, krangsr are at staggered location
     IF(nxmro.eq.nxmr .AND. istr3ro.eq.istr3r) then
 
-        irangs(0) = 1
-        irangc(0) = 1
+        irangsr(0) = 1
         do ic=1,nxmro  
-            irangs(ic) = ic
-            irangc(ic) = ic
+            irangsr(ic) = ic
         enddo
-        irangs(nxro) = nxro
-        irangc(nxro) = nxro
+        irangsr(nxro) = nxro
 
     ELSE
 
-        irangs(0) = 1
-        irangc(0) = 1
+        irangsr(0) = 1
         do ic=1,nxmro
             do i=1,nxmr
                 if(xmr(i).lt.xmro(ic) .and. xmr(i+1).ge.xmro(ic))then
-                    irangs(ic) = i+1
-                endif
-            enddo
-            do i=1,nxmr
-                if(xcr(i).lt.xcro(ic) .and. xcr(i+1).ge.xcro(ic))then
-                    irangc(ic) = i+1
+                    irangsr(ic) = i+1
                 endif
             enddo
         enddo
-        irangs(nxro) = nxr
-        irangc(1) = 1
-        irangc(nxro) = nxr
+        irangsr(nxro) = nxr
 
     ENDIF 
 
     IF(nymro.eq.nymr) then
          
-        jrangs(0) = 1
-        jrangc(0) = 1
+        jrangsr(0) = 1
         do jc=1,nymro
-         jrangs(jc) = jc
-         jrangc(jc) = jc
+         jrangsr(jc) = jc
         enddo
-        jrangs(nyro) = nyr
-        jrangc(nyro) = nyr
+        jrangsr(nyro) = nyr
     
     ELSE
 
-        jrangs(0) = 1
-        jrangc(0) = 1
+        jrangsr(0) = 1
         do jc=1,nymro
           do j=1,nymr
             if(ymr(j).lt.ymro(jc) .and. ymr(j+1).ge.ymro(jc))then
-              jrangs(jc) = j+1
-            endif
-          enddo
-          do j=1,nymr
-            if(ycr(j).lt.ycro(jc) .and. ycr(j+1).ge.ycro(jc))then
-              jrangc(jc) = j+1
+              jrangsr(jc) = j+1
             endif
           enddo
         enddo
-        jrangs(nyro) = nyr
-        jrangc(1) = 1
-        jrangc(nyro) = nyr
+        jrangsr(nyro) = nyr
 
     ENDIF 
 
     IF(nzmro.eq.nzmr) then
 
-        krangs(0) = 1
-        krangc(0) = 1
+        krangsr(0) = 1
         do kc=1,nzmro
-         krangs(kc) = kc
-         krangc(kc) = kc
+         krangsr(kc) = kc
         enddo
-        krangs(nzro) = nzr
-        krangc(nzro) = nzr
+        krangsr(nzro) = nzr
 
     ELSE
 
-        krangs(0) = 1
-        krangc(0) = 1
+        krangsr(0) = 1
         do kc=1,nzmro
           do k=1,nzmr
             if(zmr(k).lt.zmro(kc) .and. zmr(k+1).ge.zmro(kc))then
-              krangs(kc) = k+1
-            endif
-          enddo
-          do k=1,nzmr
-            if(zcr(k).lt.zcro(kc) .and. zcr(k+1).ge.zcro(kc))then
-              krangc(kc) = k+1
+              krangsr(kc) = k+1
             endif
           enddo
         enddo
-        krangs(nzro) = nzr
-        krangc(1) = 1
-        krangc(nzro) = nzr
+        krangsr(nzro) = nzr
 
     ENDIF
 
@@ -160,7 +123,7 @@ subroutine CreateSalStencil
             dlc = xxs(ic+1)-xxs(ic)
             dlp = xxs(ic+2)-xxs(ic+1)
             lxa = 1.d0/dlc
-            do icr=max(irangs(ic),1),min(irangs(ic+1)-1,nxmr)
+            do icr=max(irangsr(ic),1),min(irangsr(ic+1)-1,nxmr)
                 lxm = (xxl(icr) - xxs(ic))*lxa
                 lxp = 1.d0 - lxm
                 h00=(1.d0+2.d0*lxm)*lxp*lxp
@@ -176,7 +139,7 @@ subroutine CreateSalStencil
             dlc = xxs(ic+1)-xxs(ic)
             dlm = xxs(ic)-xxs(ic-1)
             lxa = 1.d0/dlc
-            do icr=max(irangs(ic),1),min(irangs(ic+1)-1,nxmr)
+            do icr=max(irangsr(ic),1),min(irangsr(ic+1)-1,nxmr)
                 lxm = (xxl(icr) - xxs(ic))*lxa
                 lxp = 1.d0 - lxm
                 h00=(1.d0+2.d0*lxm)*lxp*lxp
@@ -193,7 +156,7 @@ subroutine CreateSalStencil
             dlm = xxs(ic)-xxs(ic-1)
             dlp = xxs(ic+2)-xxs(ic+1)
             lxa = 1.d0/dlc
-            do icr=max(irangs(ic),1),min(irangs(ic+1)-1,nxmr)
+            do icr=max(irangsr(ic),1),min(irangsr(ic+1)-1,nxmr)
                 lxm = (xxl(icr) - xxs(ic))*lxa
                 lxp = 1.d0 - lxm
                 h00=(1.d0+2.d0*lxm)*lxp*lxp
@@ -213,7 +176,7 @@ subroutine CreateSalStencil
         dlm = yys(jc)-yys(jc-1)
         dlp = yys(jc+2)-yys(jc+1)
         lya=1.d0/dlc
-        do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
+        do jcr=max(jrangsr(jc),1),min(jrangsr(jc+1)-1,nymr)
             lym = (yyl(jcr) - yys(jc))*lya
             lyp = 1.d0 - lym
             h00=(1.d0+2.d0*lym)*lyp*lyp
@@ -232,7 +195,7 @@ subroutine CreateSalStencil
         dlm = zzs(kc)-zzs(kc-1)
         dlp = zzs(kc+2)-zzs(kc+1)
         lza=1.d0/dlc
-        do kcr=max(krangs(kc),1),min(krangs(kc+1)-1,nzmr)
+        do kcr=max(krangsr(kc),1),min(krangsr(kc+1)-1,nzmr)
             lzm = (zzl(kcr) - zzs(kc))*lza
             lzp = 1.d0 - lzm
             h00=(1.d0+2.d0*lzm)*lzp*lzp
