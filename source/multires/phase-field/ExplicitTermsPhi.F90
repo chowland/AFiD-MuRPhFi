@@ -14,7 +14,7 @@ subroutine ExplicitTermsPhi
     use decomp_2d, only: xstartr,xendr
     implicit none
     integer :: jc,kc,ic
-    integer :: km,kp,jm,jp,im,ip
+    integer :: jm,jp,im,ip
     real    :: nlphi
     real    :: udzrq,udyrq
     real    :: dyyp,dzzp
@@ -32,8 +32,6 @@ subroutine ExplicitTermsPhi
             jm=jc-1
             jp=jc+1
             do kc=1,nxmr
-                km=kc-1
-                kp=kc+1
                 ! yy second derivative of phi
                 dyyp = (phi(kc,jp,ic) - 2.0*phi(kc,jc,ic) + phi(kc,jm,ic))*udyrq
                 ! zz second derivative of phi

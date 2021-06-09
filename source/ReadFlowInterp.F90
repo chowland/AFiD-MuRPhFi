@@ -14,7 +14,6 @@ subroutine ReadFlowInterp
     integer :: i, j, k, ic, jc, kc
 
     real :: yleno, zleno
-    real, allocatable, dimension(:,:,:) :: salo, tempo, vxo, vyo, vzo
     real, dimension(4,4,4) :: qv3
     real, dimension(4,4) :: qv2
     real, dimension(4) :: qv1
@@ -78,73 +77,17 @@ subroutine ReadFlowInterp
         call MpiAbort
     end if
 
-    ! if (ismaster) then
-    !     write(*,*) "nx, nxo: ", nx, nxo
-    !     write(*,*) "ny, nyo: ", ny, nyo
-    !     write(*,*) "nz, nzo: ", nz, nzo
-    !     write(*,*) "nxr, nxro: ", nxr, nxro
-    !     write(*,*) "nyr, nyro: ", nyr, nyro
-    !     write(*,*) "nzr, nzro: ", nzr, nzro
-    ! end if
-
     ! Check whether we are using a new grid
     if ((nx.ne.nxo) .or. (ny.ne.nyo) .or. (nz.ne.nzo) .or. &
         (nxr/=nxro) .or. (nyr/=nyro) .or. (nzr/=nzro) .or. &
         (istr3/=istr3o) .or. (istr3r/=istr3ro) .or. &
         (abs(str3-str3o)>1e-8)) then
 
-        ! Allocate old grids
-        call AllocateReal1DArray(xco, 1, nxo)
-        call AllocateReal1DArray(xmo, 1, nxo)
-        call AllocateReal1DArray(yco, 1, nyo)
-        call AllocateReal1DArray(ymo, 1, nyo)
-        call AllocateReal1DArray(zco, 1, nzo)
-        call AllocateReal1DArray(zmo, 1, nzo)
-
-        call AllocateReal1DArray(xcro, 1, nxro)
-        call AllocateReal1DArray(xmro, 0, nxro+1)
-        call AllocateReal1DArray(ycro, 1, nyro)
-        call AllocateReal1DArray(ymro, 0, nyro+1)
-        call AllocateReal1DArray(zcro, 1, nzro)
-        call AllocateReal1DArray(zmro, 0, nzro+1)
+        call InitInputVars
 
         call CreateOldGrid
 
-        ! if (ismaster) then
-        !     filnam = trim("grids_test.h5")
-        !     call HdfCreateBlankFile(filnam)
-        !     dsetname = trim("xco")
-        !     call HdfSerialWriteReal1D(dsetname, filnam, xco, nxo)
-        !     dsetname = trim("xcro")
-        !     call HdfSerialWriteReal1D(dsetname, filnam, xcro, nxro)
-        !     dsetname = trim("xmo")
-        !     call HdfSerialWriteReal1D(dsetname, filnam, xmo, nxo)
-        !     dsetname = trim("xmro")
-        !     call HdfSerialWriteReal1D(dsetname, filnam, xmro, nxro)
-        !     dsetname = trim("ycro")
-        !     call HdfSerialWriteReal1D(dsetname, filnam, ycro, nyro)
-        !     dsetname = trim("ymro")
-        !     call HdfSerialWriteReal1D(dsetname, filnam, ymro, nyro)
-        ! end if
-
         call CreateInputStencil
-
-        ! if (ismaster) then
-        !     filnam = trim("itp_range.h5")
-        !     call HdfCreateBlankFile(filnam)
-        !     dsetname = trim("irangs")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, irangs, nx+1)
-        !     dsetname = trim("jrangs")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, jrangs, ny+1)
-        !     dsetname = trim("krangs")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, krangs, nz+1)
-        !     dsetname = trim("irangc")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, irangc, nx+1)
-        !     dsetname = trim("jrangc")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, jrangc, ny+1)
-        !     dsetname = trim("krangc")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, krangc, nz+1)
-        ! end if
 
         call MpiBarrier
         xs2o = ceiling(real((xstart(2) - 1)*nymo/nym)) + 1
@@ -156,62 +99,29 @@ subroutine ReadFlowInterp
         xs3o = max(xs3o, 1)
         xe3o = min(xe3o, nzmo)
 
-        ! write(*,*) "xs2o, xe2o: ",xs2o, xe2o
-        ! write(*,*) "xs2, xe2: ", xstart(2), xend(2)
-        ! write(*,*) "xs3o, xe3o: ",xs3o, xe3o
-
         call InterpInputVel
 
         if (ismaster) write(*,*) "Velocity and T interpolated"
 
-        call CreateSalStencil
+        if (multires) then
+            call CreateSalStencil
 
-        ! if (ismaster) then
-        !     filnam = trim("itp_range.h5")
-        !     dsetname = trim("irangsr")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, irangs, nx+1)
-        !     dsetname = trim("jrangsr")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, jrangs, ny+1)
-        !     dsetname = trim("krangsr")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, krangs, nz+1)
-        !     dsetname = trim("irangcr")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, irangc, nx+1)
-        !     dsetname = trim("jrangcr")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, jrangc, ny+1)
-        !     dsetname = trim("krangcr")
-        !     call HdfSerialWriteInt1D(dsetname, filnam, krangc, nz+1)
-        ! end if
- 
-        call MpiBarrier
-        xs2o = ceiling(real((xstartr(2) - 1)*nymro/nymr)) + 1
-        xe2o = ceiling(real(xendr(2)*nymro/nymr))
-        xs3o = ceiling(real((xstartr(3) - 1)*nzmro/nzmr)) + 1
-        xe3o = ceiling(real(xendr(3)*nzmro/nzmr))
-        xs2o = max(xs2o, 1)
-        xe2o = min(xe2o, nymro)
-        xs3o = max(xs3o, 1)
-        xe3o = min(xe3o, nzmro)
+            call MpiBarrier
+            xs2o = ceiling(real((xstartr(2) - 1)*nymro/nymr)) + 1
+            xe2o = ceiling(real(xendr(2)*nymro/nymr))
+            xs3o = ceiling(real((xstartr(3) - 1)*nzmro/nzmr)) + 1
+            xe3o = ceiling(real(xendr(3)*nzmro/nzmr))
+            xs2o = max(xs2o, 1)
+            xe2o = min(xe2o, nymro)
+            xs3o = max(xs3o, 1)
+            xe3o = min(xe3o, nzmro)
 
-        ! write(*,*) "Rxs2o, xe2o: ",xs2o, xe2o
-        ! write(*,*) "Rxs2, xe2: ", xstartr(2), xendr(2)
-        ! write(*,*) "Rxs3o, xe3o: ",xs3o, xe3o
+            if (salinity) call InterpInputSal
+            if (phasefield) call InterpInputPhi
 
-        call InterpInputSal
+        end if
 
-        ! Deallocate old grids
-        call DestroyReal1DArray(xco)
-        call DestroyReal1DArray(xmo)
-        call DestroyReal1DArray(yco)
-        call DestroyReal1DArray(ymo)
-        call DestroyReal1DArray(zco)
-        call DestroyReal1DArray(zmo)
-
-        call DestroyReal1DArray(xcro)
-        call DestroyReal1DArray(xmro)
-        call DestroyReal1DArray(ycro)
-        call DestroyReal1DArray(ymro)
-        call DestroyReal1DArray(zcro)
-        call DestroyReal1DArray(zmro)
+        call DeallocateInputVars
 
     else
         ! No interpolation necessary

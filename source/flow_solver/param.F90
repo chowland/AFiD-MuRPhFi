@@ -158,6 +158,7 @@ module input_grids !CJH Grids for input flow field
     real, allocatable, dimension(:) :: ycro, ymro
     real, allocatable, dimension(:) :: zco, zmo
     real, allocatable, dimension(:) :: zcro, zmro
+    integer,allocatable,dimension(:) :: irangsr,jrangsr,krangsr
 end module input_grids
 !=====================================================       
 module stat3_param

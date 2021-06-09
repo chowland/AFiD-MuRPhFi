@@ -40,7 +40,7 @@ IDTV    DT      RESID   CFLMAX  DTMIN   DTMAX
 
 Dirichlet/Neumann BC flag on upper(N) and lower(S) walls
 inslwS  inslwN  TfixS   TfixN   SfixS   SfixN
-1       1       1       1       1       1
+1       1       1       1       0       0
 
 Active/passive scalar flags / Gravitational axis (x=1,y=2,z=3)
 active_T    active_S    gAxis
