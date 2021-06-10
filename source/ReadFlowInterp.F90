@@ -90,14 +90,9 @@ subroutine ReadFlowInterp
         call CreateInputStencil
 
         call MpiBarrier
-        xs2o = ceiling(real((xstart(2) - 1)*nymo/nym)) + 1
-        xe2o = ceiling(real(xend(2)*nymo/nym))
-        xs3o = ceiling(real((xstart(3) - 1)*nzmo/nzm)) + 1
-        xe3o = ceiling(real(xend(3)*nzmo/nzm))
-        xs2o = max(xs2o, 1)
-        xe2o = min(xe2o, nymo)
-        xs3o = max(xs3o, 1)
-        xe3o = min(xe3o, nzmo)
+
+        call partition(nxmo, nymo, nzmo, (/ 1,2,3 /), &
+                    xstarto, xendo, xsizeo)
 
         call InterpInputVel
 
@@ -107,14 +102,9 @@ subroutine ReadFlowInterp
             call CreateSalStencil
 
             call MpiBarrier
-            xs2o = ceiling(real((xstartr(2) - 1)*nymro/nymr)) + 1
-            xe2o = ceiling(real(xendr(2)*nymro/nymr))
-            xs3o = ceiling(real((xstartr(3) - 1)*nzmro/nzmr)) + 1
-            xe3o = ceiling(real(xendr(3)*nzmro/nzmr))
-            xs2o = max(xs2o, 1)
-            xe2o = min(xe2o, nymro)
-            xs3o = max(xs3o, 1)
-            xe3o = min(xe3o, nzmro)
+
+            call partition(nxmro, nymro, nzmro, (/ 1,2,3 /), &
+                        xstarto, xendo, xsizeo)
 
             if (salinity) call InterpInputSal
             if (phasefield) call InterpInputPhi

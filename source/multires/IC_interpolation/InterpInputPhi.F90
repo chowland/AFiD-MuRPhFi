@@ -22,15 +22,15 @@ subroutine InterpInputPhi
 !     Interpolation of phi
 
     ! Allocate and read in old phi
-    call AllocateReal3DArray(phio, -1, nxro+1, xs2o-lvlhalo, xe2o+lvlhalo, xs3o-lvlhalo, xe3o+lvlhalo)
+    call AllocateReal3DArray(phio, -1, nxro+1, xstarto(2)-lvlhalo, xendo(2)+lvlhalo, xstarto(3)-lvlhalo, xendo(3)+lvlhalo)
 
     phio(:,:,:) = 0.d0
 
-    call HdfReadContinua(nzro, nyro, nxro, xs2o, xe2o, xs3o, xe3o, 6, &
-            phio(1:nxro, xs2o-lvlhalo:xe2o+lvlhalo, xs3o-lvlhalo:xe3o+lvlhalo))
+    call HdfReadContinua(nzro, nyro, nxro, xstarto(2), xendo(2), xstarto(3), xendo(3), 6, &
+            phio(1:nxro, xstarto(2)-lvlhalo:xendo(2)+lvlhalo, xstarto(3)-lvlhalo:xendo(3)+lvlhalo))
 
-    do ic=xs3o,xe3o ! BC: dphi/dx=0
-        do jc=xs2o,xe2o
+    do ic=xstarto(3),xendo(3) ! BC: dphi/dx=0
+        do jc=xstarto(2),xendo(2)
             phio(0,jc,ic) = phio(1,jc,ic)
             phio(nxro,jc,ic) = phio(nxmro,jc,ic)
         end do
@@ -39,8 +39,8 @@ subroutine InterpInputPhi
     call update_halo(phio, lvlhalo)
 
     !-- Interpolate phase-field to refined grid
-    do ic=xs3o-1,xe3o
-        do jc=xs2o-1,xe2o
+    do ic=xstarto(3)-1,xendo(3)
+        do jc=xstarto(2)-1,xendo(2)
             do kc=0,nxmro
 
                 qv3=phio(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)

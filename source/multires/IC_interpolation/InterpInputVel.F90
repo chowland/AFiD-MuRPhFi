@@ -26,7 +26,8 @@ subroutine InterpInputVel
       !-- Allocate temporary arrays for velocities and gradients
     real,allocatable,dimension(:,:) :: dvyloc,dvybot, dvzloc,dvzbot
 
-    call AllocateReal3DArray(tpdvo,-1,nx+1,xs2o-2,xe2o+2,xs3o-2,xe3o+2)
+    call AllocateReal3DArray(tpdvo,-1,nx+1, &
+            xstarto(2)-2,xendo(2)+2,xstarto(3)-2,xendo(3)+2)
 
     tpdvo(:,:,:) = 0.d0     ! Temporary gradient array - old
     tpdv(:,:,:) = 0.d0      ! Temporary gradient array - new
@@ -41,18 +42,18 @@ subroutine InterpInputVel
 !     Interpolation of vx
 
     ! Allocate and read in old vx
-    call AllocateReal3DArray(vxo, 0, nxo+1, xs2o-lvlhalo, xe2o+lvlhalo, xs3o-lvlhalo, xe3o+lvlhalo)
+    call AllocateReal3DArray(vxo, 0, nxo+1, xstarto(2)-lvlhalo,xendo(2)+lvlhalo,xstarto(3)-lvlhalo,xendo(3)+lvlhalo)
 
-    call HdfReadContinua(nzo, nyo, nxo, xs2o, xe2o, xs3o, xe3o, 1, &
-            vxo(1:nxo, xs2o-lvlhalo:xe2o+lvlhalo, xs3o-lvlhalo:xe3o+lvlhalo))
+    call HdfReadContinua(nzo, nyo, nxo, xstarto(2), xendo(2), xstarto(3), xendo(3), 1, &
+            vxo(1:nxo, xstarto(2)-lvlhalo:xendo(2)+lvlhalo,xstarto(3)-lvlhalo:xendo(3)+lvlhalo))
 
     call update_halo(vxo, lvlhalo)
 
 
     !-- Interpolate dvx/dx to cell center after transpose
-    do ic=xs3o,xe3o
+    do ic=xstarto(3),xendo(3)
         ip=ic+1
-        do jc=xs2o,xe2o
+        do jc=xstarto(2),xendo(2)
             jp=jc+1
     
             !-- Interior points
@@ -71,8 +72,8 @@ subroutine InterpInputVel
     call update_halo(tpdvo,2)
 
     !-- Now interpolate gradients to new grid
-    do ic=xs3o-1,xe3o
-        do jc=xs2o-1,xe2o
+    do ic=xstarto(3)-1,xendo(3)
+        do jc=xstarto(2)-1,xendo(2)
             do kc=0,nxmo
     
                 qv3=tpdvo(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
@@ -111,10 +112,10 @@ subroutine InterpInputVel
 !     Interpolation of vy
 
     ! Allocate and read in old vy
-    call AllocateReal3DArray(vyo, 0, nxo+1, xs2o-lvlhalo, xe2o+lvlhalo, xs3o-lvlhalo, xe3o+lvlhalo)
+    call AllocateReal3DArray(vyo, 0, nxo+1, xstarto(2)-lvlhalo, xendo(2)+lvlhalo, xstarto(3)-lvlhalo, xendo(3)+lvlhalo)
 
-    call HdfReadContinua(nzo, nyo, nxo, xs2o, xe2o, xs3o, xe3o, 2, &
-            vyo(1:nxo, xs2o-lvlhalo:xe2o+lvlhalo, xs3o-lvlhalo:xe3o+lvlhalo))
+    call HdfReadContinua(nzo, nyo, nxo, xstarto(2), xendo(2), xstarto(3), xendo(3), 2, &
+            vyo(1:nxo, xstarto(2)-lvlhalo:xendo(2)+lvlhalo, xstarto(3)-lvlhalo:xendo(3)+lvlhalo))
 
     call update_halo(vyo, lvlhalo)
 
@@ -122,8 +123,8 @@ subroutine InterpInputVel
     tpdv(:,:,:) = 0.d0
 
     !-- Interpolate dvy/dy to cell center after transpose
-    do ic=xs3o,xe3o
-        do jc=xs2o,xe2o
+    do ic=xstarto(3),xendo(3)
+        do jc=xstarto(2),xendo(2)
             jp=jc+1
 
             !-- Interior points
@@ -142,8 +143,8 @@ subroutine InterpInputVel
     call update_halo(tpdvo,2)
 
     !-- Now interpolate gradients to refined grid
-    do ic=xs3o-1,xe3o
-        do jc=xs2o-1,xe2o
+    do ic=xstarto(3)-1,xendo(3)
+        do jc=xstarto(2)-1,xendo(2)
             do kc=0,nxmo
 
                 qv3=tpdvo(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
@@ -165,19 +166,19 @@ subroutine InterpInputVel
     enddo
 
     !-- Interpolate vyr at an arbitrary x-z plane | tpvr | 1st guess
-    call AllocateReal2DArray(vyxzc,-1,nxmo+2,xs3o-2,xe3o+2)
+    call AllocateReal2DArray(vyxzc,-1,nxmo+2,xstarto(3)-2,xendo(3)+2)
     call AllocateReal2DArray(vyxzr,1,nxm,xstart(3),xend(3))
     jc0 = 1 !global index
     jcr0 = 1
     vyxzc(:,:)=0.d0
-    if (jc0.ge.xs2o.and.jc0.le.xe2o) then
-        do ic=xs3o-2,xe3o+2
+    if (jc0.ge.xstarto(2).and.jc0.le.xendo(2)) then
+        do ic=xstarto(3)-2,xendo(3)+2
             do kc=1,nxmo+1 !0,nxm+1
                 vyxzc(kc,ic)=vyo(kc,jc0,ic) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
             enddo
         enddo
 
-        do ic=xs3o-1,xe3o
+        do ic=xstarto(3)-1,xendo(3)
             do kc=0,nxmo
     
                 qv2=vyxzc(kc-1:kc+2,ic-1:ic+2)
@@ -231,10 +232,10 @@ subroutine InterpInputVel
 !     Interpolation of vz
 
     ! Allocate and read in old vz
-    call AllocateReal3DArray(vzo, 0, nxo+1, xs2o-lvlhalo, xe2o+lvlhalo, xs3o-lvlhalo, xe3o+lvlhalo)
+    call AllocateReal3DArray(vzo, 0, nxo+1, xstarto(2)-lvlhalo, xendo(2)+lvlhalo, xstarto(3)-lvlhalo, xendo(3)+lvlhalo)
 
-    call HdfReadContinua(nzo, nyo, nxo, xs2o, xe2o, xs3o, xe3o, 3, &
-            vzo(1:nxo, xs2o-lvlhalo:xe2o+lvlhalo, xs3o-lvlhalo:xe3o+lvlhalo))
+    call HdfReadContinua(nzo, nyo, nxo, xstarto(2), xendo(2), xstarto(3), xendo(3), 3, &
+            vzo(1:nxo, xstarto(2)-lvlhalo:xendo(2)+lvlhalo, xstarto(3)-lvlhalo:xendo(3)+lvlhalo))
 
     call update_halo(vzo, lvlhalo)
 
@@ -242,9 +243,9 @@ subroutine InterpInputVel
     tpdv(:,:,:) = 0.d0
 
       !-- Interpolate dvz/dz to cell center after transpose
-    do ic=xs3o,xe3o
+    do ic=xstarto(3),xendo(3)
         ip=ic+1
-        do jc=xs2o,xe2o
+        do jc=xstarto(2),xendo(2)
  
             !-- Interior points
             do kc=1,nxmo
@@ -261,8 +262,8 @@ subroutine InterpInputVel
     call update_halo(tpdvo,2)   !CS Are the corners updated? Might need to check.
 
     !-- Now interpolate gradients to refined grid
-    do ic=xs3o-1,xe3o
-        do jc=xs2o-1,xe2o
+    do ic=xstarto(3)-1,xendo(3)
+        do jc=xstarto(2)-1,xendo(2)
             do kc=0,nxmo
     
                 qv3=tpdvo(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
@@ -284,19 +285,19 @@ subroutine InterpInputVel
     enddo
     
     !-- Interpolate vzr at an arbitrary x-y plane | tpvr | 1st guess
-    call AllocateReal2DArray(vzxyc,-1,nxmo+2,xs2o-2,xe2o+2)
+    call AllocateReal2DArray(vzxyc,-1,nxmo+2,xstarto(2)-2,xendo(2)+2)
     call AllocateReal2DArray(vzxyr,1,nxm,xstart(2),xend(2))
     ic0 = 1 !global index
     icr0 = 1
     vzxyc(:,:)=0.d0
-    if (ic0.ge.xs3o.and.ic0.le.xe3o) then
-        do jc=xs2o-2,xe2o+2
+    if (ic0.ge.xstarto(3).and.ic0.le.xendo(3)) then
+        do jc=xstarto(2)-2,xendo(2)+2
             do kc=1,nxmo+1 !0,nxm+1
                 vzxyc(kc,jc)=vzo(kc,jc,ic0) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
             enddo
         enddo
 
-        do jc=xs2o-1,xe2o
+        do jc=xstarto(2)-1,xendo(2)
             do kc=0,nxmo
 
                 qv2=vzxyc(kc-1:kc+2,jc-1:jc+2)
@@ -352,40 +353,40 @@ subroutine InterpInputVel
 !     Interpolation of T
 
     ! Allocate and read in old T
-    call AllocateReal3DArray(tempo, -1, nxo+1, xs2o-lvlhalo, xe2o+lvlhalo, xs3o-lvlhalo, xe3o+lvlhalo)
+    call AllocateReal3DArray(tempo, -1, nxo+1, xstarto(2)-lvlhalo, xendo(2)+lvlhalo, xstarto(3)-lvlhalo, xendo(3)+lvlhalo)
 
     tempo(:,:,:) = 0.d0
 
-    call HdfReadContinua(nzo, nyo, nxo, xs2o, xe2o, xs3o, xe3o, 4, &
-            tempo(1:nxo, xs2o-lvlhalo:xe2o+lvlhalo, xs3o-lvlhalo:xe3o+lvlhalo))
+    call HdfReadContinua(nzo, nyo, nxo, xstarto(2), xendo(2), xstarto(3), xendo(3), 4, &
+            tempo(1:nxo, xstarto(2)-lvlhalo:xendo(2)+lvlhalo, xstarto(3)-lvlhalo:xendo(3)+lvlhalo))
 
     !-- Boundary points
     if (melt) then
-        do ic=xs3o,xe3o
-            do jc=xs2o,xe2o
+        do ic=xstarto(3),xendo(3)
+            do jc=xstarto(2),xendo(2)
                 tempo(0,jc,ic) = tempo(1,jc,ic) - xmo(1)&
                                 *(tempo(2,jc,ic) - tempo(1,jc,ic))/(xmo(2)-xmo(1))
                 tempo(nxo,jc,ic) = 0.d0
             end do
         end do
     else if (phasefield) then
-        do ic=xs3o,xe3o
-            do jc=xs2o,xe2o
+        do ic=xstarto(3),xendo(3)
+            do jc=xstarto(2),xendo(2)
                 tempo(0,jc,ic) = 1.d0
                 tempo(nxo,jc,ic) = 0.d0
             end do
         end do
     else
         if (rayt>=0) then
-            do ic=xs3o,xe3o
-                do jc=xs2o,xe2o
+            do ic=xstarto(3),xendo(3)
+                do jc=xstarto(2),xendo(2)
                     tempo(0,jc,ic) = 0.5d0
                     tempo(nxo,jc,ic) = -0.5d0
                 end do
             end do
         else
-            do ic=xs3o,xe3o
-                do jc=xs2o,xe2o
+            do ic=xstarto(3),xendo(3)
+                do jc=xstarto(2),xendo(2)
                     tempo(0,jc,ic) = -0.5d0
                     tempo(nxo,jc,ic) = 0.5d0
                 end do
@@ -396,8 +397,8 @@ subroutine InterpInputVel
     call update_halo(tempo, lvlhalo)
 
     !-- Interpolate temperature to refined grid
-    do ic=xs3o-1,xe3o
-        do jc=xs2o-1,xe2o
+    do ic=xstarto(3)-1,xendo(3)
+        do jc=xstarto(2)-1,xendo(2)
             do kc=0,nxmo
     
                 qv3=tempo(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)

@@ -150,7 +150,7 @@ module input_grids !CJH Grids for input flow field
     integer :: nxro, nyro, nzro
     integer :: nxmro, nymro, nzmro
     integer :: istr3o, istr3ro
-    integer :: xs2o, xe2o, xs3o, xe3o
+    integer, dimension(3) :: xstarto, xendo, xsizeo
     real :: str3o
     real, allocatable, dimension(:) :: xco, xmo
     real, allocatable, dimension(:) :: xcro, xmro
