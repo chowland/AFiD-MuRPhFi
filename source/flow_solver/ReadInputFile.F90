@@ -103,6 +103,7 @@
 
       pf_A = pf_A/pect
       pf_eps = 1.0/nxmr
+      pf_Lambda = 2.8e-3/Rrho
 
       if (pf_IBM.ne.0) IBM = .true.
 
