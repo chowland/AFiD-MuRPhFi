@@ -286,6 +286,7 @@
 !
 !    SALINITY DIFFERENTIATION
       !CJH (now staggered!)
+      !CJH now with additional phi stencil to allow for various BCs
 !
 
       do kc=2,nxmr-1
@@ -296,6 +297,9 @@
         ap3sskr(kc)=a33*a33p
         am3sskr(kc)=a33*a33m
         ac3sskr(kc)=-(ap3sskr(kc)+am3sskr(kc))
+        ap3spkr(kc)=a33*a33p
+        am3spkr(kc)=a33*a33m
+        ac3spkr(kc)=-(ap3spkr(kc)+am3spkr(kc))
       enddo
 
       !CJH Lower wall BC
@@ -306,6 +310,9 @@
       ap3sskr(kc)=a33*a33p
       am3sskr(kc)=0.d0
       ac3sskr(kc)=-a33*(a33p + 2.d0*SfixS*a33m)
+      ap3spkr(kc)=a33*a33p
+      am3spkr(kc)=0.d0
+      ac3spkr(kc)=-a33*a33p ! Sets d/dx(phi)=0 on boundary
 
       !CJH Upper wall BC
       kc = nxmr
@@ -316,6 +323,9 @@
       ap3sskr(kc)=0.d0
       am3sskr(kc)=a33*a33m
       ac3sskr(kc)=-a33*(2.d0*SfixN*a33p + a33m)
+      ap3spkr(kc)=0.d0
+      am3spkr(kc)=a33*a33m
+      ac3spkr(kc)=-a33*a33m ! Sets d/dx(phi)=0 on boundary
 
       return                                                            
       end                                                               
