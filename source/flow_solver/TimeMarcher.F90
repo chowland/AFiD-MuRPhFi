@@ -37,13 +37,17 @@
         call ExplicitTermsVY
         call ExplicitTermsVZ
         call ExplicitTermsTemp
-        if (salinity) call ExplicitTermsSal !Refined
-        if (phasefield) call ExplicitTermsPhi
 
+        if (phasefield) call ExplicitTermsPhi
         ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-implicit'
         if (phasefield) call ImplicitAndUpdatePhi
         ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI post-implicit'
+
+        !CJH: Phi must be updated before computing S explicit terms and latent heat
+        ! varaible rhsr used to store d(phi)/dt for the following subroutines
+        if (salinity) call ExplicitTermsSal !Refined
         if (phasefield) call AddLatentHeat
+
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ

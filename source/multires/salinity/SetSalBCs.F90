@@ -29,6 +29,14 @@ subroutine SetSalBCs
             end do
         end do
     end if
+    if (phasefield) then
+        do ic=xstartr(3),xendr(3)
+            do jc=xstartr(2),xendr(2)
+                saltp(1,jc,ic) = 0.d0
+                salbp(1,jc,ic) = 1.d0
+            end do
+        end do
+    end if
     !CJH Add halo for interpolation routine
     call update_halo(saltp,lvlhalo)
     call update_halo(salbp,lvlhalo)

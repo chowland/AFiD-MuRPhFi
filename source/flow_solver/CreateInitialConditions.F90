@@ -88,6 +88,18 @@ subroutine CreateInitialConditions
             end if
         end do
     end do
+    if (salinity) then
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,kmid
+                    temp(k,j,i) = 1.0
+                end do
+                do k=kmid+1,nxm
+                    temp(k,j,i) = 0.0
+                end do
+            end do
+        end do
+    end if
 
     if (melt) then
         do i=xstart(3),xend(3)

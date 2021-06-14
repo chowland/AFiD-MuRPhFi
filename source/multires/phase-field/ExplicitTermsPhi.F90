@@ -10,7 +10,7 @@
 
 subroutine ExplicitTermsPhi
     use param
-    use mgrd_arrays, only: phi,hphi,tempr
+    use mgrd_arrays, only: phi,hphi,tempr,sal
     use decomp_2d, only: xstartr,xendr
     implicit none
     integer :: jc,kc,ic
@@ -18,7 +18,7 @@ subroutine ExplicitTermsPhi
     real    :: nlphi
     real    :: udzrq,udyrq
     real    :: dyyp,dzzp
-    real    :: pf_B
+    real    :: pf_B, bcl
 
     pf_B = pf_A / (pf_eps)**2
 
@@ -44,6 +44,22 @@ subroutine ExplicitTermsPhi
             end do
         end do
     end do
+
+    if (salinity) then
+        bcl = pf_B*pf_C*pf_Lambda
+        do ic=xstartr(3),xendr(3)
+            im=ic-1
+            ip=ic+1
+            do jc=xstartr(2),xendr(2)
+                jm=jc-1
+                jp=jc+1
+                do kc=1,nxmr
+                    hphi(kc,jc,ic) = hphi(kc,jc,ic) - &
+                        bcl*sal(kc,jc,ic)*phi(kc,jc,ic)*(1.0 - phi(kc,jc,ic))
+                end do
+            end do
+        end do
+    end if
 
     return
 end subroutine ExplicitTermsPhi

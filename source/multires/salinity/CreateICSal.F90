@@ -14,7 +14,7 @@ subroutine CreateICSal
     use decomp_2d, only: xstartr,xendr
     use mpih
     implicit none
-    integer :: i,k,j
+    integer :: i,k,j, kmid
     real :: xxx,yyy,eps,varptb,amp
 
     call random_seed()
@@ -41,6 +41,21 @@ subroutine CreateICSal
                 do k=1,nxmr
                     call random_number(varptb)
                     sal(k,j,i) = eps*(2.d0*varptb - 1.d0) * exp(-xmr(k)/0.1)
+                end do
+            end do
+        end do
+    end if
+
+    if (phasefield) then
+        kmid = nxmr/2
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,kmid
+                    call random_number(varptb)
+                    sal(k,j,i) = 1.0 + eps*(2.d0*varptb - 1.d0)
+                end do
+                do k=kmid+1,nxmr
+                    sal(k,j,i) = 0.0
                 end do
             end do
         end do
