@@ -21,10 +21,16 @@ subroutine ImmersedBoundary
 
     do i=xstart(3),xend(3)
         do j=xstart(2),xend(2)
-            do k=1,nxm
-                if (phic(k,j,i) .gt. 0.5) then
+            do k=2,nxm
+                if (0.5*(phic(k,j,i) + phic(k-1,j,i)) .gt. 0.5) then
                     vx(k,j,i) = 0.0
+                end if
+            end do
+            do k=1,nxm
+                if (0.5*(phic(k,j,i) + phic(k,j-1,i)) .gt. 0.5) then
                     vy(k,j,i) = 0.0
+                end if
+                if (0.5*(phic(k,j,i) + phic(k,j,i-1)) .gt. 0.5) then
                     vz(k,j,i) = 0.0
                 end if
             end do
