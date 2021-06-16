@@ -54,7 +54,7 @@
         call ImplicitAndUpdateTemp
         if (salinity) call ImplicitAndUpdateSal !Refined
 
-        if (IBM) call ImmersedBoundary
+        if (phasefield .and. IBM) call ImmersedBoundary
 
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
