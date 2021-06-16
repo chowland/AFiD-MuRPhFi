@@ -52,9 +52,9 @@
     if(kc.eq.1) then
             dxxvy=vy(kpp,jc,ic)*app &
                  +vy(kc,jc,ic)*acc &
-                 +(acc+app)*xminusU
+                 -(acc+app)*xminusU*inslws
     elseif(kc.eq.nxm) then
-            dxxvy=(acc+amm)*xplusU &
+            dxxvy=-(acc+amm)*xplusU*inslwn &
                  +vy(kc,jc,ic)*acc &
                  +vy(kmm,jc,ic)*amm
     else
