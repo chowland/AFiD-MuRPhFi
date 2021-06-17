@@ -66,7 +66,7 @@
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy
-        read(15,*) xplusU, xminusU, dPdz, flagmelt
+        read(15,*) xplusU, xminusU, dPdy, dPdz, flagmelt
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy

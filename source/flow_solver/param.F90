@@ -17,7 +17,7 @@ module param
     integer   :: inslws,inslwn
     integer   :: TfixS,TfixN,SfixS,SfixN        !CJH option for fixed T/S BCs
     integer   :: gAxis      !CJH option to choose gravity axis
-    real      :: xminusU,xplusU,dPdz
+    real      :: xminusU,xplusU,dPdz,dPdy
     real      :: pf_A, pf_eps, pf_C, pf_S, pf_Tm, pf_Lambda
     logical   :: IBM
     ! integer   :: starea,tsta
