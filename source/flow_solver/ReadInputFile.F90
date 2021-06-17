@@ -15,63 +15,63 @@ subroutine ReadInputFile
     integer :: FFscaleS, pf_IBM
     logical fexist
 
-      open(unit=15,file='bou.in',status='old')
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) nxm, nym, nzm, nsst
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) flagMR, nxmr, nymr, nzmr
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) flagsal, flagPF
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) nread, ireset
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) ntst, walltimemax, tmax
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) tout, tframe
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) alx3, ylen, zlen
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) istr3, str3, istr3r
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) rayt, prat, rays, pras, FFscaleS
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) idtv, dt, resid, limitCFL, dtmin, dtmax
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) inslws, inslwn, TfixS, TfixN, SfixS, SfixN
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) active_T, active_S, gAxis
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) xplusU, xminusU, dPdy, dPdz, flagmelt
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,301) dummy
-            read(15,*) pf_A, pf_C, pf_S, pf_Tm, pf_IBM
-301         format(a4)
+    open(unit=15,file='bou.in',status='old')
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) nxm, nym, nzm, nsst
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) flagMR, nxmr, nymr, nzmr
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) flagsal, flagPF
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) nread, ireset
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) ntst, walltimemax, tmax
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) tout, tframe
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) alx3, ylen, zlen
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) istr3, str3, istr3r
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) rayt, prat, rays, pras, FFscaleS
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) idtv, dt, resid, limitCFL, dtmin, dtmax
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) inslws, inslwn, TfixS, TfixN, SfixS, SfixN
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) active_T, active_S, gAxis
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) xplusU, xminusU, dPdy, dPdz, flagmelt
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,301) dummy
+        read(15,*) pf_A, pf_C, pf_S, pf_Tm, pf_IBM
+301     format(a4)
     close(15)
 
     nx=nxm+1
