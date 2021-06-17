@@ -8,26 +8,26 @@
 !                                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      subroutine ExplicitTermsVZ
-      use param
-      use local_arrays, only: vx,vy,vz,dq,temp
-      use mgrd_arrays, only: salc,phic
-      use decomp_2d, only: xstart,xend
-      implicit none
-      integer :: kc,kp,jpp,jmm,jc,ic,imm,ipp
-      integer :: kmm,kpp
-      real    :: hzx,hzy,hzz,udy,udz
-      real    :: udyq,udzq
-      real    :: dzzvz,dyyvz,pf_eta
-      real    :: tempit, salit,volpen
+subroutine ExplicitTermsVZ
+    use param
+    use local_arrays, only: vx,vy,vz,dq,temp
+    use mgrd_arrays, only: salc,phic
+    use decomp_2d, only: xstart,xend
+    implicit none
+    integer :: kc,kp,jpp,jmm,jc,ic,imm,ipp
+    integer :: kmm,kpp
+    real    :: hzx,hzy,hzz,udy,udz
+    real    :: udyq,udzq
+    real    :: dzzvz,dyyvz,pf_eta
+    real    :: tempit, salit,volpen
 
-      pf_eta = ren*(1.51044385*pf_eps)**2
+    pf_eta = ren*(1.51044385*pf_eps)**2
 
-      udyq=dyq/ren
-      udzq=dzq/ren
+    udyq=dyq/ren
+    udzq=dzq/ren
 
-      udy=dy*0.25
-      udz=dz*0.25
+    udy=dy*0.25
+    udz=dz*0.25
 
 !$OMP  PARALLEL DO &
 !$OMP  DEFAULT(none) &
@@ -38,17 +38,17 @@
 !$OMP  PRIVATE(jmm,jpp) &
 !$OMP  PRIVATE(hzz,hzy,hzx,dzzvz,dyyvz)
 
-      do ic=xstart(3),xend(3)
-       imm=ic-1
-       ipp=ic+1
-       do jc=xstart(2),xend(2)
-        jmm=jc-1
-        jpp=jc+1
-        do kc=1,nxm
-         kmm=kmv(kc)
-         kpp=kpv(kc)
-         kp=kc+1
-      
+    do ic=xstart(3),xend(3)
+        imm=ic-1
+        ipp=ic+1
+        do jc=xstart(2),xend(2)
+            jmm=jc-1
+            jpp=jc+1
+            do kc=1,nxm
+                kmm=kmv(kc)
+                kpp=kpv(kc)
+                kp=kc+1
+        
 !     vz vz term
 !
 !
@@ -56,11 +56,11 @@
 !                ------------
 !                 d   t      
 !
-      hzz=( (vz(kc,jc,ipp)+vz(kc,jc,ic)) &
-           *(vz(kc,jc,ipp)+vz(kc,jc,ic)) &
-           -(vz(kc,jc,imm)+vz(kc,jc,ic)) &
-           *(vz(kc,jc,imm)+vz(kc,jc,ic)) &
-          )*udz
+                hzz=( (vz(kc,jc,ipp)+vz(kc,jc,ic)) &
+                    *(vz(kc,jc,ipp)+vz(kc,jc,ic)) &
+                    -(vz(kc,jc,imm)+vz(kc,jc,ic)) &
+                    *(vz(kc,jc,imm)+vz(kc,jc,ic)) &
+                    )*udz
 
 !     vz vy term
 !
@@ -69,11 +69,11 @@
 !                ------------
 !                 d   r      
 !
-      hzy=( (vy(kc,jpp,ic)+vy(kc,jpp,imm)) &
-           *(vz(kc,jpp,ic)+vz(kc,jc,ic)) &
-           -(vy(kc,jc,ic)+vy(kc,jc,imm)) &
-           *(vz(kc,jc,ic)+vz(kc,jmm,ic)) &
-          )*udy
+                hzy=( (vy(kc,jpp,ic)+vy(kc,jpp,imm)) &
+                    *(vz(kc,jpp,ic)+vz(kc,jc,ic)) &
+                    -(vy(kc,jc,ic)+vy(kc,jc,imm)) &
+                    *(vz(kc,jc,ic)+vz(kc,jmm,ic)) &
+                    )*udy
 !
 !     vz vx term
 !
@@ -82,84 +82,70 @@
 !                -----------
 !                 d   x      
 !
-      hzx=((vx(kp,jc,ic)+vx(kp,jc,imm))*(vz(kpp,jc,ic)+vz(kc,jc,ic)) &
-          -(vx(kc,jc,ic)+vx(kc,jc,imm))*(vz(kc,jc,ic)+vz(kmm,jc,ic)) &
-          )*udx3m(kc)*0.25d0
+                hzx=((vx(kp,jc,ic)+vx(kp,jc,imm))*(vz(kpp,jc,ic)+vz(kc,jc,ic)) &
+                    -(vx(kc,jc,ic)+vx(kc,jc,imm))*(vz(kc,jc,ic)+vz(kmm,jc,ic)) &
+                    )*udx3m(kc)*0.25d0
 !
 !
 !
 !   11 second derivative of vz
 !
-            dzzvz=(vz(kc,jc,ipp) &
-                  -2.0*vz(kc,jc,ic) &
-                  +vz(kc,jc,imm))*udzq
+                dzzvz=(vz(kc,jc,ipp) &
+                    -2.0*vz(kc,jc,ic) &
+                    +vz(kc,jc,imm))*udzq
 !
 !   22 second derivative of vz
 !
-            dyyvz=(vz(kc,jpp,ic) &
-                  -2.0*vz(kc,jc,ic) &
-                  +vz(kc,jmm,ic))*udyq
+                dyyvz=(vz(kc,jpp,ic) &
+                    -2.0*vz(kc,jc,ic) &
+                    +vz(kc,jmm,ic))*udyq
 
 !
-        dq(kc,jc,ic)=-(hzx+hzy+hzz)+dyyvz+dzzvz
+                dq(kc,jc,ic)=-(hzx+hzy+hzz)+dyyvz+dzzvz - dPdz
 !
-      enddo
-      enddo
-      enddo
+            enddo
+        enddo
+    enddo
 
-      !CJH Add the buoyancy term if z is chosen gAxis
-      if (gAxis.eq.3) then
+    !CJH Add the buoyancy term if z is chosen gAxis
+    if (gAxis.eq.3) then
         do ic=xstart(3),xend(3)
-          imm=ic-1
-          do jc=xstart(2),xend(2)
-            do kc=1,nxm
-              tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(kc,jc,imm))
-              dq(kc,jc,ic) = dq(kc,jc,ic) + byct*tempit
+            imm=ic-1
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                    tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(kc,jc,imm))
+                    dq(kc,jc,ic) = dq(kc,jc,ic) + byct*tempit
+                end do
             end do
-          end do
         end do
 
         !CJH Add salinity component of buoyancy if used
         if (salinity) then
-          do ic=xstart(3),xend(3)
-            imm=ic-1
-            do jc=xstart(2),xend(2)
-              do kc=1,nxm
-                salit =active_S*0.5d0*(salc(kc,jc,ic)+salc(kc,jc,imm))
-                dq(kc,jc,ic) = dq(kc,jc,ic) - bycs*salit
-              end do
+            do ic=xstart(3),xend(3)
+                imm=ic-1
+                do jc=xstart(2),xend(2)
+                    do kc=1,nxm
+                        salit =active_S*0.5d0*(salc(kc,jc,ic)+salc(kc,jc,imm))
+                        dq(kc,jc,ic) = dq(kc,jc,ic) - bycs*salit
+                    end do
+                end do
             end do
-          end do
         end if
-      end if
+    end if
 !$OMP END PARALLEL DO
 
-      !CJH Add a mean pressure gradient
-      if (dPdz.ne.0) then
+    if (phasefield .and. .not.IBM) then
         do ic=xstart(3),xend(3)
-          do jc=xstart(2),xend(2)
-            do kc=1,nxm
-              dq(kc,jc,ic) = dq(kc,jc,ic) - dPdz
+            imm=ic-1
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                volpen = 0.5d0*(phic(kc,jc,ic) + phic(kc,jc,imm))* &
+                            vz(kc,jc,ic)/pf_eta
+                dq(kc,jc,ic) = dq(kc,jc,ic) - volpen
+                end do
             end do
-          end do
         end do
-      end if
+    end if
 
-      if (phasefield .and. .not.IBM) then
-        do ic=xstart(3),xend(3)
-          imm=ic-1
-          do jc=xstart(2),xend(2)
-            do kc=1,nxm
-              volpen = 0.5d0*(phic(kc,jc,ic) + phic(kc,jc,imm))* &
-                        vz(kc,jc,ic)/pf_eta
-              ! volpen = 0.5*(1.0+tanh((xm(kc)-0.5)/2/pf_eps))* &
-              !           vz(kc,jc,ic)/pf_gamma
-              dq(kc,jc,ic) = dq(kc,jc,ic) - volpen
-            end do
-          end do
-        end do
-      end if
-
-      return
-      end
-!
+    return
+end subroutine ExplicitTermsVZ
