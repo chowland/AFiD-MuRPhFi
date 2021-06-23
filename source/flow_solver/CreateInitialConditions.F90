@@ -100,29 +100,43 @@ subroutine CreateInitialConditions
 
     if (phasefield) then
 
-        eps = 0.1
-        kmid = nxm/2
+        ! eps = 0.1
+        ! kmid = nxm/2
+        ! do i=xstart(3),xend(3)
+        !     do j=xstart(2),xend(2)
+        !     !CJH Favier et al (2019) Appendix A3 Validation Case
+        !         if (nzm.gt.1) then
+        !             do k=1,kmid ! If domain 3D, add in z perturbation too
+        !                 xxx = xm(k)
+        !                 yyy = ym(j)
+        !                 zzz = zm(i)
+
+        !                 temp(k,j,i) = temp(k,j,i) &
+        !                     + eps*sin(4.0*pi*yyy)*cos(4.0*pi*zzz)*sin(2.0*pi*xxx)**2
+        !             end do
+        !         else
+        !             do k=1,kmid
+        !                 xxx = xm(k)
+        !                 yyy = ym(j)
+
+        !                 temp(k,j,i) = temp(k,j,i) &
+        !                     + eps*sin(4.0*pi*yyy)*sin(2.0*pi*xxx)**2
+        !             end do
+        !         end if
+        !     end do
+        ! end do
+
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
-            !CJH Favier et al (2019) Appendix A3 Validation Case
-                if (nzm.gt.1) then
-                    do k=1,kmid ! If domain 3D, add in z perturbation too
-                        xxx = xm(k)
-                        yyy = ym(j)
-                        zzz = zm(i)
-
-                        temp(k,j,i) = temp(k,j,i) &
-                            + eps*sin(4.0*pi*yyy)*cos(4.0*pi*zzz)*sin(2.0*pi*xxx)**2
-                    end do
-                else
-                    do k=1,kmid
-                        xxx = xm(k)
-                        yyy = ym(j)
-
-                        temp(k,j,i) = temp(k,j,i) &
-                            + eps*sin(4.0*pi*yyy)*sin(2.0*pi*xxx)**2
-                    end do
-                end if
+                do k=1,nxm
+                    if ((xm(k) - 0.75)**2 + (ym(j) - ylen/2)**2 + (zm(i) - zlen/2)**2 < 0.0225) then
+                        temp(k,j,i) = 0.0
+                    else
+                        temp(k,j,i) = 1.0
+                    end if
+                    call random_number(varptb)
+                    temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
+                end do
             end do
         end do
 
