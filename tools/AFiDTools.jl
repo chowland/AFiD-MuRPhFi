@@ -11,6 +11,12 @@ using
     DelimitedFiles,
     HDF5
 
+"""
+    function read_grid(folder::String)
+    
+Returns an named tuple containing staggered coordinates `xm`, `ym`, `zm`,
+cell-edge coordinates e.g. `xc`, and refined grid coordinates e.g. `xmr`
+"""
 function read_grid(folder::String)
     filename = folder*"/outputdir/cordin_info.h5"
     fileid = h5open(filename,"r")
@@ -50,17 +56,32 @@ function read_grid(folder::String)
     return (xm=xm, xmr=xmr, xc=xc, xcr=xcr, ym=ym, ymr=ymr, yc=yc, ycr=ycr, zm=zm, zmr=zmr, zc=zc, zcr=zcr)
 end
 
+"""
+    function read_mean(folder::String,varname::String)
+    
+Returns a 2D array containing a time series of mean profiles f̄(x,t) of `varname`
+from the simulation output in `folder`.
+"""
 function read_mean(folder::String,varname::String)
     filename = folder*"/outputdir/means.h5"
     fileid = h5open(filename,"r")
-    list = keys(fileid[varname])
-    Nsamp = size(list)[1]
-    nxx = length(fileid[varname*"/"*list[1]])
-    var = zeros((nxx,Nsamp))
-    i = 1
-    for num in list
-        var[:,i] = read(fileid[varname*"/"*num])
-        i = i + 1;
+    varlist = keys(filied)
+    if varname in varlist
+        list = keys(fileid[varname])
+        Nsamp = size(list)[1]
+        nxx = length(fileid[varname*"/"*list[1]])
+        var = zeros((nxx,Nsamp))
+        i = 1
+        for num in list
+            var[:,i] = read(fileid[varname*"/"*num])
+            i = i + 1;
+        end
+    else
+        varstring = string()
+        for var in varlist
+            varstring *= var*", "
+        end
+        error(varname*" not a variable in means.h5. Valid options are "*varstring)
     end
     close(fileid)
     return var
