@@ -19,8 +19,8 @@ NTST        WALLTIMEMAX     TMAX
 1000000     600            100.0
 
 Time interval for saving stats/movie frames
-TOUT    TFRAME
-0.1     0.1
+TOUT    TFRAME  SAVE_3D
+0.1     0.1     1.0
 
 Domain size (keep ALX3 = 1.0)
 ALX3   YLEN   ZLEN

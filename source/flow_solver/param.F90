@@ -23,7 +23,7 @@ module param
     ! integer   :: starea,tsta
     real      :: dtmin,dtmax,limitCFL
     integer   :: nson,idtv
-    real      :: tframe !steven for slice
+    real      :: tframe, save_3D
     integer   :: active_T, active_S !CJH Option for passive scalars
     !=================================================
     !       end of input file

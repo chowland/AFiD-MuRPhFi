@@ -38,7 +38,7 @@ subroutine ReadInputFile
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy
-        read(15,*) tout, tframe
+        read(15,*) tout, tframe, save_3D
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy
