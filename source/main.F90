@@ -181,6 +181,9 @@ program AFiD
     call Mkmov_xcut
     call Mkmov_ycut
     call Mkmov_zcut
+    
+    if (ismaster) write(*,*) "Writing 3D fields"
+    call WriteFlowField(.false.)
 
 !EP   Check divergence. Should be reduced to machine precision after the first
 !phcalc. Here it can still be high.
@@ -298,11 +301,11 @@ program AFiD
             minwtdt = huge(0.0d0)
         endif
 
-        if ( mod(ti(2)-tin(1),3600.d0) .lt. (ti(2)-ti(1)) ) then
-            if(ismaster) write(6,*) '*** Writing data every hour ***'
-            call WriteFlowField
+        if ((mod(time,save_3D).lt.dt) .and. (floor(time/tframe).ne.0)) then
+            if(ismaster) write(6,*) '*** Writing 3D fields ***'
+            call WriteFlowField(.false.)
             call MpiBarrier
-            if(ismaster) write(6,*) '************ Done *****************'
+            if(ismaster) write(6,*) '********* Done **********'
         end if
 
         if( (ti(2) - tin(1)) .gt. walltimemax) errorcode = 334
