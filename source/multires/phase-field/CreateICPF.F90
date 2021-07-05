@@ -19,25 +19,41 @@ subroutine CreateICPF
 
     integer :: i,j,k
 
-    ! do i=xstartr(3),xendr(3)
-    !     do j=xstartr(2),xendr(2)
-    !         do k=1,nxmr
-    !             phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - 0.5)/2/pf_eps))
-    !         end do
-    !     end do
-    ! end do
-
-    do i=xstartr(3),xendr(3)
-        do j=xstartr(2),xendr(2)
-            do k=1,nxmr
-                if ((xmr(k) - 0.75)**2 + (ymr(j) - ylen/2)**2 + (zmr(i) - zlen/2)**2 < 0.0225) then
-                    phi(k,j,i) = 1.0
-                else
-                    phi(k,j,i) = 0.0
-                end if
+    if (pf_IC.eq.1) then ! Favier et al (2019) Appendix A3 Validation Case
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - 0.5)/2/pf_eps))
+                end do
             end do
         end do
-    end do
+    else if (pf_IC.eq.2) then ! Solid sphere of radius 0.15 at x=0.75, centre of yz-domain
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    if ((xmr(k) - 0.75)**2 + (ymr(j) - ylen/2)**2 + (zmr(i) - zlen/2)**2 < 0.0225) then
+                        phi(k,j,i) = 1.0
+                    else
+                        phi(k,j,i) = 0.0
+                    end if
+                end do
+            end do
+        end do
+    end if
+
+    if (salinity) then ! Ice above salty water
+        kmid = nxmr/2
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,kmid
+                    phi(k,j,i) = 0.0
+                end do
+                do k=kmid+1,nxmr
+                    phi(k,j,i) = 1.0
+                end do
+            end do
+        end do
+    end if
 
     return
 

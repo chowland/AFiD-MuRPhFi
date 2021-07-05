@@ -70,7 +70,7 @@ subroutine ReadInputFile
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy
-        read(15,*) pf_A, pf_C, pf_S, pf_Tm, pf_IBM
+        read(15,*) pf_A, pf_C, pf_S, pf_Tm, pf_IBM, pf_IC
 301     format(a4)
     close(15)
 
