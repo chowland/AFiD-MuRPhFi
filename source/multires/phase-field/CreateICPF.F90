@@ -17,7 +17,7 @@ subroutine CreateICPF
 
     implicit none
 
-    integer :: i,j,k
+    integer :: i,j,k,kmid
 
     if (pf_IC.eq.1) then ! Favier et al (2019) Appendix A3 Validation Case
         do i=xstartr(3),xendr(3)
