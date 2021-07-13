@@ -23,10 +23,8 @@ subroutine WriteFlowField(final)
         basename='outputdir/fields/'//frame
     end if
     filnam1 = trim(basename)//'_temp.h5'
-    write(*,*) 'filnam1: ',filnam1,'#'
     call HdfWriteRealHalo3D(filnam1,temp)
     filnam1 = trim(basename)//'_vx.h5'
-    write(*,*) 'filnam1: ',filnam1,'#'
     call HdfWriteRealHalo3D(filnam1,vx)
     filnam1 = trim(basename)//'_vy.h5'
     call HdfWriteRealHalo3D(filnam1,vy)
