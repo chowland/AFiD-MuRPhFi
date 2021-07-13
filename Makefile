@@ -1,54 +1,59 @@
+# Choose the machine being used
+# Options: PC_GNU, PC_INTEL, CARTESIUS, IRENE, MARENOSTRUM, SUPERMUC
+MACHINE=PC_GNU
+# Modules required for each HPC system as follows:
+# CARTESIUS: 2019 intel/2018b HDF5 FFTW
+# IRENE: flavor/hdf5/parallel hdf5 fftw3/gnu
+# MARENOSTRUM: fftw hdf5
+# SUPERMUC: fftw hdf5 szip
+
 #=======================================================================
 #  Compiler options
 #=======================================================================
-# FC = h5pfc -fpp # ifort preprocessor
-FC = h5pfc -cpp # gfortran preprocessor
-## Laptop
-# FC += -r8 -O3 # ifort options
-FC += -fdefault-real-8 -fdefault-double-8 -O2 # gfortran options
-# FC += -fdefault-real-8 -fdefault-double-8 -O0 -g -fbacktrace -fbounds-check
-## Cartesius
-# FC += -r8 -O3 -xAVX -axCORE-AVX2
-## Irene
-# FC += -r8 -O3 -mavx2 $(FFTW3_FFLAGS)
-## MareNostrum
-# FC += -r8 -O3 $(FFTW_FFLAGS)
+
+# Object and module directory:
+OBJDIR=obj
+
+ifeq ($(MACHINE),PC_GNU)
+	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -O2
+# FC += -O0 -g -fbacktrace -fbounds-check
+	LDFLAGS = -lfftw3 -llapack -lblas -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+endif
+ifeq ($(MACHINE),PC_INTEL)
+	FC = h5pfc -fpp -r8 -O3
 ## Traceback / Debug
 # FC += -r8 -O0 -g -traceback -check bounds 
 # FC += -DSHM -DSHM_DEBUG
+	LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+endif
+ifeq ($(MACHINE),CARTESIUS)
+	FC = h5pfc -fpp -r8 -O3 -xAVX -axCORE-AVX2
+	BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+	HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
+	LDFLAGS = -lfftw3 $(BLAS_LIBS) $(HDF5_LIBS)
+endif
+ifeq ($(MACHINE),IRENE)
+	FC = h5pfc -fpp -r8 -O3 -mavx2 $(FFTW3_FFLAGS)
+	HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
+	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) $(HDF5_LIBS)
+endif
+ifeq ($(MACHINE),MARENOSTRUM)
+	FC = h5pfc -fpp -r8 -O3 $(FFTW_FFLAGS)
+	BLAS_LIBS = -L$(MKLROOT)/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+	HDF5_LIBS = -lhdf5_fortran -lhdf5  -lsz -lz -ldl -lm
+	LDFLAGS = $(FFTW_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
+endif
+ifeq ($(MACHINE),SUPERMUC)
+	FC = h5pfc -fpp -r8 -O3
+	HDF5_LIBS = $(HDF5_F90_SHLIB) $(HDF5_SHLIB) -L$(SZIP_LIBDIR) -lz -ldl -lm
+	LDFLAGS = $(MKL_LIB) $(FFTW_LIB) $(HDF5_LIBS)
+endif
 
-#=======================================================================
-#  Library
-#======================================================================
-# Common build flags
-##  Laptop (with intel libraries)
-# LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
-## Laptop (with GNU libraries)
-LDFLAGS = -lfftw3 -llapack -lblas -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
-
-## Cartesius (Before compiling, load modules 2019 intel/2018b HDF5 FFTW)
-# FFTW3_LIBS = -lfftw3
-# BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
-# HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
-# LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
-
-## Irene (Before compiling, load modules flavor/hdf5/parallel hdf5 fftw3/gnu)
-# FFTW3_LIBS = $(FFTW3_LDFLAGS)
-# BLAS_LIBS = $(MKL_LDFLAGS)
-# HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
-# LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
-
-## MareNostrum (Before compiling, load modules fftw hdf5)
-# FFTW3_LIBS = $(FFTW_LIBS)
-# BLAS_LIBS = -L$(MKLROOT)/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
-# HDF5_LIBS = -lhdf5_fortran -lhdf5  -lsz -lz -ldl -lm
-# LDFLAGS = $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
-
-## SuperMUC-NG (Before compiling, load modules fftw hdf5 szip)
-# BLAS_LIBS = $(MKL_LIB)
-# FFTW3_LIBS = $(FFTW_LIB)
-# HDF5_LIBS = $(HDF5_F90_SHLIB) $(HDF5_SHLIB) -L$(SZIP_LIBDIR) -lz -ldl -lm
-# LDFLAGS = $(BLAS_LIBS) $(FFTW3_LIBS) $(HDF5_LIBS)
+ifeq ($(MACHINE),PC_GNU)
+	FC += -J $(OBJDIR)
+else
+	FC += -module $(OBJDIR)
+endif
 
 #=======================================================================
 #  Non-module Fortran files to be compiled:
@@ -103,24 +108,13 @@ MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90
 
-# Object and module directory:
-OBJDIR=obj
-OUTDIR=outputdir outputdir/stst3 outputdir/stst outputdir/flowmov outputdir/flowmov3d
-# OBJS  := $(FFILES:%.F90=$(OBJDIR)/%.o)
-# MOBJS := $(MFILES:%.F90=$(OBJDIR)/%.o)
-
-# when using ifort compiler:
-# FC += -module $(OBJDIR) 
-# when using gfortran:
-FC += -J $(OBJDIR) 
-
 #============================================================================ 
 #  make PROGRAM   
 #============================================================================
 PROGRAM = afid 
 
 #Compiling 
-all: objdir outdir $(PROGRAM) 
+all: objdir $(PROGRAM) 
 $(PROGRAM): $(MOBJS) $(OBJS) 
 	$(FC) -o $@ $^ $(LDFLAGS) 
 
@@ -154,10 +148,7 @@ $(OBJDIR)/%.o: source/multires/salinity/%.F90 $(MOBJS)
 clean: 
 	/bin/rm -rf $(OBJDIR)/*.o $(OBJDIR)/*.mod $(OBJDIR)/*genmod* $(OBJDIR)/*.o obj\
 
-.PHONY: objdir outdir
+.PHONY: objdir
 objdir: $(OBJDIR) 
 $(OBJDIR): 
-	mkdir -p ${OBJDIR} 
-#outdir: $(OUTDIR) 
-# $(OUTDIR): 
-# 	mkdir -p ${OUTDIR} 
+	mkdir -p ${OBJDIR}
