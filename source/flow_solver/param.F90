@@ -83,6 +83,7 @@ module param
     real, dimension(1:3) :: gam,rom,alm
     real, allocatable, dimension(:,:,:) :: tempbp,temptp !CJH make BCs 3D arrays so we can use update_halo
     real, allocatable, dimension(:,:,:) :: salbp,saltp
+    integer, dimension(5) :: spec_idx, spec_idxr
             
     logical :: dumpslabs=.false.
     ! logical :: statcal=.false.

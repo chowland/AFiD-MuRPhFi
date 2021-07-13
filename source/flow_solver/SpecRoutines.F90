@@ -209,6 +209,252 @@ return
 end subroutine CalcSpec
 !
 !***********************************************************************
+subroutine CalcPowerSpec(var, idx, specy, specz)
+    use, intrinsic :: iso_c_binding
+    use param
+    use fftw_params
+    use decomp_2d
+    use decomp_2d_fft
+    use mpih
+    implicit none
+
+    real,intent(in),dimension(1:nxm,xstart(2):xend(2),xstart(3):xend(3)) :: var
+    integer,intent(in),dimension(5) :: idx
+    real,intent(inout),dimension(5,1:int(nym/2+1)) :: specy
+    real,intent(inout),dimension(5,1:int(nzm/2+1)) :: specz
+    real :: re_uhat,re_vhat,im_uhat,im_vhat
+    real :: re_spec,im_spec
+    integer :: i,j,k,izk,jyk,niz,nizk,kk
+    logical :: dsetexists
+
+!-- output is specy and specz
+    specy(:,:)=0.d0
+    specz(:,:)=0.d0
+    
+    allocate(fouvar1(sp%xst(1):sp%xen(1), &
+                    sp%xst(2):sp%xen(2), &
+                    sp%xst(3):sp%xen(3)))
+    
+    !-- Calculate DFT for var
+    call CalcFourierCoef(var,fouvar1)
+        
+    !-- Calculate the spectra in y and z (periodic dirs)
+    do i=sp%xst(3),sp%xen(3)
+        do j=sp%xst(2),sp%xen(2)
+            do k=1,5
+                kk = idx(k)
+
+                re_uhat= real(fouvar1(kk,j,i))
+                im_uhat=aimag(fouvar1(kk,j,i))
+
+                re_spec = re_uhat**2 + im_uhat**2
+    
+                niz = mod(nzm-(i-1),nzm)+1
+
+                !-- specy
+                if ( i.eq.1 .and. j.eq.1 ) then
+                else
+                    specy(k,j) = specy(k,j) + re_spec
+                end if
+
+                !-- specz
+                if ( j.eq.1 ) then
+                    if ( i.gt.1 .and. i.le.(nzm/2+1) ) then
+                        specz(k,i) = specz(k,i) + re_spec
+                    end if
+                else if( j.eq.(nym/2+1) ) then
+                    if ( i.ge.1 .and. i.le.(nzm/2+1) ) then
+                        specz(k,i) = specz(k,i) + re_spec
+                    end if
+                else
+                    if ( i.ge.1 .and. i.le.(nzm/2+1) ) then
+                        specz(k,i) = specz(k,i) + re_spec
+                    end if
+                    if ( niz.ge.1 .and. niz.le.(nzm/2+1) ) then
+                        specz(k,niz) = specz(k,niz) + re_spec
+                    end if
+                end if
+            end do
+        end do
+    end do
+
+    if(allocated(fouvar1)) deallocate(fouvar1)
+
+!-- Save the files
+    do k=1,5
+        call MpiSumReal1D(specy(k,:),(nym/2+1))
+        call MpiSumReal1D(specz(k,:),(nzm/2+1))
+    end do
+    
+    return
+end subroutine CalcPowerSpec
+!
+!***********************************************************************
+subroutine WritePowerSpec
+    use param
+    use local_arrays, only: vz,vy,vx,temp
+    use mgrd_arrays, only: sal
+    use decomp_2d, only: xstart,xend,xstartr,xendr
+    use stat_arrays
+    use mpih
+    use hdf5
+    implicit none
+
+    character(70) :: filename
+    character(70) :: dataname
+    character( 5) :: frame
+    real,dimension(5,1:int(nym/2+1)) :: vx_specy,vy_specy,vz_specy,te_specy
+    real,dimension(5,1:int(nzm/2+1)) :: vx_specz,vy_specz,vz_specz,te_specz
+    real,dimension(5,1:int(nymr/2+1)) :: sa_specy
+    real,dimension(5,1:int(nzmr/2+1)) :: sa_specz
+
+    real     :: tprfi
+    integer  :: ndims
+    integer        :: hdf_error
+    integer(HID_T) :: file_id
+    integer(HID_T) :: filespace
+    integer(HID_T) :: dset_var
+    integer(HSIZE_T), dimension(2) :: dims
+    logical :: dsetexists
+
+    ! calculate spectra
+    vx_specy=0.d0; vx_specz=0.d0
+    call CalcPowerSpec(vx(1:nxm,xstart(2):xend(2),xstart(3):xend(3)),&
+            spec_idx, vx_specy,vx_specz)
+    vy_specy=0.d0; vy_specz=0.d0
+    call CalcPowerSpec(vy(1:nxm,xstart(2):xend(2),xstart(3):xend(3)),&
+            spec_idx, vy_specy,vy_specz)
+    vz_specy=0.d0; vz_specz=0.d0
+    call CalcPowerSpec(vz(1:nxm,xstart(2):xend(2),xstart(3):xend(3)),&
+            spec_idx, vz_specy,vz_specz)
+    te_specy=0.d0; te_specz=0.d0
+    call CalcPowerSpec(temp(1:nxm,xstart(2):xend(2),xstart(3):xend(3)),&
+            spec_idx, te_specy,te_specz)
+    ! sa_specy=0.d0; sa_specz=0.d0
+    ! call CalcPowerSpecMgrd(sal(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)),&
+    !         spec_idxr, sa_specy,sa_specz)
+
+    ! Record frame number and filename as strings
+    write(frame,"(i5.5)")nint(time/tframe)
+    filename = trim("outputdir/spectra.h5")
+
+    if (ismaster) then
+
+        !=========
+        !  specy
+        !=========
+        call h5fopen_f(filename, H5F_ACC_RDWR_F, file_id, hdf_error)
+    
+        ndims = 2
+        dims(1) = 5
+        dims(2) = nym/2+1
+
+        dataname = trim("specy/vx/"//frame)
+        call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, vx_specy(1:5,1:int(nym/2+1)), dims, hdf_error)
+        call h5dclose_f(dset_var, hdf_error)
+        call h5sclose_f(filespace, hdf_error)
+
+        dataname = trim("specy/vy/"//frame)
+        call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, vy_specy(1:5,1:int(nym/2+1)), dims, hdf_error)
+        call h5dclose_f(dset_var, hdf_error)
+        call h5sclose_f(filespace, hdf_error)
+
+        dataname = trim("specy/vz/"//frame)
+        call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, vz_specy(1:5,1:int(nym/2+1)), dims, hdf_error)
+        call h5dclose_f(dset_var, hdf_error)
+        call h5sclose_f(filespace, hdf_error)
+
+        dataname = trim("specy/temp/"//frame)
+        call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, te_specy(1:5,1:int(nym/2+1)), dims, hdf_error)
+        call h5dclose_f(dset_var, hdf_error)
+        call h5sclose_f(filespace, hdf_error)
+
+        ! dims(2) = nymr/2 + 1
+
+        ! dataname = trim("specy/sal/"//frame)
+        ! call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        ! if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        ! call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        ! call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        ! call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, sa_specy(1:5,1:int(nymr/2+1)), dims, hdf_error)
+        ! call h5dclose_f(dset_var, hdf_error)
+        ! call h5sclose_f(filespace, hdf_error)
+
+        dims(2) = nzm/2+1
+
+        dataname = trim("specz/vx/"//frame)
+        call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, vx_specz(1:5,1:int(nzm/2+1)), dims, hdf_error)
+        call h5dclose_f(dset_var, hdf_error)
+        call h5sclose_f(filespace, hdf_error)
+
+        dataname = trim("specz/vy/"//frame)
+        call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, vy_specz(1:5,1:int(nzm/2+1)), dims, hdf_error)
+        call h5dclose_f(dset_var, hdf_error)
+        call h5sclose_f(filespace, hdf_error)
+
+        dataname = trim("specz/vz/"//frame)
+        call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, vz_specz(1:5,1:int(nzm/2+1)), dims, hdf_error)
+        call h5dclose_f(dset_var, hdf_error)
+        call h5sclose_f(filespace, hdf_error)
+
+        dataname = trim("specz/temp/"//frame)
+        call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, te_specz(1:5,1:int(nzm/2+1)), dims, hdf_error)
+        call h5dclose_f(dset_var, hdf_error)
+        call h5sclose_f(filespace, hdf_error)
+
+        ! dims(2) = nzmr/2 + 1
+
+        ! dataname = trim("specz/sal/"//frame)
+        ! call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+        ! if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+        ! call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+        ! call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+        ! call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, sa_specz(1:5,1:int(nzmr/2+1)), dims, hdf_error)
+        ! call h5dclose_f(dset_var, hdf_error)
+        ! call h5sclose_f(filespace, hdf_error)
+
+        call h5fclose_f(file_id, hdf_error)
+
+    end if
+
+    return
+
+end subroutine WritePowerSpec
+
+!
+!***********************************************************************
 subroutine WriteSpec
 use param
 use local_arrays, only: vz,vy,vx
@@ -300,6 +546,89 @@ end if
 
 return
 end subroutine WriteSpec
+!
+!***********************************************************************
+subroutine InitPowerSpec
+    use mpih
+    use param
+    use hdf5
+    
+    implicit none
+    
+    integer :: hdf_error, i, k
+    integer(HID_T) :: file_id
+    integer(HID_T) :: group_id
+    integer(HID_T) :: filespace
+    character(70) ::  filename
+    real :: xloc(5)
+    logical :: fexist
+    
+    open(unit=15, file='spectra.in', status='old')
+        read(15,*) xloc(1), xloc(2), xloc(3), xloc(4), xloc(5)
+    close(15)
+    
+    if (ismaster) then
+        write(*,*) 'Read from spectra.in:'
+        write(*,*) xloc(1), xloc(2), xloc(3), xloc(4), xloc(5)
+    end if
+    spec_idx(:) = 1
+    spec_idxr(:) = 1
+    do i=1,5
+        k = 1
+        do while (xm(k) <= xloc(i))
+            spec_idx(i) = k
+            k = k + 1
+        end do
+        do while (xmr(k) <= xloc(i))
+            spec_idxr(i) = k
+            k = k + 1
+        end do
+    end do
+    if (ismaster) then
+        write(*,*) 'Spectra indices, idx: ',spec_idx
+        write(*,*) 'Spectra indices, idxr: ',spec_idxr
+    end if
+
+    !   create hdf5 file if reset or new simulation
+    if (ismaster) then
+
+        filename = trim("outputdir/spectra.h5")
+        ! reset file
+        inquire(file=filename,exist=fexist)
+        if (fexist) then
+        else
+            call h5fcreate_f(filename, H5F_ACC_TRUNC_F, file_id, hdf_error)
+    
+            call h5gcreate_f(file_id, 'specy', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specy/vx', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specy/vy', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specy/vz', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specy/temp', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specy/sal', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specz', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specz/vx', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specz/vy', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specz/vz', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specz/temp', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+            call h5gcreate_f(file_id, 'specz/sal', group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+    
+            call h5fclose_f(file_id, hdf_error)
+        end if
+    end if
+    return
+end subroutine InitPowerSpec
 !
 !***********************************************************************
 subroutine InitSpec
