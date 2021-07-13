@@ -61,6 +61,7 @@ program AFiD
 !$    end if
 
     if(ismaster) then
+        call system('mkdir outputdir outputdir/flowmov outputdir/fields')
 !m==========================================
         call ResetLogs
 !m====================================================
