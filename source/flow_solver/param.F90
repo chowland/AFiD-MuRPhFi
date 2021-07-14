@@ -1,9 +1,9 @@
 
 ! Declaration of global variables
-!***********************************************************      
+!***********************************************************
 module param
     implicit none
-    !==========================================================			
+    !==========================================================
     !       read from input file bou.in
     !==========================================================
     integer   :: nx, ny, nz
@@ -38,7 +38,7 @@ module param
     real, allocatable, dimension(:) :: zc,zm
     real, allocatable, dimension(:) :: g3rc,g3rm
     real, allocatable, dimension(:) :: d3xc, d3xm    !CJH modified derivatives
-    real, allocatable, dimension(:) :: xcr,xmr       !CS mgrd    
+    real, allocatable, dimension(:) :: xcr,xmr       !CS mgrd
     real, allocatable, dimension(:) :: ycr,ymr       !CS mgrd
     real, allocatable, dimension(:) :: zcr,zmr       !CS mgrd
     real, allocatable, dimension(:) :: g3rcr,g3rmr   !CS mgrd
@@ -84,7 +84,7 @@ module param
     real, allocatable, dimension(:,:,:) :: tempbp,temptp !CJH make BCs 3D arrays so we can use update_halo
     real, allocatable, dimension(:,:,:) :: salbp,saltp
     integer, dimension(5) :: spec_idx, spec_idxr
-            
+
     logical :: dumpslabs=.false.
     ! logical :: statcal=.false.
     ! logical :: disscal=.false.
@@ -101,7 +101,7 @@ module param
     integer :: lvlhalo=2
 
 end module param
-      
+
 !************* End of param module******************************
 !===============================================================
 !******* 2D arrays, dynamically allocated by each process*******
@@ -134,9 +134,9 @@ end module mgrd_arrays
 !===============================================================
 module stat_arrays
     implicit none
-    real,allocatable, dimension(:) :: vz_me,vz_rms 
-    real,allocatable, dimension(:) :: vy_me,vx_me,vy_rms,vx_rms 
-    real,allocatable, dimension(:) :: temp_me,temp_rms 
+    real,allocatable, dimension(:) :: vz_me,vz_rms
+    real,allocatable, dimension(:) :: vy_me,vx_me,vy_rms,vx_rms
+    real,allocatable, dimension(:) :: temp_me,temp_rms
     real,allocatable, dimension(:) :: disste,dissth,tempvx_me
     real,allocatable, dimension(:) :: vxvy_corr
     real,allocatable, dimension(:) :: vz_me_buf,vy_me_buf,vx_me_buf
@@ -162,13 +162,13 @@ module input_grids !CJH Grids for input flow field
     real, allocatable, dimension(:) :: zcro, zmro
     integer,allocatable,dimension(:) :: irangsr,jrangsr,krangsr
 end module input_grids
-!=====================================================       
+!=====================================================
 module stat3_param
     implicit none
     integer :: kslab(1:9)
     real    :: xslab(1:9)
 end module stat3_param
-!=====================================================       
+!=====================================================
 module mpih
     implicit none
     include 'mpif.h'
@@ -212,7 +212,7 @@ module fftw_params
             complex(C_DOUBLE_COMPLEX), dimension(*), intent(out) :: out
             integer(C_INT), value :: flags
         end function fftw_plan_guru_dft_r2c
-        
+
         type(C_PTR) function fftw_plan_guru_dft_c2r(rank,dims, &
             howmany_rank,howmany_dims,in,out,flags)  &
             bind(C, name='fftw_plan_guru_dft_c2r')
@@ -230,11 +230,11 @@ module fftw_params
     end interface
 
     integer FFTW_PATIENT, FFTW_FORWARD, FFTW_BACKWARD,FFTW_ESTIMATE
-    parameter (FFTW_PATIENT=32)   
-    parameter (FFTW_ESTIMATE=64)   
-    parameter (FFTW_FORWARD=-1)   
-    parameter (FFTW_BACKWARD=1)   
-    type(C_PTR) :: fwd_guruplan_y,bwd_guruplan_y 
+    parameter (FFTW_PATIENT=32)
+    parameter (FFTW_ESTIMATE=64)
+    parameter (FFTW_FORWARD=-1)
+    parameter (FFTW_BACKWARD=1)
+    type(C_PTR) :: fwd_guruplan_y,bwd_guruplan_y
     type(C_PTR) :: fwd_guruplan_z,bwd_guruplan_z
     logical :: planned=.false.
 
