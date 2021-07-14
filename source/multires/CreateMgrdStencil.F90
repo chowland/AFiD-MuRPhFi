@@ -796,11 +796,11 @@
          h10=lxm*lxp*lxp
          h01=(1.d0+2.d0*lxp)*lxm*lxm
          h11=-lxp*lxm*lxm
-         ! if( icr.eq.0 .or. icr.eq.nxmr ) then
-         !    cxsalc(1,ic)=0.d0
-         !    cxsalc(2,ic)=lxp
-         !    cxsalc(3,ic)=lxm
-         !    cxsalc(4,ic)=0.d0
+         if( icr.eq.0 .or. icr.eq.nxmr ) then
+            cxsalc(1,ic)=0.d0
+            cxsalc(2,ic)=lxp
+            cxsalc(3,ic)=lxm
+            cxsalc(4,ic)=0.d0
          !if(ic.eq.1)then  !ic.eq.1 technically not used because fi starts from 2
          !   cxsalc(1,ic)=0.d0
          !   cxsalc(2,ic)=lxp !h00-h11*dlp/(dlp+dlc)+h10*(dlc-dlm)/dlm !Average of 2 nearest points
@@ -811,12 +811,12 @@
          !   cxsalc(2,ic)=lxp !h00-h11*dlp/(dlp+dlc)+h10*(dlc-dlm)/dlm !Average of 2 nearest points
          !   cxsalc(3,ic)=lxm !h01+h10*dlm/(dlm+dlc)+h11*(dlp-dlc)/dlp
          !   cxsalc(4,ic)=0.d0
-         ! else
-         cxsalc(1,ic)=-h10*dlc*dlc/dlm/(dlc+dlm)
-         cxsalc(2,ic)=h00-h11*dlp/(dlp+dlc)+h10*(dlc-dlm)/dlm
-         cxsalc(3,ic)=h01+h10*dlm/(dlm+dlc)+h11*(dlp-dlc)/dlp
-         cxsalc(4,ic)=h11*dlc*dlc/dlp/(dlp+dlc)
-         ! endif
+         else
+            cxsalc(1,ic)=-h10*dlc*dlc/dlm/(dlc+dlm)
+            cxsalc(2,ic)=h00-h11*dlp/(dlp+dlc)+h10*(dlc-dlm)/dlm
+            cxsalc(3,ic)=h01+h10*dlm/(dlm+dlc)+h11*(dlp-dlc)/dlp
+            cxsalc(4,ic)=h11*dlc*dlc/dlp/(dlp+dlc)
+         endif
       enddo
       !-- Now construct Hermite basis function in y | cysalc
       do jc=0,nym

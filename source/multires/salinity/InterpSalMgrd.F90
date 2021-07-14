@@ -26,7 +26,17 @@
          do kc=1,nxm
           kcr = irangs(kc)-1
 
-          if (kcr==1) then
+          if (kcr==0) then
+            qv3(1,:,:) = 0.d0
+            if (SfixS==1) then
+              qv3(2,:,:) = 2.d0*salbp(1,jcr-1:jcr+2,icr-1:icr+2) &
+                            - sal(kcr+1,jcr-1:jcr+2,icr-1:icr+2)
+            else
+              qv3(2,:,:) = sal(kcr+1,jcr-1:jcr+2,icr-1:icr+2)
+            end if
+            qv3(3,:,:) = sal(kcr+1,jcr-1:jcr+2,icr-1:icr+2)
+            qv3(4,:,:) = 0.d0
+          else if (kcr==1) then
             if (SfixS==1) then    !CJH apply lower fixed value BC
               qv3(1,:,:) = 2.d0*salbp(1,jcr-1:jcr+2,icr-1:icr+2) &
                             - sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
@@ -34,7 +44,7 @@
               qv3(1,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
             end if
             qv3(2:,:,:) = sal(kcr:kcr+2,jcr-1:jcr+2,icr-1:icr+2)
-          else if (kcr==nxmr) then
+          else if (kcr==nxmr-1) then
             qv3(1:3,:,:) = sal(kcr-1:kcr+1,jcr-1:jcr+2,icr-1:icr+2)
             if (SfixN==1) then    !CJH apply upper fixed value BC
               qv3(4,:,:) = 2.d0*saltp(1,jcr-1:jcr+2,icr-1:icr+2) &
@@ -42,6 +52,16 @@
             else    !CJH apply no flux BC
               qv3(4,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
             end if
+          else if (kcr==nxmr) then
+            qv3(1,:,:) = 0.d0
+            qv3(2,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
+            if (SfixN==1) then
+              qv3(3,:,:) = 2.d0*saltp(1,jcr-1:jcr+2,icr-1:icr+2) &
+                            - sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
+            else
+              qv3(3,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
+            end if
+            qv3(4,:,:) = 0.d0
           else
             qv3 = sal(kcr-1:kcr+2,jcr-1:jcr+2,icr-1:icr+2)
           end if
