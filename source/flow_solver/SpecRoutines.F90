@@ -234,7 +234,7 @@ subroutine CalcPowerSpec(var, idx, specy, specz)
     allocate(fouvar1(sp%xst(1):sp%xen(1), &
                     sp%xst(2):sp%xen(2), &
                     sp%xst(3):sp%xen(3)))
-    
+
     !-- Calculate DFT for var
     call CalcFourierCoef(var,fouvar1)
         
@@ -293,7 +293,7 @@ end subroutine CalcPowerSpec
 subroutine WritePowerSpec
     use param
     use local_arrays, only: vz,vy,vx,temp
-    use mgrd_arrays, only: sal
+    use mgrd_arrays, only: salc
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use stat_arrays
     use mpih
@@ -303,10 +303,8 @@ subroutine WritePowerSpec
     character(70) :: filename
     character(70) :: dataname
     character( 5) :: frame
-    real,dimension(5,1:int(nym/2+1)) :: vx_specy,vy_specy,vz_specy,te_specy
-    real,dimension(5,1:int(nzm/2+1)) :: vx_specz,vy_specz,vz_specz,te_specz
-    real,dimension(5,1:int(nymr/2+1)) :: sa_specy
-    real,dimension(5,1:int(nzmr/2+1)) :: sa_specz
+    real,dimension(5,1:int(nym/2+1)) :: vx_specy,vy_specy,vz_specy,te_specy,sa_specy
+    real,dimension(5,1:int(nzm/2+1)) :: vx_specz,vy_specz,vz_specz,te_specz,sa_specz
 
     real     :: tprfi
     integer  :: ndims
@@ -330,9 +328,9 @@ subroutine WritePowerSpec
     te_specy=0.d0; te_specz=0.d0
     call CalcPowerSpec(temp(1:nxm,xstart(2):xend(2),xstart(3):xend(3)),&
             spec_idx, te_specy,te_specz)
-    ! sa_specy=0.d0; sa_specz=0.d0
-    ! call CalcPowerSpecMgrd(sal(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)),&
-    !         spec_idxr, sa_specy,sa_specz)
+    sa_specy=0.d0; sa_specz=0.d0
+    call CalcPowerSpec(salc(1:nxm,xstart(2):xend(2),xstart(3):xend(3)),&
+            spec_idx, sa_specy,sa_specz)
 
     ! Record frame number and filename as strings
     write(frame,"(i5.5)")nint(time/tframe)
@@ -385,16 +383,16 @@ subroutine WritePowerSpec
         call h5dclose_f(dset_var, hdf_error)
         call h5sclose_f(filespace, hdf_error)
 
-        ! dims(2) = nymr/2 + 1
-
-        ! dataname = trim("specy/sal/"//frame)
-        ! call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
-        ! if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
-        ! call h5screate_simple_f(ndims, dims, filespace, hdf_error)
-        ! call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
-        ! call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, sa_specy(1:5,1:int(nymr/2+1)), dims, hdf_error)
-        ! call h5dclose_f(dset_var, hdf_error)
-        ! call h5sclose_f(filespace, hdf_error)
+        if (salinity) then
+            dataname = trim("specy/sal/"//frame)
+            call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+            if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+            call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+            call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+            call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, sa_specy(1:5,1:int(nym/2+1)), dims, hdf_error)
+            call h5dclose_f(dset_var, hdf_error)
+            call h5sclose_f(filespace, hdf_error)
+        end if
 
         dims(2) = nzm/2+1
 
@@ -434,16 +432,16 @@ subroutine WritePowerSpec
         call h5dclose_f(dset_var, hdf_error)
         call h5sclose_f(filespace, hdf_error)
 
-        ! dims(2) = nzmr/2 + 1
-
-        ! dataname = trim("specz/sal/"//frame)
-        ! call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
-        ! if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
-        ! call h5screate_simple_f(ndims, dims, filespace, hdf_error)
-        ! call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
-        ! call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, sa_specz(1:5,1:int(nzmr/2+1)), dims, hdf_error)
-        ! call h5dclose_f(dset_var, hdf_error)
-        ! call h5sclose_f(filespace, hdf_error)
+        if (salinity) then
+            dataname = trim("specz/sal/"//frame)
+            call h5lexists_f(file_id, dataname, dsetexists, hdf_error)
+            if (dsetexists) call h5ldelete_f(file_id, dataname, hdf_error)
+            call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+            call h5dcreate_f(file_id, trim(dataname), H5T_NATIVE_DOUBLE, filespace, dset_var, hdf_error)
+            call h5dwrite_f(dset_var, H5T_NATIVE_DOUBLE, sa_specz(1:5,1:int(nzm/2+1)), dims, hdf_error)
+            call h5dclose_f(dset_var, hdf_error)
+            call h5sclose_f(filespace, hdf_error)
+        end if
 
         call h5fclose_f(file_id, hdf_error)
 
