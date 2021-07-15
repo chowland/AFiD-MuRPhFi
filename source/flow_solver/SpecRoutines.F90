@@ -329,8 +329,10 @@ subroutine WritePowerSpec
     call CalcPowerSpec(temp(1:nxm,xstart(2):xend(2),xstart(3):xend(3)),&
             spec_idx, te_specy,te_specz)
     sa_specy=0.d0; sa_specz=0.d0
-    call CalcPowerSpec(salc(1:nxm,xstart(2):xend(2),xstart(3):xend(3)),&
-            spec_idx, sa_specy,sa_specz)
+    if (salinity) then
+        call CalcPowerSpec(salc(1:nxm,xstart(2):xend(2),xstart(3):xend(3)),&
+                spec_idx, sa_specy,sa_specz)
+    end if
 
     ! Record frame number and filename as strings
     write(frame,"(i5.5)")nint(time/tframe)
