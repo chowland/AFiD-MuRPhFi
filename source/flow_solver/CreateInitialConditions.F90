@@ -15,7 +15,7 @@ subroutine CreateInitialConditions
     use mpih
     implicit none
     integer :: j,k,i,kmid
-    real :: xxx,yyy,zzz,eps,varptb,amp
+    real :: xxx,yyy,zzz,eps,varptb,amp,h0,t0,Lambda
 
     call random_seed()
 
@@ -138,6 +138,23 @@ subroutine CreateInitialConditions
                         end if
                         call random_number(varptb)
                         temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
+                    end do
+                end do
+            end do
+
+        else if (pf_IC.eq.3) then
+            h0 = 0.1
+            Lambda = 0.620063
+            t0 = pect * (h0/2/Lambda)**2
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xm(k)
+                        if (xxx < h0) then
+                            temp(k,j,i) = erf(xxx*sqrt(pect/t0)/2)/erf(Lambda)
+                        else
+                            temp(k,j,i) = 1.0
+                        end if
                     end do
                 end do
             end do
