@@ -1,13 +1,13 @@
-# This workflow will do a clean install of the Fortran, HDF5, FFTW dependencies,
-# cache and restore them, and build the source code of AFiD
+# This workflow will do a clean install of the dependencies,
+# and build the source code of AFiD
 
-name: CI
+name: AFiD CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   build:
