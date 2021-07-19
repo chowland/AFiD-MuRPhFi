@@ -1,7 +1,7 @@
 # AFiD-MuRPhFi
 **A**dvanced **Fi**nite **D**ifference flow solver with **Mu**ltiple **R**esolution and **Ph**ase-**Fi**eld implementations
 
-![Build status](https://github.com/chowland/AFiD-MuRPhFi/actions/workflows/CI/badge.svg)
+![Build status](https://github.com/chowland/AFiD-MuRPhFi/actions/workflows/CI.yml/badge.svg)
 [![Documentation](https://img.shields.io/badge/documentation-in%20progress-blue)](https://chowland.github.io/AFiD-MuRPhFi/)
 
 ## Quickstart
