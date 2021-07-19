@@ -1,0 +1,35 @@
+# This workflow will do a clean install of the Fortran, HDF5, FFTW dependencies,
+# cache and restore them, and build the source code of AFiD
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_reques:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # - name: Install GFortran # NB gfortran and build-essential already on VM
+      #   run: |
+      #     sudo apt install build-essential gfortran
+
+      - name: Install BLAS and LAPACK
+        run: sudo apt install libblas-dev liblapack-dev
+
+      - name: Install Parallel HDF5
+        run: sudo apt install libhdf5-mpich-dev
+
+      - name: Install FFTW library
+        run: sudo apt install libfftw3-dev
+
+      - name: Build AFiD
+        run: make
