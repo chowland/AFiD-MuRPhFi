@@ -121,25 +121,25 @@ $(PROGRAM): $(MOBJS) $(OBJS)
 #============================================================================
 #  Dependencies 
 #============================================================================
-$(OBJDIR)/param.o: source/flow_solver/param.F90
+$(OBJDIR)/param.o: src/flow_solver/param.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/AuxiliaryRoutines.o: source/flow_solver/AuxiliaryRoutines.F90 
+$(OBJDIR)/AuxiliaryRoutines.o: src/flow_solver/AuxiliaryRoutines.F90 
 	$(FC) -c -o $@ $< $(LDFLAGS) 
-$(OBJDIR)/decomp_2d.o: source/flow_solver/2decomp/decomp_2d.F90
+$(OBJDIR)/decomp_2d.o: src/flow_solver/2decomp/decomp_2d.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/decomp_2d_fft.o: source/flow_solver/2decomp/decomp_2d_fft.F90
+$(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
 	$(FC) -c -o $@ $< $(LDFLAGS) 
-$(OBJDIR)/%.o: source/%.F90 $(MOBJS)
+$(OBJDIR)/%.o: src/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/%.o: source/flow_solver/%.F90 $(MOBJS)
+$(OBJDIR)/%.o: src/flow_solver/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/%.o: source/multires/%.F90 $(MOBJS)
+$(OBJDIR)/%.o: src/multires/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/%.o: source/multires/IC_interpolation/%.F90 $(MOBJS)
+$(OBJDIR)/%.o: src/multires/IC_interpolation/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/%.o: source/multires/phase-field/%.F90 $(MOBJS)
+$(OBJDIR)/%.o: src/multires/phase-field/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/%.o: source/multires/salinity/%.F90 $(MOBJS)
+$(OBJDIR)/%.o: src/multires/salinity/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 
 #============================================================================
