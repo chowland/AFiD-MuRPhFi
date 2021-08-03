@@ -572,21 +572,15 @@ subroutine InitPowerSpec
         write(*,*) xloc(1), xloc(2), xloc(3), xloc(4), xloc(5)
     end if
     spec_idx(:) = 1
-    spec_idxr(:) = 1
     do i=1,5
         k = 1
         do while (xm(k) <= xloc(i))
             spec_idx(i) = k
             k = k + 1
         end do
-        do while (xmr(k) <= xloc(i))
-            spec_idxr(i) = k
-            k = k + 1
-        end do
     end do
     if (ismaster) then
         write(*,*) 'Spectra indices, idx: ',spec_idx
-        write(*,*) 'Spectra indices, idxr: ',spec_idxr
     end if
 
     !   create hdf5 file if reset or new simulation
