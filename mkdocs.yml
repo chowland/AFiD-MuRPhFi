@@ -18,6 +18,15 @@ nav:
         - 'pluto.md'
         - 'jupyter.md'
         - 'paraview.md'
+    - Examples:
+        - 'examples/rbc.md'
+        - 'examples/ddc.md'
+        - 'examples/freezing.md'
+        - 'examples/melting_rbc.md'
+    - 'Benchmarking and validation':
+        - 'compilers.md'
+        - 'convergence.md'
+        - 'phasefield_validation.md'
     - 'Technical Details':
         - 'equations.md'
         - 'numerics.md'
