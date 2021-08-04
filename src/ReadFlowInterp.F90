@@ -32,43 +32,47 @@ subroutine ReadFlowInterp
     if (ismaster) then
         dsetname = trim("nx")
         call HdfSerialReadIntScalar(dsetname, filnam, nxo)
-        dsetname = trim("nxr")
-        call HdfSerialReadIntScalar(dsetname, filnam, nxro)
         dsetname = trim("ny")
         call HdfSerialReadIntScalar(dsetname, filnam, nyo)
-        dsetname = trim("nyr")
-        call HdfSerialReadIntScalar(dsetname, filnam, nyro)
         dsetname = trim("nz")
         call HdfSerialReadIntScalar(dsetname, filnam, nzo)
-        dsetname = trim("nzr")
-        call HdfSerialReadIntScalar(dsetname, filnam, nzro)
         dsetname = trim("time")
         call HdfSerialReadRealScalar(dsetname, filnam, time)
         dsetname = trim("istr3")
         call HdfSerialReadIntScalar(dsetname, filnam, istr3o)
-        dsetname = trim("istr3r")
-        call HdfSerialReadIntScalar(dsetname, filnam, istr3ro)
         dsetname = trim("str3")
         call HdfSerialReadRealScalar(dsetname, filnam, str3o)
         dsetname = trim("ylen")
         call HdfSerialReadRealScalar(dsetname, filnam, yleno)
         dsetname = trim("zlen")
         call HdfSerialReadRealScalar(dsetname, filnam, zleno)
+        if (multires) then
+            dsetname = trim("nxr")
+            call HdfSerialReadIntScalar(dsetname, filnam, nxro)
+            dsetname = trim("nyr")
+            call HdfSerialReadIntScalar(dsetname, filnam, nyro)
+            dsetname = trim("nzr")
+            call HdfSerialReadIntScalar(dsetname, filnam, nzro)
+            dsetname = trim("istr3r")
+            call HdfSerialReadIntScalar(dsetname, filnam, istr3ro)
+        end if
     end if
 
     call MpiBarrier
     call MpiBcastInt(nxo)
-    call MpiBcastInt(nxro)
     call MpiBcastInt(nyo)
-    call MpiBcastInt(nyro)
     call MpiBcastInt(nzo)
-    call MpiBcastInt(nzro)
     call MpiBcastInt(istr3o)
-    call MpiBcastInt(istr3ro)
     call MpiBcastReal(str3o)
     call MpiBcastReal(time)
     call MpiBcastReal(yleno)
     call MpiBcastReal(zleno)
+    if (multires) then
+        call MpiBcastInt(nxro)
+        call MpiBcastInt(nyro)
+        call MpiBcastInt(nzro)
+        call MpiBcastInt(istr3ro)
+    end if
 
     if ((abs(ylen-yleno)>1e-8) .or. (abs(zlen-zleno)>1e-8)) then
         write(*,*) "Continua domain size does not match bou.in"
@@ -79,9 +83,11 @@ subroutine ReadFlowInterp
 
     ! Check whether we are using a new grid
     if ((nx.ne.nxo) .or. (ny.ne.nyo) .or. (nz.ne.nzo) .or. &
-        (nxr/=nxro) .or. (nyr/=nyro) .or. (nzr/=nzro) .or. &
-        (istr3/=istr3o) .or. (istr3r/=istr3ro) .or. &
-        (abs(str3-str3o)>1e-8)) then
+        (istr3/=istr3o) .or. (abs(str3-str3o)>1e-8) .or. &
+        (multires .and. ( &
+            (nxr/=nxro) .or. (nyr/=nyro) .or. &
+            (nzr/=nzro) .or. (istr3r/=istr3ro)) &
+        )) then
 
         call InitInputVars
 
