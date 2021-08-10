@@ -93,8 +93,8 @@ program AFiD
 
     call WriteGridInfo
 
-    inquire(file=trim("spectra.in"),exist=writespec)
-    if (writespec) call InitPowerSpec
+    inquire(file=trim("spectra.in"),exist=specwrite)
+    if (specwrite) call InitPowerSpec
 
 !m===================================
 !m===================================
@@ -179,7 +179,7 @@ program AFiD
     end if
 
     call CalcMeanProfiles
-    if (writespec) call WritePowerSpec
+    if (specwrite) call WritePowerSpec
     if(ismaster)  write(6,*) 'Write plane slices'
     call Mkmov_xcut
     call Mkmov_ycut
@@ -258,7 +258,7 @@ program AFiD
                 write(6,'(a,E11.4,a,i9,a,E11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
             endif
             call CalcMeanProfiles
-            if (writespec) then
+            if (specwrite) then
                 if (ismaster) write(*,*) "Writing power spectra"
                 call WritePowerSpec
                 if (ismaster) write(*,*) "Done writing power spectra"
