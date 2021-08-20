@@ -54,6 +54,7 @@ subroutine DeallocateInputVars
         call DestroyReal2DArray(cxrs)
         call DestroyReal2DArray(cyrs)
         call DestroyReal2DArray(czrs)
+        call DestroyReal3DArray(tpdv)
     end if
 
     return

@@ -64,6 +64,7 @@ subroutine InitInputVars
         call AllocateReal2DArray(cyrs,1,4,0,ny)
         call AllocateReal2DArray(czrs,1,4,0,nz)
 
+        call AllocateReal3DArray(tpdv,-1,nx+1,xstart(2)-2,xend(2)+2,xstart(3)-2,xend(3)+2)
     end if
 
     return
