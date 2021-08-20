@@ -50,19 +50,20 @@ end subroutine InitInputVars
 ! usually allocated by InitMgrdVariables when MULTIRES is enabled
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 subroutine InitInputIndices
-    use param
     use mgrd_arrays
+    use input_grids
+    use AuxiliaryRoutines
 
     implicit none
 
     ! Allocate indices for interpolation
-    call AllocateInt1dArray(irangs,0,nxo)
-    call AllocateInt1dArray(jrangs,0,nyo)
-    call AllocateInt1dArray(krangs,0,nzo)
+    call AllocateInt1DArray(irangs,0,nxo)
+    call AllocateInt1DArray(jrangs,0,nyo)
+    call AllocateInt1DArray(krangs,0,nzo)
 
-    call AllocateInt1dArray(irangc,0,nxo)
-    call AllocateInt1dArray(jrangc,0,nyo)
-    call AllocateInt1dArray(krangc,0,nzo)
+    call AllocateInt1DArray(irangc,0,nxo)
+    call AllocateInt1DArray(jrangc,0,nyo)
+    call AllocateInt1DArray(krangc,0,nzo)
 
     return
 

@@ -39,15 +39,15 @@ subroutine DeallocateInputVars
 end subroutine DeallocateInputVars
 
 subroutine DeallocateInputIndices
-    use param
     use mgrd_arrays
+    use AuxiliaryRoutines
     implicit none
 
-    call DestroyReal1DArray(irangs)
-    call DestroyReal1DArray(jrangs)
-    call DestroyReal1DArray(krangs)
-    call DestroyReal1DArray(irangc)
-    call DestroyReal1DArray(jrangc)
-    call DestroyReal1DArray(krangc)
+    call DestroyInt1DArray(irangs)
+    call DestroyInt1DArray(jrangs)
+    call DestroyInt1DArray(krangs)
+    call DestroyInt1DArray(irangc)
+    call DestroyInt1DArray(jrangc)
+    call DestroyInt1DArray(krangc)
 
 end subroutine DeallocateInputIndices
