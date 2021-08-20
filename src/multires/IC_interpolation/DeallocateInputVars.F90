@@ -42,6 +42,18 @@ subroutine DeallocateInputVars
         call DestroyInt1DArray(irangc)
         call DestroyInt1DArray(jrangc)
         call DestroyInt1DArray(krangc)
+        call DestroyReal2DArray(cxvx)
+        call DestroyReal2DArray(cxvy)
+        call DestroyReal2DArray(cxvz)
+        call DestroyReal2DArray(cyvx)
+        call DestroyReal2DArray(cyvy)
+        call DestroyReal2DArray(cyvz)
+        call DestroyReal2DArray(czvx)
+        call DestroyReal2DArray(czvy)
+        call DestroyReal2DArray(czvz)
+        call DestroyReal2DArray(cxrs)
+        call DestroyReal2DArray(cyrs)
+        call DestroyReal2DArray(czrs)
     end if
 
     return
