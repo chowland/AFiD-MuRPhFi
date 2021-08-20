@@ -48,21 +48,21 @@ subroutine InitInputVars
         call AllocateInt1DArray(jrangc,0,nyo)
         call AllocateInt1DArray(krangc,0,nzo)
 
-        call AllocateReal2DArray(cxvx,1,4,0,nxr)
-        call AllocateReal2DArray(cxvy,1,4,0,nxr)
-        call AllocateReal2DArray(cxvz,1,4,0,nxr)
+        call AllocateReal2DArray(cxvx,1,4,0,nx)
+        call AllocateReal2DArray(cxvy,1,4,0,nx)
+        call AllocateReal2DArray(cxvz,1,4,0,nx)
 
-        call AllocateReal2DArray(cyvx,1,4,0,nyr)
-        call AllocateReal2DArray(cyvy,1,4,0,nyr)
-        call AllocateReal2DArray(cyvz,1,4,0,nyr)
+        call AllocateReal2DArray(cyvx,1,4,0,ny)
+        call AllocateReal2DArray(cyvy,1,4,0,ny)
+        call AllocateReal2DArray(cyvz,1,4,0,ny)
 
-        call AllocateReal2DArray(czvx,1,4,0,nzr)
-        call AllocateReal2DArray(czvy,1,4,0,nzr)
-        call AllocateReal2DArray(czvz,1,4,0,nzr)
+        call AllocateReal2DArray(czvx,1,4,0,nz)
+        call AllocateReal2DArray(czvy,1,4,0,nz)
+        call AllocateReal2DArray(czvz,1,4,0,nz)
 
-        call AllocateReal2DArray(cxrs,1,4,0,nxr)
-        call AllocateReal2DArray(cyrs,1,4,0,nyr)
-        call AllocateReal2DArray(czrs,1,4,0,nzr)
+        call AllocateReal2DArray(cxrs,1,4,0,nx)
+        call AllocateReal2DArray(cyrs,1,4,0,ny)
+        call AllocateReal2DArray(czrs,1,4,0,nz)
 
     end if
 
