@@ -75,7 +75,7 @@ subroutine InterpInputVel
     do ic=xstarto(3)-1,xendo(3)
         do jc=xstarto(2)-1,xendo(2)
             do kc=0,nxmo
-    
+
                 qv3=tpdvo(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
 
                 do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzm)
