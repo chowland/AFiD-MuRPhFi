@@ -37,34 +37,42 @@ subroutine InitInputVars
         call AllocateInt1DArray(irangsr,0,nxro)
         call AllocateInt1DArray(jrangsr,0,nyro)
         call AllocateInt1DArray(krangsr,0,nzro)
+    else
+        call AllocateInt1DArray(irangs,0,nxo)
+        call AllocateInt1DArray(jrangs,0,nyo)
+        call AllocateInt1DArray(krangs,0,nzo)
+
+        call AllocateInt1DArray(irangc,0,nxo)
+        call AllocateInt1DArray(jrangc,0,nyo)
+        call AllocateInt1DArray(krangc,0,nzo)
     end if
 
     return
 
 end subroutine InitInputVars
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! This subroutine is needed for interpolating an initial condition
-! when MULTIRES is not enabled. This subroutine simply allocates
-! the index variable needed to perform the interpolation that is
-! usually allocated by InitMgrdVariables when MULTIRES is enabled
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-subroutine InitInputIndices
-    use mgrd_arrays
-    use input_grids
-    use AuxiliaryRoutines
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! ! This subroutine is needed for interpolating an initial condition
+! ! when MULTIRES is not enabled. This subroutine simply allocates
+! ! the index variable needed to perform the interpolation that is
+! ! usually allocated by InitMgrdVariables when MULTIRES is enabled
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! subroutine InitInputIndices
+!     use mgrd_arrays
+!     use input_grids
+!     use AuxiliaryRoutines
 
-    implicit none
+!     implicit none
 
-    ! Allocate indices for interpolation
-    call AllocateInt1DArray(irangs,0,nxo)
-    call AllocateInt1DArray(jrangs,0,nyo)
-    call AllocateInt1DArray(krangs,0,nzo)
+!     ! Allocate indices for interpolation
+!     call AllocateInt1DArray(irangs,0,nxo)
+!     call AllocateInt1DArray(jrangs,0,nyo)
+!     call AllocateInt1DArray(krangs,0,nzo)
 
-    call AllocateInt1DArray(irangc,0,nxo)
-    call AllocateInt1DArray(jrangc,0,nyo)
-    call AllocateInt1DArray(krangc,0,nzo)
+!     call AllocateInt1DArray(irangc,0,nxo)
+!     call AllocateInt1DArray(jrangc,0,nyo)
+!     call AllocateInt1DArray(krangc,0,nzo)
 
-    return
+!     return
 
-end subroutine InitInputIndices
+! end subroutine InitInputIndices

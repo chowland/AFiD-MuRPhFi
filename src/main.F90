@@ -128,9 +128,7 @@ program AFiD
 
         if(ismaster) write(6,*) 'Reading initial condition from file'
 
-        if (.not. multires) call InitInputIndices
         call ReadFlowInterp
-        if (.not. multires) call DeallocateInputIndices
 
     else
 

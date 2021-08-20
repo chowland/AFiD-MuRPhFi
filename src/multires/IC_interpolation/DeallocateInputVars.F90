@@ -30,24 +30,33 @@ subroutine DeallocateInputVars
     call DestroyReal1DArray(zcro)
     call DestroyReal1DArray(zmro)
 
-    call DestroyInt1DArray(irangsr)
-    call DestroyInt1DArray(jrangsr)
-    call DestroyInt1DArray(krangsr)
+    if (multires) then
+        call DestroyInt1DArray(irangsr)
+        call DestroyInt1DArray(jrangsr)
+        call DestroyInt1DArray(krangsr)
+    else
+        call DestroyInt1DArray(irangs)
+        call DestroyInt1DArray(jrangs)
+        call DestroyInt1DArray(krangs)
+        call DestroyInt1DArray(irangc)
+        call DestroyInt1DArray(jrangc)
+        call DestroyInt1DArray(krangc)
+    end if
 
     return
 
 end subroutine DeallocateInputVars
 
-subroutine DeallocateInputIndices
-    use mgrd_arrays
-    use AuxiliaryRoutines
-    implicit none
+! subroutine DeallocateInputIndices
+!     use mgrd_arrays
+!     use AuxiliaryRoutines
+!     implicit none
 
-    call DestroyInt1DArray(irangs)
-    call DestroyInt1DArray(jrangs)
-    call DestroyInt1DArray(krangs)
-    call DestroyInt1DArray(irangc)
-    call DestroyInt1DArray(jrangc)
-    call DestroyInt1DArray(krangc)
+!     call DestroyInt1DArray(irangs)
+!     call DestroyInt1DArray(jrangs)
+!     call DestroyInt1DArray(krangs)
+!     call DestroyInt1DArray(irangc)
+!     call DestroyInt1DArray(jrangc)
+!     call DestroyInt1DArray(krangc)
 
-end subroutine DeallocateInputIndices
+! end subroutine DeallocateInputIndices
