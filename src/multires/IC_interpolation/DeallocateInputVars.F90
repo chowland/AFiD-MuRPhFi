@@ -11,6 +11,7 @@
 subroutine DeallocateInputVars
     use param
     use input_grids
+    use mgrd_arrays
     use decomp_2d
     use AuxiliaryRoutines
     implicit none
