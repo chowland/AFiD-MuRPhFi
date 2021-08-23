@@ -22,12 +22,12 @@
 !-------------------------------------------------
 
       call AllocateReal1DArray(zc,1,nz)
-      call AllocateReal1DArray(zm,1,nz)
+      call AllocateReal1DArray(zm,0,nz+1)
       call AllocateReal1DArray(ak1,1,nz)
       call AllocateReal1DArray(ao,1,nz)
 
       call AllocateReal1DArray(yc,1,ny)
-      call AllocateReal1DArray(ym,1,ny)
+      call AllocateReal1DArray(ym,0,ny+1)
       call AllocateReal1DArray(ak2,1,ny)
       call AllocateReal1DArray(ap,1,ny)
 
