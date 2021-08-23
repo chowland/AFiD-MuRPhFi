@@ -97,6 +97,7 @@ module param
     logical :: multires=.false.
     logical :: phasefield=.false.
     logical :: salinity=.false.
+    logical :: specwrite=.false.
 
     integer :: lvlhalo=2
 

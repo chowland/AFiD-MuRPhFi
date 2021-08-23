@@ -93,7 +93,8 @@ program AFiD
 
     call WriteGridInfo
 
-    call InitPowerSpec
+    inquire(file=trim("spectra.in"),exist=specwrite)
+    if (specwrite) call InitPowerSpec
 
 !m===================================
 !m===================================
@@ -115,6 +116,13 @@ program AFiD
 
 !m===================================
 !m===================================
+    if (ismaster .and. multires) then
+        if ((modulo(nym,prow) /= 0) .or. (modulo(nzm,pcol) /= 0) .or. &
+            (modulo(nymr,prow)/= 0) .or. (modulo(nzmr,pcol)/= 0)) then
+            write(*,*) "WARNING: Grid size not a perfect factor of the pencil decomposition"
+            write(*,*) "This may cause issues with the multi-grid interpolation"
+        end if
+    end if
 
     time=0.d0
     ! if(statcal) nstatsamples = 0
@@ -178,7 +186,7 @@ program AFiD
     end if
 
     call CalcMeanProfiles
-    call WritePowerSpec
+    if (specwrite) call WritePowerSpec
     if(ismaster)  write(6,*) 'Write plane slices'
     call Mkmov_xcut
     call Mkmov_ycut
@@ -257,9 +265,11 @@ program AFiD
                 write(6,'(a,E11.4,a,i9,a,E11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
             endif
             call CalcMeanProfiles
-            if (ismaster) write(*,*) "Writing power spectra"
-            call WritePowerSpec
-            if (ismaster) write(*,*) "Done writing power spectra"
+            if (specwrite) then
+                if (ismaster) write(*,*) "Writing power spectra"
+                call WritePowerSpec
+                if (ismaster) write(*,*) "Done writing power spectra"
+            end if
             if(ismaster) then
                 open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
                 write(96,769) ntime,time,dt,instCFL*dt!,vx_global,vy_global,vz_global
