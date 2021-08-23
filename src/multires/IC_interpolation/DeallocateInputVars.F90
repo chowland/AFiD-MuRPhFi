@@ -11,6 +11,7 @@
 subroutine DeallocateInputVars
     use param
     use input_grids
+    use mgrd_arrays
     use decomp_2d
     use AuxiliaryRoutines
     implicit none
@@ -30,9 +31,31 @@ subroutine DeallocateInputVars
     call DestroyReal1DArray(zcro)
     call DestroyReal1DArray(zmro)
 
-    call DestroyInt1DArray(irangsr)
-    call DestroyInt1DArray(jrangsr)
-    call DestroyInt1DArray(krangsr)
+    if (multires) then
+        call DestroyInt1DArray(irangsr)
+        call DestroyInt1DArray(jrangsr)
+        call DestroyInt1DArray(krangsr)
+    else
+        call DestroyInt1DArray(irangs)
+        call DestroyInt1DArray(jrangs)
+        call DestroyInt1DArray(krangs)
+        call DestroyInt1DArray(irangc)
+        call DestroyInt1DArray(jrangc)
+        call DestroyInt1DArray(krangc)
+        call DestroyReal2DArray(cxvx)
+        call DestroyReal2DArray(cxvy)
+        call DestroyReal2DArray(cxvz)
+        call DestroyReal2DArray(cyvx)
+        call DestroyReal2DArray(cyvy)
+        call DestroyReal2DArray(cyvz)
+        call DestroyReal2DArray(czvx)
+        call DestroyReal2DArray(czvy)
+        call DestroyReal2DArray(czvz)
+        call DestroyReal2DArray(cxrs)
+        call DestroyReal2DArray(cyrs)
+        call DestroyReal2DArray(czrs)
+        call DestroyReal3DArray(tpdv)
+    end if
 
     return
 

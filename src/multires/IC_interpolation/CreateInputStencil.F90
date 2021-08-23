@@ -84,7 +84,7 @@ subroutine CreateInputStencil
         jrangs(0) = 1
         jrangc(0) = 1
         do jc=1,nymo
-          do j=1,nym
+          do j=0,ny
             if(ym(j).lt.ymo(jc) .and. ym(j+1).ge.ymo(jc))then
               jrangs(jc) = j+1
             endif

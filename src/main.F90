@@ -116,6 +116,13 @@ program AFiD
 
 !m===================================
 !m===================================
+    if (ismaster .and. multires) then
+        if ((modulo(nym,prow) /= 0) .or. (modulo(nzm,pcol) /= 0) .or. &
+            (modulo(nymr,prow)/= 0) .or. (modulo(nzmr,pcol)/= 0)) then
+            write(*,*) "WARNING: Grid size not a perfect factor of the pencil decomposition"
+            write(*,*) "This may cause issues with the multi-grid interpolation"
+        end if
+    end if
 
     time=0.d0
     ! if(statcal) nstatsamples = 0
