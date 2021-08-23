@@ -4,11 +4,25 @@ repo_url: https://github.com/chowland/AFiD-MuRPhFi
 site_author: Chris Howland
 markdown_extensions:
     - tables
-    - markdown_katex:
-        no_inline_svg: True
-        insert_fonts_css: True
-        macro-file: docs/macros.tex
-theme: readthedocs
+    - pymdownx.arithmatex:
+        generic: true
+    # - markdown_katex:
+    #     no_inline_svg: True
+    #     insert_fonts_css: True
+    #     macro-file: docs/macros.tex
+extra_css:
+    - https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css
+extra_javascript:
+    - javascripts/config.js
+    - https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js
+theme:
+    name: material
+    palette:
+        primary: deep orange
+    font: false
+    icon:
+        logo: fontawesome/solid/wind
+    favicon: assets/favicon.png
 nav:
     - 'index.md'
     - Usage:
