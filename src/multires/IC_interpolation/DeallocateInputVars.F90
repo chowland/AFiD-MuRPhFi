@@ -60,17 +60,3 @@ subroutine DeallocateInputVars
     return
 
 end subroutine DeallocateInputVars
-
-! subroutine DeallocateInputIndices
-!     use mgrd_arrays
-!     use AuxiliaryRoutines
-!     implicit none
-
-!     call DestroyInt1DArray(irangs)
-!     call DestroyInt1DArray(jrangs)
-!     call DestroyInt1DArray(krangs)
-!     call DestroyInt1DArray(irangc)
-!     call DestroyInt1DArray(jrangc)
-!     call DestroyInt1DArray(krangc)
-
-! end subroutine DeallocateInputIndices
