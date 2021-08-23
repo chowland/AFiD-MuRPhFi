@@ -19,11 +19,16 @@ subroutine CreateICPF
 
     integer :: i,j,k,kmid
 
-    if (pf_IC.eq.1) then ! Favier et al (2019) Appendix A3 Validation Case
+    if (pf_IC.eq.1) then ! 1D freezing validation
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
-                    phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - 0.5)/2/pf_eps))
+                    if (xmr(k) < 0.1) then
+                        phi(k,j,i) = 1.0
+                    else
+                        phi(k,j,i) = 0.0
+                    end if
+                    if (RAYT > 0) phi(k,j,i) = 1.0 - phi(k,j,i)
                 end do
             end do
         end do
@@ -39,15 +44,11 @@ subroutine CreateICPF
                 end do
             end do
         end do
-    else if (pf_IC.eq.3) then ! 1D freezing validation
+    else if (pf_IC.eq.1) then ! Favier et al (2019) Appendix A3 Validation Case
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
-                    if (xmr(k) < 0.1) then
-                        phi(k,j,i) = 1.0
-                    else
-                        phi(k,j,i) = 0.0
-                    end if
+                    phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - 0.5)/2/pf_eps))
                 end do
             end do
         end do
