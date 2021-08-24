@@ -6,4 +6,4 @@ __pycache__/*
 .ipynb_checkpoints/*
 .vscode/*
 notebooks/*
-examples/*/outputdir
+examples/*/*/*
