@@ -28,9 +28,9 @@
        dsetname = trim('xc')
        call HdfSerialWriteReal1D(dsetname,namfile,xc,nx)
        dsetname = trim('ym')
-       call HdfSerialWriteReal1D(dsetname,namfile,ym,nym)
+       call HdfSerialWriteReal1D(dsetname,namfile,ym(1:nym),nym)
        dsetname = trim('zm')
-       call HdfSerialWriteReal1D(dsetname,namfile,zm,nzm)
+       call HdfSerialWriteReal1D(dsetname,namfile,zm(1:nzm),nzm)
 
        if (multires) then
         dsetname = trim('xmr')

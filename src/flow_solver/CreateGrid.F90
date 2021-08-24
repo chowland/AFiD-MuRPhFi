@@ -48,6 +48,8 @@
        do i=1,nzm
          zm(i)=(zc(i)+zc(i+1))*0.5d0
        end do
+       zm(0) = 2.d0*zm(1) - zm(2)
+       zm(nz) = 2.d0*zm(nzm) - zm(nzm-1)
 
        do j=1,ny
         x2=real(j-1)/real(nym)
@@ -57,6 +59,8 @@
        do j=1,nym
         ym(j)=(yc(j)+yc(j+1))*0.5d0
        end do
+       ym(0) = 2.d0*ym(1) - ym(2)
+       ym(ny) = 2.d0*ym(nym) - ym(nym-1)
 
 !
 !     VERTICAL COORDINATE DEFINITION
