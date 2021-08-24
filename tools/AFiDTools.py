@@ -56,7 +56,7 @@ def read_mean(folder, varname):
         Nsamp = len(samplist)
         nx = f[varname+"/"+samplist[0]].size
         var = np.zeros((nx,Nsamp))
-        i = 1
+        i = 0
         for num in samplist:
             var[:,i] = f[varname+"/"+num][()]
             i = i + 1
