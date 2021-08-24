@@ -28,6 +28,7 @@ subroutine CreateICPF
                     else
                         phi(k,j,i) = 0.0
                     end if
+                    ! phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - 0.1)/2/pf_eps))
                     if (RAYT > 0) phi(k,j,i) = 1.0 - phi(k,j,i)
                 end do
             end do
