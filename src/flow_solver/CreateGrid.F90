@@ -15,7 +15,7 @@
 
       real :: x1,x2,x3
       real :: a33, a33m, a33p
-      real :: delet, etain, tstr3
+      real :: delet, tstr3
       real :: z2dp
 
       real, allocatable, dimension(:) :: etaz, etazm
@@ -111,7 +111,6 @@
         etaz(kc)=etazm(kc+nclip)
       end do
       delet = etaz(1)-etaz(nx)
-      etain = etaz(1)
       do kc=1,nx
         etaz(kc)=etaz(kc)/(0.5*delet)
       end do
