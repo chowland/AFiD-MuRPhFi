@@ -17,7 +17,7 @@ OBJDIR=obj
 ifeq ($(MACHINE),PC_GNU)
 	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -O2
 # FC += -O0 -g -fbacktrace -fbounds-check
-	LDFLAGS = -lfftw3 -llapack -lblas -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+	LDFLAGS = -lfftw3 -llapack -lblas -ldl
 endif
 ifeq ($(MACHINE),PC_INTEL)
 	FC = h5pfc -fpp -r8 -O3
@@ -31,6 +31,11 @@ ifeq ($(MACHINE),CARTESIUS)
 	BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
 	HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
 	LDFLAGS = -lfftw3 $(BLAS_LIBS) $(HDF5_LIBS)
+endif
+ifeq ($(MACHINE),SNELLIUS)
+	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -w -fallow-argument-mismatch -O2
+	BLAS_LIBS = -lscalapack -lopenblas -ldl
+	LDFLAGS = -lfftw3 $(BLAS_LIBS)
 endif
 ifeq ($(MACHINE),IRENE)
 	FC = h5pfc -fpp -r8 -O3 -mavx2 $(FFTW3_FFLAGS)
@@ -49,10 +54,14 @@ ifeq ($(MACHINE),SUPERMUC)
 	LDFLAGS = $(MKL_LIB) $(FFTW_LIB) $(HDF5_LIBS)
 endif
 
-ifeq ($(MACHINE),PC_GNU)
+ifeq ($(MACHINE),SNELLIUS)
 	FC += -J $(OBJDIR)
 else
-	FC += -module $(OBJDIR)
+	ifeq ($(MACHINE),PC_GNU)
+		FC += -J $(OBJDIR)
+	else
+		FC += -module $(OBJDIR)
+	endif
 endif
 
 #=======================================================================
