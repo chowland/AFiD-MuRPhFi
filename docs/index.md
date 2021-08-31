@@ -22,7 +22,7 @@ Differences with [van der Poel et al (2015)](https://doi.org/10.1016/j.compfluid
 Differences with [Ostilla-Monico et al (2015)](https://doi.org/10.1016/j.jcp.2015.08.031):
 
 - Since the current code is modified from AFiD, it is pencil-parallelized in the periodic directions. This contrasts with the previous multi-resolution code, which was slab-parallelized in the wall-normal direction.
-- For reasons linked to this change in parallelization, the only terms calculated implicitly are the diffusive terms with derivatives in the wall-normal direction (e.g. $`\nu \pd_{xx}u`$). All other terms are computed explicitly.
+- For reasons linked to this change in parallelization, the only terms calculated implicitly are the diffusive terms with derivatives in the wall-normal direction (e.g. $`\nu \partial_{xx}u`$). All other terms are computed explicitly.
 - The multiple resolution strategy in time from [Ostilla-Monico et al (2015)](https://doi.org/10.1016/j.jcp.2015.08.031) is not yet implemented in the code. For now, we only rely on a CFL condition.
 
 ## Prerequisites
@@ -41,6 +41,28 @@ A step-by-step guide to installing these on Ubuntu can be found [here](prerequis
 
 ## Building AFiD
 
+A `Makefile` is provided to easily build the program.
+Once all the pre-requisites are installed (along with GNU Make), you only need to run `make` in the command line to build AFiD.
+The `Makefile` contains a variable `MACHINE` that automatically enables a range of appropriate compiler options based on the computer you are using.
+This variable has a range of preset options for HPC facilities across Europe, on which the code compilation has been successful.
+
 ## Running a simulation
+Once AFiD has been successfully compiled, an executable `afid` will be produced in the root directory of the repository.
+You can then add this directory to your `PATH`, say on Ubuntu by adding the following line to your `.profile` file (assuming AFiD-MuRPhFi has been stored in your home directory):
+```
+PATH="$PATH:$HOME/AFiD-MuRPhFi"
+```
+Running a simulation can then be achieved by executing `afid` using `mpiexec` with the following command:
+```
+mpiexec -n N afid Ny Nz
+```
+This command tells `mpiexec` to use `N` cores, and tells `afid` that we want to decompose the domain `Ny` times in the y direction and `Nz` times in the z direction.
+Note that `N`=`Ny`×`Nz` must be satisfied, and `mpiexec` must use the same MPI implementation that you used to compile `afid`.
+
+A range of SLURM submission files will also be provided as examples for use on HPC systems.
 
 ## Post-processing
+
+The `tools` subdirectory contains a range of helper functions in both Python and Julia to enable easy reading and manipulation of the data stored in the output statistics files.
+Both modules are called `AFiDTools`.
+More details on the helper functions will be provided in the documentation, including example Jupyter notebooks and a guide to using ParaView for 3-D visualisation.
