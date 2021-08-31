@@ -18,30 +18,28 @@ subroutine CreateICPF
     implicit none
 
     integer :: i,j,k,kmid
+    real :: r
 
     if (pf_IC.eq.1) then ! 1D freezing validation
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
-                    if (xmr(k) < 0.1) then
-                        phi(k,j,i) = 1.0
-                    else
-                        phi(k,j,i) = 0.0
-                    end if
-                    ! phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - 0.1)/2/pf_eps))
+                    ! if (xmr(k) < 0.1) then
+                    !     phi(k,j,i) = 1.0
+                    ! else
+                    !     phi(k,j,i) = 0.0
+                    ! end if
+                    phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - 0.1)/2/pf_eps))
                     if (RAYT > 0) phi(k,j,i) = 1.0 - phi(k,j,i)
                 end do
             end do
         end do
-    else if (pf_IC.eq.2) then ! Solid sphere of radius 0.15 at x=0.75, centre of yz-domain
+    else if (pf_IC.eq.2) then ! Solid disc of radius 0.1 at x=0.5, centre of y-domain
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
-                    if ((xmr(k) - 0.75)**2 + (ymr(j) - ylen/2)**2 + (zmr(i) - zlen/2)**2 < 0.0225) then
-                        phi(k,j,i) = 1.0
-                    else
-                        phi(k,j,i) = 0.0
-                    end if
+                    r = sqrt((xmr(k) - 0.5)**2 + (ymr(j) - ylen/2)**2)
+                    phi(k,j,i) = 0.5*(1.0 - tanh((r - 0.1)/2/pf_eps))
                 end do
             end do
         end do

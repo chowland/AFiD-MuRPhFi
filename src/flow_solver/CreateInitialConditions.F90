@@ -15,7 +15,7 @@ subroutine CreateInitialConditions
     use mpih
     implicit none
     integer :: j,k,i,kmid
-    real :: xxx,yyy,zzz,eps,varptb,amp,h0,t0,Lambda
+    real :: xxx,yyy,zzz,eps,varptb,amp,h0,t0,Lambda,r
 
     call random_seed()
 
@@ -118,19 +118,13 @@ subroutine CreateInitialConditions
                     end do
                 end do
             end do
-        end if
 
         else if (pf_IC.eq.2) then
             do i=xstart(3),xend(3)
                 do j=xstart(2),xend(2)
                     do k=1,nxm
-                        if ((xm(k) - 0.75)**2 + (ym(j) - ylen/2)**2 + (zm(i) - zlen/2)**2 < 0.0225) then
-                            temp(k,j,i) = 0.0
-                        else
-                            temp(k,j,i) = 1.0
-                        end if
-                        call random_number(varptb)
-                        temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
+                        r = sqrt((xm(k) - 0.5)**2 + (ym(j) - ylen/2)**2)
+                        temp(k,j,i) = 0.5*(1.0 + tanh(100.0*(r - 0.1)))
                     end do
                 end do
             end do
@@ -160,6 +154,7 @@ subroutine CreateInitialConditions
                     end if
                 end do
             end do
+        end if
 
         if (salinity) then
             kmid = nxm/2
