@@ -134,6 +134,7 @@ $$
 $$
 \partial_t T + (\boldsymbol{u} \cdot \boldsymbol{\nabla}) T = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T + \mathcal{S}\partial_t \phi ,
 $$
+
 where $\eta = (\beta \varepsilon)^2$ is the volume penalty coefficient for a dimensionless diffusive interface thickness $\varepsilon$ and $\mathcal{S}=L/c_p\Delta T$ is the Stefan number.
 $L$ is the latent heat of solidification, and $c_p$ is the specific heat capacity which, like the diffusivity of heat $\kappa_T$, is assumed to be equal in the solid and liquid phases.
 Following [Hester et al (2020)](https://doi.org/10.1098/rspa.2020.0508), we take $\beta=1.51044385$ as the optimal coefficient for the smooth volume penalty term.
