@@ -256,6 +256,7 @@ def generate_field_xmf(folder, var):
     for file in os.listdir(folder+"/outputdir/fields"):
         if var in file:
             samplist.append(int(file[:5]))
+    samplist.sort()
 
     # Check the time interval used for field writing from bou.in
     with open(folder+"/bou.in","r") as f:
@@ -277,7 +278,7 @@ def generate_field_xmf(folder, var):
     fields, geom, xdata, ydata, zdata = (), (), (), (), ()
     var_att, var_slab, slab_data, var_data = (), (), (), ()
 
-    for i in samplist:
+    for i, j in enumerate(samplist):
         fields = fields + (SubElement(time_series, "Grid", attrib={
             "Name":"field", "GridType":"Uniform"
         }),)
@@ -318,7 +319,7 @@ def generate_field_xmf(folder, var):
         var_data = var_data + (SubElement(var_slab[i], "DataItem", attrib={
             "Dimensions":"%i %i %i" % fulldims, "Format":"HDF"
         }),)
-        var_data[i].text = "fields/%05i_" % i + var +".h5:/var"
+        var_data[i].text = "fields/%05i_" % j + var +".h5:/var"
 
     # Convert xmf structure to string
     rough_xmf = ElementTree.tostring(Xdmf, "utf-8")
