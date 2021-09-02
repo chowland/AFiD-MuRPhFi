@@ -2,6 +2,7 @@
 
 import h5py
 import numpy as np
+import os
 
 class Grid:
     def __init__(self, xm, xmr, xc, xcr, ym, ymr, yc, ycr, zm, zmr, zc, zcr):
@@ -56,7 +57,7 @@ def read_mean(folder, varname):
         Nsamp = len(samplist)
         nx = f[varname+"/"+samplist[0]].size
         var = np.zeros((nx,Nsamp))
-        i = 1
+        i = 0
         for num in samplist:
             var[:,i] = f[varname+"/"+num][()]
             i = i + 1
@@ -149,6 +150,12 @@ def generate_cut_xmf(folder, plane):
         Nsamp = len(list(f["temp"].keys()))
     varlist = ["vx", "vy", "vz", "temp"]
 
+    # Check the time interval used for frame writing from bou.in
+    with open(folder+"/bou.in","r") as f:
+        for i, line in enumerate(f):
+            if i==22:
+                t_frame = float(line.split()[1])
+
 
     ### BUILD THE XMF STRUCTURE ###
     Xdmf = Element("Xdmf")
@@ -169,7 +176,7 @@ def generate_cut_xmf(folder, plane):
             "Name":plane+"cut", "GridType":"Uniform"
         }),)
 
-        SubElement(cuts[i], "Time", attrib={"Value":"%.1f" % float(0.1*i)})
+        SubElement(cuts[i], "Time", attrib={"Value":"%.1f" % float(t_frame*i)})
 
         SubElement(cuts[i], "Topology", attrib={
             "TopologyType":"3DRectMesh", "Dimensions":"%i %i" % dims
@@ -211,3 +218,222 @@ def generate_cut_xmf(folder, plane):
     formatted_xmf = minidom.parseString(rough_xmf)
     with open(folder+"/outputdir/flowmov/movie_"+plane+"cut.xmf","w") as f:
         f.write(formatted_xmf.toprettyxml(indent="  "))
+
+
+
+def generate_field_xmf(folder, var):
+    """
+    Generates an xmf file in the Xdmf format to allow reading of
+    the 3D fields in ParaView. Specify the variable `var`
+    ("vx", "vy", "vz", "temp", "sal", "phi") and the `folder`
+    containing the simulation.
+    """
+
+    # Read the grid data from the simulation
+    grid = read_grid(folder)
+    nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
+    nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
+
+    # Store the appropriate grid sizes and names based on the variable
+    fulldims = (nzm, nym, nxm+1)
+    xx, yy, zz = "xm", "ym", "zm"
+    if var=="vx":
+        dims = (nzm, nym, nxm+1)
+        xx = "xc"
+    elif var in "phisal":
+        dims = (nzmr, nymr, nxmr)
+        fulldims = (nzmr, nymr, nxmr+1)
+        xx, yy, zz = "xmr", "ymr", "zmr"
+    else:
+        dims = (nzm, nym, nxm)
+        if var=="vy":
+            yy = "yc"
+        elif var=="vz":
+            zz = "zc"
+    
+    # Collect indices of saved fields
+    samplist = []
+    for file in os.listdir(folder+"/outputdir/fields"):
+        if var in file:
+            samplist.append(int(file[:5]))
+    samplist.sort()
+
+    # Check the time interval used for field writing from bou.in
+    with open(folder+"/bou.in","r") as f:
+        for i, line in enumerate(f):
+            if i==22:
+                t_field = float(line.split()[2])
+
+
+    ### BUILD THE XMF STRUCTURE ###
+    Xdmf = Element("Xdmf")
+
+    top_domain = SubElement(Xdmf, "Domain")
+
+    # Create Grid element to store the time series
+    time_series = SubElement(top_domain, "Grid", attrib={
+        "Name":"Time", "GridType":"Collection", "CollectionType":"Temporal"
+    })
+
+    fields, geom, xdata, ydata, zdata = (), (), (), (), ()
+    var_att, var_slab, slab_data, var_data = (), (), (), ()
+
+    for i, j in enumerate(samplist):
+        fields = fields + (SubElement(time_series, "Grid", attrib={
+            "Name":"field", "GridType":"Uniform"
+        }),)
+
+        SubElement(fields[i], "Time", attrib={"Value":"%.1f" % float(t_field*i)})
+
+        SubElement(fields[i], "Topology", attrib={
+            "TopologyType":"3DRectMesh", "Dimensions":"%i %i %i" % dims
+        })
+        
+        geom = geom + (SubElement(fields[i], "Geometry", attrib={
+            "GeometryType":"VXVYVZ"
+        }),)
+        zdata = zdata + (SubElement(geom[i], "DataItem", attrib={
+            "Dimensions":"%i" % dims[2], "Format":"HDF"
+        }),)
+        zdata[i].text = "cordin_info.h5:/"+xx
+        ydata = ydata + (SubElement(geom[i], "DataItem", attrib={
+            "Dimensions":"%i" % dims[1], "Format":"HDF"
+        }),)
+        ydata[i].text = "cordin_info.h5:/"+yy
+        xdata = xdata + (SubElement(geom[i], "DataItem", attrib={
+            "Dimensions":"%i" % dims[0], "Format":"HDF"
+        }),)
+        xdata[i].text = "cordin_info.h5:/"+zz
+        
+        var_att = var_att + (SubElement(fields[i], "Attribute", attrib={
+            "Name":var, "AttributeType":"Scalar", "Center":"Node"
+        }),)
+        var_slab = var_slab + (SubElement(var_att[i], "DataItem", attrib={
+            "ItemType":"HyperSlab", "Dimensions":"%i %i %i" % dims,
+            "Type": "HyperSlab"
+        }),)
+        slab_data = slab_data + (SubElement(var_slab[i], "DataItem", attrib={
+            "Dimensions":"3 3", "Format":"XML"
+        }),)
+        slab_data[i].text = "0 0 0 1 1 1 %i %i %i" % dims
+        var_data = var_data + (SubElement(var_slab[i], "DataItem", attrib={
+            "Dimensions":"%i %i %i" % fulldims, "Format":"HDF"
+        }),)
+        var_data[i].text = "fields/%05i_" % j + var +".h5:/var"
+
+    # Convert xmf structure to string
+    rough_xmf = ElementTree.tostring(Xdmf, "utf-8")
+
+    # Format string for readability and write to file
+    formatted_xmf = minidom.parseString(rough_xmf)
+    with open(folder+"/outputdir/"+var+"_fields.xmf","w") as f:
+        f.write(formatted_xmf.toprettyxml(indent="  "))
+
+
+def generate_rawfield_xmf(folder, var):
+    """
+    Generates an xmf file in the Xdmf format to allow reading of
+    the 3D fields in ParaView. Specify the variable `var`
+    ("vx", "vy", "vz", "temp", "sal", "phi") and the `folder`
+    containing the simulation.
+    """
+
+    # Read the grid data from the simulation
+    grid = read_grid(folder)
+    nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
+    nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
+
+    # Store the appropriate grid sizes and names based on the variable
+    if var in "phisal":
+        dims = (nzmr, nymr, nxmr+1)
+        xx, yy, zz = "xcr", "ymr", "zmr"
+    else:
+        dims = (nzm, nym, nxm+1)
+        xx, yy, zz = "xc", "ym", "zm"
+    
+    # Collect indices of saved fields
+    samplist = []
+    for file in os.listdir(folder+"/outputdir/fields"):
+        if var in file:
+            samplist.append(int(file[:5]))
+    samplist.sort()
+
+    # Check the time interval used for field writing from bou.in
+    with open(folder+"/bou.in","r") as f:
+        for i, line in enumerate(f):
+            if i==22:
+                t_field = float(line.split()[2])
+
+
+    ### BUILD THE XMF STRUCTURE ###
+    Xdmf = Element("Xdmf")
+
+    top_domain = SubElement(Xdmf, "Domain")
+
+    # Create Grid element to store the time series
+    time_series = SubElement(top_domain, "Grid", attrib={
+        "Name":"Time", "GridType":"Collection", "CollectionType":"Temporal"
+    })
+
+    fields, geom, xdata, ydata, zdata = (), (), (), (), ()
+    var_att, var_data = (), ()
+
+    for i, j in enumerate(samplist):
+        fields = fields + (SubElement(time_series, "Grid", attrib={
+            "Name":"field", "GridType":"Uniform"
+        }),)
+
+        SubElement(fields[i], "Time", attrib={"Value":"%.1f" % float(t_field*i)})
+
+        SubElement(fields[i], "Topology", attrib={
+            "TopologyType":"3DSMesh", "Dimensions":"%i %i %i" % dims
+        })
+        
+        geom = geom + (SubElement(fields[i], "Geometry", attrib={
+            "GeometryType":"X_Y_Z"
+        }),)
+        zdata = zdata + (SubElement(geom[i], "DataItem", attrib={
+            "Dimensions":"%i %i %i" % dims, "Format":"HDF"
+        }),)
+        zdata[i].text = "fields/grids.h5:/"+xx
+        ydata = ydata + (SubElement(geom[i], "DataItem", attrib={
+            "Dimensions":"%i %i %i" % dims, "Format":"HDF"
+        }),)
+        ydata[i].text = "fields/grids.h5:/"+yy
+        xdata = xdata + (SubElement(geom[i], "DataItem", attrib={
+            "Dimensions":"%i %i %i" % dims, "Format":"HDF"
+        }),)
+        xdata[i].text = "fields/grids.h5:/"+zz
+        
+        var_att = var_att + (SubElement(fields[i], "Attribute", attrib={
+            "Name":var, "AttributeType":"Scalar", "Center":"Node"
+        }),)
+        var_data = var_data + (SubElement(var_att[i], "DataItem", attrib={
+            "Dimensions":"%i %i %i" % dims, "Format":"HDF"
+        }),)
+        var_data[i].text = "fields/%05i_" % j + var +".h5:/var"
+
+    # Convert xmf structure to string
+    rough_xmf = ElementTree.tostring(Xdmf, "utf-8")
+
+    # Format string for readability and write to file
+    formatted_xmf = minidom.parseString(rough_xmf)
+    with open(folder+"/outputdir/"+var+"_fields.xmf","w") as f:
+        f.write(formatted_xmf.toprettyxml(indent="  "))
+
+def create_3D_grids(folder):
+    grid = read_grid(folder)
+    dims = (grid.zm.size, grid.ym.size, grid.xc.size)
+    tmp = np.zeros(dims)
+    for i in range(dims[0]):
+        tmp[i,:,:] = grid.zm[i]
+    with h5py.File(folder+"/outputdir/fields/grids.h5","a") as f:
+        f["zm"] = tmp
+    for j in range(dims[1]):
+        tmp[:,j,:] = grid.ym[j]
+    with h5py.File(folder+"/outputdir/fields/grids.h5","a") as f:
+        f["ym"] = tmp
+    for k in range(dims[2]):
+        tmp[:,:,k] = grid.xc[k]
+    with h5py.File(folder+"/outputdir/fields/grids.h5","a") as f:
+        f["xc"] = tmp

@@ -15,7 +15,7 @@ subroutine CreateInitialConditions
     use mpih
     implicit none
     integer :: j,k,i,kmid
-    real :: xxx,yyy,zzz,eps,varptb,amp,h0,t0,Lambda
+    real :: xxx,yyy,zzz,eps,varptb,amp,h0,t0,Lambda,r
 
     call random_seed()
 
@@ -101,7 +101,35 @@ subroutine CreateInitialConditions
 
     if (phasefield) then
 
-        if (pf_IC.eq.1) then ! Favier et al (2019) Appendix A3 Validation Case
+        if (pf_IC.eq.1) then        ! 1D moving interface example
+            h0 = 0.1                ! Freezing if RAYT < 0
+            Lambda = 0.620063       ! Melting if RAYT > 0
+            t0 = pect * (h0/2/Lambda)**2
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xm(k)
+                        if (xxx < h0) then
+                            temp(k,j,i) = erf(xxx*sqrt(pect/t0)/2)/erf(Lambda)
+                        else
+                            temp(k,j,i) = 1.0
+                        end if
+                        if (RAYT > 0) temp(k,j,i) = 1.0 - temp(k,j,i)
+                    end do
+                end do
+            end do
+
+        else if (pf_IC.eq.2) then
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        r = sqrt((xm(k) - 0.5)**2 + (ym(j) - ylen/2)**2)
+                        temp(k,j,i) = 0.5*(1.0 + tanh(100.0*(r - 0.1)))
+                    end do
+                end do
+            end do
+
+        else if (pf_IC.eq.3) then ! Favier et al (2019) Appendix A3 Validation Case
             eps = 0.1
             kmid = nxm/2
             do i=xstart(3),xend(3)
@@ -127,31 +155,12 @@ subroutine CreateInitialConditions
                 end do
             end do
 
-        else if (pf_IC.eq.2) then
+        elseif (pf_IC==4) then ! Ice block to compare with Neufeld et al (2010)
             do i=xstart(3),xend(3)
                 do j=xstart(2),xend(2)
                     do k=1,nxm
-                        if ((xm(k) - 0.75)**2 + (ym(j) - ylen/2)**2 + (zm(i) - zlen/2)**2 < 0.0225) then
+                        if ((xm(k) < 0.25) .and. (abs(ym(j) - ylen/2) < ylen/4)) then
                             temp(k,j,i) = 0.0
-                        else
-                            temp(k,j,i) = 1.0
-                        end if
-                        call random_number(varptb)
-                        temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
-                    end do
-                end do
-            end do
-
-        else if (pf_IC.eq.3) then
-            h0 = 0.1
-            Lambda = 0.620063
-            t0 = pect * (h0/2/Lambda)**2
-            do i=xstart(3),xend(3)
-                do j=xstart(2),xend(2)
-                    do k=1,nxm
-                        xxx = xm(k)
-                        if (xxx < h0) then
-                            temp(k,j,i) = erf(xxx*sqrt(pect/t0)/2)/erf(Lambda)
                         else
                             temp(k,j,i) = 1.0
                         end if

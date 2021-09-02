@@ -1,5 +1,6 @@
 site_name: AFiD-MuRPhFi Documentation
 site_url: https://chowland.github.io/AFiD-MuRPhFi/
+repo_name: chowland/AFiD-MuRPhFi
 repo_url: https://github.com/chowland/AFiD-MuRPhFi
 site_author: Chris Howland
 markdown_extensions:
@@ -19,6 +20,7 @@ theme:
     font: false
     icon:
         logo: fontawesome/solid/wind
+        repo: fontawesome/brands/github
     favicon: assets/favicon.png
 nav:
     - 'index.md'
@@ -32,8 +34,8 @@ nav:
     - Examples:
         - 'examples/rbc.md'
         - 'examples/ddc.md'
-        - 'examples/freezing.md'
-        - 'examples/melting_rbc.md'
+        - 'examples/stefan.md'
+        - 'examples/coupled_flows.md'
     - 'Benchmarking and validation':
         - 'compilers.md'
         - 'convergence.md'

@@ -15,7 +15,8 @@ export
 using
     DelimitedFiles,
     HDF5,
-    Interpolations
+    Interpolations,
+    Statistics
 
 """
     function read_grid(folder::String)
