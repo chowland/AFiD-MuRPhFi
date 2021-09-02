@@ -154,6 +154,19 @@ subroutine CreateInitialConditions
                     end if
                 end do
             end do
+
+        elseif (pf_IC==4) then ! Ice block to compare with Neufeld et al (2010)
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        if ((xm(k) < 0.25) .and. (abs(ym(j) - ylen/2) < ylen/4)) then
+                            temp(k,j,i) = 0.0
+                        else
+                            temp(k,j,i) = 1.0
+                        end if
+                    end do
+                end do
+            end do
         end if
 
         if (salinity) then

@@ -43,11 +43,23 @@ subroutine CreateICPF
                 end do
             end do
         end do
-    else if (pf_IC.eq.1) then ! Favier et al (2019) Appendix A3 Validation Case
+    else if (pf_IC.eq.3) then ! Favier et al (2019) Appendix A3 Validation Case
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
                     phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - 0.5)/2/pf_eps))
+                end do
+            end do
+        end do
+    else if (pf_IC==4) then ! Ice block to compare with Neufeld et al. (2010)
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    if ((xmr(k) < 0.25) .and. (abs(ymr(j) - ylen/2) < ylen/4)) then
+                        phi(k,j,i) = 1.0
+                    else
+                        phi(k,j,i) = 0.0
+                    end if
                 end do
             end do
         end do
