@@ -330,7 +330,6 @@ def generate_field_xmf(folder, var):
         f.write(formatted_xmf.toprettyxml(indent="  "))
 
 
-
 def generate_rawfield_xmf(folder, var):
     """
     Generates an xmf file in the Xdmf format to allow reading of
@@ -387,24 +386,24 @@ def generate_rawfield_xmf(folder, var):
         SubElement(fields[i], "Time", attrib={"Value":"%.1f" % float(t_field*i)})
 
         SubElement(fields[i], "Topology", attrib={
-            "TopologyType":"3DRectMesh", "Dimensions":"%i %i %i" % dims
+            "TopologyType":"3DSMesh", "Dimensions":"%i %i %i" % dims
         })
         
         geom = geom + (SubElement(fields[i], "Geometry", attrib={
-            "GeometryType":"VXVYVZ"
+            "GeometryType":"X_Y_Z"
         }),)
         zdata = zdata + (SubElement(geom[i], "DataItem", attrib={
-            "Dimensions":"%i" % dims[2], "Format":"HDF"
+            "Dimensions":"%i %i %i" % dims, "Format":"HDF"
         }),)
-        zdata[i].text = "cordin_info.h5:/"+xx
+        zdata[i].text = "fields/grids.h5:/"+xx
         ydata = ydata + (SubElement(geom[i], "DataItem", attrib={
-            "Dimensions":"%i" % dims[1], "Format":"HDF"
+            "Dimensions":"%i %i %i" % dims, "Format":"HDF"
         }),)
-        ydata[i].text = "cordin_info.h5:/"+yy
+        ydata[i].text = "fields/grids.h5:/"+yy
         xdata = xdata + (SubElement(geom[i], "DataItem", attrib={
-            "Dimensions":"%i" % dims[0], "Format":"HDF"
+            "Dimensions":"%i %i %i" % dims, "Format":"HDF"
         }),)
-        xdata[i].text = "cordin_info.h5:/"+zz
+        xdata[i].text = "fields/grids.h5:/"+zz
         
         var_att = var_att + (SubElement(fields[i], "Attribute", attrib={
             "Name":var, "AttributeType":"Scalar", "Center":"Node"
@@ -421,3 +420,20 @@ def generate_rawfield_xmf(folder, var):
     formatted_xmf = minidom.parseString(rough_xmf)
     with open(folder+"/outputdir/"+var+"_fields.xmf","w") as f:
         f.write(formatted_xmf.toprettyxml(indent="  "))
+
+def create_3D_grids(folder):
+    grid = read_grid(folder)
+    dims = (grid.zm.size, grid.ym.size, grid.xc.size)
+    tmp = np.zeros(dims)
+    for i in range(dims[0]):
+        tmp[i,:,:] = grid.zm[i]
+    with h5py.File(folder+"/outputdir/fields/grids.h5","a") as f:
+        f["zm"] = tmp
+    for j in range(dims[1]):
+        tmp[:,j,:] = grid.ym[j]
+    with h5py.File(folder+"/outputdir/fields/grids.h5","a") as f:
+        f["ym"] = tmp
+    for k in range(dims[2]):
+        tmp[:,:,k] = grid.xc[k]
+    with h5py.File(folder+"/outputdir/fields/grids.h5","a") as f:
+        f["xc"] = tmp
