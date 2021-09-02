@@ -1,6 +1,6 @@
 # Flows coupled to phase change
 
-## 2-D Rayleigh Bénard with a melting boundary
+## 2-D Rayleigh-Bénard with a melting boundary
 This example is taken from appendix A.3 of [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773).
 We consider the convection flow between a heated lower plate and a moving phase boundary.
 There is no analytic form for the solution of this flow, so we can only perform a relative convergence study and compare to the results of [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773).
