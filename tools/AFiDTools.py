@@ -219,8 +219,6 @@ def generate_cut_xmf(folder, plane):
     with open(folder+"/outputdir/flowmov/movie_"+plane+"cut.xmf","w") as f:
         f.write(formatted_xmf.toprettyxml(indent="  "))
 
-
-
 def generate_field_xmf(folder, var):
     """
     Generates an xmf file in the Xdmf format to allow reading of
@@ -329,11 +327,13 @@ def generate_field_xmf(folder, var):
     with open(folder+"/outputdir/"+var+"_fields.xmf","w") as f:
         f.write(formatted_xmf.toprettyxml(indent="  "))
 
-
 def generate_uniform_xmf(folder, var):
     """
     Generates an xmf file in the Xdmf format to allow reading of
-    the 3D fields in ParaView. Specify the variable `var`
+    the 3D fields in ParaView. This function produces a 3D array 
+    on a grid with uniform spacing, allowing for fast volume rendering.
+    If grid stretching is used in the simulation, the visualisation
+    will not be accurate! Specify the variable `var`
     ("vx", "vy", "vz", "temp", "sal", "phi") and the `folder`
     containing the simulation.
     """
@@ -343,7 +343,8 @@ def generate_uniform_xmf(folder, var):
     nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
     nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
     dx, dy, dz = 1/nxm, grid.yc[-1]/nym, grid.zc[-1]/nzm
-    # dxr, dyr, dzr = 1/nxmr, grid.ycr[-1]/nymr, grid.zcr[-1]/nzmr
+    if nxmr!=0:
+        dxr, dyr, dzr = 1/nxmr, grid.ycr[-1]/nymr, grid.zcr[-1]/nzmr
 
     # Store the appropriate grid sizes and names based on the variable
     fulldims = (nzm, nym, nxm+1)
@@ -405,10 +406,13 @@ def generate_uniform_xmf(folder, var):
             origin_data[i].text = 3*"%.5f " % (dx/2, dy/2, 0)
         elif var=="temp":
             origin_data[i].text = 3*"%.5f " % (dx/2, dy/2, dz/2)
+        else:
+            origin_data[i].text = 3*"%.5f " % (dxr/2, dyr/2, dzr/2)
         step_data = step_data + (SubElement(geom[i], "DataItem", attrib={"Dimensions":"3"}),)
-        step_data[i].text = 3*"%.5f " % (dx, dy, dz)
-        # else:
-        #     geom[i].text = 6*"%.2f " % (dxr/2, dyr/2, dzr/2, dxr, dyr, dzr)
+        if var in "phisal":
+            step_data[i].text = 3*"%.5f " % (dxr, dyr, dzr)
+        else:
+            step_data[i].text = 3*"%.5f " % (dx, dy, dz)
 
         var_att = var_att + (SubElement(fields[i], "Attribute", attrib={
             "Name":var, "AttributeType":"Scalar", "Center":"Node"
@@ -438,7 +442,10 @@ def generate_uniform_xmf(folder, var):
 def generate_rawfield_xmf(folder, var):
     """
     Generates an xmf file in the Xdmf format to allow reading of
-    the 3D fields in ParaView. Specify the variable `var`
+    the 3D fields in ParaView. Creates a 3D structured mesh that requires
+    the `grids.h5` file to be produced by the helper function 
+    `create_3D_grids`. Volume rendering is possible, but very slow with
+    this output. Specify the variable `var`
     ("vx", "vy", "vz", "temp", "sal", "phi") and the `folder`
     containing the simulation.
     """
@@ -527,6 +534,10 @@ def generate_rawfield_xmf(folder, var):
         f.write(formatted_xmf.toprettyxml(indent="  "))
 
 def create_3D_grids(folder):
+    """
+    Creates a grids.h5 file containing 3D arrays with the
+    locations of the xc, ym, zm grids at each spatial point.
+    """
     grid = read_grid(folder)
     dims = (grid.zm.size, grid.ym.size, grid.xc.size)
     tmp = np.zeros(dims)
