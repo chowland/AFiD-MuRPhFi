@@ -10,13 +10,17 @@ export
     xmean,
     ddx,
     coarsen,
-    refine
+    refine,
+    xmf_cuts,
+    xmf_fields
 
 using
     DelimitedFiles,
     HDF5,
     Interpolations,
-    Statistics
+    Statistics,
+    LightXML,
+    Printf
 
 """
     function read_grid(folder::String)
@@ -40,11 +44,13 @@ function read_grid(folder::String)
         dy = ym[2] - ym[1]
         yc = 0:dy:dy*length(ym)
     else
-        yc = []
+        yc = [0,2*ym[1]]
     end
     if length(ymr)>1
         dyr = ymr[2] - ymr[1]
         ycr = 0:dyr:dyr*length(ymr)
+    elseif length(ymr)==1
+        ycr = [0,2*ymr[1]]
     else
         ycr = []
     end
@@ -52,11 +58,13 @@ function read_grid(folder::String)
         dz = zm[2] - zm[1]
         zc = 0:dz:dz*length(zm)
     else
-        zc = []
+        zc = [0,2*zm[1]]
     end
     if length(zmr)>1
         dzr = zmr[2] - zmr[1]
         zcr = 0:dzr:dzr*length(zmr)
+    elseif length(zmr)==1
+        zcr = [0,2*zmr[1]]
     else
         zcr = []
     end
@@ -243,6 +251,145 @@ function refine(var::Vector{Float64}, grid)
     itp = interpolate(nodes, tmpvar, Gridded(Linear()))
     varr = itp.(grid.xmr)
     return varr
+end
+
+"""
+    function xmf_cuts(folder::String)
+"""
+function xmf_cuts(folder::String)
+
+    grid = read_grid(folder)
+    nxm, nym, nzm = length(grid.xm), length(grid.ym), length(grid.zm)
+    dims = Dict(string(key) => length(grid[key]) for key in keys(grid))
+    cutdims = Dict{String,Int64}()
+    grids = Dict(
+        "vx" => Dict("x"=>"xc", "y"=>"ym", "z"=>"zm"),
+        "vy" => Dict("x"=>"xm", "y"=>"ym", "z"=>"zm"),
+        "vz" => Dict("x"=>"xm", "y"=>"ym", "z"=>"zm"),
+        "temp" => Dict("x"=>"xm", "y"=>"ym", "z"=>"zm"),
+        "sal" => Dict("x"=>"xmr", "y"=>"ymr", "z"=>"zmr"),
+        "phi" => Dict("x"=>"xmr", "y"=>"ymr", "z"=>"zmr")
+    )
+
+    dt = readdlm(folder*"/bou.in")[18,2]
+    cut_vals = Dict("x"=>grid.xm[1], "y"=>grid.yc[end]/2, "z"=>grid.zc[end]/2)
+
+    for plane in ["x","y","z"]
+        f = h5open(folder*"/outputdir/flowmov/movie_"*plane*"cut.h5","r")
+        varlist = keys(f)
+        samplist = parse.(Int, keys(f["temp"]))
+        close(f)
+        for var in varlist
+            xdoc = XMLDocument()
+            xroot= create_root(xdoc, "Xdmf")
+            droot= new_child(xroot, "Domain")
+            troot= new_child(droot, "Grid")
+            set_attributes(troot; GridType="Collection", CollectionType="Temporal")
+            for i in samplist
+                xcut = new_child(troot, "Grid")
+                set_attributes(xcut)
+                time = new_child(xcut, "Time")
+                set_attributes(time; Value=@sprintf("%.2f", i*dt))
+                for k in keys(grids[var])
+                    cutdims[k] = dims[grids[var][k]]
+                end
+                cutdims[plane] = 1
+                mesh = new_child(xcut, "Topology")
+                set_attributes(mesh; TopologyType="3DRectMesh", Dimensions=@sprintf("%i %i %i", cutdims["z"], cutdims["y"], cutdims["x"]))
+                geom = new_child(xcut, "Geometry")
+                set_attributes(geom; GeometryType="VXVYVZ")
+                for grid in ["x","y","z"]
+                    grid_data = new_child(geom, "DataItem")
+                    if plane==grid
+                        set_attributes(grid_data; Dimensions="1")
+                        add_text(grid_data, @sprintf("%.3f", cut_vals[plane]))
+                    else
+                        set_attributes(grid_data; Dimensions=@sprintf("%i", cutdims[grid]), Format="HDF")
+                        add_text(grid_data, "../cordin_info.h5:/"*grids[var][grid])
+                    end
+                end
+                att = new_child(xcut, "Attribute")
+                set_attributes(att; AttributeType="Scalar", Center="Node", Name=var)
+                data = new_child(att, "DataItem")
+                set_attributes(data; Dimensions=@sprintf("%i %i %i", cutdims["z"], cutdims["y"], cutdims["x"]), Format="HDF")
+                add_text(data, "movie_"*plane*"cut.h5:/"*var*"/"*@sprintf("%05i", i))
+            end
+            save_file(xdoc, folder*"/outputdir/flowmov/"*var*"_"*plane*"cut.xmf")
+        end
+    end
+end
+
+"""
+    function xmf_fields(folder::String)
+"""
+function xmf_fields(folder::String)
+
+    grid = read_grid(folder)
+    nxm, nym, nzm = length(grid.xm), length(grid.ym), length(grid.zm)
+    nxmr, nymr, nzmr = length(grid.xmr), length(grid.ymr), length(grid.zmr)
+    dx, dy, dz = 1/nxm, grid.yc[end]/nym, grid.zc[end]/nzm
+    if nxmr!=0
+        dxr, dyr, dzr = 1/nxmr, grid.ycr[end]/nymr, grid.zcr[end]/nzmr
+    end
+    dims = Dict(string(key) => length(grid[key]) for key in keys(grid))
+    fielddims = Dict{String,Int64}()
+    grids = Dict(
+        "vx" => Dict("x"=>"xc", "y"=>"ym", "z"=>"zm"),
+        "vy" => Dict("x"=>"xm", "y"=>"ym", "z"=>"zm"),
+        "vz" => Dict("x"=>"xm", "y"=>"ym", "z"=>"zm"),
+        "temp" => Dict("x"=>"xm", "y"=>"ym", "z"=>"zm"),
+        "sal" => Dict("x"=>"xmr", "y"=>"ymr", "z"=>"zmr"),
+        "phi" => Dict("x"=>"xmr", "y"=>"ymr", "z"=>"zmr")
+    )
+
+    dt = readdlm(folder*"/bou.in")[18,2]
+    varlist = unique(replace(t->t[7:end-3],readdir(folder*"/outputdir/fields")))
+    for var in varlist
+        samplist = parse.(Int, replace(t->t[1:5], filter(t->t[7:end-3]=="temp",readdir(folder*"/outputdir/fields"))))
+        sort!(samplist)
+        xdoc = XMLDocument()
+        xroot= create_root(xdoc, "Xdmf")
+        droot= new_child(xroot, "Domain")
+        troot= new_child(droot, "Grid")
+        set_attributes(troot; GridType="Collection", CollectionType="Temporal")
+        for i in samplist
+            field = new_child(troot, "Grid")
+            set_attributes(field)
+            time = new_child(field, "Time")
+            set_attributes(time; Value=@sprintf("%.2f", i*dt))
+            for k in keys(grids[var])
+                fielddims[k] = dims[grids[var][k]]
+                if occursin("yc",grids[var][k]) || occursin("zc",grids[var][k])
+                    fielddims[k] = fielddims[k] - 1
+                end
+            end
+            mesh = new_child(field, "Topology")
+            set_attributes(mesh; TopologyType="3DCoRectMesh", Dimensions=@sprintf("%i %i %i", fielddims["z"], fielddims["y"], fielddims["x"]))
+            geom = new_child(field, "Geometry")
+            set_attributes(geom; GeometryType="ORIGIN_DXDYDZ")
+            origin = new_child(geom, "DataItem")
+            set_attributes(origin; Dimensions="3")
+            add_text(origin, @sprintf("%.5f %.5f %.5f", grid[Symbol(grids[var]["x"])][1], grid[Symbol(grids[var]["y"])][1], grid[Symbol(grids[var]["z"])][1]))
+            step = new_child(geom, "DataItem")
+            set_attributes(step; Dimensions="3")
+            if occursin(var, "phisal")
+                add_text(step, @sprintf("%.5f %.5f %.5f", dxr, dyr, dzr))
+            else
+                add_text(step, @sprintf("%.5f %.5f %.5f", dx, dy, dz))
+            end
+            att = new_child(field, "Attribute")
+            set_attributes(att; AttributeType="Scalar", Center="Node", Name=var)
+            slab = new_child(att, "DataItem")
+            set_attributes(slab, ItemType="HyperSlab", Dimensions=@sprintf("%i %i %i", fielddims["z"], fielddims["y"], fielddims["x"]), Type="HyperSlab")
+            slabstep = new_child(slab, "DataItem")
+            set_attributes(slabstep, Dimensions="3 3")
+            add_text(slabstep, @sprintf("0 0 0 1 1 1 %i %i %i", fielddims["z"], fielddims["y"], fielddims["x"]))
+            data = new_child(slab, "DataItem")
+            set_attributes(data; Dimensions=@sprintf("%i %i %i", fielddims["z"], fielddims["y"], fielddims["x"]), Format="HDF")
+            add_text(data, "fields/"*@sprintf("%05i", i)*"_"*var*".h5:/var")
+        end
+        save_file(xdoc, folder*"/outputdir/"*var*"_fields.xmf")
+    end
 end
 
 end # module
