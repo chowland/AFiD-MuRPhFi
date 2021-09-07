@@ -36,18 +36,22 @@ def read_grid(folder):
     if ym.size > 1:
         dy = ym[1] - ym[0]
         yc = np.arange(0, dy*(ym.size+1), dy)
-    else: yc = []
+    else: yc = np.array([0, 2*ym[0]])
     if ymr.size > 1:
         dyr = ymr[1] - ymr[0]
         ycr = np.arange(0, dyr*(ymr.size+1), dyr)
+    elif ymr.size==1:
+        ycr = np.array([0,2*ymr[0]])
     else: ycr = []
     if zm.size > 1:
         dz = zm[1] - zm[0]
         zc = np.arange(0, dz*(zm.size+1), dz)
-    else: zc = []
+    else: zc = np.array([0, 2*zm[0]])
     if zmr.size > 1:
         dzr = zmr[1] - zmr[0]
         zcr = np.arange(0, dzr*(zmr.size+1), dzr)
+    elif zmr.size==1:
+        zcr = np.array([0,2*zmr[0]])
     else: zcr = []
     return Grid(xm, xmr, xc, xcr, ym, ymr, yc, ycr, zm, zmr, zc, zcr)
 
