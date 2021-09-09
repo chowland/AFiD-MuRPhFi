@@ -51,8 +51,8 @@
         km=kmv(kc)
         kp=kpv(kc)
 
-        a33icc=kmc(kc)*dxq/g3rc(kc)
-        a33icp=kpc(kc)*dxq/g3rc(kp)
+        a33icc=kmc(kc)*dxq/d3xm(km)
+        a33icp=kpc(kc)*dxq/d3xm(kc)
         ugmmm=1.0d0/d3xc(kc)
 
         amphk(kc)=a33icc*ugmmm
