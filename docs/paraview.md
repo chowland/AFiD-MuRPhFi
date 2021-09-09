@@ -43,7 +43,7 @@ Python and Julia functions are provided to produce these XML files for the 2D sl
 A (somewhat poorly maintained) overview of XDMF and the structure of these XML files can be found on the [XDMF website](https://www.xdmf.org/index.php/XDMF_Model_and_Format).
 
 ### 2D slices from `flowmov`
-Although viewing the 2D slices can be easily done in [Jupyter notebooks](./jupyter.html), it is also possible to load the planes in ParaView.
+Although viewing the 2D slices can be easily done in [Jupyter notebooks](../jupyter), it is also possible to load the planes in ParaView.
 This also has the benefit of plotting the various slices in 3-D space.
 The Julia function `xmf_cuts()` produces an XML file for each variable in each plane slice.
 These can be opened in ParaView using the XDMF Reader.
