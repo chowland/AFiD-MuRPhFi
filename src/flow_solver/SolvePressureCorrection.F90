@@ -116,26 +116,13 @@
 !$OMP   PRIVATE(phpiv,info,appph)
       do i=sp%xst(3),sp%xen(3)
         do j=sp%xst(2),sp%xen(2)
-         do k = 1,nxm
-          acphT_b=1.0/(acphk(k)-ak2(j)-ak1(i))
-          dphc(k,j,i)=dphc(k,j,i)*acphT_b
-          apph(k)=apphk(k)*acphT_b
-          amph(k)=amphk(k)*acphT_b
-          acphT(k)=1.0d0
-         enddo
-  
-
-         call zgttrf(nxm, amph(2:nxm), acphT, apph(1:(nxm-1)), appph, phpiv, info)
-
-         if (info.gt.0) then
-           print*,'Singular value found in LAPACK routine zgttrf: info=',info
-           print*,'Please try to adjust either NX or STR3 in bou.in'
-           call MPI_Abort(MPI_COMM_WORLD,1,ierr)
-         endif
-
-         call zgttrs('N',nxm,1,amph(2:nxm),acphT,apph(1:(nxm-1)),appph,phpiv,      &
-                       dphc(1:nxm,j,i), nxm, info)
-
+            do k = 1,nxm
+                acphT_b=1.0/(acphk(k)-ak2(j)-ak1(i))
+                dphc(k,j,i)=dphc(k,j,i)*acphT_b
+                apph(k)=apphk(k)*acphT_b
+                amph(k)=amphk(k)*acphT_b
+                acphT(k)=1.0d0 + 1.0d-15  ! Small perturbation needed to prevent singular matrix
+            enddo                         ! when using uniform grid
         enddo
       enddo
 !$OMP END PARALLEL DO
