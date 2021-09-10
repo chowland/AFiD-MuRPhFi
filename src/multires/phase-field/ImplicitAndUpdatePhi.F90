@@ -14,6 +14,7 @@ subroutine ImplicitAndUpdatePhi
     use param
     use mgrd_arrays, only: phi,hphi,rhsr,ruphi
     use decomp_2d, only: xstartr,xendr,nrank
+    use mpih
     implicit none
     integer :: jc,kc,ic
     integer :: km,kp
