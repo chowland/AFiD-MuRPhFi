@@ -19,7 +19,7 @@
 
       real,allocatable,dimension(:,:) :: vyxzc,vyxzr, vzxyc,vzxyr
 
-      real  :: lxa, lya, lza
+      real  :: lxa, lya, lza, x0, xp
 
       !-- Allocate temporary arrays for velocities and gradients
       real,allocatable,dimension(:,:) :: dvyloc,dvybot, dvzloc,dvzbot
@@ -32,6 +32,9 @@
 
 !=========================================================
 !     Interpolation of vx
+
+      x0 = 2.0*xm(1) - xm(2)
+      xp = 2.0*xm(nxm) - xm(nxm-1)
 
       !-- Interpolate dvx/dx to cell center after transpose
       do ic=xstart(3),xend(3)
@@ -46,9 +49,9 @@
         enddo
 
         !-- Boundary points, enforce continuity
-        !CJH Note indices 0 & nx are AT boundaries in CreateMgrdStencil
-        tpdv( 0,jc,ic) = 0.d0
-        tpdv(nx,jc,ic) = 0.d0
+        !CJH Note indices 0 & nx are now beyond boundaries in CreateMgrdStencil
+        tpdv( 0,jc,ic) = x0/xm(1)*tpdv(1,jc,ic)
+        tpdv(nx,jc,ic) = (1.0-xp)/(1.0-xm(nxm))*tpdv(nxm,jc,ic)
 
        enddo
       enddo
@@ -109,8 +112,8 @@
         enddo
 
         !-- Boundary points, enforce zero velocity
-        tpdv( 0,jc,ic) = 0.d0
-        tpdv(nx,jc,ic) = 0.d0
+        tpdv( 0,jc,ic) = x0/xm(1)*tpdv(1,jc,ic)
+        tpdv(nx,jc,ic) = (1.0-xp)/(1.0-xm(nxm))*tpdv(nxm,jc,ic)
 
        enddo
       enddo
@@ -148,9 +151,12 @@
       vyxzc(:,:)=0.d0
       if (jc0.ge.xstart(2).and.jc0.le.xend(2)) then
        do ic=xstart(3)-2,xend(3)+2
-        do kc=1,nxm+1 !0,nxm+1
+        do kc=1,nxm
          vyxzc(kc,ic)=vy(kc,jc0,ic) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
         enddo
+        ! x boundaries
+        vyxzc(0,ic) = x0/xm(1)*vyxzc(1,ic)
+        vyxzc(nx,ic) = (1.0-xp)/(1.0-xm(nxm))*vyxzc(nxm,ic)
        enddo
 
        do ic=xstart(3)-1,xend(3)
@@ -223,8 +229,8 @@
         enddo
 
         !-- Boundary points, enforce zero velocity
-        tpdv( 0,jc,ic) = 0.d0
-        tpdv(nx,jc,ic) = 0.d0
+        tpdv( 0,jc,ic) = x0/xm(1)*tpdv(1,jc,ic)
+        tpdv(nx,jc,ic) = (1.0-xp)/(1.0-xm(nxm))*tpdv(nxm,jc,ic)
 
        enddo
       enddo
@@ -265,6 +271,9 @@
         do kc=1,nxm+1 !0,nxm+1
          vzxyc(kc,jc)=vz(kc,jc,ic0) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
         enddo
+        ! Boundary points
+        vzxyc( 0,jc) = x0/xm(1)*vzxyc(1,jc)
+        vzxyc(nx,jc) = (1.0-xp)/(1.0-xm(nxm))*vzxyc(nxm,jc)
        enddo
 
        do jc=xstart(2)-1,xend(2)
