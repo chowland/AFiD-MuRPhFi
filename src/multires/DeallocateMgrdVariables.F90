@@ -53,6 +53,10 @@ subroutine DeallocateMgrdVariables
     call DestroyInt1dArray(jrangc)   !CS mgrd
     call DestroyInt1dArray(krangc)   !CS mgrd
 
+    call DestroyInt1dArray(irangr)   !CS mgrd
+    call DestroyInt1dArray(jrangr)   !CS mgrd
+    call DestroyInt1dArray(krangr)   !CS mgrd
+
     call DestroyReal2DArray(cxvx) !CS mgrd
     call DestroyReal2DArray(cxvy) !CS mgrd
     call DestroyReal2DArray(cxvz) !CS mgrd

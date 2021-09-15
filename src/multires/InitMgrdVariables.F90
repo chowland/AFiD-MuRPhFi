@@ -58,29 +58,33 @@ subroutine InitMgrdVariables
     call AllocateInt1dArray(jrangs,0,ny)
     call AllocateInt1dArray(krangs,0,nz)
 
-    call AllocateInt1dArray(irangc,0,nx)
+    call AllocateInt1dArray(irangc,0,nx+1)
     call AllocateInt1dArray(jrangc,0,ny)
     call AllocateInt1dArray(krangc,0,nz)
 
-    call AllocateReal2DArray(cxvx,1,4,0,nxr)
-    call AllocateReal2DArray(cxvy,1,4,0,nxr)
-    call AllocateReal2DArray(cxvz,1,4,0,nxr)
+    call AllocateInt1dArray(irangr,0,nxr)
+    call AllocateInt1dArray(jrangr,0,nyr)
+    call AllocateInt1dArray(krangr,0,nzr)
 
-    call AllocateReal2DArray(cyvx,1,4,0,nyr)
-    call AllocateReal2DArray(cyvy,1,4,0,nyr)
-    call AllocateReal2DArray(cyvz,1,4,0,nyr)
+    call AllocateReal2DArray(cxvx,1,4,1,nxr)
+    call AllocateReal2DArray(cxvy,1,4,1,nxmr)
+    call AllocateReal2DArray(cxvz,1,4,1,nxmr)
 
-    call AllocateReal2DArray(czvx,1,4,0,nzr)
-    call AllocateReal2DArray(czvy,1,4,0,nzr)
-    call AllocateReal2DArray(czvz,1,4,0,nzr)
+    call AllocateReal2DArray(cyvx,1,4,1,nymr)
+    call AllocateReal2DArray(cyvy,1,4,1,nymr)
+    call AllocateReal2DArray(cyvz,1,4,1,nymr)
 
-    call AllocateReal2DArray(cxrs,1,4,0,nxr)
-    call AllocateReal2DArray(cyrs,1,4,0,nyr)
-    call AllocateReal2DArray(czrs,1,4,0,nzr)
+    call AllocateReal2DArray(czvx,1,4,1,nzmr)
+    call AllocateReal2DArray(czvy,1,4,1,nzmr)
+    call AllocateReal2DArray(czvz,1,4,1,nzmr)
 
-    call AllocateReal2DArray(cxsalc,1,4,0,nx)
-    call AllocateReal2DArray(cysalc,1,4,0,ny)
-    call AllocateReal2DArray(czsalc,1,4,0,nz)
+    call AllocateReal2DArray(cxrs,1,4,1,nxmr)
+    call AllocateReal2DArray(cyrs,1,4,1,nymr)
+    call AllocateReal2DArray(czrs,1,4,1,nzmr)
+
+    call AllocateReal2DArray(cxsalc,1,4,1,nxm)
+    call AllocateReal2DArray(cysalc,1,4,1,nym)
+    call AllocateReal2DArray(czsalc,1,4,1,nzm)
 
 !-------------------------------------------------
 ! Arrays with ghost cells
