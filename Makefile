@@ -16,7 +16,7 @@ OBJDIR=obj
 
 ifeq ($(MACHINE),PC_GNU)
 	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -O2
-# FC += -O0 -g -fbacktrace -fbounds-check
+	FC += -g -fbacktrace -fbounds-check
 	LDFLAGS = -lfftw3 -llapack -lblas -ldl
 endif
 ifeq ($(MACHINE),PC_INTEL)
@@ -89,8 +89,8 @@ OBJS = obj/main.o obj/CalcLocalDivergence.o obj/CalcMaxCFL.o \
 	obj/CalcWriteQ.o obj/GlobalQuantities.o obj/ReadFlowInterp.o
 
 # Object files associated with multiple resolution grids
-OBJS += obj/CreateMgrdGrid.o obj/CreateMgrdStencil.o obj/InitMgrdVariables.o \
-	obj/DeallocateMgrdVariables.o
+OBJS += obj/CreateMgrdGrid.o obj/InitMgrdVariables.o \
+	obj/DeallocateMgrdVariables.o obj/CreateNewStencil.o# obj/CreateMgrdStencil.o
 
 # Object files associated with initial condition interpolation
 OBJS += obj/CreateInputStencil.o obj/CreateOldGrid.o obj/CreateSalStencil.o \
@@ -110,12 +110,13 @@ OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
 	obj/ImmersedBoundary.o
 
 # Module object files
-MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o
+MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
+	obj/stencil_mod.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
-MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90
+MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 stencil_mod.F90
 
 #============================================================================ 
 #  make PROGRAM   

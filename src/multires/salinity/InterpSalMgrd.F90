@@ -1,7 +1,7 @@
       subroutine InterpSalMgrd
 
       use param
-      use mgrd_arrays, only: sal,salc,cxsalc,cysalc,czsalc,irangs,jrangs,krangs
+      use mgrd_arrays, only: sal,salc,cxsalc,cysalc,czsalc,irangr,jrangr,krangr,tpdvr
       use mpih
       use decomp_2d
       use AuxiliaryRoutines
@@ -13,63 +13,51 @@
       real,dimension(4,4) :: qv2
       real,dimension(4) :: qv1
 
+      real :: x0, xp
+
       ! Interpolate to coarse grid here. A better option is to apply
       ! a box filter.
       salc(:,:,:) = 0.d0
 
-      do ic=xstart(3),xend(3)
-       icr = krangs(ic)-1
+      x0 = 2.0*xmr(1) - xmr(2)
+      xp = 2.0*xmr(nxmr) - xmr(nxmr-1)
 
-       do jc=xstart(2),xend(2)
-         jcr = jrangs(jc)-1
-
-         do kc=1,nxm
-          kcr = irangs(kc)-1
-
-          if (kcr==0) then
-            qv3(1,:,:) = 0.d0
-            if (SfixS==1) then
-              qv3(2,:,:) = 2.d0*salbp(1,jcr-1:jcr+2,icr-1:icr+2) &
-                            - sal(kcr+1,jcr-1:jcr+2,icr-1:icr+2)
-            else
-              qv3(2,:,:) = sal(kcr+1,jcr-1:jcr+2,icr-1:icr+2)
-            end if
-            qv3(3,:,:) = sal(kcr+1,jcr-1:jcr+2,icr-1:icr+2)
-            qv3(4,:,:) = 0.d0
-          else if (kcr==1) then
-            if (SfixS==1) then    !CJH apply lower fixed value BC
-              qv3(1,:,:) = 2.d0*salbp(1,jcr-1:jcr+2,icr-1:icr+2) &
-                            - sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
-            else    !CJH apply no flux BC
-              qv3(1,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
-            end if
-            qv3(2:,:,:) = sal(kcr:kcr+2,jcr-1:jcr+2,icr-1:icr+2)
-          else if (kcr==nxmr-1) then
-            qv3(1:3,:,:) = sal(kcr-1:kcr+1,jcr-1:jcr+2,icr-1:icr+2)
-            if (SfixN==1) then    !CJH apply upper fixed value BC
-              qv3(4,:,:) = 2.d0*saltp(1,jcr-1:jcr+2,icr-1:icr+2) &
-                            - sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
-            else    !CJH apply no flux BC
-              qv3(4,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
-            end if
-          else if (kcr==nxmr) then
-            qv3(1,:,:) = 0.d0
-            qv3(2,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
-            if (SfixN==1) then
-              qv3(3,:,:) = 2.d0*saltp(1,jcr-1:jcr+2,icr-1:icr+2) &
-                            - sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
-            else
-              qv3(3,:,:) = sal(kcr,jcr-1:jcr+2,icr-1:icr+2)
-            end if
-            qv3(4,:,:) = 0.d0
+      do icr=xstartr(3)-lvlhalo,xendr(3)+lvlhalo
+        do jcr=xstartr(2)-lvlhalo,xendr(2)+lvlhalo
+          do kcr=1,nxmr
+            tpdvr(kcr,jcr,icr) = sal(kcr,jcr,icr)
+          end do
+          if (SfixS==1) then
+            tpdvr(0,jcr,icr) = sal(1,jcr,icr) - (xmr(1) - x0)* &
+                (sal(1,jcr,icr) - salbp(1,jcr,icr))/xmr(1)
           else
-            qv3 = sal(kcr-1:kcr+2,jcr-1:jcr+2,icr-1:icr+2)
+            tpdvr(0,jcr,icr) = sal(1,jcr,icr)
           end if
-          qv2(:,:) = qv3(:,:,1)*czsalc(1,ic)+qv3(:,:,2)*czsalc(2,ic)&
-                    +qv3(:,:,3)*czsalc(3,ic)+qv3(:,:,4)*czsalc(4,ic)
-          qv1(:)   = qv2(:,1)*cysalc(1,jc)+qv2(:,2)*cysalc(2,jc) &
-                    +qv2(:,3)*cysalc(3,jc)+qv2(:,4)*cysalc(4,jc)
-          salc(kc,jc,ic) = sum(qv1(1:4)*cxsalc(1:4,kc))
+          if (SfixN==1) then
+            tpdvr(nxr,jcr,icr) = sal(nxmr,jcr,icr) + (xp - xmr(nxmr))* &
+                (saltp(1,jcr,icr) - sal(nxmr,jcr,icr))/(alx3 - xmr(nxmr))
+          else
+            tpdvr(nxr,jcr,icr) = sal(nxmr,jcr,icr)
+          end if
+        end do
+      end do
+
+      do icr=xstartr(3)-1,xendr(3)
+       do jcr=xstartr(2)-1,xendr(2)
+         do kcr=0,nxmr
+          
+          qv3 = tpdvr(kcr-1:kcr+2,jcr-1:jcr+2,icr-1:icr+2)
+          do ic=max(krangr(icr),1),min(krangr(icr+1)-1,nzm)
+            qv2(:,:) = qv3(:,:,1)*czsalc(1,ic) + qv3(:,:,2)*czsalc(2,ic)&
+                      +qv3(:,:,3)*czsalc(3,ic) + qv3(:,:,4)*czsalc(4,ic)
+            do jc=max(jrangr(jcr),1),min(jrangr(jcr+1)-1,nym)
+              qv1(:) = qv2(:,1)*cysalc(1,jc) + qv2(:,2)*cysalc(2,jc) &
+                      +qv2(:,3)*cysalc(3,jc) + qv2(:,4)*cysalc(4,jc)
+              do kc=max(irangr(kcr),1),min(irangr(kcr+1)-1,nxm)
+                salc(kc,jc,ic) = sum(qv1(1:4)*cxsalc(1:4,kc))
+              end do
+            end do
+          end do
 
          enddo
        enddo
