@@ -8,146 +8,70 @@
 !                                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      subroutine CreateGrid
-      use param
-      use AuxiliaryRoutines
-      implicit none
+subroutine CreateGrid
+    use param
+    use AuxiliaryRoutines
+    use GridModule
+    implicit none
 
-      real :: x1,x2,x3
-      real :: a33, a33m, a33p
-      real :: delet, tstr3
-      real :: z2dp
+    real :: x1,x2,x3
+    real :: a33, a33m, a33p
 
-      real, allocatable, dimension(:) :: etaz, etazm
+    integer :: i, j, kc, km, kp
+    logical :: fexist
 
-      integer :: i, j, kc, km, kp
-      integer :: nxmo, nclip
-      logical :: fexist
-
-      do kc=1,nxm
+    do kc=1,nxm
         kmv(kc)=kc-1
         kpv(kc)=kc+1
         if(kc.eq.1) kmv(kc)=kc
         if(kc.eq.nxm) kpv(kc)=kc
-      end do
+    end do
 
-      do kc=1,nxm
+    do kc=1,nxm
         kpc(kc)=kpv(kc)-kc
         kmc(kc)=kc-kmv(kc)
-      end do
+    end do
 
 
 !
 !     UNIFORM (HORIZONTAL DIRECTIONS) GRID
 !
-       do  i=1,nz
-        x1=real(i-1)/real(nzm)
-        zc(i)= zlen*x1
-       end do
 
-       do i=1,nzm
-         zm(i)=(zc(i)+zc(i+1))*0.5d0
-       end do
-       zm(0) = 2.d0*zm(1) - zm(2)
-       zm(nz) = 2.d0*zm(nzm) - zm(nzm-1)
+    call uniform_grid(zc(1:nz), zm(1:nzm), nzm, zlen)
 
-       do j=1,ny
-        x2=real(j-1)/real(nym)
-        yc(j)= ylen*x2
-       end do
+    zm(0) = 2.d0*zm(1) - zm(2)
+    zm(nz) = 2.d0*zm(nzm) - zm(nzm-1)
 
-       do j=1,nym
-        ym(j)=(yc(j)+yc(j+1))*0.5d0
-       end do
-       ym(0) = 2.d0*ym(1) - ym(2)
-       ym(ny) = 2.d0*ym(nym) - ym(nym-1)
+    call uniform_grid(yc(1:ny), ym(1:nym), nym, ylen)
+
+    ym(0) = 2.d0*ym(1) - ym(2)
+    ym(ny) = 2.d0*ym(nym) - ym(nym-1)
 
 !
 !     VERTICAL COORDINATE DEFINITION
 !
 !     OPTION 0: UNIFORM CLUSTERING
 !
-      call AllocateReal1DArray(etaz,1,nx+500)
-      call AllocateReal1DArray(etazm,1,nx+500)
 
-      if (istr3.eq.0) then
-        do kc=1,nx
-          x3=real(kc-1)/real(nxm)
-          etaz(kc)=alx3*x3
-          xc(kc)=etaz(kc)
-        enddo
-      endif
+    if (istr3==0) call uniform_grid(xc(1:nx),xm(1:nxm),nxm,alx3)
 
 !
 !     OPTION 4: HYPERBOLIC TANGENT-TYPE CLUSTERING
 !
 
-        tstr3=tanh(str3)
-
-        if (istr3.eq.4) then
-         xc(1)=0.0d0
-         do kc=2,nx
-          z2dp=float(2*kc-nx-1)/float(nxm)
-          xc(kc)=(1+tanh(str3*z2dp)/tstr3)*0.5*alx3
-          if(xc(kc).lt.0.or.xc(kc).gt.alx3)then
-           write(*,*)'Grid is too streched: ','zc(',kc,')=',xc(kc)
-           stop
-          endif
-         end do
-        end if
+    if (istr3==4) call tanh_grid(xc(1:nx),xm(1:nxm),nxm,alx3,str3)
 
 !
 !     OPTION 6: CLIPPED CHEBYCHEV-TYPE CLUSTERING
 !
 
-
-      if(istr3.eq.6) then
-      nclip = int(str3)
-      nxmo = nx+nclip+nclip
-      do kc=1,nxmo
-        etazm(kc)=+cos(pi*(float(kc)-0.5)/float(nxmo))
-      end do
-      do kc=1,nx
-        etaz(kc)=etazm(kc+nclip)
-      end do
-      delet = etaz(1)-etaz(nx)
-      do kc=1,nx
-        etaz(kc)=etaz(kc)/(0.5*delet)
-      end do
-      xc(1) = 0.
-      do kc=2,nxm
-        xc(kc) = alx3*(1.-etaz(kc))*0.5
-      end do
-      xc(nx) = alx3
-      endif
+    if (istr3==6) call cheb_grid(xc(1:nx),xm(1:nxm),nxm,alx3,str3)
 
 !
 !     OPTION 7: As option 6, but only for high resolution at one (lower) wall
 !
 
-
-      if(istr3.eq.7) then
-        nclip = int(str3)
-        nxmo = nx+nclip   !CJH only extend on one side
-        do kc=1,nxmo
-          etazm(kc)=+cos(pi*float(kc)/float(nxmo)/2.0)
-        end do
-        do kc=1,nx
-          etaz(kc)=etazm(kc+nclip)
-        end do
-        delet = etaz(1)
-        do kc=1,nx
-          etaz(kc)=etaz(kc)/delet
-        end do
-        xc(1) = 0.
-        do kc=2,nxm
-          xc(kc) = alx3*(1.0 - etaz(kc))
-        end do
-        xc(nx) = alx3
-      endif
-
-      call DestroyReal1DArray(etaz)
-      call DestroyReal1DArray(etazm)
+    if (istr3==7) call asym_cheb_grid(xc(1:nx),xm(1:nxm),nxm,alx3,str3)
 
 !m-----------------------------------------
 !

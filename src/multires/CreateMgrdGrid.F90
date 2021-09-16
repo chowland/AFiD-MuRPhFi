@@ -8,147 +8,72 @@
 !                                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      subroutine CreateMgrdGrid
-      use param
-      use AuxiliaryRoutines
-      implicit none
+subroutine CreateMgrdGrid
+    use param
+    use AuxiliaryRoutines
+    use GridModule
+    implicit none
 
-      real :: x1,x2,x3
-      real :: a33, a33m, a33p
-      real :: delet, tstr3
-      real :: z2dp
+    real :: x1,x2,x3
+    real :: a33, a33m, a33p
 
-      real, allocatable, dimension(:) :: etaz, etazm
+    integer :: i, j, kc, km, kp
+    logical :: fexist
 
-      integer :: i, j, kc, km, kp
-      integer :: nxmo, nclip
-      logical :: fexist
-
-      do kc=1,nxmr
+    do kc=1,nxmr
         kmvr(kc)=kc-1
         kpvr(kc)=kc+1
         if(kc.eq.1) kmvr(kc)=kc
         if(kc.eq.nxmr) kpvr(kc)=kc
-      end do
+    end do
 
-      do kc=1,nxmr
+    do kc=1,nxmr
         kpcr(kc)=kpvr(kc)-kc
         kmcr(kc)=kc-kmvr(kc)
-      end do
+    end do
 
 
 !
 !     UNIFORM (HORIZONTAL DIRECTIONS) GRID
 !
-       do  i=1,nzr
-        x1=real(i-1)/real(nzmr)
-        zcr(i)= zlen*x1
-       end do
 
-       do i=1,nzmr
-         zmr(i)=(zcr(i)+zcr(i+1))*0.5d0
-       end do
-       zmr(0)=2.d0*zmr(1)-zmr(2)
-       zmr(nzr)=2.d0*zmr(nzmr)-zmr(nzmr-1)
+    call uniform_grid(zcr(1:nzr), zmr(1:nzmr), nzmr, zlen)
 
-       do j=1,nyr
-        x2=real(j-1)/real(nymr)
-        ycr(j)= ylen*x2
-       end do
+    zmr(0)=2.d0*zmr(1)-zmr(2)
+    zmr(nzr)=2.d0*zmr(nzmr)-zmr(nzmr-1)
 
-       do j=1,nymr
-        ymr(j)=(ycr(j)+ycr(j+1))*0.5d0
-       end do
-       ymr(0)=2.d0*ymr(1)-ymr(2)
-       ymr(nyr)=2.d0*ymr(nymr)-ymr(nymr-1)
+    call uniform_grid(ycr(1:nyr), ymr(1:nymr), nymr, ylen)
+
+    ymr(0)=2.d0*ymr(1)-ymr(2)
+    ymr(nyr)=2.d0*ymr(nymr)-ymr(nymr-1)
 
 !
 !     VERTICAL COORDINATE DEFINITION
 !
 !     OPTION 0: UNIFORM CLUSTERING
 !
-      call AllocateReal1DArray(etaz,1,nxr+500)
-      call AllocateReal1DArray(etazm,1,nxr+500)
 
-      if (istr3r.eq.0) then
-        do kc=1,nxr
-          x3=real(kc-1)/real(nxmr)
-          etaz(kc)=alx3*x3
-          xcr(kc)=etaz(kc)
-        enddo
-      endif
+    if (istr3r==0) call uniform_grid(xcr(1:nxr),xmr(1:nxmr),nxmr,alx3)
+
 
 !
 !     OPTION 4: HYPERBOLIC TANGENT-TYPE CLUSTERING
 !
 
-        tstr3=tanh(str3)
-
-        if (istr3r.eq.4) then
-         xcr(1)=0.0d0
-         do kc=2,nxr
-          z2dp=float(2*kc-nxr-1)/float(nxmr)
-          xcr(kc)=(1+tanh(str3*z2dp)/tstr3)*0.5*alx3
-          if(xcr(kc).lt.0.or.xcr(kc).gt.alx3)then
-           write(*,*)'Refined grid is too streched: ','zc(',kc,')=',xcr(kc)
-           stop
-          endif
-         end do
-        end if
+    if (istr3r==4) call tanh_grid(xcr(1:nxr),xmr(1:nxmr),nxmr,alx3,str3)
 
 !
 !     OPTION 6: CLIPPED CHEBYCHEV-TYPE CLUSTERING
 !
 
-
-      if(istr3r.eq.6) then
-      nclip = int(str3)
-      nxmo = nxr+nclip+nclip
-      do kc=1,nxmo
-        etazm(kc)=+cos(pi*(float(kc)-0.5)/float(nxmo))
-      end do
-      do kc=1,nxr
-        etaz(kc)=etazm(kc+nclip)
-      end do
-      delet = etaz(1)-etaz(nxr)
-      do kc=1,nxr
-        etaz(kc)=etaz(kc)/(0.5*delet)
-      end do
-      xcr(1) = 0.
-      do kc=2,nxmr
-        xcr(kc) = alx3*(1.-etaz(kc))*0.5
-      end do
-      xcr(nxr) = alx3
-      endif
+    if (istr3r==6) call cheb_grid(xcr(1:nxr),xmr(1:nxmr),nxmr,alx3,str3)
 
 !
 !     OPTION 7: As option 6, but only for high resolution at one (lower) wall
 !
 
+    if (istr3r==7) call asym_cheb_grid(xcr(1:nxr),xmr(1:nxmr),nxmr,alx3,str3)
 
-      if(istr3r.eq.7) then
-        nclip = int(str3)
-        nxmo = nxr+nclip   !CJH only extend on one side
-        do kc=1,nxmo
-          etazm(kc)=+cos(pi*float(kc)/float(nxmo)/2.0)
-        end do
-        do kc=1,nxr
-          etaz(kc)=etazm(kc+nclip)
-        end do
-        delet = etaz(1)
-        do kc=1,nxr
-          etaz(kc)=etaz(kc)/delet
-        end do
-        xcr(1) = 0.
-        do kc=2,nxmr
-          xcr(kc) = alx3*(1.0 - etaz(kc))
-        end do
-        xcr(nxr) = alx3
-      endif
-
-      call DestroyReal1DArray(etaz)
-      call DestroyReal1DArray(etazm)
-      
 !m-----------------------------------------
 !
 !     METRIC FOR UNIFORM DIRECTIONS
