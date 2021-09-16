@@ -78,13 +78,13 @@ subroutine CreateGrid
 !     METRIC FOR UNIFORM DIRECTIONS
 !
 
-      dx=real(nxm)/alx3
-      dy=real(nym)/ylen
-      dz=real(nzm)/zlen
+    dx=real(nxm)/alx3
+    dy=real(nym)/ylen
+    dz=real(nzm)/zlen
 
-      dxq=dx*dx                                                      
-      dyq=dy*dy                                                      
-      dzq=dz*dz                                                      
+    dxq=dx*dx                                                      
+    dyq=dy*dy                                                      
+    dzq=dz*dz                                                      
 
 !
 !     STAGGERED COORDINATES AND
@@ -92,50 +92,50 @@ subroutine CreateGrid
 !     DIRECTIONS
 !
 
-      do kc=1,nxm
+    do kc=1,nxm
         xm(kc)=(xc(kc)+xc(kc+1))*0.5d0
-      enddo
-      xm(nx) = 2*xc(nx) - xm(nxm)
-      do kc=2,nxm
+    end do
+    xm(nx) = 2*xc(nx) - xm(nxm)
+    do kc=2,nxm
         g3rc(kc)=(xc(kc+1)-xc(kc-1))*dx*0.5d0
         g3rm(kc)=(xm(kc+1)-xm(kc-1))*dx*0.5d0
-      enddo
-      !CJH virtual xm(0) = 2*xc(1) - xm(1)
-      g3rm(1) = (xm(2)-(2*xc(1)-xm(1)))*dx*0.5d0
-      g3rc(1)=(xc(2)-xc(1))*dx
-      g3rc(nx)= (xc(nx)-xc(nxm))*dx
-      
-      do kc=1,nxm
+    end do
+    !CJH virtual xm(0) = 2*xc(1) - xm(1)
+    g3rm(1) = (xm(2)-(2*xc(1)-xm(1)))*dx*0.5d0
+    g3rc(1)=(xc(2)-xc(1))*dx
+    g3rc(nx)= (xc(nx)-xc(nxm))*dx
+    
+    do kc=1,nxm
         d3xc(kc) = (xc(kc+1) - xc(kc))*dx
         d3xm(kc) = (xm(kc+1) - xm(kc))*dx
-      end do
+    end do
 !
 !     WRITE GRID INFORMATION
 !
-      do kc=1,nxm
+    do kc=1,nxm
         udx3m(kc) = dx/d3xc(kc)
         udx3c(kc) = dx/g3rc(kc)
-      end do
-      udx3c(nx) = dx/g3rc(nx)
+    end do
+    udx3c(nx) = dx/g3rc(nx)
 !m====================================================
-      if(ismaster) then
-      open(unit=78,file='outputdir/axicor.out',status='unknown')
-      do kc=1,nx
-        write(78,345) kc,xc(kc),xm(kc),g3rc(kc),g3rm(kc)
-      end do
-      close(78)
- 345  format(i4,4(2x,e23.15))
+    if(ismaster) then
+        open(unit=78,file='outputdir/axicor.out',status='unknown')
+        do kc=1,nx
+            write(78,345) kc,xc(kc),xm(kc),g3rc(kc),g3rm(kc)
+        end do
+        close(78)
+   345  format(i4,4(2x,e23.15))
 !m===================================================
 !
 !     QUANTITIES FOR DERIVATIVES
 !
-      open(unit=78,file='outputdir/fact3.out',status='unknown')
-      do kc=1,nxm
-        write(78,*) kc,udx3m(kc),udx3c(kc)
-      end do
+        open(unit=78,file='outputdir/fact3.out',status='unknown')
+        do kc=1,nxm
+            write(78,*) kc,udx3m(kc),udx3c(kc)
+        end do
         write(78,*) nx,udx3m(nxm),udx3c(nx)
-      close(78)
-      endif
+        close(78)
+    end if
 
 !
 !    COEFFICIENTS FOR DIFFERENTIATION FOR NON-UNIFORM GRID
@@ -143,14 +143,14 @@ subroutine CreateGrid
 !    Q3 DIFFERENTIATION (CENTERED VARIABLE)
 !
 
-      am3ck(1)=0.d0
-      ap3ck(1)=0.d0
-      ac3ck(1)=1.d0
-      am3ck(nx)=0.d0
-      ap3ck(nx)=0.d0
-      ac3ck(nx)=1.d0
+    am3ck(1)=0.d0
+    ap3ck(1)=0.d0
+    ac3ck(1)=1.d0
+    am3ck(nx)=0.d0
+    ap3ck(nx)=0.d0
+    ac3ck(nx)=1.d0
 
-      do kc=2,nxm
+    do kc=2,nxm
        km=kc-1
        a33=dxq/g3rc(kc)
        a33p=1.d0/d3xc(kc)
@@ -158,14 +158,14 @@ subroutine CreateGrid
        ap3ck(kc)=a33*a33p
        am3ck(kc)=a33*a33m
        ac3ck(kc)=-(ap3ck(kc)+am3ck(kc))
-      enddo
+    end do
 
 !
 !    Q1/Q2 DIFFERENTIATION (STAGGERED VARIABLE)
 !
 !
 
-      do kc=2,nxm-1
+    do kc=2,nxm-1
         km=kc-1
         a33=dxq/g3rm(kc)
         a33p=1.d0/d3xm(kc)
@@ -173,61 +173,60 @@ subroutine CreateGrid
         ap3sk(kc)=a33*a33p
         am3sk(kc)=a33*a33m
         ac3sk(kc)=-(ap3sk(kc)+am3sk(kc))
-      enddo
+    end do
 !    
 !    LOWER WALL BOUNDARY CONDITIONS (INSLWS SETS NO-SLIP vs STRESS-FREE WALL)
 !    
-      kc=1
-      a33=dxq/g3rm(kc)
-      a33p=1.d0/d3xm(kc)
-      a33m=1.d0/g3rc(kc) ! equivalent to virtual 1/d3xm(0)
-      ap3sk(kc)=a33*a33p
-      am3sk(kc)=0.d0
-      ac3sk(kc)=-a33*(a33p+2.d0*inslws*a33m)
+    kc=1
+    a33=dxq/g3rm(kc)
+    a33p=1.d0/d3xm(kc)
+    a33m=1.d0/g3rc(kc) ! equivalent to virtual 1/d3xm(0)
+    ap3sk(kc)=a33*a33p
+    am3sk(kc)=0.d0
+    ac3sk(kc)=-a33*(a33p+2.d0*inslws*a33m)
 
 !    
 !    UPPER WALL BOUNDARY CONDITIONS (INSLWN SETS NO-SLIP vs STRESS-FREE WALL)
 !    
 
-      kc=nxm
-      km=kc-1
-      a33=dxq/g3rm(kc)
-      a33p=1.d0/d3xm(kc)
-      a33m=1.d0/d3xm(km)
-      ap3sk(kc)=0.d0
-      am3sk(kc)=a33*a33m
-      ac3sk(kc)=-a33*(2.d0*inslwn*a33p+a33m)
+    kc=nxm
+    km=kc-1
+    a33=dxq/g3rm(kc)
+    a33p=1.d0/d3xm(kc)
+    a33m=1.d0/d3xm(km)
+    ap3sk(kc)=0.d0
+    am3sk(kc)=a33*a33m
+    ac3sk(kc)=-a33*(2.d0*inslwn*a33p+a33m)
 
 !
 !    TEMPERATURE DIFFERENTIATION
 !CJH (now staggered!)
 !
 
-      do kc=2,nxm-1
+    do kc=2,nxm-1
         ap3ssk(kc)=ap3sk(kc)
         am3ssk(kc)=am3sk(kc)
         ac3ssk(kc)=ac3sk(kc)
-      enddo
+    end do
 
-      !CJH Lower wall BC
-      kc = 1
-      a33 = dxq/g3rm(kc)
-      a33p = 1.d0/d3xm(kc)
-      a33m = 1.d0/g3rc(kc) ! equivalent to virtual 1/d3xm(0)
-      ap3ssk(kc) = a33*a33p
-      am3ssk(kc) = 0.d0
-      ac3ssk(kc) = -a33*(a33p + 2.d0*TfixS*a33m)
+    !CJH Lower wall BC
+    kc = 1
+    a33 = dxq/g3rm(kc)
+    a33p = 1.d0/d3xm(kc)
+    a33m = 1.d0/g3rc(kc) ! equivalent to virtual 1/d3xm(0)
+    ap3ssk(kc) = a33*a33p
+    am3ssk(kc) = 0.d0
+    ac3ssk(kc) = -a33*(a33p + 2.d0*TfixS*a33m)
 
-      !CJH Upper wall BC
-      kc = nxm
-      km = kc - 1
-      a33 = dxq/g3rm(kc)
-      a33p = 1.d0/d3xm(kc)
-      a33m = 1.d0/d3xm(km)
-      ap3ssk(kc) = 0.d0
-      am3ssk(kc) = a33*a33m
-      ac3ssk(kc) = -a33*(a33m + 2.d0*TfixN*a33p)
+    !CJH Upper wall BC
+    kc = nxm
+    km = kc - 1
+    a33 = dxq/g3rm(kc)
+    a33p = 1.d0/d3xm(kc)
+    a33m = 1.d0/d3xm(km)
+    ap3ssk(kc) = 0.d0
+    am3ssk(kc) = a33*a33m
+    ac3ssk(kc) = -a33*(a33m + 2.d0*TfixN*a33p)
 
       return                                                            
-      end                                                               
-
+end subroutine CreateGrid
