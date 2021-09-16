@@ -12,8 +12,6 @@ subroutine CreateMgrdStencil
     ! cell centre grid (vy, vz, temp)
     call interpolation_indices(irangs, xm, nxm, xmr, nxmr)
     call construct_stencil(cxvy, xm, nxm, xmr, nxmr, irangs, "x")
-    ! call construct_stencil(cxvz, xm, xmr, irangs)
-    ! call construct_stencil(cxrs, xm, xmr, irangs)
     cxvz(:,:) = cxvy(:,:)
     cxrs(:,:) = cxvy(:,:)
 
