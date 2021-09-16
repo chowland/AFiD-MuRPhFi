@@ -21,7 +21,7 @@ subroutine InterpInputVel
     real, allocatable, dimension(:,:,:) :: tempo, vxo, vyo, vzo
     real, allocatable, dimension(:,:,:) :: tpdvo
 
-    real  :: lxa, lya, lza, dyo, dzo
+    real  :: lxa, lya, lza, dyo, dzo, Tup, Tlo, x0, xp
 
       !-- Allocate temporary arrays for velocities and gradients
     real,allocatable,dimension(:,:) :: dvyloc,dvybot, dvzloc,dvzbot
@@ -40,6 +40,9 @@ subroutine InterpInputVel
 
 !=========================================================
 !     Interpolation of vx
+
+    x0 = 2.0*xmo(1) - xmo(2)
+    xp = 2.0*xmo(nxmo) - xmo(nxmo-1)
 
     ! Allocate and read in old vx
     call AllocateReal3DArray(vxo, 0, nxo+1, xstarto(2)-lvlhalo,xendo(2)+lvlhalo,xstarto(3)-lvlhalo,xendo(3)+lvlhalo)
@@ -63,8 +66,8 @@ subroutine InterpInputVel
             enddo
             ! CJH du/dx=0 on boundaries
             !-- Boundary points, enforce continuity
-            tpdvo(0,jc,ic) = 0.d0
-            tpdvo(nxo,jc,ic) = 0.d0
+            tpdvo(0,jc,ic) = x0/xmo(1)*tpdvo(1,jc,ic)
+            tpdvo(nxo,jc,ic) = (1.0-xp)/(1.0-xmo(nxmo))*tpdvo(nxmo,jc,ic)
     
         enddo
     enddo
@@ -134,8 +137,8 @@ subroutine InterpInputVel
 
             !-- Boundary points, enforce zero velocity
             !CJH e.g. v=0 on x=0 => dv/dy=0 on x=0
-            tpdvo(0,jc,ic) = 0.d0   ! at xco(1)
-            tpdvo(nxo,jc,ic)=0.d0   ! at xco(nxo)
+            tpdvo(0,jc,ic) = x0/xmo(1)*tpdvo(1,jc,ic)
+            tpdvo(nxo,jc,ic) = (1.0-xp)/(1.0-xmo(nxmo))*tpdvo(nxmo,jc,ic)
 
         enddo
     enddo
@@ -173,9 +176,12 @@ subroutine InterpInputVel
     vyxzc(:,:)=0.d0
     if (jc0.ge.xstarto(2).and.jc0.le.xendo(2)) then
         do ic=xstarto(3)-2,xendo(3)+2
-            do kc=1,nxmo+1 !0,nxm+1
+            do kc=1,nxmo
                 vyxzc(kc,ic)=vyo(kc,jc0,ic) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
             enddo
+            ! x boundaries
+            vyxzc(0,ic) = x0/xmo(1)*vyxzc(1,ic)
+            vyxzc(nxo,ic) = (1.0-xp)/(1.0-xmo(nxmo))*vyxzc(nxmo,ic)
         enddo
 
         do ic=xstarto(3)-1,xendo(3)
@@ -253,8 +259,8 @@ subroutine InterpInputVel
             enddo
     
             !-- Boundary points, enforce zero velocity
-            tpdvo(0,jc,ic) = 0.d0
-            tpdvo(nxo,jc,ic)=0.d0
+            tpdvo(0,jc,ic) = x0/xmo(1)*tpdvo(1,jc,ic)
+            tpdvo(nxo,jc,ic) = (1.0-xp)/(1.0-xmo(nxmo))*tpdvo(nxmo,jc,ic)
 
         enddo
     enddo
@@ -292,9 +298,12 @@ subroutine InterpInputVel
     vzxyc(:,:)=0.d0
     if (ic0.ge.xstarto(3).and.ic0.le.xendo(3)) then
         do jc=xstarto(2)-2,xendo(2)+2
-            do kc=1,nxmo+1 !0,nxm+1
+            do kc=1,nxmo
                 vzxyc(kc,jc)=vzo(kc,jc,ic0) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
             enddo
+            ! Boundary points
+            vzxyc(0,jc) = x0/xmo(1)*vzxyc(1,jc)
+            vzxyc(nxo,jc) = (1.0-xp)/(1.0-xmo(nxmo))*vzxyc(nxmo,jc)
         enddo
 
         do jc=xstarto(2)-1,xendo(2)
@@ -360,40 +369,41 @@ subroutine InterpInputVel
     call HdfReadContinua(nzo, nyo, nxo, xstarto(2), xendo(2), xstarto(3), xendo(3), 4, &
             tempo(1:nxo, xstarto(2)-lvlhalo:xendo(2)+lvlhalo, xstarto(3)-lvlhalo:xendo(3)+lvlhalo))
 
-    !-- Boundary points
-    if (melt) then
-        do ic=xstarto(3),xendo(3)
-            do jc=xstarto(2),xendo(2)
-                tempo(0,jc,ic) = tempo(1,jc,ic) - xmo(1)&
-                                *(tempo(2,jc,ic) - tempo(1,jc,ic))/(xmo(2)-xmo(1))
-                tempo(nxo,jc,ic) = 0.d0
-            end do
-        end do
-    else if (phasefield) then
-        do ic=xstarto(3),xendo(3)
-            do jc=xstarto(2),xendo(2)
-                tempo(0,jc,ic) = 1.d0
-                tempo(nxo,jc,ic) = 0.d0
-            end do
-        end do
+    ! Temperature BCs
+    if (RAYT>0) then
+        Tup = -0.5
+        Tlo = 0.5
     else
-        if (rayt>=0) then
-            do ic=xstarto(3),xendo(3)
-                do jc=xstarto(2),xendo(2)
-                    tempo(0,jc,ic) = 0.5d0
-                    tempo(nxo,jc,ic) = -0.5d0
-                end do
-            end do
+        Tup = 0.5
+        Tlo = -0.5
+    end if
+    if (phasefield) then
+        if (RAYT>0) then
+            Tup = 0.0
+            Tlo = 1.0
         else
-            do ic=xstarto(3),xendo(3)
-                do jc=xstarto(2),xendo(2)
-                    tempo(0,jc,ic) = -0.5d0
-                    tempo(nxo,jc,ic) = 0.5d0
-                end do
-            end do
+            Tup = 1.0
+            Tlo = 0.0
         end if
     end if
-        
+
+    do ic=xstarto(3),xendo(3)
+        do jc=xstarto(2),xendo(2)
+            if (TfixS==1) then
+                tempo(0,jc,ic) = tempo(1,jc,ic) - (xmo(1) - x0)* &
+                    (tempo(1,jc,ic) - Tlo)/xmo(1)
+            else
+                tempo(0,jc,ic) = tempo(1,jc,ic)
+            end if
+            if (TfixN==1) then
+                tempo(nxo,jc,ic) = tempo(nxmo,jc,ic) + (xp - xmo(nxmo))* &
+                    (Tup - tempo(nxmo,jc,ic))/(alx3 - xmo(nxmo))
+            else
+                tempo(nxo,jc,ic) = tempo(nxmo,jc,ic)
+            end if
+        end do
+    end do
+
     call update_halo(tempo, lvlhalo)
 
     !-- Interpolate temperature to refined grid
