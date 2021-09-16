@@ -6,23 +6,21 @@ module stencil_mod
 
 contains
 
-    subroutine interpolation_indices(idx, x_old, n_old, x_new, n_new)
-        ! integer :: nxo, nxn
+    subroutine interpolation_indices(idx, x_old, x_new, x_len)
         integer, intent(out) :: idx(0:)
-        integer, intent(in) :: n_old, n_new
-        real, intent(in) :: x_old(:), x_new(:)
+        real, intent(in) :: x_old(:), x_new(:), x_len
         real, allocatable :: xn(:)
-        integer :: io, in
+        integer :: n_old, n_new, io, in
 
-        ! nxo = size(x_old)
-        ! write(*,*) 'nxo: ',nxo
-        ! nxn = size(x_new)
-        ! write(*,*) 'nxn: ',nxn
+        n_old = size(x_old)
+        n_new = size(x_new)
 
         allocate(xn(0:n_new+1))
         xn(1:n_new) = x_new(1:n_new)
-        xn(0) = 2.0*xn(1) - xn(2)
-        xn(n_new+1) = 2.0*xn(n_new) - xn(n_new-1)
+        xn(0) = -xn(1)
+        if (xn(0)==xn(1)) xn(0) = -xn(2)
+        xn(n_new+1) = 2.0*x_len - xn(n_new)
+        if (xn(n_new+1)==xn(n_new)) xn(n_new+1) = 2.0*x_len - xn(n_new-1)
         
         idx(0) = 1
         do io=1,n_old
@@ -38,9 +36,9 @@ contains
 
     end subroutine
 
-    subroutine construct_stencil(cx, x_old, n_old, x_new, n_new, idx, axis)
+    subroutine construct_stencil(cx, x_old, x_new, x_len, idx, axis)
         real, intent(out) :: cx(:,:)
-        real, intent(in) :: x_old(:), x_new(:)
+        real, intent(in) :: x_old(:), x_new(:), x_len
         integer, intent(in) :: idx(0:)
         character, intent(in) :: axis
 
@@ -53,6 +51,9 @@ contains
             write(*,*) '         Please set axis as one of "x", "y", or "z".'
         end if
 
+        n_old = size(x_old)
+        n_new = size(x_new)
+
         if (axis=="x") then
             allocate(xo(0:n_old+1))
             allocate(xn(0:n_new+1))
@@ -61,16 +62,21 @@ contains
             allocate(xn(-1:n_new+2))
         end if
         xo(1:n_old) = x_old(1:n_old)
-        xo(0) = 2.0*xo(1) - xo(2)
-        xo(n_old+1) = 2.0*xo(n_old) - xo(n_old-1)
         xn(1:n_new) = x_new(1:n_new)
-        xn(0) = 2.0*xn(1) - xn(2)
-        xn(n_new+1) = 2.0*xn(n_new) - xn(n_new-1)
-        if (axis/="x") then
-            xo(-1) = 2.0*xo(0) - xo(1)
-            xo(n_old+2) = 2.0*xo(n_old+1) - xo(n_old)
-            xn(-1) = 2.0*xn(0) - xn(1)
-            xn(n_new+2) = 2.0*xn(n_new+1) - xn(n_new)
+        if (axis=="x") then
+            xo(0) = -xo(2)
+            xo(n_old+1) = 2.0*x_len - xo(n_old-1)
+            xn(0) = -xn(2)
+            xn(n_new+1) = 2.0*x_len - xn(n_new-1)
+        else
+            xo(0) = -xo(1)
+            xo(-1) = -xo(2)
+            xo(n_old+1) = 2.0*x_len - xo(n_old)
+            xo(n_old+2) = 2.0*x_len - xo(n_old-1)
+            xn(0) = -xn(1)
+            xn(-1) = -xn(2)
+            xn(n_new+1) = 2.0*x_len - xn(n_new)
+            xn(n_new+2) = 2.0*x_len - xn(n_new-1)
         end if
         
         do io=0,n_old

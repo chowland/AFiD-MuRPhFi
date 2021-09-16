@@ -21,7 +21,7 @@ subroutine InterpInputVel
     real, allocatable, dimension(:,:,:) :: tempo, vxo, vyo, vzo
     real, allocatable, dimension(:,:,:) :: tpdvo
 
-    real  :: lxa, lya, lza, dyo, dzo, Tup, Tlo, x0, xp
+    real  :: lxa, lya, lza, dyo, dzo, Tup, Tlo
 
       !-- Allocate temporary arrays for velocities and gradients
     real,allocatable,dimension(:,:) :: dvyloc,dvybot, dvzloc,dvzbot
@@ -40,9 +40,6 @@ subroutine InterpInputVel
 
 !=========================================================
 !     Interpolation of vx
-
-    x0 = 2.0*xmo(1) - xmo(2)
-    xp = 2.0*xmo(nxmo) - xmo(nxmo-1)
 
     ! Allocate and read in old vx
     call AllocateReal3DArray(vxo, 0, nxo+1, xstarto(2)-lvlhalo,xendo(2)+lvlhalo,xstarto(3)-lvlhalo,xendo(3)+lvlhalo)
@@ -66,8 +63,8 @@ subroutine InterpInputVel
             enddo
             ! CJH du/dx=0 on boundaries
             !-- Boundary points, enforce continuity
-            tpdvo(0,jc,ic) = x0/xmo(1)*tpdvo(1,jc,ic)
-            tpdvo(nxo,jc,ic) = (1.0-xp)/(1.0-xmo(nxmo))*tpdvo(nxmo,jc,ic)
+            tpdvo(0,jc,ic) = -tpdvo(1,jc,ic)
+            tpdvo(nxo,jc,ic) = -tpdvo(nxmo,jc,ic)
     
         enddo
     enddo
@@ -137,8 +134,8 @@ subroutine InterpInputVel
 
             !-- Boundary points, enforce zero velocity
             !CJH e.g. v=0 on x=0 => dv/dy=0 on x=0
-            tpdvo(0,jc,ic) = x0/xmo(1)*tpdvo(1,jc,ic)
-            tpdvo(nxo,jc,ic) = (1.0-xp)/(1.0-xmo(nxmo))*tpdvo(nxmo,jc,ic)
+            tpdvo(0,jc,ic) = -tpdvo(1,jc,ic)
+            tpdvo(nxo,jc,ic) = -tpdvo(nxmo,jc,ic)
 
         enddo
     enddo
@@ -180,8 +177,8 @@ subroutine InterpInputVel
                 vyxzc(kc,ic)=vyo(kc,jc0,ic) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
             enddo
             ! x boundaries
-            vyxzc(0,ic) = x0/xmo(1)*vyxzc(1,ic)
-            vyxzc(nxo,ic) = (1.0-xp)/(1.0-xmo(nxmo))*vyxzc(nxmo,ic)
+            vyxzc(0,ic) = -vyxzc(1,ic)
+            vyxzc(nxo,ic) = -vyxzc(nxmo,ic)
         enddo
 
         do ic=xstarto(3)-1,xendo(3)
@@ -259,8 +256,8 @@ subroutine InterpInputVel
             enddo
     
             !-- Boundary points, enforce zero velocity
-            tpdvo(0,jc,ic) = x0/xmo(1)*tpdvo(1,jc,ic)
-            tpdvo(nxo,jc,ic) = (1.0-xp)/(1.0-xmo(nxmo))*tpdvo(nxmo,jc,ic)
+            tpdvo(0,jc,ic) = -tpdvo(1,jc,ic)
+            tpdvo(nxo,jc,ic) = -tpdvo(nxmo,jc,ic)
 
         enddo
     enddo
@@ -302,8 +299,8 @@ subroutine InterpInputVel
                 vzxyc(kc,jc)=vzo(kc,jc,ic0) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
             enddo
             ! Boundary points
-            vzxyc(0,jc) = x0/xmo(1)*vzxyc(1,jc)
-            vzxyc(nxo,jc) = (1.0-xp)/(1.0-xmo(nxmo))*vzxyc(nxmo,jc)
+            vzxyc(0,jc) = -vzxyc(1,jc)
+            vzxyc(nxo,jc) = -vzxyc(nxmo,jc)
         enddo
 
         do jc=xstarto(2)-1,xendo(2)
@@ -390,14 +387,12 @@ subroutine InterpInputVel
     do ic=xstarto(3),xendo(3)
         do jc=xstarto(2),xendo(2)
             if (TfixS==1) then
-                tempo(0,jc,ic) = tempo(1,jc,ic) - (xmo(1) - x0)* &
-                    (tempo(1,jc,ic) - Tlo)/xmo(1)
+                tempo(0,jc,ic) = 2.0*Tlo - tempo(1,jc,ic)
             else
                 tempo(0,jc,ic) = tempo(1,jc,ic)
             end if
             if (TfixN==1) then
-                tempo(nxo,jc,ic) = tempo(nxmo,jc,ic) + (xp - xmo(nxmo))* &
-                    (Tup - tempo(nxmo,jc,ic))/(alx3 - xmo(nxmo))
+                tempo(nxo,jc,ic) = 2.0*Tup - tempo(nxmo,jc,ic)
             else
                 tempo(nxo,jc,ic) = tempo(nxmo,jc,ic)
             end if

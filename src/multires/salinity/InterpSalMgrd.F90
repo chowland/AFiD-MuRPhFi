@@ -13,14 +13,9 @@
       real,dimension(4,4) :: qv2
       real,dimension(4) :: qv1
 
-      real :: x0, xp
-
       ! Interpolate to coarse grid here. A better option is to apply
       ! a box filter.
       salc(:,:,:) = 0.d0
-
-      x0 = 2.0*xmr(1) - xmr(2)
-      xp = 2.0*xmr(nxmr) - xmr(nxmr-1)
 
       do icr=xstartr(3)-lvlhalo,xendr(3)+lvlhalo
         do jcr=xstartr(2)-lvlhalo,xendr(2)+lvlhalo
@@ -28,14 +23,12 @@
             tpdvr(kcr,jcr,icr) = sal(kcr,jcr,icr)
           end do
           if (SfixS==1) then
-            tpdvr(0,jcr,icr) = sal(1,jcr,icr) - (xmr(1) - x0)* &
-                (sal(1,jcr,icr) - salbp(1,jcr,icr))/xmr(1)
+            tpdvr(0,jcr,icr) = 2.0*salbp(1,jcr,icr) - sal(1,jcr,icr)
           else
             tpdvr(0,jcr,icr) = sal(1,jcr,icr)
           end if
           if (SfixN==1) then
-            tpdvr(nxr,jcr,icr) = sal(nxmr,jcr,icr) + (xp - xmr(nxmr))* &
-                (saltp(1,jcr,icr) - sal(nxmr,jcr,icr))/(alx3 - xmr(nxmr))
+            tpdvr(nxr,jcr,icr) = 2.0*saltp(1,jcr,icr) - sal(nxmr,jcr,icr)
           else
             tpdvr(nxr,jcr,icr) = sal(nxmr,jcr,icr)
           end if

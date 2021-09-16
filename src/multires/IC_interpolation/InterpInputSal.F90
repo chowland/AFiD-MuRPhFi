@@ -14,7 +14,7 @@ subroutine InterpInputSal
     real,dimension(4,4) :: qv2
     real,dimension(4) :: qv1
 
-    real :: x0, xp, Sup, Slo
+    real :: Sup, Slo
 
     real, allocatable, dimension(:,:,:) :: salo
     
@@ -22,9 +22,6 @@ subroutine InterpInputSal
 
 !=========================================================
 !     Interpolation of S
-
-    x0 = 2.0*xmro(1) - xmro(2)
-    xp = 2.0*xmro(nxmro) - xmro(nxmro-1)
 
     ! Allocate and read in old S
     call AllocateReal3DArray(salo, -1, nxro+1, xstarto(2)-lvlhalo, xendo(2)+lvlhalo, xstarto(3)-lvlhalo, xendo(3)+lvlhalo)
@@ -51,14 +48,12 @@ subroutine InterpInputSal
     do ic=xstarto(3),xendo(3)
         do jc=xstarto(2),xendo(2)
             if (SfixS==1) then
-                salo(0,jc,ic) = salo(1,jc,ic) - (xmro(1) - x0)* &
-                    (salo(1,jc,ic) - Slo)/xmro(1)
+                salo(0,jc,ic) = 2.0*Slo - salo(1,jc,ic)
             else
                 salo(0,jc,ic) = salo(1,jc,ic)
             end if
             if (SfixN==1) then
-                salo(nxro,jc,ic) = salo(nxmro,jc,ic) + (xp - xmro(nxmro))* &
-                    (Sup - salo(nxmro,jc,ic))/(alx3 - xmro(nxmo))
+                salo(nxro,jc,ic) = 2.0*Sup - salo(nxmro,jc,ic)
             else
                 salo(nxro,jc,ic) = salo(nxmro,jc,ic)
             end if
