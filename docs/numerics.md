@@ -1,6 +1,6 @@
-# Numerical schemes
+# Numerical time stepping scheme
 
-## Time stepping: 3rd order Runge-Kutta
+## Third order Runge-Kutta
 For the time-stepping, the evolution of each state variable ($u$, $v$, $w$, $T$, $S$, $\phi$) is essentially treated in the same way.
 The wall-normal diffusion (associated with a $\partial_xx$ term) is treated semi-implicitly, and all other terms are treated explicitly.
 A third-order Runge-Kutta scheme is used:
@@ -21,7 +21,7 @@ and $\alpha_l = \gamma_l + \rho_l$.
 The pressure term in the momentum equation is treated using a split time step to ensure the velocity field remains divergence free.
 This is detailed below.
 
-### Crank-Nicolson (semi-implicit) diffusion
+## Crank-Nicolson (semi-implicit) diffusion
 The only term in each equation that is not treated explicitly is the wall-normal component of the diffusion.
 This term is treated semi-implicitly, which we illustrate below with a simple 1D diffusion scheme to discretise $\partial f/\partial t = \kappa \partial^2 f/\partial x^2$:
 
@@ -40,7 +40,7 @@ This amounts to solving a tridiagonal matrix equation, for which AFiD uses a fas
 This step is performed in the subroutines named `SolveImpEqnUpdate_XX`.
 Note that for a Runge-Kutta substep, $\Delta t$ in the above equation should be replaced with $\alpha \Delta t$.
 
-### Pressure solver - split time step
+## Pressure solver - split time step
 For the momentum equations, each Runge-Kutta substep is split into two steps - one to evolve the velocity due to advection, diffusion, buoyancy etc., and one to solve for the pressure correction needed to ensure that $\boldsymbol{\nabla} \cdot \boldsymbol{u}^{l+1} = 0$.
 An intermediate velocity $\hat{u}_k$ is obtained by the RK step
 
@@ -88,6 +88,3 @@ a_+ = [(x^m_k - x^m_{k-1})(x^c_{k+1} - x^c_k)]^{-1},
 $$
 
 where $x^c$ is the wall-normal velocity grid, and $x^m$ is the cell-centre grid.
-
-## Staggered grid layout
-
