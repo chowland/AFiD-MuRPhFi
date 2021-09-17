@@ -15,7 +15,6 @@ subroutine CreateGrid
     implicit none
 
     real :: x1,x2,x3
-    real :: a33, a33m, a33p
 
     integer :: i, j, kc, km, kp
     logical :: fexist
@@ -143,90 +142,19 @@ subroutine CreateGrid
 !    Q3 DIFFERENTIATION (CENTERED VARIABLE)
 !
 
-    am3ck(1)=0.d0
-    ap3ck(1)=0.d0
-    ac3ck(1)=1.d0
-    am3ck(nx)=0.d0
-    ap3ck(nx)=0.d0
-    ac3ck(nx)=1.d0
-
-    do kc=2,nxm
-       km=kc-1
-       a33=dxq/g3rc(kc)
-       a33p=1.d0/d3xc(kc)
-       a33m=1.d0/d3xc(km)
-       ap3ck(kc)=a33*a33p
-       am3ck(kc)=a33*a33m
-       ac3ck(kc)=-(ap3ck(kc)+am3ck(kc))
-    end do
+    call second_derivative_coeff(ap3ck, ac3ck, am3ck, xc(1:nx), alx3, 1, 1)
 
 !
 !    Q1/Q2 DIFFERENTIATION (STAGGERED VARIABLE)
 !
-!
 
-    do kc=2,nxm-1
-        km=kc-1
-        a33=dxq/g3rm(kc)
-        a33p=1.d0/d3xm(kc)
-        a33m=1.d0/d3xm(km)
-        ap3sk(kc)=a33*a33p
-        am3sk(kc)=a33*a33m
-        ac3sk(kc)=-(ap3sk(kc)+am3sk(kc))
-    end do
-!    
-!    LOWER WALL BOUNDARY CONDITIONS (INSLWS SETS NO-SLIP vs STRESS-FREE WALL)
-!    
-    kc=1
-    a33=dxq/g3rm(kc)
-    a33p=1.d0/d3xm(kc)
-    a33m=1.d0/g3rc(kc) ! equivalent to virtual 1/d3xm(0)
-    ap3sk(kc)=a33*a33p
-    am3sk(kc)=0.d0
-    ac3sk(kc)=-a33*(a33p+2.d0*inslws*a33m)
-
-!    
-!    UPPER WALL BOUNDARY CONDITIONS (INSLWN SETS NO-SLIP vs STRESS-FREE WALL)
-!    
-
-    kc=nxm
-    km=kc-1
-    a33=dxq/g3rm(kc)
-    a33p=1.d0/d3xm(kc)
-    a33m=1.d0/d3xm(km)
-    ap3sk(kc)=0.d0
-    am3sk(kc)=a33*a33m
-    ac3sk(kc)=-a33*(2.d0*inslwn*a33p+a33m)
+    call second_derivative_coeff(ap3sk, ac3sk, am3sk, xm(1:nxm), alx3, inslwn, inslws)
 
 !
 !    TEMPERATURE DIFFERENTIATION
-!CJH (now staggered!)
 !
 
-    do kc=2,nxm-1
-        ap3ssk(kc)=ap3sk(kc)
-        am3ssk(kc)=am3sk(kc)
-        ac3ssk(kc)=ac3sk(kc)
-    end do
+    call second_derivative_coeff(ap3ssk, ac3ssk, am3ssk, xm(1:nxm), alx3, TfixN, TfixS)
 
-    !CJH Lower wall BC
-    kc = 1
-    a33 = dxq/g3rm(kc)
-    a33p = 1.d0/d3xm(kc)
-    a33m = 1.d0/g3rc(kc) ! equivalent to virtual 1/d3xm(0)
-    ap3ssk(kc) = a33*a33p
-    am3ssk(kc) = 0.d0
-    ac3ssk(kc) = -a33*(a33p + 2.d0*TfixS*a33m)
-
-    !CJH Upper wall BC
-    kc = nxm
-    km = kc - 1
-    a33 = dxq/g3rm(kc)
-    a33p = 1.d0/d3xm(kc)
-    a33m = 1.d0/d3xm(km)
-    ap3ssk(kc) = 0.d0
-    am3ssk(kc) = a33*a33m
-    ac3ssk(kc) = -a33*(a33m + 2.d0*TfixN*a33p)
-
-      return                                                            
+    return
 end subroutine CreateGrid

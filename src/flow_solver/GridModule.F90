@@ -3,7 +3,8 @@ module GridModule
     implicit none
 
     private
-    public uniform_grid, tanh_grid, cheb_grid, asym_cheb_grid
+    public uniform_grid, tanh_grid, cheb_grid, asym_cheb_grid, &
+            second_derivative_coeff
 
 contains
 
@@ -132,6 +133,49 @@ contains
 
     end subroutine
 
-    ! subroutine second_derivative_coeff(ap3,ac3,am3,x)
+    subroutine second_derivative_coeff(ap3 ,ac3, am3, x, xlen, fix_up, fix_low)
+        ! Returns second derivative coefficients ap3, ac3, am3
+        ! Inputs:
+        ! -- grid vector x
+        ! -- domain size xlen (e.g. alx3, ylen, zlen)
+        ! -- fix_up/low (=1 if upper/lower boundary condition is fixed value)
+        !               (=0 if upper/lower boundary condition is zero gradient)
+        real, intent(out) :: ap3(:), ac3(:), am3(:)
+        real, intent(in) :: x(:), xlen
+        integer, intent(in) :: fix_up, fix_low
+
+        integer :: k, nx
+        real :: a33
+
+        nx = size(x)
+
+        k = 1
+        a33 = 2.0/(x(k) + x(k+1))
+        ap3(k) = a33/(x(k+1) - x(k))
+        am3(k) = 0.0
+        ac3(k) = -ap3(k) - fix_low*a33/x(k)
+        if (x(k)==0.0) then
+            ap3(k) = 0.0
+            ac3(k) = 1.0
+        end if
+
+        do k=2,nx-1
+            a33 = 2.0/(x(k+1) - x(k-1))
+            ap3(k) = a33/(x(k+1) - x(k))
+            am3(k) = a33/(x(k) - x(k-1))
+            ac3(k) = -ap3(k) - am3(k)
+        end do
+
+        k = nx
+        a33 = 2.0/(2.0*xlen - x(k) - x(k-1))
+        ap3(k) = 0.0
+        am3(k) = a33/(x(k) - x(k-1))
+        ac3(k) = -am3(k) - fix_up*a33/(xlen - x(k))
+        if (x(k)==xlen) then
+            am3(k) = 0.0
+            ac3(k) = 1.0
+        end if
+
+    end subroutine second_derivative_coeff
 
 end module GridModule
