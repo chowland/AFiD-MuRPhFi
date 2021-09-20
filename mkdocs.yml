@@ -13,6 +13,9 @@ extra_css:
 extra_javascript:
     - javascripts/config.js
     - https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js
+plugins:
+    - macros:
+        include_dir: docs/figures
 theme:
     name: material
     palette:
