@@ -30,8 +30,8 @@ subroutine InterpTempMgrd
     ! Fill temporary array with temperature field and BCs
     do ic=xstart(3)-lvlhalo,xend(3)+lvlhalo
         do jc=xstart(2)-lvlhalo,xend(2)+lvlhalo
-            tpdv(0,jc,ic) = tempbp(1,jc,ic)
-            tpdv(nx,jc,ic) = temptp(1,jc,ic)
+            tpdv(0,jc,ic) = 2.0*tempbp(1,jc,ic) - temp(1,jc,ic)
+            tpdv(nx,jc,ic) = 2.0*temptp(1,jc,ic) - temp(nxm,jc,ic)
             do kc=1,nxm
                 tpdv(kc,jc,ic) = temp(kc,jc,ic)
             end do

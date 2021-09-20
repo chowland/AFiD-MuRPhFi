@@ -14,6 +14,8 @@ subroutine InterpInputSal
     real,dimension(4,4) :: qv2
     real,dimension(4) :: qv1
 
+    real :: Sup, Slo
+
     real, allocatable, dimension(:,:,:) :: salo
     
     sal(:,:,:) = 0.d0
@@ -29,32 +31,34 @@ subroutine InterpInputSal
     call HdfReadContinua(nzro, nyro, nxro, xstarto(2), xendo(2), xstarto(3), xendo(3), 5, &
             salo(1:nxro, xstarto(2)-lvlhalo:xendo(2)+lvlhalo, xstarto(3)-lvlhalo:xendo(3)+lvlhalo))
 
-    !-- Boundary points
-    if (melt) then
-        do ic=xstarto(3),xendo(3)
-            do jc=xstarto(2),xendo(2)
-                salo(0,jc,ic) = salo(1,jc,ic) - xmro(1)&
-                                *(salo(2,jc,ic) - salo(1,jc,ic))/(xmro(2)-xmro(1))
-                salo(nxro,jc,ic) = 0.d0
-            end do
-        end do
+    ! Salinity BCs
+    if (RAYS>0) then
+        Sup = 0.5
+        Slo = -0.5
     else
-        if (rays>=0) then
-            do ic=xstarto(3),xendo(3)
-                do jc=xstarto(2),xendo(2)
-                    salo(0,jc,ic) = -0.5d0
-                    salo(nxro,jc,ic) = 0.5d0
-                end do
-            end do
-        else
-            do ic=xstarto(3),xendo(3)
-                do jc=xstarto(2),xendo(2)
-                    salo(0,jc,ic) = 0.5d0
-                    salo(nxro,jc,ic) = -0.5d0
-                end do
-            end do
-        end if
+        Sup = -0.5
+        Slo = +0.5
     end if
+    if (phasefield) then
+        Sup = 0.0
+        Slo = 1.0
+    end if
+        
+    !-- Boundary points
+    do ic=xstarto(3),xendo(3)
+        do jc=xstarto(2),xendo(2)
+            if (SfixS==1) then
+                salo(0,jc,ic) = 2.0*Slo - salo(1,jc,ic)
+            else
+                salo(0,jc,ic) = salo(1,jc,ic)
+            end if
+            if (SfixN==1) then
+                salo(nxro,jc,ic) = 2.0*Sup - salo(nxmro,jc,ic)
+            else
+                salo(nxro,jc,ic) = salo(nxmro,jc,ic)
+            end if
+        end do
+    end do
 
     call update_halo(salo, lvlhalo)
 

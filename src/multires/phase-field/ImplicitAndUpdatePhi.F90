@@ -14,6 +14,7 @@ subroutine ImplicitAndUpdatePhi
     use param
     use mgrd_arrays, only: phi,hphi,rhsr,ruphi
     use decomp_2d, only: xstartr,xendr,nrank
+    use mpih
     implicit none
     integer :: jc,kc,ic
     integer :: km,kp
@@ -55,9 +56,11 @@ subroutine ImplicitAndUpdatePhi
         enddo
     enddo
     
-    iF(ANY(IsNaN(rhsr))) write(*,*)nrank,'NaN in rhsr pre-solve'
-    iF(ANY(IsNaN(ruphi))) write(*,*)nrank,'NaN in ruphi pre-solve'
-    iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-solve'
+    iF(ANY(IsNaN(rhsr))) then
+        write(*,*)nrank,'NaN in rhsr pre-solve'
+        write(*,*)'Please try to reduce dtmax in bou.in'
+        call MPI_Abort(MPI_COMM_WORLD,1,ierr)
+    end if
 
 !  Solve equation and update salinity
 

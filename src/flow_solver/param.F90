@@ -122,6 +122,7 @@ module mgrd_arrays
     implicit none
     integer,allocatable,dimension(:) :: irangs,jrangs,krangs
     integer,allocatable,dimension(:) :: irangc,jrangc,krangc
+    integer,allocatable,dimension(:) :: irangr,jrangr,krangr
     real,allocatable,dimension(:,:,:) :: sal,rhsr,rusal,hsal
     real,allocatable,dimension(:,:) :: cxvx, cxvy, cxvz, cxrs, cxsalc
     real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs, cysalc
