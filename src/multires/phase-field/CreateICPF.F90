@@ -63,6 +63,15 @@ subroutine CreateICPF
                 end do
             end do
         end do
+    else if (pf_IC.eq.5) then ! 1D freezing supercooled validation
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - 0.02)/2/pf_eps))
+                    ! if (RAYT > 0) phi(k,j,i) = 1.0 - phi(k,j,i)
+                end do
+            end do
+        end do
     end if
 
     if (salinity) then ! Ice above salty water
