@@ -53,6 +53,25 @@ The above initial condition can be used by simply mapping $T \rightarrow 1 - T$.
 
 The input file for this example is provided in [`examples/1DMelting`](https://github.com/chowland/AFiD-MuRPhFi/examples/1DMelting).
 
+### 1-D freezing into a supercooled melt
+[Davis (2001)](https://doi.org/10.1017/CBO9780511546747) also presents an example where one-dimensional freezing occurs into a liquid that is initially at a temperature *below* the melting temperature.
+In this example, the liquid is initially at $T=0$ and the melting temperature is higher at $T_m=1$.
+As the system evolves, the solid occupies the domain $z<h(t)$ and remains isothermal at the melting temperature.
+In the liquid, a similarity solution can be derived by imposing the boundary condition $T\rightarrow 0$ as $x\rightarrow \infty$, using the same similarity variable $\eta=x/\sqrt{2\kappa t}$ as above:
+
+$$
+T(\eta) = \frac{\mathrm{erfc}(\eta)}{\mathrm{erfc}(\Lambda)} , \qquad
+\sqrt{\pi} \Lambda e^{\Lambda^2} \mathrm{erfc}(\Lambda) = \mathcal{S}^{-1} .
+$$
+
+Here, $\mathrm{erfc}(x) = 1 - \mathrm{erf}(x)$ is the complementary error function.
+Note that the second equation above, which determines $\Lambda$, has **no** solutions for $\mathcal{S}\leq 1$.
+For such small Stefan numbers, this highlights a breakdown of the thermodynamic equilibrium assumption at the interface.
+We are not concerned with such problems, which could be addressed by including the effect of kinetic undercooling.
+For the validation of this case, we shall simply set the Stefan number higher at $\mathcal{S}=10$, at which $\Lambda=0.060314$.
+Setting the initial interface position to $x=0.1$ in this problem would result in a temperature significantly above zero at the upper boundary.
+We therefore set the intial interface position to be $x=0.02$, for which the effect of enforcing $T=0$ at $x=1$ will be minimal.
+
 ## Axisymmetric melting of a solid disc in 2-D
 This example is taken from appendix A.2 of [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773).
 Here, we consider an isothermal solid disc of radius 0.1 that is immersed in an isothermal fluid of higher temperature.
