@@ -163,7 +163,15 @@ $$
 where the dimensionless coefficients are given by
 
 $$
-A = \frac{6}{5\varepsilon} \frac{\kappa}{U_T H} \frac{c_p \Gamma}{LH}, \quad B = \frac{A}{\varepsilon^2}, \quad C = \frac{H \Delta T}{\Gamma} .
+A = \frac{6}{5\varepsilon} \frac{\kappa}{U_T H} \frac{c_p \Gamma}{LH}, \quad B = \frac{A}{\varepsilon^2}, \quad C = \frac{\varepsilon H \Delta T}{\Gamma} .
+$$
+
+Note that we can typically set $\varepsilon=1/n_x^r$ to be the grid spacing, so that choosing $A$ determines $B$.
+Furthermore, $A$ can be written as $A=1.2 (Pe_T \mathcal{S} C)^{-1}$, so choosing $C$ also determines $A$.
+In this case, we can write down the dimensionless phase-field equation in terms of the physical parameters and a single model parameter $C$:
+
+$$
+\frac{\partial\phi}{\partial t} = \frac{6}{5 Pe_T \mathcal{S} C} \left\{ \nabla^2 \phi - \frac{1}{\varepsilon^2} \phi (1 - \phi) \left[1 - 2\phi + C(T - T_m)\right]\right\}.
 $$
 
 In the absence of temperature variations, $\phi$ has a steady state solution of
@@ -210,7 +218,7 @@ By comparison, the dimensionless grid spacing in the vertical is $\Delta z = 1/n
 Finally, we can recover the coefficients of the phase-field equation:
 
 $$
-A \approx \frac{0.3}{\sqrt{RaPr}} \approx 5.15\times 10^{-6} , \quad B \approx 11.8, \quad C = 1500.
+A = \frac{1.2}{\mathcal{S} Pe_T C} \approx \frac{0.3}{Pe_T} , \quad B = \frac{A}{\varepsilon^2} \approx 11.8, \quad C = 1.
 $$
 
 #### Couston et al. (2021)
