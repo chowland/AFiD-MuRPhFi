@@ -1,8 +1,7 @@
 # Stefan problems
 
 By setting `activeT = 0` in `bou.in`, we can decouple the temperature and velocity fields and model the class of problems involving only the diffusion of heat coupled to phase changes, known as Stefan problems.
-
-**Note:** Due to the strong coupling of the temperature field to the phase-field variable $\phi$, the phase-field method is *not* well suited to modelling the growth of solids in a supercooled liquid.
+Some of the results obtained from running these examples can be found on the [validation page](../phasefield_validation.md).
 
 ## 1-D solidification from a cooled boundary
 First, we consider the classical textbook example of a growing solidifaction front such as that presented in [Davis (2001)](https://doi.org/10.1017/CBO9780511546747).
@@ -41,7 +40,7 @@ $$
 T(x,t) = \frac{1}{\mathrm{erf}(\Lambda)} \mathrm{erf}\left(\frac{\Lambda x}{0.1}\right) \quad \textrm{for} \quad 0<x<0.1, \qquad T = 1 \quad \textrm{for} \quad x>0.1.
 $$
 
-Input files to run this example are provided in [`examples/1DFreezing`](https://github.com/chowland/AFiD-MuRPhFi/examples/1DFreezing).
+Input files to run this example are provided in [`examples/1DFreezing`](https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/1DFreezing).
 For this example, we use $\mathcal{S}=1$, which requires $\Lambda=0.62$.
 The value of $\Lambda$ is currently hard-coded into `CreateInitialConditions`, so if you want to test other values of $\mathcal{S}$ then this will need modifying.
 Since the domain is 1-D, this example must be run in serial (i.e. with `mpiexec -n 1`.
@@ -51,7 +50,7 @@ For a pure substance, i.e. one where melting and freezing solely depends on the 
 Therefore we can also validate against the case of an initially isothermal solid at the melting temperature $T=T_m = 0$ melting due to a boundary whose temperature is higher at $T=1$.
 The above initial condition can be used by simply mapping $T \rightarrow 1 - T$.
 
-The input file for this example is provided in [`examples/1DMelting`](https://github.com/chowland/AFiD-MuRPhFi/examples/1DMelting).
+The input file for this example is provided in [`examples/1DMelting`](https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/1DMelting).
 
 ### 1-D freezing into a supercooled melt
 [Davis (2001)](https://doi.org/10.1017/CBO9780511546747) also presents an example where one-dimensional freezing occurs into a liquid that is initially at a temperature *below* the melting temperature.
@@ -71,6 +70,8 @@ We are not concerned with such problems, which could be addressed by including t
 For the validation of this case, we shall simply set the Stefan number higher at $\mathcal{S}=10$, at which $\Lambda=0.060314$.
 Setting the initial interface position to $x=0.1$ in this problem would result in a temperature significantly above zero at the upper boundary.
 We therefore set the intial interface position to be $x=0.02$, for which the effect of enforcing $T=0$ at $x=1$ will be minimal.
+
+The input file for this example is provided in [`examples/1DSupercooling`](https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/1DSupercooling).
 
 ## Axisymmetric melting of a solid disc in 2-D
 This example is taken from appendix A.2 of [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773).
@@ -97,5 +98,5 @@ $$
 
 where $\varepsilon=1/N_x^r$ is the diffuse interface thickness, equal to one wall-normal grid space.
 
-The input file for this example is provided in [`examples/2DAxisymMelting`](https://github.com/chowland/AFiD-MuRPhFi/examples/2DAxisymMelting).
+The input file for this example is provided in [`examples/2DAxisymMelting`](https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/2DAxisymMelting).
 Here we take $\mathcal{S}=1$ to match the example presented in [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773).
