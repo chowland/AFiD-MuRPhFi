@@ -105,14 +105,33 @@ The reason for the instability of the system is currently unclear, but given the
 
 ## 2-D axisymmetric melting
 
+We now consider our first two-dimensional problem, where curved phase boundaries arise and so changing the parameter $C$ will affect the results through the Gibbs-Thomson effect.
+In particular, we follow the example from appendix A.2 of [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773), where a disc of initial radius $r=0.1$ melts into a liquid of initially uniform temperature.
+A video showcasing the evolution of the temperature field is shown below.
+
 <video width="100%" controls>
   <source src="../assets/AxisymMelting.mp4" type="video/mp4">
 </video>
 
+[Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773) provide a semi-analytic solution for the case in which surface energy is zero and the melting temperature on the phase boundary remains equal to $T_m$.
+Below, we reproduce the two figures from their appendix.
+We compare the phase-field model for various values of $C$, keeping $\mathcal{S}=1$ and $A=1.2/\mathcal{S}C$.
+
+{% include "axisymmetric_melting_radius.html" %}
+
+The initial development is quite similar in all cases, since the curvature of the interface is not too high.
+As the simulation develops and the disc shrinks, the interface curvature increases, leading to faster melting in the cases where $C$ is smaller.
+This matches the trend seen by [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773), and as $C$ gets larger, we appear to approach the semi-analytic solution associated with no Gibbs-Thomson effect.
+
+{% include "axisymmetric_melting_temperature.html" %}
+
+This trend is even clearer in the temperature profiles, where for cases with lower $C$ we see the interface temperature drop significantly as the disc melts.
+Reassuringly, despite such variation in the solid and phase boundary, the temperature profile in the liquid phase remains very similar between all cases.
+
 ## 2-D Rayleigh-Bénard convection with a melting boundary
 
 Now, we introduce an example where the evolution of the temperature field and the phase boundary are also coupled to the fluid flow.
-This again follows a validation example used by [Favier et al. (2019)](), and details of the initial condition can be found on the [examples page](examples/coupled_flows.md).
+This again follows a validation example used by [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773), and details of the initial condition can be found on the [examples page](examples/coupled_flows.md).
 The system consists of a fluid heated from below that underlies a solid phase.
 The evolution of the system is shown in the following video:
 
@@ -120,7 +139,7 @@ The evolution of the system is shown in the following video:
   <source src="../assets/MeltingRBC.mp4" type="video/mp4">
 </video>
 
-We follow Favier et al. in performing a convergence study, taking into account the resolutions of the two grids separately.
+We follow [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773) in performing a convergence study, now taking into account the resolutions of the two grids separately.
 The following plot presents the height of the phase boundary $\phi=0.5$ at the time $t=0.1 Pe$ for a range of resolutions.
 
 {% include "melting_RBC_interface_convergence.html" %}
@@ -128,10 +147,12 @@ The following plot presents the height of the phase boundary $\phi=0.5$ at the t
 As in the previous cases, we see that the resolution of the phase field is most important for the accurate evolution of the phase boundary.
 This highlights a key advantage of our multiple-resolution technique, where only the phase-field variable needs evolving on the largest grid.
 The above figure presents results for the model parameters $A=0.01$, $C=100$.
+[Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773) found that the interface rose vertically as they increased the resolution of their simulation, whereas we do not observe such a monotonic trend.
+This is likely due to the different implementations of the phase-field method between that paper and that used here.
 
-As we described above, the product $AC$ should be set by the physical parameters.
-This leaves the parameter $C$ as the sole free model parameter.
-Below, we vary the value of $C$ while keeping $AC=1$ fixed, with a resolution of $n_x=512$, $n_x^r=1024$.
-We observe monotonic dependence of the interface position with $A$, but only small variations relative to those seen in the resolution study.
+Finally, we vary the model parameter $C$ to see the effect on the results.
+Below, we vary the value of $C$ while keeping $AC=1.2$ fixed, with a resolution of $n_x=512$, $n_x^r=1024$.
+As may be expected, the corners that emerge in the interface for $C=10^3$ are somewhat smoothed out by setting $C$ to a lower value.
+This highlights the importance of choosing $C$ based on realistic values of the surface energy for each simulation.
 
 {% include "melting_RBC_interface_parameters.html" %}
