@@ -52,11 +52,11 @@ The above initial condition can be used by simply mapping $T \rightarrow 1 - T$.
 
 The input file for this example is provided in [`examples/1DMelting`](https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/1DMelting).
 
-### 1-D freezing into a supercooled melt
+## 1-D freezing into a supercooled melt
 [Davis (2001)](https://doi.org/10.1017/CBO9780511546747) also presents an example where one-dimensional freezing occurs into a liquid that is initially at a temperature *below* the melting temperature.
 In this example, the liquid is initially at $T=0$ and the melting temperature is higher at $T_m=1$.
 As the system evolves, the solid occupies the domain $z<h(t)$ and remains isothermal at the melting temperature.
-In the liquid, a similarity solution can be derived by imposing the boundary condition $T\rightarrow 0$ as $x\rightarrow \infty$, using the same similarity variable $\eta=x/\sqrt{2\kappa t}$ as above:
+In the liquid, a similarity solution can be derived by imposing the boundary condition $T\rightarrow 0$ as $x\rightarrow \infty$, using the same similarity variable $\eta=x/2\sqrt{\kappa t}$ as above:
 
 $$
 T(\eta) = \frac{\mathrm{erfc}(\eta)}{\mathrm{erfc}(\Lambda)} , \qquad
@@ -100,3 +100,24 @@ where $\varepsilon=1/N_x^r$ is the diffuse interface thickness, equal to one wal
 
 The input file for this example is provided in [`examples/2DAxisymMelting`](https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/2DAxisymMelting).
 Here we take $\mathcal{S}=1$ to match the example presented in [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773).
+
+## 2-D axisymmetric growth of a disc from a supercooled melt
+Finally, we consider the problem originally considered by [Frank (1950)](https://doi.org/10.1098/rspa.1950.0080) of the radially symmetric growth of a solid due to diffusion in a supercooled melt.
+In 2-D the problem considers the growth of a disc at the origin in an unbounded domain.
+The solid that grows is isothermal at the melting temperature $T_m=1$, and the liquid phase is supercooled such that it tends to a far field temperature of $T_\infty=0$ as $r\rightarrow\infty$.
+The solution for the radial temperature profile is then given by
+
+$$
+T(r,t) = \frac{F(s)}{F(\Lambda)}, \quad \textrm{where } F(s) = E_1\left(\frac{s^2}{4}\right), \quad \textrm{and } E_1(z) = \int_z^\infty \frac{e^{-t}}{t} \mathrm{d}t .
+$$
+
+As in the above examples, $s=r\sqrt{Pe/t}$ is a similarity variable, and $\Lambda$ is the constant value of $s$ associated with the phase boundary.
+$\Lambda$ satisfies the following solvability condition:
+
+$$
+\mathcal{S} \frac{\Lambda^2}{2}e^{\Lambda^2/4} F(\Lambda) = 1 .
+$$
+
+We fix the Stefan number to be 2.5, giving a value for $\Lambda$ of 0.62865.
+The initial radius for the solid in the simulation is chosen to be $r=0.1$ such that the unbounded solution for the temperature field is close to zero at the boundaries of our finite domain.
+This is associated with an initial time of $t_0=25.3$.
