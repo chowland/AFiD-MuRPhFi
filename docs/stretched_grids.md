@@ -9,7 +9,7 @@
 In the case of a uniform grid of grid spacing $\Delta x$, it is straightforward to obtain a finite-difference expression for the second derivative of a function $f(x)$ accurate to second order in $\Delta x$:
 
 $$
-f''(x_k) \approx \frac{f_{k+1}-2f_k + f_{k-1}}{{\Delta x}^2} + O({\Delta x}^2).
+f''(x_k) \approx \frac{f_{k+1}-2f_k + f_{k-1}}{ {\Delta x}^2} + O({\Delta x}^2).
 $$
 
 Here we have written $f_k=f(x_k)$ for values of the function on the discrete grid $x_k=k\Delta x$.

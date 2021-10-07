@@ -8,10 +8,10 @@ At each point on the refined grid $x^r$, we find the index $k$ such that $x_k < 
 The Hermite interpolation is then given by
 
 $$
-f(x^r) = h_{00}(t)f(x_k) + h_{10}(t)f'(x_k) + h_{01}(t)f(x_{k+1}) + h_{11}(t)f'(x_{k+1}),
+f(x^r) = h_{00}(t)f(x_k) + \Delta_k h_{10}(t)f'(x_k) + h_{01}(t)f(x_{k+1}) + \Delta_k h_{11}(t)f'(x_{k+1}),
 $$
 
-where $t = (x^r-x_k)/(x_{k+1}-x_k)$ and $h_{ij}$ are the polynomial basis functions
+where $t = (x^r-x_k)/(x_{k+1}-x_k)$, $\Delta_k = x_{k+1} - x_k$ and $h_{ij}$ are the polynomial basis functions
 
 $$
 h_{00}(t) = (1+2t)(1-t)^2, \quad h_{10}(t) = t(1-t)^2,

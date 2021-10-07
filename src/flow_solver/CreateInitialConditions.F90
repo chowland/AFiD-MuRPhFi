@@ -167,6 +167,24 @@ subroutine CreateInitialConditions
                     end do
                 end do
             end do
+
+        else if (pf_IC.eq.5) then        ! 1D supercooling example
+            h0 = 0.02
+            Lambda = 0.060314
+            t0 = pect * (h0/2/Lambda)**2
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xm(k)
+                        if (xxx > h0) then
+                            temp(k,j,i) = erfc(xxx*sqrt(pect/t0)/2)/erfc(Lambda)
+                        else
+                            temp(k,j,i) = 1.0
+                        end if
+                        ! if (RAYT > 0) temp(k,j,i) = 1.0 - temp(k,j,i)
+                    end do
+                end do
+            end do
         end if
 
         if (salinity) then
