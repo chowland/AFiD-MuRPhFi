@@ -156,3 +156,59 @@ As may be expected, the corners that emerge in the interface for $C=10^3$ are so
 This highlights the importance of choosing $C$ based on realistic values of the surface energy for each simulation.
 
 {% include "melting_RBC_interface_parameters.html" %}
+
+## Axisymmetric growth from a supercooled melt
+
+Finally, we investigate the problem of a solid disc that grows in a supercooled liquid.
+In the absence of the Gibbs-Thomson effect, there is an analytic solution to this problem in an unbounded domain, as detailed on the [examples page](examples/stefan.md#2-d-axisymmetric-growth-of-a-disc-from-a-supercooled-melt) for Stefan problems.
+We must consider this example in a confined domain, with periodic boundaries in $y$, and solid boundaries at $x=0$ and $x=1$.
+In this example, we use Neumann (no flux) boundary conditions for the temperature at the solid walls.
+
+As in the 1-D case with a supercooled melt, setting $C=1$ is necessary for an accurate simulation.
+Tests with $C$ at higher values again showed spurious behaviour in the temperature and phase field.
+We perform the validation simulation for this example at a resolution of $512^2$ for the base (temperature) grid, and $1024^2$ for the refined (phase-field) grid.
+The development of the temperature field and the phase boundary are shown in the below video:
+
+<video width="100%" controls>
+  <source src="../assets/disc_growth_ice.mp4" type="video/mp4">
+</video>
+
+Towards the end of the simulation, we see that the disc shape deviates somewhat from axisymmetry due to the effect of the boundary conditions.
+Nevertheless, we can use the early evolution of the system for validation of the phase-field model.
+Below, we plot the disc radius as a function of time.
+The radius is estimated by integrating the phase-field $\phi$ to find the area covered by the solid, and then assuming that the disc remains circular:
+
+$$
+r(t) = \sqrt{\frac{\int_\mathcal{D} \phi \,\mathrm{d}A}{\pi}}
+$$
+
+{% include "2d_supercool_radius.html" %}
+
+The agreement between the phase-field model and the unbounded solution is reassuringly good, despite the clear impact of the boundaries at later times.
+Setting $C=1$ does not appear to introduce a significant Gibbs-Thomson effect to the solidification dynamics.
+Indeed for this case we can exactly quantify the magnitude of this effect since the mean curvature is simply $K=1/R$ for a given disc radius.
+In our dimensionless framework, the melting temperature is modified such that the temperature at the phase boundary is
+
+$$
+T_b = T_m + \frac{\varepsilon}{C} K ,
+$$
+
+so for $\varepsilon \approx 10^{-3}$ and $K\leq 10$, the melting temperature is only modified by at most 0.01.
+
+Below, we plot the radial temperature profiles over time in the simulation.
+The initial agreement is very good, although the insulating boundary conditions cause the temperatures at the outer boundaries to increase over time beyond that of the unbounded analytic solution.
+Nevertheless, the gradients close to the phase boundary remain consistent with the exact solution even at these later times.
+
+{% include "2d_supercool_temperature.html" %}
+
+## Next on the validation list
+
+As things stand, we are happy with the validation of the phase-field code, particularly for standard melting and freezing dynamics.
+Before starting any new projects that involve simulating supercooled liquids or multicomponent problems (where temperature and salinity affect the phase transition), we should run further validation cases:
+
+- Mullins-Sekerka instability
+    - quantitative predicitons from growing planar front
+    - qualitative dynamics of dendritic growth from a perturbed disc
+- Double-diffusive melting dynamics
+    - [Martin & Kauffman (1977)](https://doi.org/10.1175/1520-0485(1977)007<0272:AEATSO>2.0.CO;2) diffusive example?
+    - Perhaps the Davis textbook has more examples for this including morphodynamic instability?
