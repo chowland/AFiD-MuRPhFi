@@ -123,7 +123,7 @@ end
 function iterate_for_lambda(x, S, rtol)
     while true
         g = F(x) - 2/S/x^2*exp(-x^2 / 4)
-        g′= exp(-x^2 / 4)*(4/S/x^3 + (1-S)/S/x)
+        g′= exp(-x^2 / 4)*(8/S/x^3 + 2*(1-S)/S/x)
         println("g($x) = $g")
         Δx = -g/g′
         x +=Δx

@@ -115,9 +115,9 @@ As in the above examples, $s=r\sqrt{Pe/t}$ is a similarity variable, and $\Lambd
 $\Lambda$ satisfies the following solvability condition:
 
 $$
-\mathcal{S} \frac{\Lambda^2}{2}e^{\Lambda^2/4} F(\Lambda) = 1 .
+\mathcal{S} \frac{\Lambda^2}{4}e^{\Lambda^2/4} F(\Lambda) = 1 .
 $$
 
-We fix the Stefan number to be 2.5, giving a value for $\Lambda$ of 0.62865.
+We fix the Stefan number to be 2.5, giving a value for $\Lambda$ of 1.2012.
 The initial radius for the solid in the simulation is chosen to be $r=0.1$ such that the unbounded solution for the temperature field is close to zero at the boundaries of our finite domain.
 This is associated with an initial time of $t_0=25.3$.
