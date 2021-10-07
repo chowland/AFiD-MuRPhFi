@@ -113,6 +113,12 @@ close(f)
 # Read Stefan number from input data
 Stefan = bou[42,3];
 
+# Define function for radial temperature profile
+function F(x)
+    f = -expinti(-x^2/4)
+    return f
+end
+
 # Use Newton iteration to find appropriate value for Lambda
 function iterate_for_lambda(x, S, rtol)
     while true
@@ -128,12 +134,6 @@ end
 
 rtol = 1e-7   # Set tolerance for integral calculation
 Λ = iterate_for_lambda(0.5,Stefan,1e-7)
-
-# Define function for radial temperature profile
-function F(x)
-    f = -expinti(-x^2/4)
-    return f
-end
 
 # Read physical parameters from input data
 RaT, PrT = bou[27,1:2]   # Rayleigh and Prandtl numbers
