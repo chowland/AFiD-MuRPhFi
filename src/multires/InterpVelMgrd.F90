@@ -59,10 +59,10 @@ subroutine InterpVelMgrd
 
                 qv3 = tpdv(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
 
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
+                do icr=max(krangs(ic),xstartr(3)),min(krangs(ic+1)-1,xendr(3))
                     qv2(:,:) = qv3(:,:,1)*czrs(1,icr) + qv3(:,:,2)*czrs(2,icr) &
                              + qv3(:,:,3)*czrs(3,icr) + qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
+                    do jcr=max(jrangs(jc),xstartr(2)),min(jrangs(jc+1)-1,xendr(2))
                         qv1(:) = qv2(:,1)*cyrs(1,jcr) + qv2(:,2)*cyrs(2,jcr) &
                                + qv2(:,3)*cyrs(3,jcr) + qv2(:,4)*cyrs(4,jcr)
                         do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
@@ -115,10 +115,10 @@ subroutine InterpVelMgrd
 
                 qv3 = tpdv(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
 
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
+                do icr=max(krangs(ic),xstartr(3)),min(krangs(ic+1)-1,xendr(3))
                     qv2(:,:) = qv3(:,:,1)*czrs(1,icr) + qv3(:,:,2)*czrs(2,icr) &
                              + qv3(:,:,3)*czrs(3,icr) + qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
+                    do jcr=max(jrangs(jc),xstartr(2)),min(jrangs(jc+1)-1,xendr(2))
                         qv1(:) = qv2(:,1)*cyrs(1,jcr) + qv2(:,2)*cyrs(2,jcr) &
                                + qv2(:,3)*cyrs(3,jcr) + qv2(:,4)*cyrs(4,jcr)
                         do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
@@ -152,7 +152,7 @@ subroutine InterpVelMgrd
 
                 qv2=vyxzc(kc-1:kc+2,ic-1:ic+2)
 
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
+                do icr=max(krangs(ic),xstartr(3)),min(krangs(ic+1)-1,xendr(3))
                     qv1(:) = qv2(:,1)*czvy(1,icr) + qv2(:,2)*czvy(2,icr) &
                            + qv2(:,3)*czvy(3,icr) + qv2(:,4)*czvy(4,icr)
                     do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
@@ -222,10 +222,10 @@ subroutine InterpVelMgrd
 
                 qv3 = tpdv(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
 
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
+                do icr=max(krangs(ic),xstartr(3)),min(krangs(ic+1)-1,xendr(3))
                     qv2(:,:) = qv3(:,:,1)*czrs(1,icr) + qv3(:,:,2)*czrs(2,icr) &
                              + qv3(:,:,3)*czrs(3,icr) + qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
+                    do jcr=max(jrangs(jc),xstartr(2)),min(jrangs(jc+1)-1,xendr(2))
                         qv1(:) = qv2(:,1)*cyrs(1,jcr) + qv2(:,2)*cyrs(2,jcr) &
                                + qv2(:,3)*cyrs(3,jcr) + qv2(:,4)*cyrs(4,jcr)
                         do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
@@ -259,7 +259,7 @@ subroutine InterpVelMgrd
 
                 qv2=vzxyc(kc-1:kc+2,jc-1:jc+2)
 
-                do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
+                do jcr=max(jrangs(jc),xstartr(2)),min(jrangs(jc+1)-1,xendr(2))
                     qv1(:) = qv2(:,1)*cyvz(1,jcr) + qv2(:,2)*cyvz(2,jcr) &
                            + qv2(:,3)*cyvz(3,jcr) + qv2(:,4)*cyvz(4,jcr)
                     do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)

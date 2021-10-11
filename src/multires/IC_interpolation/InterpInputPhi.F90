@@ -45,10 +45,10 @@ subroutine InterpInputPhi
 
                 qv3=phio(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
 
-                do icr=max(krangsr(ic),1),min(krangsr(ic+1)-1,nzmr)
+                do icr=max(krangsr(ic),xstartr(3)),min(krangsr(ic+1)-1,xendr(3))
                     qv2(:,:) = qv3(:,:,1)*czrs(1,icr)+qv3(:,:,2)*czrs(2,icr) &
                                 +qv3(:,:,3)*czrs(3,icr)+qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangsr(jc),1),min(jrangsr(jc+1)-1,nymr)
+                    do jcr=max(jrangsr(jc),xstartr(2)),min(jrangsr(jc+1)-1,xendr(2))
                         qv1(:) = qv2(:,1)*cyrs(1,jcr)+qv2(:,2)*cyrs(2,jcr) &
                                 +qv2(:,3)*cyrs(3,jcr)+qv2(:,4)*cyrs(4,jcr)
                         do kcr=max(irangsr(kc),1),min(irangsr(kc+1)-1,nxmr)
