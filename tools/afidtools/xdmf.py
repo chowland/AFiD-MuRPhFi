@@ -12,7 +12,7 @@ from xml.dom import minidom
 from xml.etree import ElementTree
 from numpy import zeros
 
-from .AFiDTools import read_grid
+from .afidtools import read_grid
 
 def generate_cut_xmf(folder, plane):
     """
