@@ -125,8 +125,8 @@ contains
     end subroutine construct_stencil
 
     subroutine interpolate_xyz_to_refined(cvar, rvar)
-        real, dimension(-1:nxm+2,xstart(2)-lvlhalo:xend(2)+lvlhalo,xstart(3)-lvlhalo:xend(3)+lvlhalo), intent(in) :: cvar
-        real, dimension(1:nxmr,xstartr(2)-lvlhalo:xendr(2)+lvlhalo,xstartr(3)-lvlhalo:xendr(3)+lvlhalo), intent(out) :: rvar
+        real, dimension(-1:,xstart(2)-lvlhalo:,xstart(3)-lvlhalo:), intent(in) :: cvar
+        real, dimension(:,xstartr(2)-lvlhalo:,xstartr(3)-lvlhalo:), intent(out) :: rvar
 
         real, dimension(4,4,4) :: qv3
         real, dimension(4,4) :: qv2
@@ -159,8 +159,8 @@ contains
     end subroutine interpolate_xyz_to_refined
 
     subroutine interpolate_xyz_to_coarse(rvar, cvar)
-        real, dimension(-1:nxmr+2,xstartr(2)-lvlhalo:xendr(2)+lvlhalo,xstartr(3)-lvlhalo:xendr(3)+lvlhalo), intent(in) :: rvar
-        real, dimension(1:nxm,xstart(2)-lvlhalo:xend(2)+lvlhalo,xstart(3)-lvlhalo:xend(3)+lvlhalo), intent(out) :: cvar
+        real, dimension(-1:,xstartr(2)-lvlhalo:,xstartr(3)-lvlhalo:), intent(in) :: rvar
+        real, dimension(:,xstart(2)-lvlhalo:,xstart(3)-lvlhalo:), intent(out) :: cvar
 
         real, dimension(4,4,4) :: qv3
         real, dimension(4,4) :: qv2
