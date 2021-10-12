@@ -2,7 +2,7 @@ subroutine CreateSalStencil
     use param
     use mgrd_arrays
     use input_grids
-    use stencil_mod
+    use HermiteInterpolations
     implicit none
 
     ! x direction

@@ -23,10 +23,10 @@ subroutine UpdateBCs
     do ic=xstart(3)-1,xend(3)
         do jc=xstart(2)-1,xend(2)
             qv2(:,:) = temp(1,jc-1:jc+2,ic-1:ic+2)
-            do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
+            do icr=max(krangs(ic),xstartr(3)),min(krangs(ic+1)-1,xendr(3))
                 qv1(:) = qv2(:,1)*czrs(1,icr) + qv2(:,2)*czrs(2,icr) &
                         +qv2(:,3)*czrs(3,icr) + qv2(:,4)*czrs(4,icr)
-                do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
+                do jcr=max(jrangs(jc),xstartr(2)),min(jrangs(jc+1)-1,xendr(2))
                     Tplaner(1,jcr,icr) = sum(qv1(1:4)*cyrs(1:4,jcr))
                 end do
             end do
@@ -65,15 +65,19 @@ subroutine UpdateBCs
     call update_halo(saltp,lvlhalo)
 
     ! Interpolate the temperature BC back to the coarse field
-    do ic=xstart(3),xend(3)
-        icr = krangs(ic) - 1
-        do jc=xstart(2),xend(2)
-            jcr = jrangs(jc) - 1
-            qv2(:,:) = Tplaner(1,jcr-1:jcr+2,icr-1:icr+2)
-            qv1(:) = qv2(:,1)*czsalc(1,ic) + qv2(:,2)*czsalc(2,ic) &
-                    +qv2(:,3)*czsalc(3,ic) + qv2(:,4)*czsalc(4,ic)
-            tempbp(1,jc,ic) = sum(qv1(1:4) * cysalc(1:4,jc))
-            temptp(1,jc,ic) = 0.d0
+    do icr=xstartr(3)-1,xendr(3)
+        do jcr=xstartr(2)-1,xendr(2)
+            
+            qv2 = Tplaner(1,jcr-1:jcr+2,icr-1:icr+2)
+
+            do ic=max(krangr(icr),xstart(3)),min(krangr(icr+1)-1,xend(3))
+                qv1(:) = qv2(:,1)*czsalc(1,ic) + qv2(:,2)*czsalc(2,ic) &
+                       + qv2(:,3)*czsalc(3,ic) + qv2(:,4)*czsalc(4,ic)
+                do jc=max(jrangr(jcr),xstart(2)),min(jrangr(jcr+1)-1,xend(2))
+                    tempbp(1,jc,ic) = sum(qv1(1:4) * cysalc(1:4,jc))
+                    temptp(1,jc,ic) = 0.d0
+                end do
+            end do
         end do
     end do
 

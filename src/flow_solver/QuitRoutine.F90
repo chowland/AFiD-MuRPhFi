@@ -76,6 +76,8 @@
          write(*,*) "statistics and continuation updated"
       else if(errorcode.eq.444) then
          write(*,*) "FFT size in ny or nz is not efficient"
+      else if (errorcode==666) then
+        write(*,*) "Domain decomposition not a factor of the grid size"
       else 
          write(*,*) " ==================================="
          write(*,*) " Maximum number of timesteps reached"

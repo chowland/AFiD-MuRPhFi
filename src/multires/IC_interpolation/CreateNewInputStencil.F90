@@ -2,7 +2,7 @@ subroutine CreateInputStencil
     use param
     use mgrd_arrays
     use input_grids
-    use stencil_mod
+    use HermiteInterpolations
     implicit none
 
     ! Construct stencils in x direction
