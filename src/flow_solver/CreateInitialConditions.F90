@@ -19,7 +19,7 @@ subroutine CreateInitialConditions
 
     call random_seed()
 
-    if ((xminusU.ne.0) .or. (xplusU.ne.0)) then
+    if ((xminusU /= 0) .or. (xplusU /= 0)) then
         !CJH: Base velocity profile if walls in motion
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
@@ -31,7 +31,7 @@ subroutine CreateInitialConditions
         end do
     end if
 
-    if (gAxis.eq.1) then
+    if (gAxis == 1) then
         !CJH: RBC initial condition as used in AFiD 1.0
         eps = 0.01
         do i=xstart(3),xend(3)
@@ -47,7 +47,7 @@ subroutine CreateInitialConditions
                 end do
             end do
         end do
-    elseif (gAxis.eq.2) then
+    elseif (gAxis == 2) then
         !CJH Laminar vertical convection as in Batchelor (1954)
         eps = 1e-3
         do i=xstart(3),xend(3)
@@ -101,7 +101,7 @@ subroutine CreateInitialConditions
 
     if (phasefield) then
 
-        if (pf_IC.eq.1) then        ! 1D moving interface example
+        if (pf_IC == 1) then        ! 1D moving interface example
             h0 = 0.1                ! Freezing if RAYT < 0
             Lambda = 0.620063       ! Melting if RAYT > 0
             t0 = pect * (h0/2/Lambda)**2
@@ -119,7 +119,7 @@ subroutine CreateInitialConditions
                 end do
             end do
 
-        else if (pf_IC.eq.2) then
+        else if (pf_IC == 2) then
             do i=xstart(3),xend(3)
                 do j=xstart(2),xend(2)
                     do k=1,nxm
@@ -129,12 +129,12 @@ subroutine CreateInitialConditions
                 end do
             end do
 
-        else if (pf_IC.eq.3) then ! Favier et al (2019) Appendix A3 Validation Case
+        else if (pf_IC == 3) then ! Favier et al (2019) Appendix A3 Validation Case
             eps = 0.1
             kmid = nxm/2
             do i=xstart(3),xend(3)
                 do j=xstart(2),xend(2)
-                    if (nzm.gt.1) then
+                    if (nzm > 1) then
                         do k=1,kmid ! If domain 3D, add in z perturbation too
                             xxx = xm(k)
                             yyy = ym(j)
@@ -155,20 +155,18 @@ subroutine CreateInitialConditions
                 end do
             end do
 
-        elseif (pf_IC==4) then ! Ice block to compare with Neufeld et al (2010)
-            do i=xstart(3),xend(3)
+        elseif (pf_IC == 4) then ! Ice block to compare with Neufeld et al (2010)
+            do i=xstart(3),xend(3)      ! Ice at bottom of domain if RayT<0, at the top if RayT>0
                 do j=xstart(2),xend(2)
+                    r = sqrt((ym(j) - ylen/2.0)**2 + (zm(i) - zlen/2.0)**2)
                     do k=1,nxm
-                        if ((xm(k) < 0.25) .and. (abs(ym(j) - ylen/2) < ylen/4)) then
-                            temp(k,j,i) = 0.0
-                        else
-                            temp(k,j,i) = 1.0
-                        end if
+                        temp(k,j,i) = 1.0 - 0.25*(1.0 + sign(1.0,RayT)*tanh((xm(k) - alx3/2.0)/2.0/pf_eps)) &
+                                    *(1.0 - tanh((r - alx3/2.0)/2.0/pf_eps))
                     end do
                 end do
             end do
 
-        else if (pf_IC.eq.5) then        ! 1D supercooling example
+        else if (pf_IC == 5) then        ! 1D supercooling example
             h0 = 0.02
             Lambda = 0.060314
             t0 = pect * (h0/2/Lambda)**2
