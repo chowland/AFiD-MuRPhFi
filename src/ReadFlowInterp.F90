@@ -73,26 +73,6 @@ subroutine ReadFlowInterp(prow,pcol)
         call MpiBcastInt(istr3ro)
     end if
 
-    ! Check that old grid is consistent with the pencil decomposition
-    if (ismaster) then
-        if ((modulo(nyo-1,prow) /= 0) .or. (modulo(nzo-1,pcol) /= 0)) then
-            write(*,*) "********** WARNING **********"
-            write(*,*) "Grid size of old input files not a perfect factor of the pencil decomposition"
-            write(*,*) "This would cause severe issues with the interpolation to the new grid"
-            write(*,*) "Terminating simulation..."
-            call MpiAbort
-        end if
-        if (multires) then
-            if ((modulo(nyro-1,prow)/= 0) .or. (modulo(nzro-1,pcol)/= 0)) then
-                write(*,*) "********** WARNING **********"
-                write(*,*) "Grid size of old input files not a perfect factor of the pencil decomposition"
-                write(*,*) "This would cause severe issues with the interpolation to the new grid"
-                write(*,*) "Terminating simulation..."
-                call MpiAbort
-            end if
-        end if
-    end if
-
     if ((abs(ylen-yleno)>1e-8) .or. (abs(zlen-zleno)>1e-8)) then
         write(*,*) "Continua domain size does not match bou.in"
         write(*,*) "old Ly, Lz: ",yleno, zleno
@@ -108,6 +88,26 @@ subroutine ReadFlowInterp(prow,pcol)
             (nzr/=nzro) .or. (istr3r/=istr3ro)) &
         )) then
 
+        ! Check that old grid is consistent with the pencil decomposition
+        if (ismaster) then
+            if ((modulo(nyo-1,prow) /= 0) .or. (modulo(nzo-1,pcol) /= 0)) then
+                write(*,*) "********** WARNING **********"
+                write(*,*) "Grid size of old input files not a perfect factor of the pencil decomposition"
+                write(*,*) "This would cause severe issues with the interpolation to the new grid"
+                write(*,*) "Terminating simulation..."
+                call MpiAbort
+            end if
+            if (multires) then
+                if ((modulo(nyro-1,prow)/= 0) .or. (modulo(nzro-1,pcol)/= 0)) then
+                    write(*,*) "********** WARNING **********"
+                    write(*,*) "Grid size of old input files not a perfect factor of the pencil decomposition"
+                    write(*,*) "This would cause severe issues with the interpolation to the new grid"
+                    write(*,*) "Terminating simulation..."
+                    call MpiAbort
+                end if
+            end if
+        end if
+        
         call InitInputVars
 
         call CreateOldGrid
