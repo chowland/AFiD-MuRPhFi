@@ -75,7 +75,7 @@ subroutine ReadFlowInterp(prow,pcol)
 
     ! Check that old grid is consistent with the pencil decomposition
     if (ismaster) then
-        if ((modulo(nymo,prow) /= 0) .or. (modulo(nzmo,pcol) /= 0)) then
+        if ((modulo(nyo-1,prow) /= 0) .or. (modulo(nzo-1,pcol) /= 0)) then
             write(*,*) "********** WARNING **********"
             write(*,*) "Grid size of old input files not a perfect factor of the pencil decomposition"
             write(*,*) "This would cause severe issues with the interpolation to the new grid"
@@ -83,7 +83,7 @@ subroutine ReadFlowInterp(prow,pcol)
             call MpiAbort
         end if
         if (multires) then
-            if ((modulo(nymro,prow)/= 0) .or. (modulo(nzmro,pcol)/= 0)) then
+            if ((modulo(nyro-1,prow)/= 0) .or. (modulo(nzro-1,pcol)/= 0)) then
                 write(*,*) "********** WARNING **********"
                 write(*,*) "Grid size of old input files not a perfect factor of the pencil decomposition"
                 write(*,*) "This would cause severe issues with the interpolation to the new grid"
