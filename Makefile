@@ -111,12 +111,13 @@ OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
 
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
-	obj/stencil_mod.o obj/GridModule.o
+	obj/HermiteInterpolations.o obj/GridModule.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
-MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 stencil_mod.F90 GridModule.F90
+MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
+	HermiteInterpolations.F90 GridModule.F90
 
 #============================================================================ 
 #  make PROGRAM   
