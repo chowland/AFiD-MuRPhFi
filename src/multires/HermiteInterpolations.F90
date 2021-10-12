@@ -5,12 +5,16 @@ module HermiteInterpolations
                             cxrs, cyrs, czrs, &
                             cxsalc, cysalc, czsalc
     use param, only: nxm, nxmr, lvlhalo
+    use input_grids, only: nxmo, nxmro, xstarto, xendo, &
+                            irangsr, jrangsr, krangsr
     implicit none
 
     private
     public interpolation_indices, construct_stencil, &
             interpolate_xyz_to_refined, &
-            interpolate_xyz_to_coarse
+            interpolate_xyz_to_coarse, &
+            interpolate_xyz_old_to_new, &
+            interpolate_xyz_old_to_new_ref
 
 contains
 
@@ -192,13 +196,9 @@ contains
 
     end subroutine interpolate_xyz_to_coarse
 
-    subroutine interpolate_xyz_old_to_new(cvar, rvar)
-        use decomp_2d, only: xstart, xstartr, xend, xendr
-        use mgrd_arrays, only: irangs, jrangs, krangs, cxrs, cyrs, czrs
-        use param, only: nxm, nxmr
-
-        real, intent(in) :: cvar(:,:,:)
-        real, intent(out) :: rvar(:,:,:)
+    subroutine interpolate_xyz_old_to_new(ovar, nvar)
+        real, dimension(-1:,xstarto(2)-lvlhalo:,xstarto(3)-lvlhalo:), intent(in) :: ovar
+        real, dimension(:,xstart(2)-lvlhalo:,xstart(3)-lvlhalo:), intent(out) :: nvar
 
         real, dimension(4,4,4) :: qv3
         real, dimension(4,4) :: qv2
@@ -206,20 +206,20 @@ contains
 
         integer :: ic, jc, kc, icr, jcr, kcr
 
-        do ic=xstart(3)-1,xend(3)
-            do jc=xstart(2)-1,xend(2)
-                do kc=0,nxm
+        do ic=xstarto(3)-1,xendo(3)
+            do jc=xstarto(2)-1,xendo(2)
+                do kc=0,nxmo
     
-                    qv3 = cvar(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
+                    qv3 = ovar(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
 
-                    do icr=max(krangs(ic),xstartr(3)),min(krangs(ic+1)-1,xendr(3))
+                    do icr=max(krangs(ic),xstart(3)),min(krangs(ic+1)-1,xend(3))
                         qv2(:,:) = qv3(:,:,1)*czrs(1,icr) + qv3(:,:,2)*czrs(2,icr) &
                                  + qv3(:,:,3)*czrs(3,icr) + qv3(:,:,4)*czrs(4,icr)
-                        do jcr=max(jrangs(jc),xstartr(2)),min(jrangs(jc+1)-1,xendr(2))
+                        do jcr=max(jrangs(jc),xstart(2)),min(jrangs(jc+1)-1,xend(2))
                             qv1(:) = qv2(:,1)*cyrs(1,jcr) + qv2(:,2)*cyrs(2,jcr) &
                                    + qv2(:,3)*cyrs(3,jcr) + qv2(:,4)*cyrs(4,jcr)
-                            do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
-                                rvar(kcr,jcr,icr) = sum(qv1(1:4)*cxrs(1:4,kcr))
+                            do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxm)
+                                nvar(kcr,jcr,icr) = sum(qv1(1:4)*cxrs(1:4,kcr))
                             end do
                         end do
                     end do
@@ -229,6 +229,40 @@ contains
         end do
 
     end subroutine interpolate_xyz_old_to_new
+
+    subroutine interpolate_xyz_old_to_new_ref(ovar, nvar)
+        real, dimension(-1:,xstarto(2)-lvlhalo:,xstarto(3)-lvlhalo:), intent(in) :: ovar
+        real, dimension(:,xstartr(2)-lvlhalo:,xstartr(3)-lvlhalo:), intent(out) :: nvar
+
+        real, dimension(4,4,4) :: qv3
+        real, dimension(4,4) :: qv2
+        real, dimension(4) :: qv1
+
+        integer :: ic, jc, kc, icr, jcr, kcr
+
+        do ic=xstarto(3)-1,xendo(3)
+            do jc=xstarto(2)-1,xendo(2)
+                do kc=0,nxmro
+    
+                    qv3 = ovar(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
+
+                    do icr=max(krangsr(ic),xstartr(3)),min(krangsr(ic+1)-1,xendr(3))
+                        qv2(:,:) = qv3(:,:,1)*czrs(1,icr) + qv3(:,:,2)*czrs(2,icr) &
+                                 + qv3(:,:,3)*czrs(3,icr) + qv3(:,:,4)*czrs(4,icr)
+                        do jcr=max(jrangsr(jc),xstartr(2)),min(jrangsr(jc+1)-1,xendr(2))
+                            qv1(:) = qv2(:,1)*cyrs(1,jcr) + qv2(:,2)*cyrs(2,jcr) &
+                                   + qv2(:,3)*cyrs(3,jcr) + qv2(:,4)*cyrs(4,jcr)
+                            do kcr=max(irangsr(kc),1),min(irangsr(kc+1)-1,nxmr)
+                                nvar(kcr,jcr,icr) = sum(qv1(1:4)*cxrs(1:4,kcr))
+                            end do
+                        end do
+                    end do
+
+                end do
+            end do
+        end do
+
+    end subroutine interpolate_xyz_old_to_new_ref
 
 
 end module HermiteInterpolations
