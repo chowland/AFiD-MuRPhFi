@@ -1,7 +1,7 @@
 subroutine CreateMgrdStencil
     use param
     use mgrd_arrays
-    use stencil_mod
+    use HermiteInterpolations
     implicit none
 
     ! Construct stencils in x direction

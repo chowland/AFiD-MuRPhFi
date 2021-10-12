@@ -33,7 +33,7 @@ where $\delta_+ = x_{k+1} - x_k$ and $\delta_- = x_k - x_{k-1}$ are the grid spa
 For each point on the refined grid, we therefore need a four-point stencil containing the values $\{f_{k-1}, f_k, f_{k+1}, f_{k+2}\}$.
 
 Exactly the same technique can be applied when interpolating from the refined grid to the coarse grid, such as for adding salinity to the buoyancy term.
-The module `stencil_mod` contains the relevant subroutines for constructing the stencils.
+The module `HermiteInterpolations` contains the relevant subroutines for constructing the stencils.
 These subroutines are also used for the interpolation of the initial condition, and work regardless of whether the resolution is being upscaled or downscaled.
 
 ## Boundary points
