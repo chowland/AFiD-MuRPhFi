@@ -140,7 +140,7 @@ program AFiD
 
         if(ismaster) write(6,*) 'Reading initial condition from file'
 
-        call ReadFlowInterp
+        call ReadFlowInterp(prow,pcol)
 
     else
 
