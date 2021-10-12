@@ -7,6 +7,7 @@ subroutine InterpInputVel
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
+    use HermiteInterpolations, only: interpolate_xyz_old_to_new
     implicit none
 
     integer  :: ic,jc,kc, ip,jp,kp, icr,jcr,kcr
@@ -71,28 +72,7 @@ subroutine InterpInputVel
     
     call update_halo(tpdvo,2)
 
-    !-- Now interpolate gradients to new grid
-    do ic=xstarto(3)-1,xendo(3)
-        do jc=xstarto(2)-1,xendo(2)
-            do kc=0,nxmo
-
-                qv3=tpdvo(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
-
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzm)
-                    qv2(:,:) = qv3(:,:,1)*czrs(1,icr)+qv3(:,:,2)*czrs(2,icr) &
-                                +qv3(:,:,3)*czrs(3,icr)+qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nym)
-                        qv1(:) = qv2(:,1)*cyrs(1,jcr)+qv2(:,2)*cyrs(2,jcr) &
-                                +qv2(:,3)*cyrs(3,jcr)+qv2(:,4)*cyrs(4,jcr)
-                        do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxm)
-                            tpdv(kcr,jcr,icr) = sum(qv1(1:4)*cxrs(1:4,kcr))
-                        enddo
-                    enddo
-                enddo
-
-            enddo
-        enddo
-    enddo
+    call interpolate_xyz_old_to_new(tpdvo, tpdv(1:nxm,:,:))
 
     !-- Integrate vx using interpolated gradients
     vx(1,:,:)=0.d0
@@ -142,28 +122,7 @@ subroutine InterpInputVel
 
     call update_halo(tpdvo,2)
 
-    !-- Now interpolate gradients to refined grid
-    do ic=xstarto(3)-1,xendo(3)
-        do jc=xstarto(2)-1,xendo(2)
-            do kc=0,nxmo
-
-                qv3=tpdvo(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
-
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzm)
-                    qv2(:,:) = qv3(:,:,1)*czrs(1,icr)+qv3(:,:,2)*czrs(2,icr) &
-                              +qv3(:,:,3)*czrs(3,icr)+qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nym)
-                        qv1(:) = qv2(:,1)*cyrs(1,jcr)+qv2(:,2)*cyrs(2,jcr) &
-                                +qv2(:,3)*cyrs(3,jcr)+qv2(:,4)*cyrs(4,jcr)
-                        do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxm)
-                            tpdv(kcr,jcr,icr) = sum(qv1*cxrs(:,kcr))
-                        enddo
-                    enddo
-                enddo
-        
-            enddo
-        enddo
-    enddo
+    call interpolate_xyz_old_to_new(tpdvo, tpdv(1:nxm,:,:))
 
     !-- Interpolate vyr at an arbitrary x-z plane | tpvr | 1st guess
     call AllocateReal2DArray(vyxzc,-1,nxmo+2,xstarto(3)-2,xendo(3)+2)
@@ -186,7 +145,7 @@ subroutine InterpInputVel
     
                 qv2=vyxzc(kc-1:kc+2,ic-1:ic+2)
     
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzm)
+                do icr=max(krangs(ic),xstart(3)),min(krangs(ic+1)-1,xend(3))
                     qv1(:) = qv2(:,1)*czvy(1,icr)+qv2(:,2)*czvy(2,icr) &
                             +qv2(:,3)*czvy(3,icr)+qv2(:,4)*czvy(4,icr)
                     do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxm)
@@ -262,30 +221,9 @@ subroutine InterpInputVel
         enddo
     enddo
  
-    call update_halo(tpdvo,2)   !CS Are the corners updated? Might need to check.
+    call update_halo(tpdvo,2)
 
-    !-- Now interpolate gradients to refined grid
-    do ic=xstarto(3)-1,xendo(3)
-        do jc=xstarto(2)-1,xendo(2)
-            do kc=0,nxmo
-    
-                qv3=tpdvo(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
-        
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzm)  !CS Is this correct?
-                    qv2(:,:) = qv3(:,:,1)*czrs(1,icr)+qv3(:,:,2)*czrs(2,icr) &
-                                +qv3(:,:,3)*czrs(3,icr)+qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nym) !CS Is this correct?
-                        qv1(:) = qv2(:,1)*cyrs(1,jcr)+qv2(:,2)*cyrs(2,jcr) &
-                                +qv2(:,3)*cyrs(3,jcr)+qv2(:,4)*cyrs(4,jcr)
-                        do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxm) !CS Is this correct?
-                            tpdv(kcr,jcr,icr) = sum(qv1*cxrs(:,kcr))
-                        enddo
-                    enddo
-                enddo
- 
-            enddo
-        enddo
-    enddo
+    call interpolate_xyz_old_to_new(tpdvo, tpdv(1:nxm,:,:))
     
     !-- Interpolate vzr at an arbitrary x-y plane | tpvr | 1st guess
     call AllocateReal2DArray(vzxyc,-1,nxmo+2,xstarto(2)-2,xendo(2)+2)
@@ -308,7 +246,7 @@ subroutine InterpInputVel
 
                 qv2=vzxyc(kc-1:kc+2,jc-1:jc+2)
 
-                do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nym)
+                do jcr=max(jrangs(jc),xstart(2)),min(jrangs(jc+1)-1,xend(2))
                     qv1(:) = qv2(:,1)*cyvz(1,jcr)+qv2(:,2)*cyvz(2,jcr) &
                             +qv2(:,3)*cyvz(3,jcr)+qv2(:,4)*cyvz(4,jcr)
                     do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxm)
@@ -401,28 +339,7 @@ subroutine InterpInputVel
 
     call update_halo(tempo, lvlhalo)
 
-    !-- Interpolate temperature to refined grid
-    do ic=xstarto(3)-1,xendo(3)
-        do jc=xstarto(2)-1,xendo(2)
-            do kc=0,nxmo
-    
-                qv3=tempo(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
-        
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzm)  !CS Is this correct?
-                    qv2(:,:) = qv3(:,:,1)*czrs(1,icr)+qv3(:,:,2)*czrs(2,icr) &
-                                +qv3(:,:,3)*czrs(3,icr)+qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nym) !CS Is this correct?
-                        qv1(:) = qv2(:,1)*cyrs(1,jcr)+qv2(:,2)*cyrs(2,jcr) &
-                                +qv2(:,3)*cyrs(3,jcr)+qv2(:,4)*cyrs(4,jcr)
-                        do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxm) !CS Is this correct?
-                            temp(kcr,jcr,icr) = sum(qv1*cxrs(:,kcr))
-                        enddo
-                    enddo
-                enddo
- 
-            enddo
-        enddo
-    enddo
+    call interpolate_xyz_old_to_new(tempo, temp(1:nxm,:,:))
 
     call DestroyReal3DArray(tempo)
 

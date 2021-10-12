@@ -1,4 +1,4 @@
-subroutine ReadFlowInterp
+subroutine ReadFlowInterp(prow,pcol)
     use mpih
     use decomp_2d
     use local_arrays
@@ -9,14 +9,13 @@ subroutine ReadFlowInterp
     
     implicit none
 
+    integer, intent(in) :: prow, pcol
+
     character*70 :: filnam,dsetname
 
     integer :: i, j, k, ic, jc, kc
 
     real :: yleno, zleno
-    real, dimension(4,4,4) :: qv3
-    real, dimension(4,4) :: qv2
-    real, dimension(4) :: qv1
 
     logical :: fexist
 
@@ -89,6 +88,26 @@ subroutine ReadFlowInterp
             (nzr/=nzro) .or. (istr3r/=istr3ro)) &
         )) then
 
+        ! Check that old grid is consistent with the pencil decomposition
+        if (ismaster) then
+            if ((modulo(nyo-1,prow) /= 0) .or. (modulo(nzo-1,pcol) /= 0)) then
+                write(*,*) "********** WARNING **********"
+                write(*,*) "Grid size of old input files not a perfect factor of the pencil decomposition"
+                write(*,*) "This would cause severe issues with the interpolation to the new grid"
+                write(*,*) "Terminating simulation..."
+                call MpiAbort
+            end if
+            if (multires) then
+                if ((modulo(nyro-1,prow)/= 0) .or. (modulo(nzro-1,pcol)/= 0)) then
+                    write(*,*) "********** WARNING **********"
+                    write(*,*) "Grid size of old input files not a perfect factor of the pencil decomposition"
+                    write(*,*) "This would cause severe issues with the interpolation to the new grid"
+                    write(*,*) "Terminating simulation..."
+                    call MpiAbort
+                end if
+            end if
+        end if
+        
         call InitInputVars
 
         call CreateOldGrid

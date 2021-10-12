@@ -119,8 +119,13 @@ program AFiD
     if (ismaster .and. multires) then
         if ((modulo(nym,prow) /= 0) .or. (modulo(nzm,pcol) /= 0) .or. &
             (modulo(nymr,prow)/= 0) .or. (modulo(nzmr,pcol)/= 0)) then
-            write(*,*) "WARNING: Grid size not a perfect factor of the pencil decomposition"
-            write(*,*) "This may cause issues with the multi-grid interpolation"
+            write(*,*) "********** WARNING **********"
+            write(*,*) "Grid size not a perfect factor of the pencil decomposition"
+            write(*,*) "This would cause severe issues with the multi-grid interpolation"
+            write(*,*) "Terminating simulation..."
+            tin(2) = MPI_WTIME()
+            errorcode = 666
+            call QuitRoutine(tin, .false., errorcode)
         end if
     end if
 
@@ -135,7 +140,7 @@ program AFiD
 
         if(ismaster) write(6,*) 'Reading initial condition from file'
 
-        call ReadFlowInterp
+        call ReadFlowInterp(prow,pcol)
 
     else
 

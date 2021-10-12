@@ -6,6 +6,7 @@ subroutine InterpVelMgrd
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
+    use HermiteInterpolations
     implicit none
     
     integer  :: ic,jc,kc, ip,jp,kp, icr,jcr,kcr
@@ -52,28 +53,7 @@ subroutine InterpVelMgrd
 
     call update_halo(tpdv,2)
 
-    !-- Now interpolate gradients to refined grid
-    do ic=xstart(3)-1,xend(3)
-        do jc=xstart(2)-1,xend(2)
-            do kc=0,nxm
-
-                qv3 = tpdv(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
-
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
-                    qv2(:,:) = qv3(:,:,1)*czrs(1,icr) + qv3(:,:,2)*czrs(2,icr) &
-                             + qv3(:,:,3)*czrs(3,icr) + qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
-                        qv1(:) = qv2(:,1)*cyrs(1,jcr) + qv2(:,2)*cyrs(2,jcr) &
-                               + qv2(:,3)*cyrs(3,jcr) + qv2(:,4)*cyrs(4,jcr)
-                        do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
-                            tpdvr(kcr,jcr,icr) = sum(qv1(1:4)*cxrs(1:4,kcr))
-                        end do
-                    end do
-                end do
-
-            end do
-        end do
-    end do
+    call interpolate_xyz_to_refined(tpdv,tpdvr(1:nxmr,:,:))
 
     !-- Integrate vxr using interpolated gradients
     vxr(1,:,:)=0.d0
@@ -108,28 +88,7 @@ subroutine InterpVelMgrd
 
     call update_halo(tpdv,2)
 
-    !-- Now interpolate gradients to refined grid
-    do ic=xstart(3)-1,xend(3)
-        do jc=xstart(2)-1,xend(2)
-            do kc=0,nxm
-
-                qv3 = tpdv(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
-
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
-                    qv2(:,:) = qv3(:,:,1)*czrs(1,icr) + qv3(:,:,2)*czrs(2,icr) &
-                             + qv3(:,:,3)*czrs(3,icr) + qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
-                        qv1(:) = qv2(:,1)*cyrs(1,jcr) + qv2(:,2)*cyrs(2,jcr) &
-                               + qv2(:,3)*cyrs(3,jcr) + qv2(:,4)*cyrs(4,jcr)
-                        do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
-                            tpdvr(kcr,jcr,icr) = sum(qv1(1:4)*cxrs(1:4,kcr))
-                        end do
-                    end do
-                end do
-
-            end do
-        end do
-    end do
+    call interpolate_xyz_to_refined(tpdv, tpdvr(1:nxmr,:,:))
 
     !-- Interpolate vyr at an arbitrary x-z plane | tpvr | 1st guess
     call AllocateReal2DArray(vyxzc,-1,nxm+2,xstart(3)-2,xend(3)+2)
@@ -152,7 +111,7 @@ subroutine InterpVelMgrd
 
                 qv2=vyxzc(kc-1:kc+2,ic-1:ic+2)
 
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
+                do icr=max(krangs(ic),xstartr(3)),min(krangs(ic+1)-1,xendr(3))
                     qv1(:) = qv2(:,1)*czvy(1,icr) + qv2(:,2)*czvy(2,icr) &
                            + qv2(:,3)*czvy(3,icr) + qv2(:,4)*czvy(4,icr)
                     do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
@@ -215,28 +174,7 @@ subroutine InterpVelMgrd
 
     call update_halo(tpdv,2)
 
-    !-- Now interpolate gradients to refined grid
-    do ic=xstart(3)-1,xend(3)
-        do jc=xstart(2)-1,xend(2)
-            do kc=0,nxm
-
-                qv3 = tpdv(kc-1:kc+2,jc-1:jc+2,ic-1:ic+2)
-
-                do icr=max(krangs(ic),1),min(krangs(ic+1)-1,nzmr)
-                    qv2(:,:) = qv3(:,:,1)*czrs(1,icr) + qv3(:,:,2)*czrs(2,icr) &
-                             + qv3(:,:,3)*czrs(3,icr) + qv3(:,:,4)*czrs(4,icr)
-                    do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
-                        qv1(:) = qv2(:,1)*cyrs(1,jcr) + qv2(:,2)*cyrs(2,jcr) &
-                               + qv2(:,3)*cyrs(3,jcr) + qv2(:,4)*cyrs(4,jcr)
-                        do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
-                            tpdvr(kcr,jcr,icr) = sum(qv1(1:4)*cxrs(1:4,kcr))
-                        end do
-                    end do
-                end do
-
-            end do
-        end do
-    end do
+    call interpolate_xyz_to_refined(tpdv, tpdvr(1:nxmr,:,:))
 
     !-- Interpolate vzr at an arbitrary x-y plane | tpvr | 1st guess
     call AllocateReal2DArray(vzxyc,-1,nxm+2,xstart(2)-2,xend(2)+2)
@@ -259,7 +197,7 @@ subroutine InterpVelMgrd
 
                 qv2=vzxyc(kc-1:kc+2,jc-1:jc+2)
 
-                do jcr=max(jrangs(jc),1),min(jrangs(jc+1)-1,nymr)
+                do jcr=max(jrangs(jc),xstartr(2)),min(jrangs(jc+1)-1,xendr(2))
                     qv1(:) = qv2(:,1)*cyvz(1,jcr) + qv2(:,2)*cyvz(2,jcr) &
                            + qv2(:,3)*cyvz(3,jcr) + qv2(:,4)*cyvz(4,jcr)
                     do kcr=max(irangs(kc),1),min(irangs(kc+1)-1,nxmr)
