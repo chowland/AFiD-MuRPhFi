@@ -20,21 +20,16 @@ subroutine CreateICPF
     integer :: i,j,k,kmid
     real :: r
 
-    if (pf_IC.eq.1) then ! 1D freezing validation
+    if (pf_IC == 1) then ! 1D freezing validation
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
-                    ! if (xmr(k) < 0.1) then
-                    !     phi(k,j,i) = 1.0
-                    ! else
-                    !     phi(k,j,i) = 0.0
-                    ! end if
                     phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - 0.1)/2/pf_eps))
                     if (RAYT > 0) phi(k,j,i) = 1.0 - phi(k,j,i)
                 end do
             end do
         end do
-    else if (pf_IC.eq.2) then ! Solid disc of radius 0.1 at x=0.5, centre of y-domain
+    else if (pf_IC == 2) then ! Solid disc of radius 0.1 at x=0.5, centre of y-domain
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
@@ -43,7 +38,7 @@ subroutine CreateICPF
                 end do
             end do
         end do
-    else if (pf_IC.eq.3) then ! Favier et al (2019) Appendix A3 Validation Case
+    else if (pf_IC == 3) then ! Favier et al (2019) Appendix A3 Validation Case
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
@@ -51,24 +46,21 @@ subroutine CreateICPF
                 end do
             end do
         end do
-    else if (pf_IC==4) then ! Ice block to compare with Neufeld et al. (2010)
+    else if (pf_IC == 4) then ! Ice block to compare with Neufeld et al. (2010)
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
+                r = sqrt((ymr(j) - ylen/2.0)**2 + (zmr(i) - zlen/2.0)**2)
                 do k=1,nxmr
-                    if ((xmr(k) < 0.25) .and. (abs(ymr(j) - ylen/2) < ylen/4)) then
-                        phi(k,j,i) = 1.0
-                    else
-                        phi(k,j,i) = 0.0
-                    end if
+                    phi(k,j,i) = 0.25*(1.0 + sign(1.0,RayT)*tanh((xmr(k) - alx3/2.0)/2.0/pf_eps)) &
+                                    *(1.0 - tanh((r - alx3/2.0)/2.0/pf_eps))
                 end do
             end do
         end do
-    else if (pf_IC.eq.5) then ! 1D freezing supercooled validation
+    else if (pf_IC == 5) then ! 1D freezing supercooled validation
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
                     phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - 0.02)/2/pf_eps))
-                    ! if (RAYT > 0) phi(k,j,i) = 1.0 - phi(k,j,i)
                 end do
             end do
         end do
