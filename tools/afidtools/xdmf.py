@@ -12,7 +12,7 @@ from xml.dom import minidom
 from xml.etree import ElementTree
 from numpy import zeros
 
-from .afidtools import read_grid
+from .afidtools import Grid
 
 def generate_cut_xmf(folder, plane):
     """
@@ -22,7 +22,7 @@ def generate_cut_xmf(folder, plane):
     """
 
     # Read the grid data from the simulation
-    grid = read_grid(folder)
+    grid = Grid(folder)
     nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
     nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
 
@@ -119,7 +119,7 @@ def generate_field_xmf(folder, var):
     """
 
     # Read the grid data from the simulation
-    grid = read_grid(folder)
+    grid = Grid(folder)
     nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
     nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
 
@@ -230,7 +230,7 @@ def generate_uniform_xmf(folder, var):
     """
 
     # Read the grid data from the simulation
-    grid = read_grid(folder)
+    grid = Grid(folder)
     nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
     nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
     dx, dy, dz = 1/nxm, grid.yc[-1]/nym, grid.zc[-1]/nzm
@@ -342,7 +342,7 @@ def generate_rawfield_xmf(folder, var):
     """
 
     # Read the grid data from the simulation
-    grid = read_grid(folder)
+    grid = Grid(folder)
     nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
     nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
 
@@ -429,7 +429,7 @@ def create_3D_grids(folder):
     Creates a grids.h5 file containing 3D arrays with the
     locations of the xc, ym, zm grids at each spatial point.
     """
-    grid = read_grid(folder)
+    grid = Grid(folder)
     dims = (grid.zm.size, grid.ym.size, grid.xc.size)
     tmp = zeros(dims)
     for i in range(dims[0]):
