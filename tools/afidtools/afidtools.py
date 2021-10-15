@@ -4,55 +4,111 @@ import h5py
 import numpy as np
 
 class Grid:
-    def __init__(self, xm, xmr, xc, xcr, ym, ymr, yc, ycr, zm, zmr, zc, zcr):
-        self.xm = xm
-        self.xmr= xmr
-        self.xc = xc
-        self.xcr= xcr
-        self.ym = ym
-        self.ymr= ymr
-        self.yc = yc
-        self.ycr= ycr
-        self.zm = zm
-        self.zmr= zmr
-        self.zc = zc
-        self.zcr= zcr
+    def __init__(self, folder):
+        with h5py.File(folder+"/outputdir/cordin_info.h5","r") as f:
+            self.xm = f["xm"][()]
+            self.xc = f["xc"][()]
+            self.ym = f["ym"][()]
+            self.zm = f["zm"][()]
+            if "xmr" in list(f.keys()):
+                self.xmr = f["xmr"][()]
+                self.xcr = f["xcr"][()]
+                self.ymr = f["ymr"][()]
+                self.zmr = f["zmr"][()]
+            else:
+                self.xmr, self.xcr = np.array([]), np.array([])
+                self.ymr, self.zmr = np.array([]), np.array([])
+        if self.ym.size > 1:
+            dy = self.ym[1] - self.ym[0]
+            self.yc = np.arange(0, dy*(self.ym.size+1), dy)
+        else: self.yc = np.array([0, 2*self.ym[0]])
+        if self.ymr.size > 1:
+            dyr = self.ymr[1] - self.ymr[0]
+            self.ycr = np.arange(0, dyr*(self.ymr.size+1), dyr)
+        elif self.ymr.size==1:
+            self.ycr = np.array([0,2*self.ymr[0]])
+        else: self.ycr = []
+        if self.zm.size > 1:
+            dz = self.zm[1] - self.zm[0]
+            self.zc = np.arange(0, dz*(self.zm.size+1), dz)
+        else: self.zc = np.array([0, 2*self.zm[0]])
+        if self.zmr.size > 1:
+            dzr = self.zmr[1] - self.zmr[0]
+            self.zcr = np.arange(0, dzr*(self.zmr.size+1), dzr)
+        elif self.zmr.size==1:
+            self.zcr = np.array([0,2*self.zmr[0]])
+        else: self.zcr = []
 
-def read_grid(folder):
-    with h5py.File(folder+"/outputdir/cordin_info.h5","r") as f:
-        xm = f["xm"][()]
-        xc = f["xc"][()]
-        ym = f["ym"][()]
-        zm = f["zm"][()]
-        if "xmr" in list(f.keys()):
-            xmr = f["xmr"][()]
-            xcr = f["xcr"][()]
-            ymr = f["ymr"][()]
-            zmr = f["zmr"][()]
-        else:
-            xmr, xcr = np.array([]), np.array([])
-            ymr, zmr = np.array([]), np.array([])
-    if ym.size > 1:
-        dy = ym[1] - ym[0]
-        yc = np.arange(0, dy*(ym.size+1), dy)
-    else: yc = np.array([0, 2*ym[0]])
-    if ymr.size > 1:
-        dyr = ymr[1] - ymr[0]
-        ycr = np.arange(0, dyr*(ymr.size+1), dyr)
-    elif ymr.size==1:
-        ycr = np.array([0,2*ymr[0]])
-    else: ycr = []
-    if zm.size > 1:
-        dz = zm[1] - zm[0]
-        zc = np.arange(0, dz*(zm.size+1), dz)
-    else: zc = np.array([0, 2*zm[0]])
-    if zmr.size > 1:
-        dzr = zmr[1] - zmr[0]
-        zcr = np.arange(0, dzr*(zmr.size+1), dzr)
-    elif zmr.size==1:
-        zcr = np.array([0,2*zmr[0]])
-    else: zcr = []
-    return Grid(xm, xmr, xc, xcr, ym, ymr, yc, ycr, zm, zmr, zc, zcr)
+class InputParams:
+    def __init__(self, folder):
+        fname = folder+"/bou.in"
+        with open(fname,"r") as f:
+            bou = f.readlines()
+        if len(bou)==55:
+            # Current format
+            self.nxm, self.nym, self.nzm, self.nsst = [
+                int(n) for n in bou[2].split()
+            ]
+            self.multires, self.nxmr, self.nymr, self.nzmr = [
+                int(n) for n in bou[6].split()
+            ]
+            self.flagsal, self.flagpf = [
+                n!="0" for n in bou[10].split()
+            ]
+            self.tout, self.tframe = [
+                float(n) for n in bou[22].split()[:2]
+            ]
+            self.save_3D = float(bou[22].split()[-1])
+            self.alx3, self.ylen, self.zlen = [
+                float(n) for n in bou[26].split()
+            ]
+            self.RayT, self.PraT, self.RayS, self.PraS = [
+                float(n) for n in bou[34].split()[:-1]
+            ]
+            self.FFscaleS = bou[34].split()[-1]=="1"
+            self.inslwS, self.inslwN, self.TfixS, self.TfixN, self.SfixS, self.SfixN = [
+                n!="0" for n in bou[42].split()
+            ]
+            self.active_T, self.active_S = [
+                n!="0" for n in bou[46].split()[:-1]
+            ]
+            self.gAxis = int(bou[46].split()[-1])
+            self.xplusU, self.xminusU, self.dPdy, self.dPdz = [
+                float(n) for n in bou[50].replace("d","e").split()[:-1]
+            ]
+            self.pf_A, self.pf_C, self.pf_S, self.pf_Tm = [
+                float(n) for n in bou[54].split()[:4]
+            ]
+            self.IBM = bou[54].split()[4]!="0"
+            self.pf_IC = int(bou[54].split()[-1])
+        
+        elif len(bou)==24:
+            self.nxm, self.nym, self.nzm = [
+                int(n) for n in bou[1].split()[:3]
+            ]
+            self.nxmr, self.nymr, self.nzmr = [
+                int(n) for n in bou[3].split()
+            ]
+            self.tout = float(bou[5].split()[2])
+            self.FFscaleS = bou[5].split()[-1]=="0"
+            self.alx3 = float(bou[7].split()[0])
+            self.ylen, self.zlen = [
+                float(n) for n in bou[9].split()
+            ]
+            self.RayT, self.PraT, self.RayS, self.PraS = [
+                float(n) for n in bou[11].split()[:4]
+            ]
+            self.inslwS, self.inslwN, self.TfixS, self.TfixN, self.SfixS, self.SfixN = [
+                n!="0" for n in bou[15].split()[:6]
+            ]
+            self.gAxis = int(bou[15].split()[-1])
+            self.xplusU, self.xminusU, self.dPdz = [
+                float(n) for n in bou[21].replace("d","e").split()
+            ]
+            self.tframe = float(bou[23].split()[0])
+            self.flagsal = True
+
+
 
 def read_mean(folder, varname):
     with h5py.File(folder+"/outputdir/means.h5","r") as f:
