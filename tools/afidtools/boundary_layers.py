@@ -155,3 +155,81 @@ def ddx(A, x, BClo=0.0, BCup=0.0):
         dA[1:-1] = (A[2:] - A[:-2])/(x[2:] - x[:-2])
         dA[-1] = (BCup - A[-2])/(1.0 - x[-2])
     return dA
+
+def refine(A, grid):
+    xgrid = np.concatenate(([0], grid.xm, [1]))
+    if A.ndim==2:
+        Ar = np.zeros((grid.xmr.size, A.shape[1]))
+        for i in range(A.shape[1]):
+            xA = np.concatenate(([0], A[:,i], [0]))
+            Ar[:,i] = np.interp(grid.xmr, xgrid, xA)
+    elif A.ndim==1:
+        xA = np.concatenate(([0], A, [0]))
+        Ar = np.interp(grid.xmr, xgrid, xA)
+    return Ar
+
+def budget_time_series(folder):
+    inputs = InputParams(folder)
+    ν = np.sqrt(inputs.PraS/inputs.RayS)
+    κT = ν/inputs.PraT
+    κS = ν/inputs.PraS
+    grid = Grid(folder)
+    uv = read_mean(folder, "vxvy")
+    uw = read_mean(folder, "vxvz")
+    v̄ = read_mean(folder, "vybar")
+    w̄ = read_mean(folder, "vzbar")
+    dv̄ = ddx(v̄, grid.xm)
+    dw̄ = ddx(w̄, grid.xm)
+    shear_prod = xmean(
+        -uv*dv̄ - uw*dw̄, grid.xc
+    )
+    eps_bar = xmean(ν*(dv̄**2 + dw̄**2), grid.xc)
+    epsilon = read_mean(folder, "epsilon")
+    eps_p = xmean(epsilon, grid.xc) - eps_bar
+    
+    Tbar = read_mean(folder, "Tbar")
+    qvT = read_mean(folder, "vyT")
+    qT_bar = xmean(v̄*Tbar, grid.xc)
+    qT_p = xmean(qvT,grid.xc) - qT_bar
+    
+    vr = refine(v̄, grid)
+    Sbar = read_mean(folder, "Sbar")
+    qvS = read_mean(folder, "vyS")
+    qS_bar = xmean(vr*Sbar, grid.xcr)
+    qS_p = xmean(qvS,grid.xcr) - qS_bar
+    
+    t = mean_time(folder, inputs.tout)
+    
+    dTbar = ddx(Tbar, grid.xm, BClo=0.5, BCup=-0.5)
+    qT = read_mean(folder, "vxT")
+    buoy_prodT = xmean(-qT*dTbar, grid.xc)
+    chiT_bar = xmean(κT*dTbar**2, grid.xc)
+    chiT = read_mean(folder, "chiT")
+    chiT_p = xmean(chiT, grid.xc) - chiT_bar
+    qT = -0.5*κT*(dTbar[0,:] + dTbar[-1,:])
+    
+    dSbar = ddx(Sbar, grid.xmr, BClo=-0.5, BCup=0.5)
+    qS = read_mean(folder, "vxS")
+    buoy_prodS = xmean(-qS*dSbar, grid.xcr)
+    chiS_bar = xmean(κS*dSbar**2, grid.xcr)
+    chiS = read_mean(folder, "chiS")
+    chiS_p = xmean(chiS, grid.xcr) - chiS_bar
+    qS = 0.5*κS*(dSbar[0,:] + dSbar[-1,:])
+    
+    RaS = inputs.RayS*np.ones(len(t))
+    PrS = inputs.PraS*np.ones(len(t))
+    RaT = inputs.RayT*np.ones(len(t))
+    PrT = inputs.PraT*np.ones(len(t))
+    
+    df = DataFrame({
+        "t": t, "shear_prod": shear_prod,
+        "eps_bar": eps_bar, "eps_p": eps_p,
+        "qT_bar": qT_bar, "qT_p": qT_p,
+        "qS_bar": qS_bar, "qS_p": qS_p,
+        "chiT_bar": chiT_bar, "chiT_p": chiT_p,
+        "chiS_bar": chiS_bar, "chiS_p": chiS_p,
+        "qT": qT, "qS": qS,
+        "buoy_prodT": buoy_prodT, "buoy_prodS": buoy_prodS,
+        "RaT": RaT, "PrT": PrT, "RaS": RaS, "PrS": PrS
+    })
+    return df
