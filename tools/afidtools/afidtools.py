@@ -4,6 +4,9 @@ import h5py
 import numpy as np
 
 class Grid:
+    """
+    Class containing the coordinates of all grids used in the simulation
+    """
     def __init__(self, folder):
         with h5py.File(folder+"/outputdir/cordin_info.h5","r") as f:
             self.xm = f["xm"][()]
@@ -40,6 +43,10 @@ class Grid:
         else: self.zcr = []
 
 class InputParams:
+    """
+    Class containing the simulation parameters specified by
+    the input file `bou.in`.
+    """
     def __init__(self, folder):
         fname = folder+"/bou.in"
         with open(fname,"r") as f:
@@ -111,6 +118,10 @@ class InputParams:
 
 
 def read_mean(folder, varname):
+    """
+    Returns a 2D array containing the time-series of the wall-normal
+    profile of the specified variable `varname`.
+    """
     with h5py.File(folder+"/outputdir/means.h5","r") as f:
         samplist = list(f[varname].keys())
         Nsamp = len(samplist)
@@ -123,12 +134,23 @@ def read_mean(folder, varname):
     return var
 
 def read_cut(folder, var, idx, plane):
+    """
+    Returns a 2D slice of sample number `idx` of the variable `var`.
+    `plane` can be 'x', 'y', or 'z' and specifies which dimension
+    is sliced to obtain the cut. `folder` specifies the root directory
+    of the simulation.
+    """
     varname = var+"/"+"%05d" % idx
     with h5py.File(folder+"/outputdir/flowmov/movie_"+plane+"cut.h5","r") as f:
         A = np.array(f[varname][()])
     return A
 
-def continua_master_from_input(folder):
+def continua_master_from_input(folder, time=0.0):
+    """
+    This function generates the file `continua_master.h5` needed to run
+    a simulation from the continua files. Optionally pass the `time` variable
+    to set the start time value for the simulation.
+    """
     with open(folder+"/bou.in", "r") as f:
         for i, line in enumerate(f):
             if i==2:
@@ -139,7 +161,6 @@ def continua_master_from_input(folder):
                 ylen, zlen = [float(n) for n in line.split()[1:3]]
             if i==30:
                 istr3, str3, istr3r = [float(n) for n in line.split()]
-        time = 0.0
         with h5py.File(folder+"/outputdir/continua_master.h5","w") as f:
             f["nx"], f["ny"], f["nz"] = nxm + 1, nym + 1, nzm + 1
             f["nxr"], f["nyr"], f["nzr"] = nxmr + 1, nymr + 1, nzmr + 1
@@ -149,11 +170,20 @@ def continua_master_from_input(folder):
     return
 
 def write_continua(folder, varname, var):
+    """
+    Generates a continua file for the variable `varname` from the
+    data in array `var`.
+    """
     with h5py.File(folder+"/outputdir/continua_"+varname+".h5","w") as f:
         f["var"] = var
     return
 
 def z_vorticity(folder, idx, grid):
+    """
+    Returns a cut of the z-component of vorticity, calculated by the
+    derivatives of the vx and vy fields. Sample number `idx`, simulation
+    directory `folder` and grid data `grid` are needed.
+    """
     vx = read_cut(folder, "vx", idx, "z")
     vy = read_cut(folder, "vy", idx, "z")
 

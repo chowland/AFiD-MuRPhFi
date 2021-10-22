@@ -4,17 +4,36 @@ import h5py
 from .afidtools import Grid, InputParams, read_mean
 
 def xmean(A, xc):
+    """
+    Returns the spatial average of the space-time data `A`.
+    It is assumed the data of `A` lies on the cell-centred grid `xm`
+    and that the grid `xc` to the function is offset from the data.
+    """
     dx = xc[1:] - xc[:-1]
     Ame = np.sum(A*dx.reshape(dx.size,1), axis=0)
     return Ame
 
-def mean_time(folder, dt):
+def mean_time(folder):
+    """
+    Returns a vector `t` that contains the time values for
+    each sample in the `means.h5` file associated with the
+    simulation in the directory `folder`.
+    """
+    inputs = InputParams(folder)
+    dt = inputs.tout
     with h5py.File(folder+"/outputdir/means.h5","r") as f:
         samplist = list(f["Tbar"].keys())
     t = [float(samp)*dt for samp in samplist]
     return t
 
 def Nusselt_numbers(folder):
+    """
+    Returns a DataFrame containing the time series of
+    the Nusselt numbers from the upper and lower plates
+    and that calculated from the scalar dissipation rates.
+    Solutal Nusselt numbers are also calculated if the input
+    file suggests salinity is being simulated.
+    """
     inputs = InputParams(folder)
     grid = Grid(folder)
     Tbar = read_mean(folder, "Tbar")
@@ -82,6 +101,10 @@ def tmean_profile(A, t, t0=0.0):
     return np.mean(A[:,i0:], axis=1)
 
 def wall_shear(folder):
+    """
+    Returns a DataFrame containing the time series of the
+    shear Reynolds number calculated at both the upper and lower plates
+    """
     inputs = InputParams(folder)
     grid = Grid(folder)
     vbar = read_mean(folder, "vybar")
@@ -143,6 +166,12 @@ def hermite_max(x4, f4):
     return x, v
 
 def ddx(A, x, BClo=0.0, BCup=0.0):
+    """
+    Computes the wall-normal derivative of the space(-time) data `A`
+    which sits on the grid `x`. Upper and lower boundary values, at
+    x=1 and x=0 respectively, can be set by the optional arguments
+    `BCup` and `BClo`.
+    """
     dA = np.zeros(A.shape)
     A = np.array(A)
     x = np.array(x)
@@ -156,19 +185,30 @@ def ddx(A, x, BClo=0.0, BCup=0.0):
         dA[-1] = (BCup - A[-2])/(1.0 - x[-2])
     return dA
 
-def refine(A, grid):
+def refine(A, grid, BClo=0.0, BCup=0.0):
+    """
+    Interpolates the space(-time) data `A` from the coarse grid `xm`
+    to the refined grid `xmr`. Upper and lower boundary values, at
+    x=1 and x=0 respectively, can be set by the optional arguments
+    `BCup` and `BClo`.
+    """
     xgrid = np.concatenate(([0], grid.xm, [1]))
     if A.ndim==2:
         Ar = np.zeros((grid.xmr.size, A.shape[1]))
         for i in range(A.shape[1]):
-            xA = np.concatenate(([0], A[:,i], [0]))
+            xA = np.concatenate(([BClo], A[:,i], [BCup]))
             Ar[:,i] = np.interp(grid.xmr, xgrid, xA)
     elif A.ndim==1:
-        xA = np.concatenate(([0], A, [0]))
+        xA = np.concatenate(([BClo], A, [BCup]))
         Ar = np.interp(grid.xmr, xgrid, xA)
     return Ar
 
 def budget_time_series(folder):
+    """
+    Returns a DataFrame containing the time series of all the
+    budget terms from the kinetic energy equation and the equations
+    for the scalar variance.
+    """
     inputs = InputParams(folder)
     ν = np.sqrt(inputs.PraS/inputs.RayS)
     κT = ν/inputs.PraT
