@@ -2,7 +2,7 @@ afid
 *.txt
 obj/*
 outputdir/*
-__pycache__/*
+*__pycache__
 .ipynb_checkpoints/*
 .vscode/*
 notebooks/*
