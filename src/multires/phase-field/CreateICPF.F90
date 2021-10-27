@@ -18,7 +18,7 @@ subroutine CreateICPF
     implicit none
 
     integer :: i,j,k,kmid
-    real :: r
+    real :: r, x0, lambda, h0, t0
 
     if (pf_IC == 1) then ! 1D freezing validation
         do i=xstartr(3),xendr(3)
@@ -67,17 +67,30 @@ subroutine CreateICPF
     end if
 
     if (salinity) then ! Ice above salty water
-        kmid = nxmr/2
-        do i=xstartr(3),xendr(3)
-            do j=xstartr(2),xendr(2)
-                do k=1,kmid
-                    phi(k,j,i) = 0.0
-                end do
-                do k=kmid+1,nxmr
-                    phi(k,j,i) = 1.0
+        if (pf_IC==1) then
+            x0 = 0.8
+            lambda = 0.24041
+            h0 = x0 + 2*Lambda*sqrt(t0/pect)
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,nxmr
+                        phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - h0)/2/pf_eps))
+                    end do
                 end do
             end do
-        end do
+        else
+            kmid = nxmr/2
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,kmid
+                        phi(k,j,i) = 0.0
+                    end do
+                    do k=kmid+1,nxmr
+                        phi(k,j,i) = 1.0
+                    end do
+                end do
+            end do
+        end if
     end if
 
     return
