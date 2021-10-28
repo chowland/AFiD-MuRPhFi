@@ -49,23 +49,31 @@ subroutine CreateInitialConditions
             end do
         end do
     elseif (gAxis == 2) then
+        if (inslwN==1) then
         !CJH Laminar vertical convection as in Batchelor (1954)
-        eps = 1e-3
-        t0 = 1.4195567
-        do i=xstart(3),xend(3)
-            do j=xstart(2),xend(2)
-                do k=1,nxm
-                    xxx = xm(k)/2*sqrt(pect/t0)
-                    ! vy(k,j,i) = 0.d0 !min(ren,320.0)/12.0*xxx*(2*xxx-1)*(xxx-1)
-                    ! Ke et al profile: 4t/(1-Pr)[i2erfc(eta) - i2erfc(eta/sqrt(Pr))]
-                    vy(k,j,i) = 4*t0/(1 - PraT)*(&
-                        0.25*((1 + 2*xxx**2)*erfc(xxx) - 2*xxx/sqrt(pi)*exp(-xxx**2)) - &
-                        0.25*((1 + 2*xxx**2/PraT)*erfc(xxx/sqrt(PraT)) &
-                            - 2*xxx/sqrt(pi*PraT)*exp(-xxx**2/PraT)) &
-                    )
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xm(k)
+                        vy(k,j,i) = min(ren,320.0)/12.0*xxx*(2*xxx-1)*(xxx-1)
+                    end do
                 end do
             end do
-        end do
+        else
+            !CJH Ke et al profile: 4t/(1-Pr)[i2erfc(eta) - i2erfc(eta/sqrt(Pr))]
+            t0 = 1.4195567
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xm(k)/2*sqrt(pect/t0)
+                        vy(k,j,i) = 4*t0/(1 - PraT)*(&
+                            0.25*((1 + 2*xxx**2)*erfc(xxx) - 2*xxx/sqrt(pi)*exp(-xxx**2)) - &
+                            0.25*((1 + 2*xxx**2/PraT)*erfc(xxx/sqrt(PraT)) &
+                                - 2*xxx/sqrt(pi*PraT)*exp(-xxx**2/PraT)) &
+                        )
+                    end do
+                end do
+            end do
     end if
 
     ! Set velocity to zero if we are using the phase-field method
@@ -107,12 +115,11 @@ subroutine CreateInitialConditions
         end do
     end do
 
-    if (gAxis==2) then
+    if (gAxis==2 .and. inslwN==0) then  ! Ke et al comparison case
         t0 = 1.4195567
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                 do k=1,nxm
-                    ! Ke et al comparison case!!
                     amp = 0.0
                     do kmid=0,7
                         amp = amp + sin(2.0**kmid * 2.0*pi*ym(j)/ylen)

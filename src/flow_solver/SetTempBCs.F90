@@ -15,12 +15,21 @@ subroutine SetTempBCs
     integer :: ic,jc
     
     if (rayt>=0) then ! unstable T gradient
-        do ic=xstart(3),xend(3)
-            do jc=xstart(2),xend(2)
-                temptp(1,jc,ic)=-0.5d0
-                tempbp(1,jc,ic)=0.5d0
+        if (inslwN==0) then !Single heated wall case
+            do ic=xstart(3),xend(3)
+                do jc=xstart(2),xend(2)
+                    temptp(1,jc,ic)=0.0
+                    tempbp(1,jc,ic)=1.0
+                end do
             end do
-        end do
+        else
+            do ic=xstart(3),xend(3)
+                do jc=xstart(2),xend(2)
+                    temptp(1,jc,ic)=-0.5d0
+                    tempbp(1,jc,ic)=0.5d0
+                end do
+            end do
+        end if
     else              ! stable T gradient
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
