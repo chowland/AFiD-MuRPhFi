@@ -48,7 +48,7 @@ subroutine CreateInitialConditions
                 end do
             end do
         end do
-    elseif (gAxis == 2) then
+    else if (gAxis == 2) then
         if (inslwN==1) then
         !CJH Laminar vertical convection as in Batchelor (1954)
             do i=xstart(3),xend(3)
@@ -74,6 +74,7 @@ subroutine CreateInitialConditions
                     end do
                 end do
             end do
+        end if
     end if
 
     ! Set velocity to zero if we are using the phase-field method
