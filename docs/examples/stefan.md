@@ -121,3 +121,65 @@ $$
 We fix the Stefan number to be 2.5, giving a value for $\Lambda$ of 1.2012.
 The initial radius for the solid in the simulation is chosen to be $r=0.1$ such that the unbounded solution for the temperature field is close to zero at the boundaries of our finite domain.
 This is associated with an initial time of $t_0=25.3$.
+
+## 1-D multi-component melting
+The melting of ice in salt water depends on the fluxes of both heat and salt at the phase boundary.
+To validate our solver, we use the analytic diffusive solution proposed by [Martin and Kauffman (1977)](https://doi.org/10.1175/1520-0485(1977)007<0272:AEATSO>2.0.CO;2).
+In our dimensionless framework, the governing equations read
+
+$$
+\partial_t T = \kappa_T \partial_{xx}T, \quad \partial_t S = \kappa_S \partial_{xx} S
+$$
+
+where for brevity we have written $\kappa_c = (Pe_c)^{-1}$ for $c=T,S$.
+The boundary conditions at the interface $x=h(t)$ are
+
+$$
+T + \Lambda S = 0, \quad \mathcal{S}h' = \kappa_T \partial_x T, \quad Sh' = \kappa_S \partial_x S .
+$$
+
+The first of these represents the change in melting temperature dependent on the local salinity value at the boundary.
+As a reminder, $\Lambda = \lambda \Delta T/ \Delta S$ where $\lambda = 5.71 \times 10^{-2} \degree C (\mathrm{psu})^{-1}$ is the liquidus slope.
+The remaining boundary conditions represent the conservation of heat and salt across the phase boundary.
+It is assumed that temperature and salinity are uniform and equal to zero in the ice, that is $x > h(t)$.
+The solution of [Martin and Kauffman (1977)](https://doi.org/10.1175/1520-0485(1977)007<0272:AEATSO>2.0.CO;2) considers an infinite domain such that the solution in the liquid phase takes the form
+
+$$
+T = 1 - A\mathrm{erfc(-\eta)}, \quad S = 1 - B\mathrm{erfc(-\zeta)}
+$$
+
+where the similarity variables are defined
+
+$$
+\eta = \frac{x - x_0}{2\sqrt{\kappa_T t}}, \quad \zeta = \frac{x - x_0}{2\sqrt{\kappa_S t}} .
+$$
+
+Here, $x_0$ is the position of the interface at time $t=0$.
+Note that we can write $\eta = \varepsilon \zeta$ where $\varepsilon = \sqrt{\kappa_S/\kappa_T}$ is the square root of the diffusivity ratio.
+The phase boundary $h(t)$ is associated with a fixed value of $\eta$ (or $\zeta$) such that $h - x_0 = 2\lambda \sqrt{\kappa_T T} = 2\gamma \sqrt{\kappa_S T}$.
+
+We now follow the same steps as [Martin and Kauffman (1977)](https://doi.org/10.1175/1520-0485(1977)007<0272:AEATSO>2.0.CO;2) to obtain the parameters $A$, $B$ and $\lambda$ from the boundary conditions in our dimensionless framework.
+Substituting the solution into the first boundary condition gives
+
+$$
+A = \frac{1+ \Lambda - \Lambda B \mathrm{erfc(-\gamma)}}{\mathrm{erfc(-\varepsilon \gamma)}} ,
+$$
+
+and the remaining boundary conditions give
+
+$$
+\lambda e^{\lambda^2} = \frac{A}{\mathcal{S}\sqrt{\pi}} , \quad \sqrt{\pi}\gamma e^{\gamma^2} = B[1 + \sqrt{\pi}\gamma e^{\gamma^2}\mathrm{erfc}(-\gamma)] .
+$$
+
+Combining these relations gives a single equation for $\lambda$ (recalling that $\lambda = \varepsilon \gamma$):
+
+$$
+\lambda e^{\lambda^2} \mathrm{erfc}(\lambda) = \frac{1+\Lambda}{\mathcal{S}\sqrt{\pi}} \left[1 - \frac{\Lambda}{1 + \Lambda}f(\gamma) \right], \quad \textrm{where} \ f(\gamma) = \frac{\gamma \sqrt{\pi} \mathrm{erfc}(-\gamma)}{e^{-\gamma^2} + \sqrt{\pi} \mathrm{erfc}(-\gamma)}.
+$$
+
+We can solve this numerically for $\lambda$, and then plug this value back into the above conditions for $A$ and $B$.
+For example, setting $\Lambda = 0.4$, $\varepsilon=0.1$ and $\mathcal{S}=10$, we obtain
+
+$$
+\lambda=0.06279, \quad A=1.1174, \quad B=0.4482 .
+$$

@@ -65,9 +65,9 @@ subroutine CreateICSal
         if (pf_IC==1) then
             t0 = 1
             x0 = 0.8
-            gamma = 0.76023
+            gamma = 0.6576 !0.76023
             h0 = x0 + 2*gamma*sqrt(t0/pecs)
-            B = 0.37372
+            B = 0.3266 !0.37372
             do i=xstartr(3),xendr(3)
                 do j=xstartr(2),xendr(2)
                     do k=1,nxmr
