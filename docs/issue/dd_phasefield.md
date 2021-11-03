@@ -143,7 +143,7 @@ The profiles match well, and the temperature in the solid remains at the constan
 <!-- Inspection of the salinity field reveals the cause for this temperature difference, and the greatest issue with the current phase-field implementation.
 The persistent jump in concentration in the analytic solution is smeared out almost straight away.
 The condition of zero salinity is not imposed in the solid phase, and this in turn affects the salinity profile in the liquid. -->
-Inspection of the salinity field reveals good agreement once again in the liquid, although somewhat spurious behaviour in the solid.
+Inspection of the salinity field reveals good agreement once again in the liquid, although the output of the model does not jump to zero in the solid.
 Salinity must be continuous at the phase boundary, which does not match the physical solution, but we already know that the salinity must be zero in the solid phase.
 The phase-field model is set up such that the correct boundary conditions are applied at the interface, making the solution in the liquid reliable.
 
@@ -157,7 +157,37 @@ The evolution of the phase-field interface over time also recovers the analytic 
 
 {% include "phi_validation.html" %}
 
-## Notes
+## Remarks
 
-- One of the boundary condition expressions in Martin & Kauffman (1977) contains an extra factor of $1/2$ that I am pretty sure should not be there. This only changes the prefactors in the analytic solution. Out of caution, I have tried initial conditions with and without the factor of 2 - there is no significant change to the above results.
-- Various values of $\delta$ have been tried, from $10^{-14}$ to $10^{-2}$. None have produced the desired solution.
+<!-- - One of the boundary condition expressions in Martin & Kauffman (1977) contains an extra factor of $1/2$ that I am pretty sure should not be there. This only changes the prefactors in the analytic solution. Out of caution, I have tried initial conditions with and without the factor of 2 - there is no significant change to the above results.
+- Various values of $\delta$ have been tried, from $10^{-14}$ to $10^{-2}$. None have produced the desired solution. -->
+
+For the case where a flow field also advects the scalars, there are some minor differences in the equations used between Hester et al. (2020) and Hester et al. (2021).
+Does one have an advantage over the other or are the differences indistinguishable?
+
+### Hester et al (2020)
+$$
+\partial_t T + \nabla \cdot (\boldsymbol{u} T) = \kappa_T \nabla^2 T + \mathcal{S} \partial_t \phi
+$$
+
+$$
+\partial_t C +  \nabla \cdot (\boldsymbol{u} C) = \kappa_S \left( \nabla^2 C - \frac{\nabla \phi \cdot \nabla C}{1-\phi+\delta} \right) + \frac{C\partial_t \phi}{1-\phi+\delta}
+$$
+
+### Hester et al (2021)
+
+$$
+\partial_t T + \nabla \cdot \left[ (1-\phi) \boldsymbol{u} T - \kappa \nabla T \right] = \mathcal{S}\partial_t \phi
+$$
+
+$$
+\Rightarrow \partial_t T + \nabla \cdot (\boldsymbol{u} T) = \kappa_T \nabla^2 T + \mathcal{S} \partial_t \phi \textcolor{blue}{+ \nabla\cdot(\phi T \boldsymbol{u})}
+$$
+
+$$
+\partial_t \left[(1-\phi+\delta) C\right] + \nabla \cdot \left[(1-\phi+\delta) (\boldsymbol{u}C - \kappa_S \nabla C)\right] = 0
+$$
+
+$$
+\Rightarrow \partial_t C +  \nabla \cdot (\boldsymbol{u} C) = \kappa_S \left( \nabla^2 C - \frac{\nabla \phi \cdot \nabla C}{1-\phi+\delta} \right) + \frac{C\partial_t \phi}{1-\phi+\delta} \textcolor{blue}{+ \frac{\boldsymbol{u} C \cdot \nabla\phi}{1-\phi+\delta}}
+$$
