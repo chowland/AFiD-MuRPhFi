@@ -1,7 +1,9 @@
-# ISSUE: Ice melting in salt water
+# SOLVED: Ice melting in salt water
 
-Currently, the phase-field implementation is unable to replicate the analytic diffusive solution for the melting of ice in salt water.
-On this page, I outline the multicomponent Stefan problem that we wish to replicate, the phase-field model being implemented, and the erroneous results that we obtain.
+<!-- Currently, the phase-field implementation is unable to replicate the analytic diffusive solution for the melting of ice in salt water.
+On this page, I outline the multicomponent Stefan problem that we wish to replicate, the phase-field model being implemented, and the erroneous results that we obtain. -->
+The phase-field implementation now successfully reproduces the analytic diffusive solution for the melting of ice in salt water.
+The problem and results are outlined below.
 
 ## 1-D diffusive melting ([Martin and Kauffman, 1977](https://doi.org/10.1175/1520-0485(1977)007%3C0272:AEATSO%3E2.0.CO;2))
 
@@ -35,8 +37,8 @@ $$
 and the interfacial boundary conditions
 
 $$
-T+\Lambda C = 0, \qquad \mathcal{S}h'=\kappa_T \partial_x T, \qquad
-Ch' = \kappa_S \partial_x C,
+T+\Lambda C = 0, \qquad \mathcal{S}h'=-\kappa_T \partial_x T, \qquad
+Ch' = -\kappa_S \partial_x C,
 $$
 
 at $x=h(t)$.
@@ -73,7 +75,7 @@ The coefficients $\alpha$, $A$, and $B$ can be determined through the boundary c
 Specifically, they satisfy the following relations:
 
 $$
-\alpha e^{\alpha^2} \mathrm{erfc}(\alpha) = \frac{1+\Lambda}{\mathcal{S}\sqrt{\pi}}\left[ 1 - \frac{\Lambda}{1+\Lambda} f(\alpha/\sqrt{\tau})\right] , \quad \textrm{where} \ f(\gamma) = \frac{\gamma \sqrt{\pi} \mathrm{erfc}(-\gamma)}{e^{-\gamma^2} + \sqrt{\pi}\mathrm{erfc}(-\gamma)} ,
+\alpha e^{\alpha^2} \mathrm{erfc}(\alpha) = \frac{1+\Lambda}{\mathcal{S}\sqrt{\pi}}\left[ 1 - \frac{\Lambda}{1+\Lambda} f(\alpha/\sqrt{\tau})\right] , \quad \textrm{where} \ f(\gamma) = \frac{\gamma \sqrt{\pi} \mathrm{erfc}(-\gamma)}{e^{-\gamma^2} + \gamma \sqrt{\pi}\mathrm{erfc}(-\gamma)} ,
 $$
 
 $$
@@ -84,7 +86,7 @@ The coefficients are fully determined once values of $\Lambda$, $\tau$ and $\mat
 For our validation case, we will take $\mathcal{S}=2.5$, $\tau=0.1$ and $\Lambda =0.4$, giving the following values for the solution coefficients:
 
 $$
-A=0.9622, \quad B=0.3266, \quad \alpha = 0.2080 .
+A=0.90954, \quad B=0.44748, \quad \alpha = 0.19742 .
 $$
 
 An animation of the solution is shown below, where temperature is plotted as a red line, concentration is in blue, and the interface position is shown by a vertical black line.
@@ -118,7 +120,7 @@ The small factor $\delta$ is used to prevent terms in the concentration equation
 <!-- Note that these equations differ slightly from those used in the later paper of [Hester et al. (2021)](https://doi.org/10.1103/PhysRevFluids.6.023802) to model the melting of ice blocks.
 In that paper,  -->
 
-## Model run issues
+## Model run results
 
 Below, we present the results obtained from a run of the phase-field model with $Pe_T=10^3$, $Pe_S=10^4$, $\mathcal{S}=2.5$, $\Gamma=1$, and $\Lambda=0.4$.
 No-flux boundary conditions are applied to $T$ and $C$ at $x=0$ and $x=1$, and a resolution of $512$ points is used for $T$, whereas $C$ and $\phi$ are resolved on a grid of $1024$ points.
@@ -132,19 +134,26 @@ $$
 where $h_0 = 2\alpha /\sqrt{Pe_T}$ is the corresponding interface position.
 
 First, we inspect the temperature profile over time.
-Although the temperature in the solid phase remains lower than zero, we see that it increases over time.
-This is in contrast to the analytic solution, which prescribes that the temperature in the solid (and at the interface) should be constant.
+<!-- Although the temperature in the solid phase remains lower than zero, we see that it increases over time.
+This is in contrast to the analytic solution, which prescribes that the temperature in the solid (and at the interface) should be constant. -->
+The profiles match well, and the temperature in the solid remains at the constant value predicted by the analytic solution.
 
 {% include "temp_validation.html" %}
 
-Inspection of the salinity field reveals the cause for this temperature difference, and the greatest issue with the current phase-field implementation.
+<!-- Inspection of the salinity field reveals the cause for this temperature difference, and the greatest issue with the current phase-field implementation.
 The persistent jump in concentration in the analytic solution is smeared out almost straight away.
-The condition of zero salinity is not imposed in the solid phase, and this in turn affects the salinity profile in the liquid.
+The condition of zero salinity is not imposed in the solid phase, and this in turn affects the salinity profile in the liquid. -->
+Inspection of the salinity field reveals good agreement once again in the liquid, although somewhat spurious behaviour in the solid.
+Salinity must be continuous at the phase boundary, which does not match the physical solution, but we already know that the salinity must be zero in the solid phase.
+The phase-field model is set up such that the correct boundary conditions are applied at the interface, making the solution in the liquid reliable.
 
 {% include "sal_validation.html" %}
 
-Since the salinity can diffuse into the solid, the value of salinity is lower at the 'interface' ($\phi=1/2$) than it should be, raising the local melting temperature.
-The diffusive heat flux at the interface is therefore lower than in the analytic solution, resulting in an interface that moves slower than that predicted:
+As further evidence of the model's good agreement, we plot the salinity profiles such that the concentration is set to zero in the solid phase ($\phi>0.5$):
+
+{% include "sal_validation_trunc.html" %}
+
+The evolution of the phase-field interface over time also recovers the analytic $t^{1/2}$ expression near-perfectly:
 
 {% include "phi_validation.html" %}
 

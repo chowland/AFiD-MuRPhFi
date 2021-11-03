@@ -222,9 +222,9 @@ subroutine CreateInitialConditions
             if (pf_IC==1) then
                 t0 = 1
                 x0 = 0.8
-                Lambda = 0.2080 !0.24041
+                Lambda = 0.19742 !0.24041
                 h0 = x0 + 2*Lambda*sqrt(t0/pect)
-                A = 0.9622 !0.90293
+                A = 0.90954 !0.90293
                 do i=xstart(3),xend(3)
                     do j=xstart(2),xend(2)
                         do k=1,nxm

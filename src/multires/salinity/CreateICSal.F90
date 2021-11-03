@@ -65,17 +65,17 @@ subroutine CreateICSal
         if (pf_IC==1) then
             t0 = 1
             x0 = 0.8
-            gamma = 0.6576 !0.76023
+            gamma = 0.62428 !0.76023
             h0 = x0 + 2*gamma*sqrt(t0/pecs)
-            B = 0.3266 !0.37372
+            B = 0.44748 !0.37372
             do i=xstartr(3),xendr(3)
                 do j=xstartr(2),xendr(2)
                     do k=1,nxmr
-                        if (xmr(k) <= h0) then
-                            sal(k,j,i) = 1 - B*erfc((x0 - xmr(k))*sqrt(pecs/t0)/2.0)
-                        else
-                            sal(k,j,i) = 0.0
-                        end if
+                        ! if (xmr(k) <= h0) then
+                            sal(k,j,i) = 1.0 - B*erfc((x0 - xmr(k))*sqrt(pecs/t0)/2.0)
+                        ! else
+                        !     sal(k,j,i) = 1.0 - B*erfc(-gamma)
+                        ! end if
                     end do
                 end do
             end do

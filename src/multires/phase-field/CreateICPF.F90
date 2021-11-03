@@ -70,7 +70,7 @@ subroutine CreateICPF
         if (pf_IC==1) then
             t0 = 1.0
             x0 = 0.8
-            lambda = 0.2080 !0.24041
+            lambda = 0.19742 !0.24041
             h0 = x0 + 2*Lambda*sqrt(t0/pect)
             do i=xstartr(3),xendr(3)
                 do j=xstartr(2),xendr(2)
