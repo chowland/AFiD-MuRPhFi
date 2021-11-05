@@ -120,7 +120,7 @@ subroutine ReadInputFile
     pecs = ren*pras
     pi = 2.d0*dasin(1.d0)
 
-    pf_A = pf_A/pect
+    pf_A = 1.2/pect/pf_S/pf_C
     pf_eps = 1.0/nxmr
     pf_Lambda = 0.4     !2.8e-3/Rrho
 
