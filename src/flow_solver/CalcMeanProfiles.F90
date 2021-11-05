@@ -12,7 +12,7 @@ subroutine CalcMeanProfiles
 
     use param
     use local_arrays, only: vx,vy,vz,temp
-    use mgrd_arrays, only: vxr,vyr,vzr,sal
+    use mgrd_arrays, only: vxr,vyr,vzr,sal,phi
     use mpih
     use decomp_2d, only: xstart,xend,xstartr,xendr
     
@@ -29,6 +29,7 @@ subroutine CalcMeanProfiles
     real, dimension(nxm) :: vxvy, vxvz
     real, dimension(nxmr) :: Sbar, Srms, chiS
     real, dimension(nxmr) :: vxS, vyS, vzS
+    real, dimension(nxmr) :: phibar, phirms
     character(5) :: nstat
     character(30) :: dsetname,filename
     logical :: fexist
@@ -43,6 +44,8 @@ subroutine CalcMeanProfiles
 
     Sbar(:)=0.0;    Srms(:)=0.0;    chiS(:)=0.0
     vxS(:) =0.0;    vyS(:) =0.0;    vzS(:) =0.0
+
+    phibar(:) = 0.0;    phirms(:) = 0.0;
 
     inym = 1.d0/nym
     inzm = 1.d0/nzm
@@ -196,6 +199,28 @@ subroutine CalcMeanProfiles
         end do
     end if
 
+    if (phasefield) then
+        inymr = 1.d0/nymr
+        inzmr = 1.d0/nzmr
+
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    phibar(k) = phibar(k) + phi(k,j,i)*inymr*inzmr
+
+                    phirms(k) = phirms(k) + phi(k,j,i)**2*inymr*inzmr
+                end do
+            end do
+        end do
+
+        call MpiAllSumReal1D(phibar,nxmr)
+        call MpiAllSumReal1D(phirms,nxmr)
+
+        do k=1,nxmr
+            phirms(k) = sqrt(phirms(k))
+        end do
+    end if
+
     write(nstat,"(i5.5)")nint(time/tout)
     filename = trim("outputdir/means.h5")
     
@@ -268,6 +293,14 @@ subroutine CalcMeanProfiles
             dsetname = trim("chiS/"//nstat)
             call HdfSerialWriteReal1D(dsetname,filename,chiS,nxmr)
         end if
+
+        if (phasefield) then
+            dsetname = trim("phibar/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,phibar,nxmr)
+            
+            dsetname = trim("phirms/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,phirms,nxmr)
+        end if
     end if
 
     call MpiBarrier
@@ -331,6 +364,12 @@ subroutine HdfCreateMeansFile(filename)
         call h5gcreate_f(file_id,"Srms",group_id,hdf_error)
         call h5gclose_f(group_id,hdf_error)
         call h5gcreate_f(file_id,"chiS",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+    end if
+    if (phasefield) then
+        call h5gcreate_f(file_id,"phibar",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+        call h5gcreate_f(file_id,"phirms",group_id,hdf_error)
         call h5gclose_f(group_id,hdf_error)
     end if
     
