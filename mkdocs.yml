@@ -31,6 +31,7 @@ nav:
         - 'prerequisites.md'
         - 'inputs.md'
         - 'outputs.md'
+        - 'mean_outs.md'
         - 'pluto.md'
         - 'jupyter.md'
         - 'paraview.md'
