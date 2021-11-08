@@ -26,7 +26,7 @@ subroutine CalcMeanProfiles
     real, dimension(nxm) :: vxrms, vyrms, vzrms
     real, dimension(nxm) :: vybar, vzbar
     real, dimension(nxm) :: epsilon
-    real, dimension(nxm) :: vxvy, vxvz
+    real, dimension(nxm) :: vxvy, vxvz, vyvz
     real, dimension(nxmr) :: Sbar, Srms, chiS
     real, dimension(nxmr) :: vxS, vyS, vzS
     real, dimension(nxmr) :: phibar, phirms
@@ -40,7 +40,7 @@ subroutine CalcMeanProfiles
     vxT(:)  =0.0;   vyT(:)  =0.0;   vzT(:)  =0.0
     vxrms(:)=0.0;   vyrms(:)=0.0;   vzrms(:)=0.0
     Trms(:) =0.0;   vxvy(:) =0.0;   vxvz(:) =0.0
-    chiT(:) =0.0;   epsilon(:)=0.0
+    chiT(:) =0.0;   epsilon(:)=0.0; vyvz(:) =0.0
 
     Sbar(:)=0.0;    Srms(:)=0.0;    chiS(:)=0.0
     vxS(:) =0.0;    vyS(:) =0.0;    vzS(:) =0.0
@@ -68,6 +68,7 @@ subroutine CalcMeanProfiles
 
                 vxvy(k) = vxvy(k) + 0.25*(vx(k,j,i)+vx(k+1,j,i))*(vy(k,j,i)+vy(k,j+1,i))*inym*inzm
                 vxvz(k) = vxvz(k) + 0.25*(vx(k,j,i)+vx(k+1,j,i))*(vz(k,j,i)+vz(k,j,i+1))*inym*inzm
+                vyvz(k) = vyvz(k) + 0.25*(vy(k,j,i)+vy(k,j+1,i))*(vz(k,j,i)+vz(k,j,i+1))*inym*inzm
             end do
         end do
     end do
@@ -84,6 +85,7 @@ subroutine CalcMeanProfiles
     call MpiAllSumReal1D(vzrms,nxm)
     call MpiAllSumReal1D(vxvy,nxm)
     call MpiAllSumReal1D(vxvz,nxm)
+    call MpiAllSumReal1D(vyvz,nxm)
 
     do k=1,nxm
         Trms(k) = sqrt(Trms(k))
@@ -268,6 +270,9 @@ subroutine CalcMeanProfiles
         dsetname = trim("vxvz/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vxvz,nxm)
 
+        dsetname = trim("vyvz/"//nstat)
+        call HdfSerialWriteReal1D(dsetname,filename,vyvz,nxm)
+
         dsetname = trim("chiT/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,chiT,nxm)
         
@@ -347,6 +352,8 @@ subroutine HdfCreateMeansFile(filename)
     call h5gcreate_f(file_id,"vxvy",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"vxvz",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vyvz",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"chiT",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
