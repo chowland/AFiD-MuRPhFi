@@ -69,6 +69,9 @@ class InputParams:
             self.alx3, self.ylen, self.zlen = [
                 float(n) for n in bou[26].split()
             ]
+            self.istr3 = int(bou[30].split()[0])
+            self.str3 = float(bou[30].split()[1])
+            self.istr3r = int(bou[30].split()[2])
             self.RayT, self.PraT, self.RayS, self.PraS = [
                 float(n) for n in bou[34].split()[:-1]
             ]
@@ -151,22 +154,26 @@ def continua_master_from_input(folder, time=0.0):
     a simulation from the continua files. Optionally pass the `time` variable
     to set the start time value for the simulation.
     """
-    with open(folder+"/bou.in", "r") as f:
-        for i, line in enumerate(f):
-            if i==2:
-                nxm, nym, nzm = [float(n) for n in line.split()[0:3]]
-            if i==6:
-                nxmr, nymr, nzmr = [float(n) for n in line.split()[1:4]]
-            if i==26:
-                ylen, zlen = [float(n) for n in line.split()[1:3]]
-            if i==30:
-                istr3, str3, istr3r = [float(n) for n in line.split()]
-        with h5py.File(folder+"/outputdir/continua_master.h5","w") as f:
-            f["nx"], f["ny"], f["nz"] = nxm + 1, nym + 1, nzm + 1
-            f["nxr"], f["nyr"], f["nzr"] = nxmr + 1, nymr + 1, nzmr + 1
-            f["ylen"], f["zlen"] = ylen, zlen
-            f["istr3"], f["str3"], f["istr3r"] = istr3, str3, istr3r
-            f["time"] = time
+    # with open(folder+"/bou.in", "r") as f:
+    #     for i, line in enumerate(f):
+    #         if i==2:
+    #             nxm, nym, nzm = [int(n) for n in line.split()[0:3]]
+    #         if i==6:
+    #             nxmr, nymr, nzmr = [int(n) for n in line.split()[1:4]]
+    #         if i==26:
+    #             ylen, zlen = [int(n) for n in line.split()[1:3]]
+    #         if i==30:
+    #             istr3, str3, istr3r = [float(n) for n in line.split()]
+    inputs = InputParams(folder)
+
+    with h5py.File(folder+"/outputdir/continua_master.h5","w") as f:
+        f["nx"], f["ny"], f["nz"] = inputs.nxm + 1, inputs.nym + 1, inputs.nzm + 1
+        if inputs.multires:
+            f["nxr"], f["nyr"], f["nzr"] = inputs.nxmr + 1, inputs.nymr + 1, inputs.nzmr + 1
+        f["ylen"], f["zlen"] = inputs.ylen, inputs.zlen
+        f["istr3"], f["str3"] = int(inputs.istr3), inputs.str3
+        if inputs.multires: f["istr3r"] = int(inputs.istr3r)
+        f["time"] = time
     return
 
 def write_continua(folder, varname, var):
