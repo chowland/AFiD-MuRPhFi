@@ -306,8 +306,13 @@ subroutine InterpInputVel
 
     ! Temperature BCs
     if (RAYT>0) then
-        Tup = -0.5
-        Tlo = 0.5
+        if (inslwN==0) then ! Single heated wall
+            Tup = 0.0
+            Tlo = 1.0
+        else
+            Tup = -0.5
+            Tlo = 0.5
+        end if
     else
         Tup = 0.5
         Tlo = -0.5
