@@ -75,7 +75,7 @@ def Nusselt_numbers(folder):
         PeS = Re*inputs.PraS
         NuSdiss = PeS*xmean(chiS, grid.xcr)
 
-    t = mean_time(folder, inputs.tout)
+    t = mean_time(folder)
 
     df = DataFrame({
         "t": t, "NuTlo": NuTlo, "NuTup": NuTup,
@@ -125,7 +125,7 @@ def wall_shear(folder):
     Vtau_lo = np.sqrt(shear_lo/Re)
     Retau_up, Retau_lo = Re*Vtau_up, Re*Vtau_lo
 
-    t = mean_time(folder, inputs.tout)
+    t = mean_time(folder)
 
     df = DataFrame({
         "t": t, "Retau_up": Retau_up, "Retau_lo": Retau_lo
@@ -238,7 +238,7 @@ def budget_time_series(folder):
     qS_bar = xmean(vr*Sbar, grid.xcr)
     qS_p = xmean(qvS,grid.xcr) - qS_bar
     
-    t = mean_time(folder, inputs.tout)
+    t = mean_time(folder)
     
     dTbar = ddx(Tbar, grid.xm, BClo=0.5, BCup=-0.5)
     qT = read_mean(folder, "vxT")
@@ -272,4 +272,155 @@ def budget_time_series(folder):
         "buoy_prodT": buoy_prodT, "buoy_prodS": buoy_prodS,
         "RaT": RaT, "PrT": PrT, "RaS": RaS, "PrS": PrS
     })
+    return df
+
+def crossover_locations(A1, A2, x):
+    """
+    Returns the time series of the two crossover points of
+    quantities A1 and A2 that are closest to the two walls
+    """
+    A = A1 - A2
+    nt = A.shape[1]
+    xlo = np.zeros(nt)
+    xup = np.zeros(nt)
+    for i in range(nt):
+        zero_indices = np.where(np.diff(np.sign(A[:,i])))[0]
+        if zero_indices.size>1:
+            ix = zero_indices[0]
+            xlo[i] = x[ix] + (x[ix+1] - x[ix])/(A[ix+1,i] - A[ix,i])*(0 - A[ix,i])
+            ix = zero_indices[-1]
+            xup[i] = x[ix] + (x[ix+1] - x[ix])/(A[ix+1,i] - A[ix,i])*(0 - A[ix,i])
+        else:
+            xlo[i] = np.nan
+            xup[i] = np.nan
+    return xlo, xup
+
+def boundary_layers(folder):
+    """
+    Returns a DataFrame containing the time series of various
+    definitions of boundary layer widths from each wall.
+    """
+    inputs = InputParams(folder)
+    grid = Grid(folder)
+    if inputs.FFscaleS and inputs.flagsal:
+        Re = np.sqrt(inputs.RayS/inputs.PraS)
+    else:
+        Re = np.sqrt(inputs.RayT/inputs.PraT)
+    PeT = Re*inputs.PraT
+    if inputs.flagsal:
+        PeS = Re*inputs.PraS
+    
+    # Compute velocity peak location and displacement thickness
+    vybar = read_mean(folder, "vybar")
+    dvdx = ddx(vybar, grid.xm)
+    nt = vybar.shape[1]
+    dmaxL, dmaxU = np.zeros(nt), np.zeros(nt)
+    VmaxL, VmaxU = np.zeros(nt), np.zeros(nt)
+    dstarL, dstarU = np.zeros(nt), np.zeros(nt)
+
+    for i in range(nt):
+        zero_indices = np.where(np.diff(np.sign(dvdx[:,i])))[0]
+        if zero_indices.size > 0:
+            ix = zero_indices[0]
+            # Location and magnitude of velocity peak by lower wall
+            dmaxL[i], VmaxL[i] = hermite_max(grid.xm[ix-1:ix+3], vybar[ix-1:ix+3,i])
+            xx = np.append(grid.xm[:ix+1], dmaxL[i])
+            vv = np.append(vybar[:ix+1,i], VmaxL[i])
+            # Displacement thickness at lower wall
+            dstarL[i] = np.trapz(vv,x=xx)/VmaxL[i]
+            ix = zero_indices[-1]
+            # Location and magnitude of velocity peak by upper wall
+            dmaxU[i], VmaxU[i] = hermite_max(grid.xm[ix-1:ix+3], vybar[ix-1:ix+3,i])
+            xx = np.insert(grid.xm[ix+1:], 0, dmaxU[i])
+            vv = np.insert(vybar[ix+1:,i], 0, VmaxU[i])
+            # Displacement thickness at lower wall
+            dstarU[i] = np.trapz(vv,x=xx)/VmaxU[i]
+        else:
+            dmaxL[i], VmaxL[i], dstarL[i] = np.nan, np.nan, np.nan
+            dmaxU[i], VmaxU[i], dstarU[i] = np.nan, np.nan, np.nan
+
+    # Compute shear-based boundary layer
+    # Wall shear:
+    dvwL = vybar[0,:]/grid.xm[0]
+    dvwU = vybar[-1,:]/(1.0 - grid.xm[-1])
+    dVL, dVU = VmaxL/dvwL, VmaxU/dvwU
+
+    # Compute dissipation crossover location
+    epsilon = read_mean(folder, "epsilon")
+    dwdx = ddx(read_mean(folder, "vzbar"), grid.xm)
+    epsbar = (dvdx**2 + dwdx**2)/Re
+    epsper = epsilon - epsbar
+    dVdL, dVdU = crossover_locations(epsbar, epsper, grid.xm)
+
+    # Temperature flux-based boundary layer
+    # Set temperature boundary conditions:
+    if inputs.RayT > 0:
+        if inputs.flagpf or (not inputs.inslwN):
+            Tup, Tlo = 0.0, 1.0
+        else:
+            Tup, Tlo = -0.5, 0.5
+    else:
+        if inputs.flagpf:
+            Tup, Tlo = 1.0, 0.0
+        else:
+            Tup, Tlo = 0.5, -0.5
+    Tbar = read_mean(folder, "Tbar")
+    dTwL = (Tbar[0,:] - Tlo)/grid.xm[0]
+    dTwU = (Tup - Tbar[-1,:])/(1 - grid.xm[-1])
+    dTL, dTU = 1/2/np.abs(dTwL), 1/2/np.abs(dTwU)
+
+    # Thermal flux crossover location
+    dTdx = ddx(Tbar, grid.xm, BClo=Tlo, BCup=Tup)
+    vxT = read_mean(folder, "vxT")
+    dfTL, dfTU = crossover_locations(dTdx/PeT, -vxT, grid.xm)
+
+    # Thermal dissipation crossover location
+    chi = read_mean(folder, "chiT")
+    chibar = dTdx**2/PeT
+    chiper = chi - chibar
+    ddTL, ddTU = crossover_locations(chibar, chiper, grid.xm)
+
+    # Salinity boundary layers
+    if inputs.flagsal:
+        if inputs.flagpf:
+            Sup, Slo = 0.0, 1.0
+        elif inputs.RayS > 0:
+            Sup, Slo = 0.5, -0.5
+        else:
+            Sup, Slo = -0.5, 0.5
+        # Nusselt-based boundary layer
+        Sbar = read_mean(folder, "Sbar")
+        dSwL = (Sbar[0,:] - Slo)/grid.xmr[0]
+        dSwU = (Sup - Sbar[-1,:])/(1 - grid.xmr[-1])
+        dSL, dSU = 1/2/np.abs(dSwL), 1/2/np.abs(dSwU)
+
+        # Solutal flux crossover location
+        dSdx = ddx(Sbar, grid.xmr, BClo=Slo, BCup=Sup)
+        vxS = read_mean(folder, "vxS")
+        dfSL, dfSU = crossover_locations(dSdx/PeS, -vxS, grid.xmr)
+
+        # Solutal dissipation crossover location
+        chi = read_mean(folder, "chiS")
+        chibar = dSdx**2/PeS
+        chiper = chi - chibar
+        ddSL, ddSU = crossover_locations(chibar, chiper, grid.xmr)
+    
+    t = mean_time(folder)
+
+    df = DataFrame({
+        "t": t,
+        "dvL": dVL, "dvU": dVU, # Shear-based boundary layers
+        "dstarL": dstarL, "dstarU": dstarU, # Displacement thickness
+        "depsL": dVdL, "depsU": 1 - dVdU, # KE dissipation crossover
+        "dmaxL": dmaxL, "dmaxU": 1 - dmaxU, # Velocity maximum location
+        "dTL": dTL, "dTU": dTU, # Nusselt-based BL
+        "dfluxTL": dfTL, "dfluxTU": 1 - dfTU, # Thermal flux crossover
+        "dchiTL": ddTL, "dchiTU": 1 - ddTU # Thermal dissipation crossover
+    })
+
+    if inputs.flagsal:
+        df["dSL"], df["dSU"] = dSL, dSU # Solutal Nusselt BL
+        df["dfluxSL"], df["dfluxSU"] = dfSL, 1 - dfSU # Solutal flux crossover
+        df["dchiSL"], df["dchiSU"] = ddSL, 1 - ddSU # Solutal dissipation crossover
+
     return df
