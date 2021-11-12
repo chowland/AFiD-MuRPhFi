@@ -7,3 +7,7 @@ outputdir/*
 .vscode/*
 notebooks/*
 examples/*/*/*
+tmp
+examples/*/*.svg
+examples/*/*.ipynb
+*.ipynb_checkpoints
