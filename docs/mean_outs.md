@@ -63,9 +63,42 @@ This can be done by computing the wall-normal derivatives of the mean profiles (
 For example, the turbulent kinetic energy dissipation rate can be computed as
 
 $$
-\varepsilon'(x,t) = \varepsilon - \frac{1}{Re} \left|\frac{\partial \boldsymbol{u}}{\partial x} \right|^2
+\varepsilon'(x,t) = \varepsilon - \frac{1}{Re} \left|\frac{\partial \boldsymbol{\overline{u}}}{\partial x} \right|^2
 $$
 
 ## Deriving other quantities from the output
 
 The outputs can also be useful for determining key quantities such as energy budget terms and the rms displacement of the phase boundary.
+
+### Energy budgets
+As an example, we consider the energy budget of the volume-averaged turbulent kinetic energy (TKE) $E_K' = \frac{1}{2}\langle|\boldsymbol{u}'|^2\rangle$.
+Here and on the rest of this page, we use $\langle \cdot\rangle$ to denote a volume average.
+A volume average can be calculated from the mean profile data using the helper function `xmean` in the `afidtools` module.
+
+Derived from the momentum equation, the evolution equation for the TKE reads
+
+$$
+\frac{dE_K'}{dt} = \mathcal{P}_S + \mathcal{J}' - \varepsilon' ,
+$$
+
+where the shear production $\mathcal{P}_S$ represents the transfer of energy between the mean flow and the turbulence, the buoyancy flux $\mathcal{J}'$ represents the exchange between kinetic and potential energy, and the dissipation rate $\varepsilon'$ has been discussed above.
+The two new terms are defined as
+
+$$
+\mathcal{P}_S = -\left\langle \overline{u'\boldsymbol{u}'} \cdot \frac{\partial \overline{\boldsymbol{u}}}{\partial x} \right\rangle , \qquad
+\mathcal{J}' = \langle w'b'\rangle = \langle w'(R_\rho T' - S') \rangle
+$$
+
+Example code for computing the shear production term can be found below
+```python
+folder = "/path/to/simulation/"
+import afidtools as afid
+grid = afid.Grid(folder)
+vxvy, vxvz = afid.read_mean(folder, "vxvy"), afid.read_mean(folder, "vxvz")
+vybar, vzbar = afid.read_mean(folder, "vybar"), afid.read_mean(folder, "vzbar")
+dvydx, dvzdx = afid.ddx(vybar, grid.xm), afid.ddx(vzbar, grid.xm)
+shear_prod = -vxvy*dvydx - vxvz*dvzdx
+P_S = afid.xmean(shear_prod, grid.xc)
+```
+
+A function `energy_budgets` is also provided that collects all the relevant energy budget terms as time series into a Pandas DataFrame.
