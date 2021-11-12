@@ -49,6 +49,8 @@ def Nusselt_numbers(folder):
         NuTup = (Tup - Tbar[-1,:])/(1.0 - grid.xm[-1])
     else:
         NuTup = np.zeros(Tbar.shape[1])
+    if inputs.RayT >0:
+        NuTup, NuTlo = -NuTup, -NuTlo
     chiT = read_mean(folder, "chiT")
     if inputs.FFscaleS and inputs.flagsal:
         Re = np.sqrt(inputs.RayS/inputs.PraS)
@@ -71,6 +73,8 @@ def Nusselt_numbers(folder):
             NuSup = (Sup - Sbar[-1,:])/(1.0 - grid.xmr[-1])
         else:
             NuSup = np.zeros(Sbar.shape[1])
+        if inputs.RayS < 0:
+            NuSlo, NuSup = -NuSlo, -NuSup
         chiS = read_mean(folder, "chiS")
         PeS = Re*inputs.PraS
         NuSdiss = PeS*xmean(chiS, grid.xcr)
