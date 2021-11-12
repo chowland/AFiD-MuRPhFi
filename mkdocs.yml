@@ -5,6 +5,10 @@ repo_url: https://github.com/chowland/AFiD-MuRPhFi
 site_author: Chris Howland
 markdown_extensions:
     - tables
+    - pymdownx.highlight
+    - pymdownx.inlinehilite
+    - pymdownx.superfences
+    - pymdownx.snippets
     - pymdownx.arithmatex:
         generic: true
     - attr_list
