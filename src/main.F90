@@ -71,13 +71,13 @@ program AFiD
         write(6,142)
     142 format(//,8x,'Periodic lateral wall boundary condition')
         write(6,202) rayt,prat,rays,pras
-    202 format(/,5x,'Parameters: ',' RaT=',e10.3,' PrT= ',e10.3,' RaS=',e10.3,' PrS= ',e10.3)
+    202 format(/,5x,'Parameters: ',' RaT=',es10.3,' PrT= ',es10.3,' RaS=',es10.3,' PrS= ',es10.3)
         if(variabletstep) then
             write(6,204) limitCFL
-        204 format(/,5x,'Variable dt and fixed cfl= ', e11.4,/ )
+        204 format(/,5x,'Variable dt and fixed cfl= ', es11.4,/ )
         else
             write(6,205) dtmax,limitCFL
-        205 format(/,5x,'Fixed dt= ',e11.4,' and maximum cfl=', e11.4,/ )
+        205 format(/,5x,'Fixed dt= ',es11.4,' and maximum cfl=', es11.4,/ )
         endif
     endif
 
@@ -106,11 +106,11 @@ program AFiD
         write(6,756)nxr,nyr,nzr
     756 format(5x,'grid resolution: ',' nxr= ',i5,' nyr= ',i5,' nzr= ',i5)
         write(6,755) 1.d0/dx,1.d0/dy,1.d0/dz,dt,ntst
-    755 format(/,2x,' dx=',e10.3,' dy=',e10.3,' dz=',e10.3, &
-                  ' dt=',e10.3,' ntst=',i7,/)
+    755 format(/,2x,' dx=',es10.3,' dy=',es10.3,' dz=',es10.3, &
+                  ' dt=',es10.3,' ntst=',i7,/)
         if (multires) then
             write(6,757) 1.d0/dxr,1.d0/dyr,1.d0/dzr
-        757 format(/,2x,' dxr=',e10.3,' dyr=',e10.3,' dzr=',e10.3,/)
+        757 format(/,2x,' dxr=',es10.3,' dyr=',es10.3,' dzr=',es10.3,/)
         end if
     endif
 
@@ -267,7 +267,7 @@ program AFiD
         if(mod(time,tout).lt.dt) then
             if(ismaster) then
                 write(6,*) ' -------------------------------------------------- '
-                write(6,'(a,E11.4,a,i9,a,E11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
+                write(6,'(a,ES11.4,a,i9,a,ES11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
             endif
             call CalcMeanProfiles
             if (specwrite) then
