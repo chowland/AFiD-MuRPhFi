@@ -130,6 +130,17 @@ subroutine ExplicitTermsVZ
                     end do
                 end do
             end do
+
+            if (melt) then
+                !CJH For melting boundary, remove far-field buoyancy
+                do ic=xstart(3),xend(3)
+                    do jc=xstart(2),xend(2)
+                        do kc=1,nxm
+                            dq(kc,jc,ic) = dq(kc,jc,ic) + bycs - byct
+                        end do
+                    end do
+                end do
+            end if
         end if
     end if
 !$OMP END PARALLEL DO

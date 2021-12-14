@@ -122,7 +122,7 @@ subroutine ReadInputFile
 
     pf_A = 1.2/pect/pf_S/pf_C
     pf_eps = 1.0/nxmr
-    pf_Lambda = 0.4     !2.8e-3/Rrho
+    pf_Lambda = 2.8e-3/Rrho
 
     return
 end subroutine ReadInputFile
