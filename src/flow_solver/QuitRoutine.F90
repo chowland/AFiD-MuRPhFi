@@ -30,7 +30,7 @@
         ! if (statcal) call WriteStats
         call WriteFlowField(.true.)
       else
-        call MPI_Abort(MPI_COMM_WORLD,1)
+        call MPI_Abort(MPI_COMM_WORLD, 1, ierr)
       endif
 
       call DeallocateVariables
