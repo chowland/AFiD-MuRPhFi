@@ -15,8 +15,8 @@ MACHINE=PC_GNU
 OBJDIR=obj
 
 ifeq ($(MACHINE),PC_GNU)
-	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -O2
-	FC += -g -fbacktrace -fbounds-check
+	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -O3
+	# FC += -g -fbacktrace -fbounds-check
 	LDFLAGS = -lfftw3 -llapack -lblas -ldl
 endif
 ifeq ($(MACHINE),PC_INTEL)
