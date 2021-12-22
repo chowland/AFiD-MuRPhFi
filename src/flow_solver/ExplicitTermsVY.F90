@@ -127,6 +127,17 @@ subroutine ExplicitTermsVY
                     end do
                 end do
             end do
+
+            if (melt) then
+                !CJH For melting boundary, remove far-field buoyancy
+                do ic=xstart(3),xend(3)
+                    do jc=xstart(2),xend(2)
+                        do kc=1,nxm
+                            dph(kc,jc,ic) = dph(kc,jc,ic) + bycs - byct
+                        end do
+                    end do
+                end do
+            end if
         end if
     end if
 

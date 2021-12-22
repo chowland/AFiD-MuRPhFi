@@ -16,6 +16,7 @@ subroutine CreateICSal
     implicit none
     integer :: i,k,j, kmid
     real :: xxx,yyy,eps,varptb,amp
+    real :: B, gamma, t0, x0, h0
 
     call random_seed()
     eps=5d-2
@@ -48,29 +49,50 @@ subroutine CreateICSal
     end if
 
     if (melt) then
+        B = 0.77512
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
-                    call random_number(varptb)
-                    sal(k,j,i) = eps*(2.d0*varptb - 1.d0) * exp(-xmr(k)/0.1)
+                    ! call random_number(varptb)
+                    ! sal(k,j,i) = eps*(2.d0*varptb - 1.d0) * exp(-xmr(k)/0.1)
+                    sal(k,j,i) = 1.0 - B*erfc(xmr(k)*sqrt(pecs)/2.0)
                 end do
             end do
         end do
     end if
 
     if (phasefield) then
-        kmid = nxmr/2
-        do i=xstartr(3),xendr(3)
-            do j=xstartr(2),xendr(2)
-                do k=1,kmid
-                    call random_number(varptb)
-                    sal(k,j,i) = 1.0 + eps*(2.d0*varptb - 1.d0)
-                end do
-                do k=kmid+1,nxmr
-                    sal(k,j,i) = 0.0
+        if (pf_IC==1) then
+            t0 = 1
+            x0 = 0.8
+            gamma = 0.62428 !0.76023
+            h0 = x0 + 2*gamma*sqrt(t0/pecs)
+            B = 0.44748 !0.37372
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,nxmr
+                        ! if (xmr(k) <= h0) then
+                            sal(k,j,i) = 1.0 - B*erfc((x0 - xmr(k))*sqrt(pecs/t0)/2.0)
+                        ! else
+                        !     sal(k,j,i) = 1.0 - B*erfc(-gamma)
+                        ! end if
+                    end do
                 end do
             end do
-        end do
+        else
+            kmid = nxmr/2
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,kmid
+                        call random_number(varptb)
+                        sal(k,j,i) = 1.0 + eps*(2.d0*varptb - 1.d0)
+                    end do
+                    do k=kmid+1,nxmr
+                        sal(k,j,i) = 0.0
+                    end do
+                end do
+            end do
+        end if
     end if
     
     return

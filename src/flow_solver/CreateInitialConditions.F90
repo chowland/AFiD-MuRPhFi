@@ -15,7 +15,8 @@ subroutine CreateInitialConditions
     use mpih
     implicit none
     integer :: j,k,i,kmid
-    real :: xxx,yyy,zzz,eps,varptb,amp,h0,t0,Lambda,r
+    real :: xxx,yyy,zzz,eps,varptb,amp
+    real :: h0,t0,Lambda,r, x0, A
 
     call random_seed()
 
@@ -47,17 +48,33 @@ subroutine CreateInitialConditions
                 end do
             end do
         end do
-    elseif (gAxis == 2) then
+    else if (gAxis == 2) then
+        if (inslwN==1) then
         !CJH Laminar vertical convection as in Batchelor (1954)
-        eps = 1e-3
-        do i=xstart(3),xend(3)
-            do j=xstart(2),xend(2)
-                do k=1,nxm
-                    xxx = xm(k)
-                    vy(k,j,i) = min(ren,320.0)/12.0*xxx*(2*xxx-1)*(xxx-1)
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xm(k)
+                        vy(k,j,i) = min(ren,320.0)/12.0*xxx*(2*xxx-1)*(xxx-1)
+                    end do
                 end do
             end do
-        end do
+        else
+            !CJH Ke et al profile: 4t/(1-Pr)[i2erfc(eta) - i2erfc(eta/sqrt(Pr))]
+            t0 = 1.4195567
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xm(k)/2*sqrt(pect/t0)
+                        vy(k,j,i) = 4*t0/(1 - PraT)*(&
+                            0.25*((1 + 2*xxx**2)*erfc(xxx) - 2*xxx/sqrt(pi)*exp(-xxx**2)) - &
+                            0.25*((1 + 2*xxx**2/PraT)*erfc(xxx/sqrt(PraT)) &
+                                - 2*xxx/sqrt(pi*PraT)*exp(-xxx**2/PraT)) &
+                        )
+                    end do
+                end do
+            end do
+        end if
     end if
 
     ! Set velocity to zero if we are using the phase-field method
@@ -98,6 +115,22 @@ subroutine CreateInitialConditions
             end do
         end do
     end do
+
+    if (gAxis==2 .and. inslwN==0) then  ! Ke et al comparison case
+        t0 = 1.4195567
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    amp = 0.0
+                    do kmid=0,7
+                        amp = amp + sin(2.0**kmid * 2.0*pi*ym(j)/ylen)
+                    end do
+                    amp = 1.0 + 1e-3*amp + 1e-3*sin(46.0*pi*zm(i)/zlen)
+                    temp(k,j,i) = amp*erfc(xm(k)/2*sqrt(pect/t0))
+                end do
+            end do
+        end do
+    end if
 
     if (phasefield) then
 
@@ -175,7 +208,7 @@ subroutine CreateInitialConditions
                     do k=1,nxm
                         xxx = xm(k)
                         if (xxx > h0) then
-                            temp(k,j,i) = erfc(xxx*sqrt(pect/t0)/2)/erfc(Lambda)
+                            temp(k,j,i) = erfc(xxx*sqrt(pect/t0)/2.0)/erfc(Lambda)
                         else
                             temp(k,j,i) = 1.0
                         end if
@@ -186,27 +219,48 @@ subroutine CreateInitialConditions
         end if
 
         if (salinity) then
-            kmid = nxm/2
-            do i=xstart(3),xend(3)
-                do j=xstart(2),xend(2)
-                    do k=1,kmid
-                        temp(k,j,i) = 1.0
-                    end do
-                    do k=kmid+1,nxm
-                        temp(k,j,i) = 0.0
+            if (pf_IC==1) then
+                t0 = 1
+                x0 = 0.8
+                Lambda = 0.19742 !0.24041
+                h0 = x0 + 2*Lambda*sqrt(t0/pect)
+                A = 0.90954 !0.90293
+                do i=xstart(3),xend(3)
+                    do j=xstart(2),xend(2)
+                        do k=1,nxm
+                            if (xm(k) <= h0) then
+                                temp(k,j,i) = 1 - A*erfc((x0 - xm(k))*sqrt(pect/t0)/2.0)
+                            else
+                                temp(k,j,i) = 1 - A*erfc(-Lambda)
+                            end if
+                        end do
                     end do
                 end do
-            end do
+            else
+                kmid = nxm/2
+                do i=xstart(3),xend(3)
+                    do j=xstart(2),xend(2)
+                        do k=1,kmid
+                            temp(k,j,i) = 1.0
+                        end do
+                        do k=kmid+1,nxm
+                            temp(k,j,i) = 0.0
+                        end do
+                    end do
+                end do
+            end if
         end if
 
     end if
 
     if (melt) then
+        A = 1.08995
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                 do k=1,nxm
-                    call random_number(varptb)
-                    temp(k,j,i) = eps*(2.d0*varptb - 1.d0) * exp(-xm(k)/0.1)
+                    ! call random_number(varptb)
+                    ! temp(k,j,i) = eps*(2.d0*varptb - 1.d0) * exp(-xm(k)/0.1)
+                    temp(k,j,i) = 1.0 - A*erfc(xm(k)*sqrt(pect)/2.0)
                 end do
             end do
         end do

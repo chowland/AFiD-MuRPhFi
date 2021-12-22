@@ -25,7 +25,7 @@ subroutine ExplicitTermsSal
     udyr=dyr*0.5d0
     udzrq=dzqr/pecs
     udyrq=dyqr/pecs
-    pf_delta = 0.01
+    pf_delta = 1e-6     !0.01
 
     do kc=1,nxmr
         sdx(kc) = 0.5*dxr/g3rmr(kc)

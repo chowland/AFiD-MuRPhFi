@@ -12,7 +12,7 @@ subroutine CalcMeanProfiles
 
     use param
     use local_arrays, only: vx,vy,vz,temp
-    use mgrd_arrays, only: vxr,vyr,vzr,sal
+    use mgrd_arrays, only: vxr,vyr,vzr,sal,phi
     use mpih
     use decomp_2d, only: xstart,xend,xstartr,xendr
     
@@ -26,9 +26,10 @@ subroutine CalcMeanProfiles
     real, dimension(nxm) :: vxrms, vyrms, vzrms
     real, dimension(nxm) :: vybar, vzbar
     real, dimension(nxm) :: epsilon
-    real, dimension(nxm) :: vxvy, vxvz
+    real, dimension(nxm) :: vxvy, vxvz, vyvz
     real, dimension(nxmr) :: Sbar, Srms, chiS
     real, dimension(nxmr) :: vxS, vyS, vzS
+    real, dimension(nxmr) :: phibar, phirms
     character(5) :: nstat
     character(30) :: dsetname,filename
     logical :: fexist
@@ -39,10 +40,12 @@ subroutine CalcMeanProfiles
     vxT(:)  =0.0;   vyT(:)  =0.0;   vzT(:)  =0.0
     vxrms(:)=0.0;   vyrms(:)=0.0;   vzrms(:)=0.0
     Trms(:) =0.0;   vxvy(:) =0.0;   vxvz(:) =0.0
-    chiT(:) =0.0;   epsilon(:)=0.0
+    chiT(:) =0.0;   epsilon(:)=0.0; vyvz(:) =0.0
 
     Sbar(:)=0.0;    Srms(:)=0.0;    chiS(:)=0.0
     vxS(:) =0.0;    vyS(:) =0.0;    vzS(:) =0.0
+
+    phibar(:) = 0.0;    phirms(:) = 0.0;
 
     inym = 1.d0/nym
     inzm = 1.d0/nzm
@@ -65,6 +68,7 @@ subroutine CalcMeanProfiles
 
                 vxvy(k) = vxvy(k) + 0.25*(vx(k,j,i)+vx(k+1,j,i))*(vy(k,j,i)+vy(k,j+1,i))*inym*inzm
                 vxvz(k) = vxvz(k) + 0.25*(vx(k,j,i)+vx(k+1,j,i))*(vz(k,j,i)+vz(k,j,i+1))*inym*inzm
+                vyvz(k) = vyvz(k) + 0.25*(vy(k,j,i)+vy(k,j+1,i))*(vz(k,j,i)+vz(k,j,i+1))*inym*inzm
             end do
         end do
     end do
@@ -81,6 +85,7 @@ subroutine CalcMeanProfiles
     call MpiAllSumReal1D(vzrms,nxm)
     call MpiAllSumReal1D(vxvy,nxm)
     call MpiAllSumReal1D(vxvz,nxm)
+    call MpiAllSumReal1D(vyvz,nxm)
 
     do k=1,nxm
         Trms(k) = sqrt(Trms(k))
@@ -196,6 +201,28 @@ subroutine CalcMeanProfiles
         end do
     end if
 
+    if (phasefield) then
+        inymr = 1.d0/nymr
+        inzmr = 1.d0/nzmr
+
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    phibar(k) = phibar(k) + phi(k,j,i)*inymr*inzmr
+
+                    phirms(k) = phirms(k) + phi(k,j,i)**2*inymr*inzmr
+                end do
+            end do
+        end do
+
+        call MpiAllSumReal1D(phibar,nxmr)
+        call MpiAllSumReal1D(phirms,nxmr)
+
+        do k=1,nxmr
+            phirms(k) = sqrt(phirms(k))
+        end do
+    end if
+
     write(nstat,"(i5.5)")nint(time/tout)
     filename = trim("outputdir/means.h5")
     
@@ -243,6 +270,9 @@ subroutine CalcMeanProfiles
         dsetname = trim("vxvz/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,vxvz,nxm)
 
+        dsetname = trim("vyvz/"//nstat)
+        call HdfSerialWriteReal1D(dsetname,filename,vyvz,nxm)
+
         dsetname = trim("chiT/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,chiT,nxm)
         
@@ -267,6 +297,14 @@ subroutine CalcMeanProfiles
 
             dsetname = trim("chiS/"//nstat)
             call HdfSerialWriteReal1D(dsetname,filename,chiS,nxmr)
+        end if
+
+        if (phasefield) then
+            dsetname = trim("phibar/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,phibar,nxmr)
+            
+            dsetname = trim("phirms/"//nstat)
+            call HdfSerialWriteReal1D(dsetname,filename,phirms,nxmr)
         end if
     end if
 
@@ -315,6 +353,8 @@ subroutine HdfCreateMeansFile(filename)
     call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"vxvz",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
+    call h5gcreate_f(file_id,"vyvz",group_id,hdf_error)
+    call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"chiT",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"epsilon",group_id,hdf_error)
@@ -331,6 +371,12 @@ subroutine HdfCreateMeansFile(filename)
         call h5gcreate_f(file_id,"Srms",group_id,hdf_error)
         call h5gclose_f(group_id,hdf_error)
         call h5gcreate_f(file_id,"chiS",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+    end if
+    if (phasefield) then
+        call h5gcreate_f(file_id,"phibar",group_id,hdf_error)
+        call h5gclose_f(group_id,hdf_error)
+        call h5gcreate_f(file_id,"phirms",group_id,hdf_error)
         call h5gclose_f(group_id,hdf_error)
     end if
     

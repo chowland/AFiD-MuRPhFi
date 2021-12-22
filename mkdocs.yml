@@ -5,6 +5,10 @@ repo_url: https://github.com/chowland/AFiD-MuRPhFi
 site_author: Chris Howland
 markdown_extensions:
     - tables
+    - pymdownx.highlight
+    - pymdownx.inlinehilite
+    - pymdownx.superfences
+    - pymdownx.snippets
     - pymdownx.arithmatex:
         generic: true
     - attr_list
@@ -31,6 +35,7 @@ nav:
         - 'prerequisites.md'
         - 'inputs.md'
         - 'outputs.md'
+        - 'mean_outs.md'
         - 'pluto.md'
         - 'jupyter.md'
         - 'paraview.md'
@@ -43,6 +48,7 @@ nav:
         - 'compilers.md'
         - 'convergence.md'
         - 'phasefield_validation.md'
+        - 'issue/dd_phasefield.md'
     - 'Technical Details':
         - 'equations.md'
         - 'numerics.md'

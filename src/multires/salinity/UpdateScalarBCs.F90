@@ -17,7 +17,7 @@ subroutine UpdateBCs
     integer :: ic, jc, icr, jcr
     real, dimension(4,4) :: qv2
     real, dimension(4) :: qv1
-    real :: dxb, dxbr, delT, a, b, c1, c2, aa, bb, cc, m, S0
+    real :: dxb, dxbr, Sb, aa, bb, cc!, m
 
     ! Interpolate (T(1,:,:) to refined grid in y and z)
     do ic=xstart(3)-1,xend(3)
@@ -37,25 +37,20 @@ subroutine UpdateBCs
     dxb = xm(1) - xc(1)
     dxbr = xmr(1) - xcr(1)
     ! Calculate coefficients for equations
-    ! dT/dx = a * m
-    ! dS/dx = b * S * m
-    ! T = c_1 * (S+S0) + c_2
+    ! (PeT)^-1 * dT/dx = Stefan * m
+    ! (PeS)^-1 * dS/dx = S * m
+    ! T + Lambda * S = 0
     ! and update boundary values
-    ! delT = 35.0*7.86e-4/3.87e-5*Rrho
-    a = 25.2    !920.0/1025.0*3974.0/3.35e5/delT*pect
-    b = 160.3    !920.0/1025.0*pecs*25 ! 25 factor to get Sc=2500
-    c1 = -0.38      !-5.73e-2 * 35.0 /delT
-    c2 = -1.28      !c1 + (8.32e-2 + 7.61e-2)/delT - 1.0
-    S0 = 1.75
     do icr=xstartr(3),xendr(3)
         do jcr=xstartr(2),xendr(2)
-            aa = dxb * dxbr * a * b
-            bb = dxb*a + dxbr*b*c2 - dxbr*b*Tplaner(1,jcr,icr) - c1*dxbr*b*S0
-            cc = c1*sal(1,jcr,icr) + c2 - Tplaner(1,jcr,icr)
-            m = (-bb + sqrt(bb**2 - 4*aa*cc))/2/aa
-            salbp(1,jcr,icr) = (sal(1,jcr,icr)-dxbr*b*m*S0)/(1+dxbr*b*m)
+            aa = dxbr * pecs * pf_Lambda
+            bb = dxbr*pecs*Tplaner(1,jcr,icr) + dxb*pect*pf_S
+            cc = -pf_S*dxb*pect*sal(1,jcr,icr)
+            Sb = (-bb + sqrt(bb**2 - 4*aa*cc))/2/aa
+            salbp(1,jcr,icr) = Sb
             saltp(1,jcr,icr) = 0.d0
-            Tplaner(1,jcr,icr) =  Tplaner(1,jcr,icr) - dxb*a*m
+            Tplaner(1,jcr,icr) =  -pf_Lambda*Sb
+            ! m = (sal(1,jcr,icr) - Sb)/dxbr/pecs/Sb
         end do
     end do
 
