@@ -21,10 +21,10 @@
 
     TYPE(DECOMP_INFO) :: decomp
 
-#ifdef SHM
-    real(mytype) :: work1(*), work2(*)
-    POINTER  (work1_p, work1), (work2_p, work2)  ! Cray pointers
-#endif
+! #ifdef SHM
+!     real(mytype) :: work1(*), work2(*)
+!     POINTER  (work1_p, work1), (work2_p, work2)  ! Cray pointers
+! #endif
     
     integer :: s1,s2,s3,d1,d2,d3
     integer :: ierror
@@ -43,36 +43,36 @@
     d3 = SIZE(dst,3)
 
     ! rearrange source array as send buffer
-#ifdef SHM
-    work1_p = decomp%ROW_INFO%SND_P
-    call mem_split_zy_real(src, s1, s2, s3, work1, dims(2), &
-         decomp%z2dist, decomp)
-#else
-#ifdef EVEN
+! #ifdef SHM
+!     work1_p = decomp%ROW_INFO%SND_P
+!     call mem_split_zy_real(src, s1, s2, s3, work1, dims(2), &
+!          decomp%z2dist, decomp)
+! #else
+! #ifdef EVEN
     if (.not. decomp%even) then
        call mem_split_zy_real(src, s1, s2, s3, work1_r, dims(2), &
             decomp%z2dist, decomp)
     end if
-#else
-    ! note the src array is suitable to be a send buffer
-    ! so no split operation needed
-#endif
-#endif
+! #else
+!     ! note the src array is suitable to be a send buffer
+!     ! so no split operation needed
+! #endif
+! #endif
     
     ! define receive buffer
-#ifdef SHM
-    work2_p = decomp%ROW_INFO%RCV_P
-    call MPI_BARRIER(decomp%ROW_INFO%CORE_COMM, ierror)
-#endif
+! #ifdef SHM
+!     work2_p = decomp%ROW_INFO%RCV_P
+!     call MPI_BARRIER(decomp%ROW_INFO%CORE_COMM, ierror)
+! #endif
     
-#ifdef SHM
-    if (decomp%ROW_INFO%CORE_ME==1) THEN
-       call MPI_ALLTOALLV(work1, decomp%z2cnts_s, decomp%z2disp_s, &
-            real_type, work2, decomp%y2cnts_s, decomp%y2disp_s, &
-            real_type, decomp%ROW_INFO%SMP_COMM, ierror)
-    end if
-#else
-#ifdef EVEN
+! #ifdef SHM
+!     if (decomp%ROW_INFO%CORE_ME==1) THEN
+!        call MPI_ALLTOALLV(work1, decomp%z2cnts_s, decomp%z2disp_s, &
+!             real_type, work2, decomp%y2cnts_s, decomp%y2disp_s, &
+!             real_type, decomp%ROW_INFO%SMP_COMM, ierror)
+!     end if
+! #else
+! #ifdef EVEN
     if (decomp%even) then
        call MPI_ALLTOALL(src, decomp%z2count, &
             real_type, work2_r, decomp%y2count, &
@@ -82,96 +82,96 @@
             real_type, work2_r, decomp%y2count, &
             real_type, DECOMP_2D_COMM_ROW, ierror)
     end if
-#else
-    call MPI_ALLTOALLV(src, decomp%z2cnts, decomp%z2disp, &
-         real_type, work2_r, decomp%y2cnts, decomp%y2disp, &
-         real_type, DECOMP_2D_COMM_ROW, ierror)
-#endif
-#endif
+! #else
+!     call MPI_ALLTOALLV(src, decomp%z2cnts, decomp%z2disp, &
+!          real_type, work2_r, decomp%y2cnts, decomp%y2disp, &
+!          real_type, DECOMP_2D_COMM_ROW, ierror)
+! #endif
+! #endif
 
     ! rearrange receive buffer
-#ifdef SHM
-    call MPI_BARRIER(decomp%ROW_INFO%CORE_COMM, ierror)
-    call mem_merge_zy_real(work2, d1, d2, d3, dst, dims(2), &
-         decomp%y2dist, decomp)
-#else
+! #ifdef SHM
+!     call MPI_BARRIER(decomp%ROW_INFO%CORE_COMM, ierror)
+!     call mem_merge_zy_real(work2, d1, d2, d3, dst, dims(2), &
+!          decomp%y2dist, decomp)
+! #else
     call mem_merge_zy_real(work2_r, d1, d2, d3, dst, dims(2), &
          decomp%y2dist, decomp)
-#endif
+! #endif
     
     return
   end subroutine transpose_z_to_y_real
 
 
-#ifdef OCC
-  subroutine transpose_z_to_y_real_start(handle, src, dst, sbuf, rbuf, &
-       opt_decomp)
+! #ifdef OCC
+!   subroutine transpose_z_to_y_real_start(handle, src, dst, sbuf, rbuf, &
+!        opt_decomp)
 
-    implicit none
+!     implicit none
     
-    integer :: handle
-    real(mytype), dimension(:,:,:) :: src, dst, sbuf, rbuf
-    TYPE(DECOMP_INFO), intent(IN), optional :: opt_decomp
+!     integer :: handle
+!     real(mytype), dimension(:,:,:) :: src, dst, sbuf, rbuf
+!     TYPE(DECOMP_INFO), intent(IN), optional :: opt_decomp
 
-    TYPE(DECOMP_INFO) :: decomp
+!     TYPE(DECOMP_INFO) :: decomp
 
-    integer :: ierror
+!     integer :: ierror
 
-    if (present(opt_decomp)) then
-       decomp = opt_decomp
-    else
-       decomp = decomp_main
-    end if
+!     if (present(opt_decomp)) then
+!        decomp = opt_decomp
+!     else
+!        decomp = decomp_main
+!     end if
 
-    sbuf = src
+!     sbuf = src
 
-#ifdef EVEN
-    call NBC_IALLTOALL(sbuf, decomp%z2count, real_type, &
-         rbuf, decomp%y2count, real_type, &
-         DECOMP_2D_COMM_ROW, handle, ierror)
-#else
-    call NBC_IALLTOALLV(sbuf, decomp%z2cnts, decomp%z2disp, real_type, &
-         rbuf, decomp%y2cnts, decomp%y2disp, real_type, &
-         DECOMP_2D_COMM_ROW, handle, ierror)
-#endif
+! #ifdef EVEN
+!     call NBC_IALLTOALL(sbuf, decomp%z2count, real_type, &
+!          rbuf, decomp%y2count, real_type, &
+!          DECOMP_2D_COMM_ROW, handle, ierror)
+! #else
+!     call NBC_IALLTOALLV(sbuf, decomp%z2cnts, decomp%z2disp, real_type, &
+!          rbuf, decomp%y2cnts, decomp%y2disp, real_type, &
+!          DECOMP_2D_COMM_ROW, handle, ierror)
+! #endif
 
-    return
-  end subroutine transpose_z_to_y_real_start
+!     return
+!   end subroutine transpose_z_to_y_real_start
 
 
-  subroutine transpose_z_to_y_real_wait(handle, src, dst, sbuf, rbuf, &
-       opt_decomp)
+!   subroutine transpose_z_to_y_real_wait(handle, src, dst, sbuf, rbuf, &
+!        opt_decomp)
 
-    implicit none
+!     implicit none
     
-    integer :: handle
-    real(mytype), dimension(:,:,:) :: src, dst, sbuf, rbuf
-    TYPE(DECOMP_INFO), intent(IN), optional :: opt_decomp
+!     integer :: handle
+!     real(mytype), dimension(:,:,:) :: src, dst, sbuf, rbuf
+!     TYPE(DECOMP_INFO), intent(IN), optional :: opt_decomp
 
-    TYPE(DECOMP_INFO) :: decomp
+!     TYPE(DECOMP_INFO) :: decomp
 
-    integer :: d1,d2,d3
-    integer :: ierror
+!     integer :: d1,d2,d3
+!     integer :: ierror
 
-    if (present(opt_decomp)) then
-       decomp = opt_decomp
-    else
-       decomp = decomp_main
-    end if
+!     if (present(opt_decomp)) then
+!        decomp = opt_decomp
+!     else
+!        decomp = decomp_main
+!     end if
 
-    d1 = SIZE(dst,1)
-    d2 = SIZE(dst,2)
-    d3 = SIZE(dst,3)
+!     d1 = SIZE(dst,1)
+!     d2 = SIZE(dst,2)
+!     d3 = SIZE(dst,3)
 
-    call NBC_WAIT(handle, ierror)
+!     call NBC_WAIT(handle, ierror)
 
-    ! rearrange receive buffer
-    call mem_merge_zy_real(rbuf, d1, d2, d3, dst, dims(2), &
-         decomp%y2dist, decomp)
+!     ! rearrange receive buffer
+!     call mem_merge_zy_real(rbuf, d1, d2, d3, dst, dims(2), &
+!          decomp%y2dist, decomp)
 
-    return
-  end subroutine transpose_z_to_y_real_wait
-#endif
+!     return
+!   end subroutine transpose_z_to_y_real_wait
+! #endif
 
 
   subroutine transpose_z_to_y_complex(src, dst, opt_decomp)
@@ -184,10 +184,10 @@
 
     TYPE(DECOMP_INFO) :: decomp
 
-#ifdef SHM
-    complex(mytype) :: work1(*), work2(*)
-    POINTER  (work1_p, work1), (work2_p, work2)  ! Cray pointers
-#endif
+! #ifdef SHM
+!     complex(mytype) :: work1(*), work2(*)
+!     POINTER  (work1_p, work1), (work2_p, work2)  ! Cray pointers
+! #endif
     
     integer :: s1,s2,s3,d1,d2,d3
     integer :: ierror
@@ -206,36 +206,36 @@
     d3 = SIZE(dst,3)
     
     ! rearrange source array as send buffer
-#ifdef SHM
-    work1_p = decomp%ROW_INFO%SND_P_c
-    call mem_split_zy_complex(src, s1, s2, s3, work1, dims(2), &
-         decomp%z2dist, decomp)
-#else
-#ifdef EVEN
+! #ifdef SHM
+!     work1_p = decomp%ROW_INFO%SND_P_c
+!     call mem_split_zy_complex(src, s1, s2, s3, work1, dims(2), &
+!          decomp%z2dist, decomp)
+! #else
+! #ifdef EVEN
     if (.not. decomp%even) then
        call mem_split_zy_complex(src, s1, s2, s3, work1_c, dims(2), &
             decomp%z2dist, decomp)
     end if
-#else
-    ! note the src array is suitable to be a send buffer
-    ! so no split operation needed
-#endif
-#endif
+! #else
+!     ! note the src array is suitable to be a send buffer
+!     ! so no split operation needed
+! #endif
+! #endif
     
-    ! define receive buffer
-#ifdef SHM
-    work2_p = decomp%ROW_INFO%RCV_P_c
-    call MPI_BARRIER(decomp%ROW_INFO%CORE_COMM, ierror)
-#endif
+!     ! define receive buffer
+! #ifdef SHM
+!     work2_p = decomp%ROW_INFO%RCV_P_c
+!     call MPI_BARRIER(decomp%ROW_INFO%CORE_COMM, ierror)
+! #endif
     
-#ifdef SHM
-    if (decomp%ROW_INFO%CORE_ME==1) THEN
-       call MPI_ALLTOALLV(work1, decomp%z2cnts_s, decomp%z2disp_s, &
-            complex_type, work2, decomp%y2cnts_s, decomp%y2disp_s, &
-            complex_type, decomp%ROW_INFO%SMP_COMM, ierror)
-    end if
-#else
-#ifdef EVEN
+! #ifdef SHM
+!     if (decomp%ROW_INFO%CORE_ME==1) THEN
+!        call MPI_ALLTOALLV(work1, decomp%z2cnts_s, decomp%z2disp_s, &
+!             complex_type, work2, decomp%y2cnts_s, decomp%y2disp_s, &
+!             complex_type, decomp%ROW_INFO%SMP_COMM, ierror)
+!     end if
+! #else
+! #ifdef EVEN
     if (decomp%even) then
        call MPI_ALLTOALL(src, decomp%z2count, &
             complex_type, work2_c, decomp%y2count, &
@@ -245,96 +245,96 @@
             complex_type, work2_c, decomp%y2count, &
             complex_type, DECOMP_2D_COMM_ROW, ierror)
     end if
-#else
-    call MPI_ALLTOALLV(src, decomp%z2cnts, decomp%z2disp, &
-         complex_type, work2_c, decomp%y2cnts, decomp%y2disp, &
-         complex_type, DECOMP_2D_COMM_ROW, ierror)
-#endif
-#endif
+! #else
+!     call MPI_ALLTOALLV(src, decomp%z2cnts, decomp%z2disp, &
+!          complex_type, work2_c, decomp%y2cnts, decomp%y2disp, &
+!          complex_type, DECOMP_2D_COMM_ROW, ierror)
+! #endif
+! #endif
 
-    ! rearrange receive buffer
-#ifdef SHM
-    call MPI_BARRIER(decomp%ROW_INFO%CORE_COMM, ierror)
-    call mem_merge_zy_complex(work2, d1, d2, d3, dst, dims(2), &
-         decomp%y2dist, decomp)
-#else
+!     ! rearrange receive buffer
+! #ifdef SHM
+!     call MPI_BARRIER(decomp%ROW_INFO%CORE_COMM, ierror)
+!     call mem_merge_zy_complex(work2, d1, d2, d3, dst, dims(2), &
+!          decomp%y2dist, decomp)
+! #else
     call mem_merge_zy_complex(work2_c, d1, d2, d3, dst, dims(2), &
          decomp%y2dist, decomp)
-#endif
+! #endif
 
     return
   end subroutine transpose_z_to_y_complex
 
 
-#ifdef OCC
-  subroutine transpose_z_to_y_complex_start(handle, src, dst, sbuf, &
-       rbuf, opt_decomp)
+! #ifdef OCC
+!   subroutine transpose_z_to_y_complex_start(handle, src, dst, sbuf, &
+!        rbuf, opt_decomp)
 
-    implicit none
+!     implicit none
     
-    integer :: handle
-    complex(mytype), dimension(:,:,:) :: src, dst, sbuf, rbuf
-    TYPE(DECOMP_INFO), intent(IN), optional :: opt_decomp
+!     integer :: handle
+!     complex(mytype), dimension(:,:,:) :: src, dst, sbuf, rbuf
+!     TYPE(DECOMP_INFO), intent(IN), optional :: opt_decomp
 
-    TYPE(DECOMP_INFO) :: decomp
+!     TYPE(DECOMP_INFO) :: decomp
 
-    integer :: ierror
+!     integer :: ierror
 
-    if (present(opt_decomp)) then
-       decomp = opt_decomp
-    else
-       decomp = decomp_main
-    end if
+!     if (present(opt_decomp)) then
+!        decomp = opt_decomp
+!     else
+!        decomp = decomp_main
+!     end if
 
-    sbuf = src
+!     sbuf = src
 
-#ifdef EVEN
-    call NBC_IALLTOALL(sbuf, decomp%z2count, &
-         complex_type, rbuf, decomp%y2count, &
-         complex_type, DECOMP_2D_COMM_ROW, handle, ierror)
-#else
-    call NBC_IALLTOALLV(sbuf, decomp%z2cnts, decomp%z2disp, &
-         complex_type, rbuf, decomp%y2cnts, decomp%y2disp, &
-         complex_type, DECOMP_2D_COMM_ROW, handle, ierror)
-#endif
+! #ifdef EVEN
+!     call NBC_IALLTOALL(sbuf, decomp%z2count, &
+!          complex_type, rbuf, decomp%y2count, &
+!          complex_type, DECOMP_2D_COMM_ROW, handle, ierror)
+! #else
+!     call NBC_IALLTOALLV(sbuf, decomp%z2cnts, decomp%z2disp, &
+!          complex_type, rbuf, decomp%y2cnts, decomp%y2disp, &
+!          complex_type, DECOMP_2D_COMM_ROW, handle, ierror)
+! #endif
 
-    return
-  end subroutine transpose_z_to_y_complex_start
+!     return
+!   end subroutine transpose_z_to_y_complex_start
 
 
-  subroutine transpose_z_to_y_complex_wait(handle, src, dst, sbuf, &
-       rbuf, opt_decomp)
+!   subroutine transpose_z_to_y_complex_wait(handle, src, dst, sbuf, &
+!        rbuf, opt_decomp)
 
-    implicit none
+!     implicit none
     
-    integer :: handle
-    complex(mytype), dimension(:,:,:) :: src, dst, sbuf, rbuf
-    TYPE(DECOMP_INFO), intent(IN), optional :: opt_decomp
+!     integer :: handle
+!     complex(mytype), dimension(:,:,:) :: src, dst, sbuf, rbuf
+!     TYPE(DECOMP_INFO), intent(IN), optional :: opt_decomp
 
-    TYPE(DECOMP_INFO) :: decomp
+!     TYPE(DECOMP_INFO) :: decomp
 
-    integer :: d1,d2,d3
-    integer :: ierror
+!     integer :: d1,d2,d3
+!     integer :: ierror
 
-    if (present(opt_decomp)) then
-       decomp = opt_decomp
-    else
-       decomp = decomp_main
-    end if
+!     if (present(opt_decomp)) then
+!        decomp = opt_decomp
+!     else
+!        decomp = decomp_main
+!     end if
 
-    d1 = SIZE(dst,1)
-    d2 = SIZE(dst,2)
-    d3 = SIZE(dst,3)
+!     d1 = SIZE(dst,1)
+!     d2 = SIZE(dst,2)
+!     d3 = SIZE(dst,3)
 
-    call NBC_WAIT(handle, ierror)
+!     call NBC_WAIT(handle, ierror)
 
-    ! rearrange receive buffer
-    call mem_merge_zy_complex(rbuf, d1, d2, d3, dst, dims(2), &
-         decomp%y2dist, decomp)
+!     ! rearrange receive buffer
+!     call mem_merge_zy_complex(rbuf, d1, d2, d3, dst, dims(2), &
+!          decomp%y2dist, decomp)
 
-    return
-  end subroutine transpose_z_to_y_complex_wait
-#endif
+!     return
+!   end subroutine transpose_z_to_y_complex_wait
+! #endif
 
 
   ! pack/unpack ALLTOALL(V) buffers
@@ -361,15 +361,15 @@
           i2 = i1+dist(m)-1
        end if
 
-#ifdef SHM
-       pos = decomp%z2disp_o(m) + 1
-#else
-#ifdef EVEN
+! #ifdef SHM
+!        pos = decomp%z2disp_o(m) + 1
+! #else
+! #ifdef EVEN
        pos = m * decomp%z2count + 1
-#else
-       pos = decomp%z2disp(m) + 1
-#endif
-#endif
+! #else
+!        pos = decomp%z2disp(m) + 1
+! #endif
+! #endif
 
        do k=i1,i2
           do j=1,n2
@@ -407,15 +407,15 @@
           i2 = i1+dist(m)-1
        end if
 
-#ifdef SHM
-       pos = decomp%z2disp_o(m) + 1
-#else
-#ifdef EVEN
+! #ifdef SHM
+!        pos = decomp%z2disp_o(m) + 1
+! #else
+! #ifdef EVEN
        pos = m * decomp%z2count + 1
-#else
-       pos = decomp%z2disp(m) + 1
-#endif
-#endif
+! #else
+!        pos = decomp%z2disp(m) + 1
+! #endif
+! #endif
 
        do k=i1,i2
           do j=1,n2
@@ -453,15 +453,15 @@
           i2 = i1+dist(m)-1
        end if
 
-#ifdef SHM
-       pos = decomp%y2disp_o(m) + 1
-#else
-#ifdef EVEN
+! #ifdef SHM
+!        pos = decomp%y2disp_o(m) + 1
+! #else
+! #ifdef EVEN
        pos = m * decomp%y2count + 1
-#else
-       pos = decomp%y2disp(m) + 1
-#endif
-#endif
+! #else
+!        pos = decomp%y2disp(m) + 1
+! #endif
+! #endif
 
        do k=1,n3
           do j=i1,i2
@@ -499,15 +499,15 @@
           i2 = i1+dist(m)-1
        end if
 
-#ifdef SHM
-       pos = decomp%y2disp_o(m) + 1
-#else
-#ifdef EVEN
+! #ifdef SHM
+!        pos = decomp%y2disp_o(m) + 1
+! #else
+! #ifdef EVEN
        pos = m * decomp%y2count + 1
-#else
-       pos = decomp%y2disp(m) + 1
-#endif
-#endif
+! #else
+!        pos = decomp%y2disp(m) + 1
+! #endif
+! #endif
 
        do k=1,n3
           do j=i1,i2
