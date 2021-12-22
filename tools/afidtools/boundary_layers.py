@@ -325,14 +325,14 @@ def boundary_layers(folder):
     for i in range(nt):
         zero_indices = np.where(np.diff(np.sign(dvdx[:,i])))[0]
         if zero_indices.size > 0:
-            ix = zero_indices[0]
+            ix = max(zero_indices[0], 1)
             # Location and magnitude of velocity peak by lower wall
             dmaxL[i], VmaxL[i] = hermite_max(grid.xm[ix-1:ix+3], vybar[ix-1:ix+3,i])
             xx = np.append(grid.xm[:ix+1], dmaxL[i])
             vv = np.append(vybar[:ix+1,i], VmaxL[i])
             # Displacement thickness at lower wall
             dstarL[i] = np.trapz(vv,x=xx)/VmaxL[i]
-            ix = zero_indices[-1]
+            ix = min(zero_indices[-1], grid.xm.size-3)
             # Location and magnitude of velocity peak by upper wall
             dmaxU[i], VmaxU[i] = hermite_max(grid.xm[ix-1:ix+3], vybar[ix-1:ix+3,i])
             xx = np.insert(grid.xm[ix+1:], 0, dmaxU[i])
