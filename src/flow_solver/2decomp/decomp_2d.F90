@@ -13,10 +13,10 @@
 
 module decomp_2d
 
+  use MPI
 
   implicit none
 
-  include "mpif.h"
 
 #ifdef GLOBAL_ARRAYS
 #include "mafdecls.fh"

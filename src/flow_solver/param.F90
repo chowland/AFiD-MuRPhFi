@@ -172,8 +172,8 @@ module stat3_param
 end module stat3_param
 !=====================================================
 module mpih
+    use mpi
     implicit none
-    include 'mpif.h'
     integer :: ierr
     integer, parameter :: master=0
     integer :: MDP = MPI_DOUBLE_PRECISION
