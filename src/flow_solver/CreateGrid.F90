@@ -55,6 +55,12 @@ subroutine CreateGrid
     if (istr3==0) call uniform_grid(xc(1:nx),xm(1:nxm),nxm,alx3)
 
 !
+!     OPTION 1: CENTRE-FOCUSED CLUSTERING
+!
+
+    if (istr3==1) call centre_focus_grid(xc(1:nx),xm(1:nxm),nxm,alx3,str3)
+
+!
 !     OPTION 4: HYPERBOLIC TANGENT-TYPE CLUSTERING
 !
 

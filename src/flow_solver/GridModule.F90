@@ -4,7 +4,7 @@ module GridModule
 
     private
     public uniform_grid, tanh_grid, cheb_grid, asym_cheb_grid, &
-            second_derivative_coeff
+            second_derivative_coeff, centre_focus_grid
 
 contains
 
@@ -132,6 +132,27 @@ contains
         deallocate(etaz)
 
     end subroutine
+
+    subroutine centre_focus_grid(c_grd, m_grd, Nm, grd_len, str)
+        real, intent(out) :: c_grd(:), m_grd(:)
+        integer, intent(in) :: Nm
+        real, intent(in) :: grd_len, str
+
+        integer :: i
+
+        c_grd(1) = 0.0
+        do i=2,Nm
+            c_grd(i) = grd_len/2.0*( &
+                    str*(2.0*(i-1)/Nm - 1)**3 + 2.0*(i-1)/Nm - 1 &
+                )/(str + 1) + grd_len/2.0
+        end do
+        c_grd(Nm+1) = grd_len
+
+        do i=1,Nm
+            m_grd(i) = 0.5*(c_grd(i) + c_grd(i+1))
+        end do
+
+    end subroutine centre_focus_grid
 
     subroutine second_derivative_coeff(ap3 ,ac3, am3, x, xlen, fix_up, fix_low)
         ! Returns second derivative coefficients ap3, ac3, am3
