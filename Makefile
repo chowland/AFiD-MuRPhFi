@@ -15,8 +15,8 @@ MACHINE=PC_GNU
 OBJDIR=obj
 
 ifeq ($(MACHINE),PC_GNU)
-	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -O2
-	FC += -g -fbacktrace -fbounds-check
+	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -O3
+	# FC += -pg -fbacktrace -fbounds-check
 	LDFLAGS = -lfftw3 -llapack -lblas -ldl
 endif
 ifeq ($(MACHINE),PC_INTEL)
@@ -33,7 +33,7 @@ ifeq ($(MACHINE),CARTESIUS)
 	LDFLAGS = -lfftw3 $(BLAS_LIBS) $(HDF5_LIBS)
 endif
 ifeq ($(MACHINE),SNELLIUS)
-	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -w -fallow-argument-mismatch -O2
+	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -w -fallow-argument-mismatch -O3
 	BLAS_LIBS = -lscalapack -lopenblas -ldl
 	LDFLAGS = -lfftw3 $(BLAS_LIBS)
 endif
