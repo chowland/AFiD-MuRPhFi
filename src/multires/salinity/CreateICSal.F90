@@ -30,6 +30,18 @@ subroutine CreateICSal
                 end do
             end do
         end do
+    else if ((RayS < 0) .and. (RayT < 0)) then
+        eps = 1e-2
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    sal(k,j,i) = -tanh(xmr(k) - 0.5*alx3)
+                    call random_number(varptb)
+                    sal(k,j,i) = sal(k,j,i) + &
+                            cosh(xmr(k) - 0.5*alx3)**(-2)*eps*(2.0*varptb - 1.0)
+                end do
+            end do
+        end do
     else
         ! Assign linear salinity profile in the nodes k=1 to k=nxmr
         do i=xstartr(3),xendr(3)

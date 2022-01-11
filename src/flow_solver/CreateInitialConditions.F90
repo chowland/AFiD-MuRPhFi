@@ -33,21 +33,32 @@ subroutine CreateInitialConditions
     end if
 
     if (gAxis == 1) then
-        !CJH: RBC initial condition as used in AFiD 1.0
-        eps = 0.01
-        do i=xstart(3),xend(3)
-            do j=xstart(2),xend(2)
-                do k=1,nxm
-                    xxx = xc(k)
-                    yyy = ym(j)
-                    vx(k,j,i) = vx(k,j,i) - eps*xxx**2*(1.0 - xxx)**2*cos(2.0*pi*yyy/ylen)
-
-                    xxx = xm(k)
-                    yyy = yc(j)
-                    vy(k,j,i) = vy(k,j,i) + 2.0*eps*xxx*(1.0 - xxx)*(1.0 - 2.0*xxx)*sin(2.0*pi*yyy/ylen)/pi
+        if ((RayT < 0) .and. (RayS <0)) then
+            !CJH: Stratified shear layer initial condition
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        vy(k,j,i) = tanh(xm(k) - alx3/2.0)
+                    end do
                 end do
             end do
-        end do
+        else
+            !CJH: RBC initial condition as used in AFiD 1.0
+            eps = 0.01
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xc(k)
+                        yyy = ym(j)
+                        vx(k,j,i) = vx(k,j,i) - eps*xxx**2*(1.0 - xxx)**2*cos(2.0*pi*yyy/ylen)
+
+                        xxx = xm(k)
+                        yyy = yc(j)
+                        vy(k,j,i) = vy(k,j,i) + 2.0*eps*xxx*(1.0 - xxx)*(1.0 - 2.0*xxx)*sin(2.0*pi*yyy/ylen)/pi
+                    end do
+                end do
+            end do
+        end if
     else if (gAxis == 2) then
         if (inslwN==1) then
         !CJH Laminar vertical convection as in Batchelor (1954)
@@ -90,31 +101,46 @@ subroutine CreateInitialConditions
         end do
     end if
 
-    ! Assign linear temperature profile in the nodes k=1 to k=nxm
-    do i=xstart(3),xend(3)
-        do j=xstart(2),xend(2)
-            do k=1,nxm
-                xxx = xm(k)
-                temp(k,j,i) = tempbp(1,j,i) + (temptp(1,j,i) - tempbp(1,j,i))*xm(k)/alx3
+    if ((RayT < 0) .and. (RayS < 0)) then
+        !CJH: Stratified shear layer + noise in centre
+        eps = 1e-2
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    temp(k,j,i) = tanh(xm(k) - 0.5*alx3)
+                    call random_number(varptb)
+                    temp(k,j,i) = temp(k,j,i) + &
+                            cosh(xm(k) - 0.5*alx3)**(-2)*eps*(2.0*varptb - 1.0)
+                end do
             end do
         end do
-    end do
+    else
+        ! Assign linear temperature profile in the nodes k=1 to k=nxm
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    xxx = xm(k)
+                    temp(k,j,i) = tempbp(1,j,i) + (temptp(1,j,i) - tempbp(1,j,i))*xm(k)/alx3
+                end do
+            end do
+        end do
 
-    ! Add noise in the temperature profile
-    eps = 1e-3
-    do i=xstart(3),xend(3)
-        do j=xstart(2),xend(2)
-            do k=1,nxm
-                call random_number(varptb)
-                if (abs(xm(k)-0.5) + eps > 0.5) then
-                  amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
-                  temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
-                else
-                  temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
-                end if
+        ! Add noise in the temperature profile
+        eps = 1e-3
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    call random_number(varptb)
+                    if (abs(xm(k)-0.5) + eps > 0.5) then
+                    amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
+                    temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
+                    else
+                    temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
+                    end if
+                end do
             end do
         end do
-    end do
+    end if
 
     if (gAxis==2 .and. inslwN==0) then  ! Ke et al comparison case
         t0 = 1.4195567
