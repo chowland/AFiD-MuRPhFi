@@ -28,7 +28,7 @@ ALX3   YLEN   ZLEN
 
 Grid stretching parameters
 ISTR3   STR3    ISTR3R
-1       10.0    1
+1       2.5     1
 
 Physical flow parameters / Free-fall timescale
 RAYT    PRAT    RAYS    PRAS    FFscaleS

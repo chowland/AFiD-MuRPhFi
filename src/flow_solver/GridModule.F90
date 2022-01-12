@@ -143,7 +143,7 @@ contains
         c_grd(1) = 0.0
         do i=2,Nm
             c_grd(i) = grd_len/2.0*( &
-                    str*(2.0*(i-1)/Nm - 1)**3 + 2.0*(i-1)/Nm - 1 &
+                    str*(2.0*(i-1)/Nm - 1)**7 + 2.0*(i-1)/Nm - 1 &
                 )/(str + 1) + grd_len/2.0
         end do
         c_grd(Nm+1) = grd_len
