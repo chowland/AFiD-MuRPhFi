@@ -20,7 +20,7 @@ subroutine CreateICSal
 
     call random_seed()
     eps=5d-2
-    if ((active_S==1) .and. (active_T==1)) then
+    if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
         ! For DDC initialise with uniform salinity
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
