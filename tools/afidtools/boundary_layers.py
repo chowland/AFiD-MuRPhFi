@@ -1,6 +1,7 @@
 from pandas import DataFrame
 import numpy as np
 import h5py
+from scipy import interp1d
 from .afidtools import Grid, InputParams, read_mean
 
 def xmean(A, xc):
@@ -198,13 +199,13 @@ def refine(A, grid, BClo=0.0, BCup=0.0):
     """
     xgrid = np.concatenate(([0], grid.xm, [1]))
     if A.ndim==2:
-        Ar = np.zeros((grid.xmr.size, A.shape[1]))
-        for i in range(A.shape[1]):
-            xA = np.concatenate(([BClo], A[:,i], [BCup]))
-            Ar[:,i] = np.interp(grid.xmr, xgrid, xA)
+        xA = np.concatenate((BClo*np.ones((1,A.shape[1])), A, BCup*np.ones((1,A.shape[1]))))
+        up = interp1d(xgrid, xA, kind='cubic', axis=0)
+        Ar = up(grid.xmr)
     elif A.ndim==1:
-        xA = np.concatenate(([BClo], A, [BCup]))
-        Ar = np.interp(grid.xmr, xgrid, xA)
+        xA = np.concatenate(([BClo, A, BCup]))
+        up = interp1d(xgrid, xA, kind='cubic')
+        Ar = up(grid.xmr)
     return Ar
 
 def budget_time_series(folder):
