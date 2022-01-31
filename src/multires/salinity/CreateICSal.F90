@@ -14,9 +14,10 @@ subroutine CreateICSal
     use decomp_2d, only: xstartr,xendr
     use mpih
     implicit none
-    integer :: i,k,j, kmid
+    integer :: i,k,j, kmid, io
     real :: xxx,yyy,eps,varptb,amp
-    real :: B, gamma, t0, x0, h0
+    real :: gamma, t0, x0, h0, A, B, alpha
+    logical :: exists
 
     call random_seed()
     eps=5d-2
@@ -75,19 +76,23 @@ subroutine CreateICSal
 
     if (phasefield) then
         if (pf_IC==1) then
-            t0 = 1
+            inquire(file="pfparam.in", exist=exists)
+            if (exists) then
+                open(newunit=io, file="pfparam.in", status="old", action="read")
+                read(io, *) A, B, alpha
+                close(io)
+            else
+                A = 1.132
+                B = 0.3796
+                alpha = 3.987e-2
+            end if
+            t0 = 1e-3
             x0 = 0.8
-            gamma = 0.62428 !0.76023
-            h0 = x0 + 2*gamma*sqrt(t0/pecs)
-            B = 0.44748 !0.37372
+            h0 = x0 + 2*alpha*sqrt(t0)
             do i=xstartr(3),xendr(3)
                 do j=xstartr(2),xendr(2)
                     do k=1,nxmr
-                        ! if (xmr(k) <= h0) then
-                            sal(k,j,i) = 1.0 - B*erfc((x0 - xmr(k))*sqrt(pecs/t0)/2.0)
-                        ! else
-                        !     sal(k,j,i) = 1.0 - B*erfc(-gamma)
-                        ! end if
+                        sal(k,j,i) = 1.0 - B*erfc((x0 - xmr(k))/sqrt(PraT/PraS*t0)/2.0)\
                     end do
                 end do
             end do

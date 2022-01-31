@@ -14,9 +14,10 @@ subroutine CreateInitialConditions
     use decomp_2d, only: xstart,xend
     use mpih
     implicit none
-    integer :: j,k,i,kmid
+    integer :: j,k,i,kmid, io
     real :: xxx,yyy,zzz,eps,varptb,amp
-    real :: h0,t0,Lambda,r, x0, A
+    real :: h0,t0,Lambda,r, x0, A, B, alpha
+    logical :: exists
 
     call random_seed()
 
@@ -246,18 +247,30 @@ subroutine CreateInitialConditions
 
         if (salinity) then
             if (pf_IC==1) then
-                t0 = 1
+                inquire(file="pfparam.in", exist=exists)
+                if (exists) then
+                    write(*,*) "Input parameter file exists!"
+                    open(newunit=io, file="pfparam.in", status="old", action="read")
+                    read(io, *) A, B, alpha
+                    close(io)
+                    write(*,*) "A = ", A
+                    write(*,*) "B = ", B
+                    write(*,*) "alpha = ", alpha
+                else
+                    A = 1.132
+                    B = 0.3796
+                    alpha = 3.987e-2
+                end if
+                t0 = 1e-3
                 x0 = 0.8
-                Lambda = 0.19742 !0.24041
-                h0 = x0 + 2*Lambda*sqrt(t0/pect)
-                A = 0.90954 !0.90293
+                h0 = x0 + 2*alpha*sqrt(t0)
                 do i=xstart(3),xend(3)
                     do j=xstart(2),xend(2)
                         do k=1,nxm
                             if (xm(k) <= h0) then
-                                temp(k,j,i) = 1 - A*erfc((x0 - xm(k))*sqrt(pect/t0)/2.0)
+                                temp(k,j,i) = 1 - A*erfc((x0 - xm(k))/sqrt(t0)/2.0)
                             else
-                                temp(k,j,i) = 1 - A*erfc(-Lambda)
+                                temp(k,j,i) = 1 - A*erfc(-alpha)
                             end if
                         end do
                     end do
