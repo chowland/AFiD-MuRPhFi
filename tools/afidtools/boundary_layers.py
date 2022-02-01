@@ -1,7 +1,7 @@
 from pandas import DataFrame
 import numpy as np
 import h5py
-from scipy import interp1d
+from scipy.interpolate import interp1d
 from .afidtools import Grid, InputParams, read_mean
 
 def xmean(A, xc):
