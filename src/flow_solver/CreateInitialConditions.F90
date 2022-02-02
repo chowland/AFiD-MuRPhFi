@@ -249,13 +249,15 @@ subroutine CreateInitialConditions
             if (pf_IC==1) then
                 inquire(file="pfparam.in", exist=exists)
                 if (exists) then
-                    write(*,*) "Input parameter file exists!"
                     open(newunit=io, file="pfparam.in", status="old", action="read")
                     read(io, *) A, B, alpha
                     close(io)
-                    write(*,*) "A = ", A
-                    write(*,*) "B = ", B
-                    write(*,*) "alpha = ", alpha
+                    if (ismaster) then
+                        write(*,*) "Input parameter file exists!"
+                        write(*,*) "A = ", A
+                        write(*,*) "B = ", B
+                        write(*,*) "alpha = ", alpha
+                    end if
                 else
                     A = 1.132
                     B = 0.3796
@@ -278,13 +280,15 @@ subroutine CreateInitialConditions
             else if (pf_IC==2) then
                 inquire(file="pfparam.in", exist=exists)
                 if (exists) then
-                    write(*,*) "Input parameter file exists!"
                     open(newunit=io, file="pfparam.in", status="old", action="read")
                     read(io, *) A, B, alpha
                     close(io)
-                    write(*,*) "A = ", A
-                    write(*,*) "B = ", B
-                    write(*,*) "alpha = ", alpha
+                    if (ismaster) then
+                        write(*,*) "Input parameter file exists!"
+                        write(*,*) "A = ", A
+                        write(*,*) "B = ", B
+                        write(*,*) "alpha = ", alpha
+                    end if
                 else
                     A = 1.132
                     B = 0.3796
