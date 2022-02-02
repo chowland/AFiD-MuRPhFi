@@ -275,6 +275,36 @@ subroutine CreateInitialConditions
                         end do
                     end do
                 end do
+            else if (pf_IC==2) then
+                inquire(file="pfparam.in", exist=exists)
+                if (exists) then
+                    write(*,*) "Input parameter file exists!"
+                    open(newunit=io, file="pfparam.in", status="old", action="read")
+                    read(io, *) A, B, alpha
+                    close(io)
+                    write(*,*) "A = ", A
+                    write(*,*) "B = ", B
+                    write(*,*) "alpha = ", alpha
+                else
+                    A = 1.132
+                    B = 0.3796
+                    alpha = 3.987e-2
+                end if
+                t0 = 1e-3
+                h0 = 0.1 + 2*alpha*sqrt(t0)
+                do i=xstart(3),xend(3)
+                    do j=xstart(2),xend(2)
+                        do k=1,nxm
+                            if (abs(ym(j) - ylen/2.0) <= h0) then
+                                temp(k,j,i) = 1.0 - A*erfc(-alpha)
+                            else if (ym(j) < ylen/2.0) then
+                                temp(k,j,i) = 1.0 - A*erfc((ylen/2.0 - h0 - ym(j))/sqrt(t0)/2.0)
+                            else
+                                temp(k,j,i) = 1.0 - A*erfc((ym(j) - ylen/2.0 - h0)/sqrt(t0)/2.0)
+                            end if
+                        end do
+                    end do
+                end do
             else
                 kmid = nxm/2
                 do i=xstart(3),xend(3)
