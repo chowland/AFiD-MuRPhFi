@@ -44,6 +44,9 @@ a0 = np.interp(0, lhs - rhs, alpha)
 A = a0*np.exp(a0**2)*S*qpi
 B = (1 + Lambda - A*erfc(-a0))/Lambda/erfc(-a0/np.sqrt(tau))
 
+real_ratio = Rrho*(A*erfc(-a0)/B*erfc(-a0/np.sqrt(tau)))
+print("Effective density ratio: ", real_ratio)
+
 x0 = 0.8
 t0 = 1e-4
 h0 = x0 + 2*a0*np.sqrt(t0)
