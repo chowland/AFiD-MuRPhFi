@@ -296,15 +296,19 @@ subroutine CreateInitialConditions
                 end if
                 t0 = 1e-3
                 h0 = 0.1 - 2*alpha*sqrt(t0)
+                eps = 5e-3
                 do i=xstart(3),xend(3)
                     do j=xstart(2),xend(2)
                         do k=1,nxm
+                            call random_number(varptb)
                             if (abs(ym(j) - ylen/2.0) <= h0) then
                                 temp(k,j,i) = 1.0 - A*erfc(-alpha)
                             else if (ym(j) < ylen/2.0) then
-                                temp(k,j,i) = 1.0 - A*erfc((ylen/2.0 - h0 - ym(j))/sqrt(t0)/2.0)
+                                temp(k,j,i) = 1.0 - A*erfc((ylen/2.0 - h0 - ym(j))/sqrt(t0)/2.0) &
+                                                + eps*(2.d0*varptb - 1.d0)
                             else
-                                temp(k,j,i) = 1.0 - A*erfc((ym(j) - ylen/2.0 - h0)/sqrt(t0)/2.0)
+                                temp(k,j,i) = 1.0 - A*erfc((ym(j) - ylen/2.0 - h0)/sqrt(t0)/2.0) &
+                                + eps*(2.d0*varptb - 1.d0)
                             end if
                         end do
                     end do

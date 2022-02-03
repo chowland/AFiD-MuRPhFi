@@ -20,7 +20,7 @@ subroutine CreateICSal
     logical :: exists
 
     call random_seed()
-    eps=5d-2
+    eps=5e-3
     if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
         ! For DDC initialise with uniform salinity
         do i=xstartr(3),xendr(3)
@@ -112,9 +112,11 @@ subroutine CreateICSal
             do i=xstartr(3),xendr(3)
                 do j=xstartr(2),xendr(2)
                     do k=1,nxmr
+                        call random_number(varptb)
                         sal(k,j,i) = 1.0 - &
                             B*erfc((ylen/2.0 - h0 - ymr(j))/sqrt(PraT/PraS*t0)/2.0) + &
-                            B*erfc((ylen/2.0 + h0 - ymr(j))/sqrt(PraT/PraS*t0)/2.0)
+                            B*erfc((ylen/2.0 + h0 - ymr(j))/sqrt(PraT/PraS*t0)/2.0) &
+                            + eps*(2.d0*varptb - 1.d0)
                     end do
                 end do
             end do
