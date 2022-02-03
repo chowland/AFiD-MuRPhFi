@@ -108,7 +108,7 @@ subroutine CreateICSal
                 alpha = 3.987e-2
             end if
             t0 = 1e-3
-            h0 = 0.1 + 2*alpha*sqrt(t0)
+            h0 = 0.1 - 2*alpha*sqrt(t0)
             do i=xstartr(3),xendr(3)
                 do j=xstartr(2),xendr(2)
                     do k=1,nxmr

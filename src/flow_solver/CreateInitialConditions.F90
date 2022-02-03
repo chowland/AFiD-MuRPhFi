@@ -295,7 +295,7 @@ subroutine CreateInitialConditions
                     alpha = 3.987e-2
                 end if
                 t0 = 1e-3
-                h0 = 0.1 + 2*alpha*sqrt(t0)
+                h0 = 0.1 - 2*alpha*sqrt(t0)
                 do i=xstart(3),xend(3)
                     do j=xstart(2),xend(2)
                         do k=1,nxm
