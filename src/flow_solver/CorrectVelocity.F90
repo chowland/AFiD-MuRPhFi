@@ -18,7 +18,7 @@ subroutine CorrectVelocity
     integer :: jc,jm,kc,km,ic,im
     real    :: usukm,udy,udz,locdph
     real, dimension(nxm) :: vxbar
-    real :: vybulk, vzbulk, Tbulk, Sbulk, idx
+    real :: vybulk, vzbulk, Tbulk, Sbulk, idx, vy_target
 
     udy = al*dt*dy
     udz = al*dt*dz
@@ -47,6 +47,32 @@ subroutine CorrectVelocity
        enddo
     enddo
 !$OMP END PARALLEL DO
+
+    !CJH Prescribe mean volume flux
+    !Treat dPdy input as a desired Re_b
+    vy_target = dPdy/ren
+    if (dPdy/=0) then
+        vybulk = 0.d0
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                    idx = 1/udx3m(kc)
+                    vybulk = vybulk + vy(kc,jc,ic)*idx
+                end do
+            end do
+        end do
+
+        call MpiAllSumRealScalar(vybulk)
+        vybulk = vybulk/nym/nzm
+
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                    vy(kc,jc,ic) = vy(kc,jc,ic) - (vybulk - vy_target)
+                end do
+            end do
+        end do
+    end if
 
     !CJH Remove mean mass flux
     if((.not.melt .and. .not.phasefield) .and. (gAxis==2 .and. inslwN==1)) then

@@ -77,6 +77,19 @@ subroutine CreateInitialConditions
         end if
     end if
 
+    if (dPdy > 0) then
+        !CJH Interpret dPdy as Re_b
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    xxx = xm(k)
+                    yyy = yc(j)
+                    vy(k,j,i) = vy(k,j,i) + 6.0*dPdy/ren*xxx*(1.0 - xxx)
+                end do
+            end do
+        end do
+    end if
+
     ! Set velocity to zero if we are using the phase-field method
     if (melt .or. phasefield) then
         do i=xstart(3),xend(3)

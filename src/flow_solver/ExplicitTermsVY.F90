@@ -98,7 +98,7 @@ subroutine ExplicitTermsVY
                     +vy(kc,jc,imm))*udzq
 
 
-                dph(kc,jc,ic)=-(hyx+hyy+hyz)+dyyvy+dzzvy - dPdy
+                dph(kc,jc,ic)=-(hyx+hyy+hyz)+dyyvy+dzzvy !- dPdy
 
             enddo
         enddo
