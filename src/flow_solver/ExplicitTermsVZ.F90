@@ -19,7 +19,7 @@ subroutine ExplicitTermsVZ
     real    :: hzx,hzy,hzz,udy,udz
     real    :: udyq,udzq
     real    :: dzzvz,dyyvz,pf_eta
-    real    :: tempit, salit,volpen
+    real    :: tempit, salit,volpen, Gz
 
     pf_eta = ren*(1.51044385*pf_eps)**2
 
@@ -28,6 +28,9 @@ subroutine ExplicitTermsVZ
 
     udy=dy*0.25
     udz=dz*0.25
+
+    !CJH Treat dPdz input variable as Re_tau
+    Gz = 8.0*dPdz**2/ren**2
 
 !$OMP  PARALLEL DO &
 !$OMP  DEFAULT(none) &
@@ -101,7 +104,7 @@ subroutine ExplicitTermsVZ
                     +vz(kc,jmm,ic))*udyq
 
 !
-                dq(kc,jc,ic)=-(hzx+hzy+hzz)+dyyvz+dzzvz - dPdz
+                dq(kc,jc,ic)=-(hzx+hzy+hzz)+dyyvz+dzzvz - Gz
 !
             enddo
         enddo

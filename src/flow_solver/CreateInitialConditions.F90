@@ -83,8 +83,19 @@ subroutine CreateInitialConditions
             do j=xstart(2),xend(2)
                 do k=1,nxm
                     xxx = xm(k)
-                    yyy = yc(j)
                     vy(k,j,i) = vy(k,j,i) + 6.0*dPdy/ren*xxx*(1.0 - xxx)
+                end do
+            end do
+        end do
+    end if
+
+    if (dPdz > 0) then
+        !CJH Interpret dPdz as Re_tau
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    xxx = xm(k)
+                    vz(k,j,i) = vz(k,j,i) + 4.0*dPdz**2/ren*xxx*(1.0 - xxx)
                 end do
             end do
         end do
