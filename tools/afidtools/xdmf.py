@@ -264,19 +264,21 @@ def generate_uniform_xmf(folder, var):
     grid = Grid(folder)
     nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
     nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
-    dx, dy, dz = 1/nxm, grid.yc[-1]/nym, grid.zc[-1]/nzm
+    dx, dy, dz = grid.xc[-1]/nxm, grid.yc[-1]/nym, grid.zc[-1]/nzm
     if nxmr!=0:
-        dxr, dyr, dzr = 1/nxmr, grid.ycr[-1]/nymr, grid.zcr[-1]/nzmr
+        dxr, dyr, dzr = grid.xc[-1]/nxmr, grid.ycr[-1]/nymr, grid.zcr[-1]/nzmr
 
     # Store the appropriate grid sizes and names based on the variable
-    fulldims = (nzm, nym, nxm+1)
+    nxu = nxm//2
+    dx, dxr = grid.xc[-1]/nxu, grid.xc[-1]/nxu
+    fulldims = (nzm, nym, nxu)
     if var=="vx":
-        dims = (nzm, nym, nxm+1)
+        dims = (nzm, nym, nxu)
     elif var in "phisal":
         dims = (nzmr, nymr, nxmr)
-        fulldims = (nzmr, nymr, nxmr+1)
+        fulldims = (nzmr, nymr, nxu)
     else:
-        dims = (nzm, nym, nxm)
+        dims = (nzm, nym, nxu)
     
     # Collect indices of saved fields
     samplist = []
