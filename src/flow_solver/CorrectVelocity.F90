@@ -15,10 +15,10 @@ subroutine CorrectVelocity
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use mpih
     implicit none
-    integer :: jc,jm,kc,km,ic,im
+    integer :: jc,jm,kc,km,ic,im,kmid
     real    :: usukm,udy,udz,locdph
-    real, dimension(nxm) :: vxbar
-    real :: vybulk, vzbulk, Tbulk, Sbulk, idx, vy_target
+    real, dimension(nxm) :: vxbar, Gshape
+    real :: vybulk, vzbulk, Tbulk, Sbulk, idx, vy_target, lam
 
     udy = al*dt*dy
     udz = al*dt*dz
@@ -53,6 +53,7 @@ subroutine CorrectVelocity
     vy_target = dPdy/ren
     if (dPdy/=0) then
         vybulk = 0.d0
+        lam = sqrt(2.0*ren/al/dt)
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
                 do kc=1,nxm
@@ -65,10 +66,17 @@ subroutine CorrectVelocity
         call MpiAllSumRealScalar(vybulk)
         vybulk = vybulk/nym/nzm
 
+        kmid = nxm/2
+        do kc=1,kmid
+            Gshape(kc) = (1.0 - exp(-lam*xm(kc)))/(1.0 + 2.0/lam*(exp(-lam/2.0) - 1.0))
+        end do
+        do kc=kmid+1,nxm
+            Gshape(kc) = (1.0 - exp(lam*(xm(kc) - 1.0)))/(1.0 + 2.0/lam*(exp(-lam/2.0) - 1.0))
+        end do
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
                 do kc=1,nxm
-                    vy(kc,jc,ic) = vy(kc,jc,ic) - (vybulk - vy_target)
+                    vy(kc,jc,ic) = vy(kc,jc,ic) + (vy_target - vybulk)*Gshape(kc)
                 end do
             end do
         end do
