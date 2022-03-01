@@ -127,6 +127,16 @@ subroutine CorrectVelocity
         do kc=1,nxm
             vxbar(kc) = vxbar(kc)/nym/nzm
         end do
+        
+        lam = sqrt(2.0*ren/al/dt)
+        kmid = nxm/2
+        lfac = (1.0 + 2.0/lam*(exp(-lam/2.0) - 1.0))
+        do kc=1,kmid
+            Gshape(kc) = (1.0 - exp(-lam*xm(kc)))/lfac
+        end do
+        do kc=kmid+1,nxm
+            Gshape(kc) = (1.0 - exp(lam*(xm(kc) - 1.0)))/lfac
+        end do
 
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
@@ -134,7 +144,7 @@ subroutine CorrectVelocity
                     vx(kc,jc,ic) = vx(kc,jc,ic) - vxbar(kc)
                 end do
                 do kc=1,nxm
-                    vy(kc,jc,ic) = vy(kc,jc,ic) - vybulk
+                    vy(kc,jc,ic) = vy(kc,jc,ic) - vybulk*Gshape(kc)
                 end do
             end do
         end do
@@ -142,7 +152,7 @@ subroutine CorrectVelocity
             do ic=xstart(3),xend(3)
                 do jc=xstart(2),xend(2)
                     do kc=1,nxm
-                        temp(kc,jc,ic) = temp(kc,jc,ic) - Tbulk
+                        temp(kc,jc,ic) = temp(kc,jc,ic) - Tbulk*Gshape(kc)
                     end do
                 end do
             end do
@@ -151,7 +161,7 @@ subroutine CorrectVelocity
             do ic=xstart(3),xend(3)
                 do jc=xstart(2),xend(2)
                     do kc=1,nxm
-                        vz(kc,jc,ic) = vz(kc,jc,ic) - vzbulk
+                        vz(kc,jc,ic) = vz(kc,jc,ic) - vzbulk*Gshape(kc)
                     end do
                 end do
             end do
@@ -160,7 +170,7 @@ subroutine CorrectVelocity
             do ic=xstartr(3),xendr(3)
                 do jc=xstartr(2),xendr(2)
                     do kc=1,nxmr
-                        sal(kc,jc,ic) = sal(kc,jc,ic) - Sbulk
+                        sal(kc,jc,ic) = sal(kc,jc,ic) - Sbulk*Gshape(kc)
                     end do
                 end do
             end do
