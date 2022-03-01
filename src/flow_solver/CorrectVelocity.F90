@@ -162,7 +162,7 @@ subroutine CorrectVelocity
             do ic=xstart(3),xend(3)
                 do jc=xstart(2),xend(2)
                     do kc=1,nxm
-                        vz(kc,jc,ic) = vz(kc,jc,ic) - vzbulk*Gshape(kc)
+                        vz(kc,jc,ic) = vz(kc,jc,ic) + (vz_target - vzbulk)*Gshape(kc)
                     end do
                 end do
             end do
