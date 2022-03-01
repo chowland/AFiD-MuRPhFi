@@ -1,10 +1,10 @@
 Base grid resolution / number of substeps
 NXM     NYM     NZM     NSST(>1=RK,else AB)
-256     1024    512     3
+256     512     1024    3
 
 Refined grid: on/off and grid size
 MULTIRES    NXMR    NYMR    NZMR
-0           256     1024    512
+0           256     512     1024
 
 Salinity and Phase-field (on/off)
 FLAGSAL     FLAGPF
@@ -24,7 +24,7 @@ TOUT    TFRAME  SAVE_3D
 
 Domain size (keep ALX3 = 1.0)
 ALX3   YLEN   ZLEN
-1.0    8.0    4.0
+1.0    4.0    8.0
 
 Grid stretching parameters
 ISTR3   STR3    ISTR3R
@@ -48,7 +48,7 @@ active_T    active_S    gAxis
 
 Wall velocity / Pressure gradient / Melt boundary condition
 xplusU  xminusU     dPdy    dPdz    MELT
-0.0     0.0         3162.0  0.0     0
+0.0     0.0         0.0     3162.0  0
 
 Phase-field parameters
 pf_A(*Pe)   pf_C    pf_S    pf_Tm   IBM     pf_IC

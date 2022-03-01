@@ -19,7 +19,7 @@ subroutine ExplicitTermsVY
     real    :: udzq,udyq
     real    :: udy,udz,hyx,hyy,hyz 
     real    :: dyyvy, dzzvy, pf_eta
-    real    :: tempit, salit, volpen
+    real    :: tempit, salit, volpen, Gy
 
     pf_eta = ren*(1.51044385*pf_eps)**2
 
@@ -28,6 +28,9 @@ subroutine ExplicitTermsVY
 
     udy=dy*0.25
     udz=dz*0.25
+
+    !CJH Treat dPdy input variable as Re_tau
+    Gy = 8.0*dPdy**2/ren**2
 
 !$OMP  PARALLEL DO &
 !$OMP  DEFAULT(none) &
@@ -98,7 +101,7 @@ subroutine ExplicitTermsVY
                     +vy(kc,jc,imm))*udzq
 
 
-                dph(kc,jc,ic)=-(hyx+hyy+hyz)+dyyvy+dzzvy !- dPdy
+                dph(kc,jc,ic)=-(hyx+hyy+hyz)+dyyvy+dzzvy - Gy
 
             enddo
         enddo

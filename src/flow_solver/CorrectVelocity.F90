@@ -18,7 +18,7 @@ subroutine CorrectVelocity
     integer :: jc,jm,kc,km,ic,im,kmid
     real    :: usukm,udy,udz,locdph
     real, dimension(nxm) :: vxbar, Gshape
-    real :: vybulk, vzbulk, Tbulk, Sbulk, idx, vy_target, lam
+    real :: vybulk, vzbulk, Tbulk, Sbulk, idx, vz_target, lam, lfac
 
     udy = al*dt*dy
     udz = al*dt*dz
@@ -49,34 +49,35 @@ subroutine CorrectVelocity
 !$OMP END PARALLEL DO
 
     !CJH Prescribe mean volume flux
-    !Treat dPdy input as a desired Re_b
-    vy_target = dPdy/ren
-    if (dPdy/=0) then
-        vybulk = 0.d0
+    !Treat dPdz input as a desired Re_b
+    vz_target = dPdz/ren
+    if (dPdz/=0) then
+        vzbulk = 0.d0
         lam = sqrt(2.0*ren/al/dt)
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
                 do kc=1,nxm
                     idx = 1/udx3m(kc)
-                    vybulk = vybulk + vy(kc,jc,ic)*idx
+                    vzbulk = vzbulk + vz(kc,jc,ic)*idx
                 end do
             end do
         end do
 
-        call MpiAllSumRealScalar(vybulk)
-        vybulk = vybulk/nym/nzm
+        call MpiAllSumRealScalar(vzbulk)
+        vzbulk = vzbulk/nym/nzm
 
         kmid = nxm/2
+        lfac = (1.0 + 2.0/lam*(exp(-lam/2.0) - 1.0))
         do kc=1,kmid
-            Gshape(kc) = (1.0 - exp(-lam*xm(kc)))/(1.0 + 2.0/lam*(exp(-lam/2.0) - 1.0))
+            Gshape(kc) = (1.0 - exp(-lam*xm(kc)))/lfac
         end do
         do kc=kmid+1,nxm
-            Gshape(kc) = (1.0 - exp(lam*(xm(kc) - 1.0)))/(1.0 + 2.0/lam*(exp(-lam/2.0) - 1.0))
+            Gshape(kc) = (1.0 - exp(lam*(xm(kc) - 1.0)))/lfac
         end do
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
                 do kc=1,nxm
-                    vy(kc,jc,ic) = vy(kc,jc,ic) + (vy_target - vybulk)*Gshape(kc)
+                    vz(kc,jc,ic) = vz(kc,jc,ic) + (vz_target - vzbulk)*Gshape(kc)
                 end do
             end do
         end do
