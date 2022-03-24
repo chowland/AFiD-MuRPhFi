@@ -21,7 +21,7 @@ subroutine ImplicitAndUpdatePhi
     real    :: alpec,dxxp
     real    :: app,acc,amm
 
-    alpec=al*pf_A
+    alpec=al*pf_D
 
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)

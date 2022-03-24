@@ -86,7 +86,7 @@ class InputParams:
             self.xplusU, self.xminusU, self.dPdy, self.dPdz = [
                 float(n) for n in bou[50].replace("d","e").split()[:-1]
             ]
-            self.pf_A, self.pf_C, self.pf_S, self.pf_Tm = [
+            self.pf_D, self.pf_A, self.pf_S, self.pf_Tm = [
                 float(n) for n in bou[54].split()[:4]
             ]
             self.IBM = bou[54].split()[4]!="0"

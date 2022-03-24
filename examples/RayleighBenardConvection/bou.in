@@ -1,18 +1,18 @@
 Base grid resolution / number of substeps
 NXM     NYM     NZM     NSST(>1=RK,else AB)
-384     384     384     3
+128     128     1       3
 
 Refined grid: on/off and grid size
 MULTIRES    NXMR    NYMR    NZMR
-0           384     384     384
+1           512     512     1
 
 Salinity and Phase-field (on/off)
 FLAGSAL     FLAGPF
-0           0
+1           0
 
 Read flow / Reset logs
 NREAD       IRESET
-0           1
+1           0
 
 Time steps / time limit (wall/flow) 
 NTST        WALLTIMEMAX     TMAX
@@ -20,11 +20,11 @@ NTST        WALLTIMEMAX     TMAX
 
 Time interval for saving stats/movie frames
 TOUT    TFRAME  SAVE_3D
-1.0     1.0     50.0
+0.2     1.0     50.0
 
 Domain size (keep ALX3 = 1.0)
 ALX3   YLEN   ZLEN
-1.0    1.0    1.0
+1.0    1.0    0.01
 
 Grid stretching parameters
 ISTR3   STR3    ISTR3R
@@ -32,7 +32,7 @@ ISTR3   STR3    ISTR3R
 
 Physical flow parameters / Free-fall timescale
 RAYT    PRAT    RAYS    PRAS    FFscaleS
-1e8     1.0     1e8     1.0     0
+1e8     1.0     1e9     1.0     1
 
 Time stepping parameters
 IDTV    DT      RESID   CFLMAX  DTMIN   DTMAX
@@ -44,12 +44,12 @@ inslwS  inslwN  TfixS   TfixN   SfixS   SfixN
 
 Active/passive scalar flags / Gravitational axis (x=1,y=2,z=3)
 active_T    active_S    gAxis
-1           0           1
+0           1           1
 
 Wall velocity / Pressure gradient / Melt boundary condition
 xplusU  xminusU     dPdy    dPdz    MELT
 0.0     0.0         0.0     0.0     0
 
 Phase-field parameters
-pf_A(*Pe)   pf_C    pf_S    pf_Tm   IBM     pf_IC
+pf_D(*Pe)   pf_A    pf_S    pf_Tm   IBM     pf_IC
 0.1         10.0    10.0    0.0     1       1
