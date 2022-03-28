@@ -123,8 +123,12 @@ subroutine ReadInputFile
     pf_D = 1.2/pect/pf_S/pf_A
     pf_eps = 1.0/nxmr
     pf_Lambda = 2.8e-3/Rrho
-    write(*,*) "Density ratio: ",Rrho
-    write(*,*) "Liquidus slope: ",pf_Lambda
+    if (ismaster .and. salinity) then
+        write(*,*) "Density ratio: ",Rrho
+        if (phasefield) then
+            write(*,*) "Liquidus slope: ",pf_Lambda
+        end if
+    end if
 
     return
 end subroutine ReadInputFile
