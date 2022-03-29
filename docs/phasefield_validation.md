@@ -2,17 +2,16 @@
 
 ## 1-D melting from a hot boundary: phase-field parameters
 
-We begin by investigating the model parameters $A$ and $C$ introduced by the phase-field method.
+We begin by investigating the model parameter $a$ introduced by the phase-field method.
 As a reminder, the governing equation for the phase field $\phi$ takes the form
 
 $$
-\partial_t \phi = \frac{A}{Pe_T} \nabla^2 \phi - \frac{A}{\varepsilon^2 Pe_T} \phi (1 - \phi) (1 - 2\phi + C(T - T_m)) ,
+\partial_t \phi = D \nabla^2 \phi - \frac{D}{\varepsilon^2} \phi (1 - \phi) (1 - 2\phi + A(T - T_m)) ,
 $$
 
-so $A$ represents the diffusion coefficient of the phase field, and $C$ captures the strength of the coupling between the temperature field and the phase field.
-As described in the [model description](equations.md#phase-field-method), the product $AC$ should be set by the Stefan number.
+where $D=1.2/\mathcal{S}A Pe_T$ represents the diffusion coefficient of the phase field, and $S$ captures the strength of the coupling between the temperature field and the phase field.
 
-Since the thermal coupling term in the above equation is premultiplied by $1/\varepsilon^2$, where $\varepsilon$ is equal to the refined grid spacing, its magnitude can become very large.
+<!-- Since the thermal coupling term in the above equation is premultiplied by $1/\varepsilon^2$, where $\varepsilon$ is equal to the refined grid spacing, its magnitude can become very large.
 This can cause numerical instability of the phase-field equation if the time step is too large.
 From testing the [1-D melting example](examples/stefan.md) for a range of values of $A$ and $C$, we find the following restrictions for the time step:
 
@@ -30,12 +29,12 @@ $A$  | $C$ | ${\Delta t}_\mathrm{max}$
 
 These tests were all performed with $Pe_T=10^3$, with a base resolution of $N_x = 512$ and a refined grid resolution of $N_x^r = 1024$.
 It is clear from these results that the prefactor $AC$ constrains the maximum possible time step.
-Since the model requires that $AC=1.2 \mathcal{S}^{-1}$, we anticipate the time step restriction to be less severe at high Stefan number.
+Since the model requires that $AC=1.2 \mathcal{S}^{-1}$, we anticipate the time step restriction to be less severe at high Stefan number. -->
 
-With that in mind, let us now consider how the value of $C$ affects the results produced by the phase-field method.
-As a reminder, $C=\varepsilon H\Delta T/\Gamma$, where $\Gamma$ is related to the surface energy of the interface.
-Larger values of $C$ therefore reduce the impact of the Gibbs-Thomson effect, where high local curvature increases the local melting temperature.
-In our 1-D example, the value of $C$ should therefore play no significant effect.
+With that in mind, let us now consider how the value of $A$ affects the results produced by the phase-field method.
+As a reminder, $A=\varepsilon H\Delta T/\Gamma$, where $\Gamma$ is related to the surface energy of the interface.
+Larger values of $A$ therefore reduce the impact of the Gibbs-Thomson effect, where high local curvature increases the local melting temperature.
+In our 1-D example, the value of $A$ should therefore play no significant effect.
 
 First, we consider the position of the phase boundary over time.
 The analytic solution for the phase boundary height is
@@ -45,12 +44,12 @@ h(t) = 2\Lambda \sqrt{(t+t_0)/Pe_T} ,
 $$
 
 where $\Lambda = 0.62$ for $\mathcal{S}=1$, and $t_0$ is a value such that $h(0)=0.1$.
-In the below figure, we plot the analytic solution against the position of $\phi=0.5$ for the phase-field model with $1\leq C \leq 100$.
+In the below figure, we plot the analytic solution against the position of $\phi=0.5$ for the phase-field model with $1\leq A \leq 100$.
 
-
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
 {% include "melting_validation_interface.html" %}
 
-As expected, the value of $C$ appears to have little impact on the phase-field solution.
+As expected, the value of $A$ appears to have little impact on the phase-field solution.
 Small differences between the simulations develop, but this is likely due to the initial condition of the phase-field, which is taken to be the equilibrium solution $\phi=0.5(1 - \tanh ((x-0.1)/2\varepsilon))$.
 This initial condition may not perfectly represent the initial motion of the interface at early times.
 
@@ -59,8 +58,8 @@ Below we plot the temperature profile $T(x,t)$ for a range of discrete times bet
 
 {% include "melting_validation_temperature.html" %}
 
-The results at first seem almost indistinguishable from the analytic solution for each value of $C$.
-However on close inspection, we can see that the temperature in the solid phase near the phase boundary is slightly above the melting temperature $T=0$ for the cases $C>1$.
+The results at first seem almost indistinguishable from the analytic solution for each value of $A$.
+However on close inspection, we can see that the temperature in the solid phase near the phase boundary is slightly above the melting temperature $T=0$ for the cases $A>1$.
 This does not appear to play a significant role in the development of the temperature field in the liquid, or the interface position, but this result should be kept in mind when proceeding with the other validation cases.
 
 ## 1-D Freezing from a cold boundary: resolution study
@@ -68,13 +67,13 @@ This does not appear to play a significant role in the development of the temper
 Now we have a good idea of how the model parameters behave, we perform a convergence study to investigate how the accuracy of the simulation depends on the resolution, both of the base grid and the refined grid.
 We consider the inverse problem to that above, where a liquid phase freezes from a cold boundary and a solidification front moves across the domain.
 Thanks to the symmetry with the previous problem, the position of the phase boundary should be unchanged from that above.
-Following the above results, we perform these tests with phase-field parameters fixed at $A=0.01$, $C=100$.
+Following the above results, we perform these tests with phase-field parameter fixed at $A=100$.
 We vary the size of the base grid `nxm` between 64 and 512, and vary the size of the refined grid `nxmr` between 64 and 1024.
 
 {% include "freezing_convergence_interface.html" %}
 
 The results highlight the importance of high resolution for the phase-field variable.
-Even for the lowest base resolution of $n_x=64$, we find that the phase-field model tracks the interface reasonably accurately if the refined grid is sufficiently large, say $n_x^r=512$.
+Even for the lowest base resolution of $N_x=64$, we find that the phase-field model tracks the interface reasonably accurately if the refined grid is sufficiently large, say $N_x^r=512$.
 Such a disparity between the resolutions does however result in some oscillations in the interface position due to the coupling between $\phi$ and the temperature field.
 Such oscillations only appear significant when the refined grid is more than twice as fine as the base grid.
 
@@ -82,30 +81,38 @@ Inspection of the temperature profiles shows a similar trend, where under-resolu
 
 {% include "freezing_convergence_temperature.html" %}
 
+For a more quantitative analysis, we plot the $L^2$ error of the interface position below.
+As suggested by the above figures, the $L^2$ error is predominantly controlled by the resolution of the refined grid, showing a convergence between first and second order.
+
+<figure markdown>
+  ![L2 error of interface position](figures/1DFreezing_convergence.svg){ width="100%" }
+  <figcaption markdown>$L^2$ error of the interface position as a function of resolution. The left panel shows trends with the resolution of the base grid, whereas the right panel shows the convergence with the refined grid resolution.
+  </figcaption>
+</figure>
+
 ## 1-D Freezing of a supercooled melt
 
 As we shall see, the stability of the phase-field model is more sensitive to the parameter choices for the case of supercooling.
 In this example, the solid phase grows out of a liquid that is cooled to below the melting temperature.
 An analytic solution can be derived for a semi-infinite domain, which we can compare to our finite domain when the interface is sufficiently far from the upper boundary.
 
-For $C=1$ the one-dimensional growth of the solid phase matches the analytic solution well, even as the effect of the upper boundary becomes more significant.
+For $A = 1$ the one-dimensional growth of the solid phase matches the analytic solution well, even as the effect of the upper boundary becomes more significant.
 As seen below, both the temperature profiles and the interface position are consistent with the analytic solution.
 
 {% include "supercooling_profile_validation.html" %}
 
 {% include "supercooling_interface_validation.html" %}
 
-However, for other values of $C$ the model breaks down.
-The phase field $\phi$ takes begins to take values away from $0$ and $1$, and a solid phase begins to grow from the upper boundary.
+However, for higher values of $A$ the model breaks down, and the phase field $\phi$ takes begins to take values away from $0$ and $1$ in the liquid layer.
 The heat fluxes also appear inconsistent at the phase boundary, with relatively large temperatures spreading throughout the domain.
 
 {% include "supercooling_errors.html" %}
 
-The reason for the instability of the system is currently unclear, but given these results, it seems sensible to fix the model parameter $C=1$ in simulations where the effect of supercooling may occur.
+The reason for the instability of the system is currently unclear, but given these results, it seems sensible to fix the model parameter $A=1$ in simulations where the effect of supercooling may occur.
 
 ## 2-D axisymmetric melting
 
-We now consider our first two-dimensional problem, where curved phase boundaries arise and so changing the parameter $C$ will affect the results through the Gibbs-Thomson effect.
+We now consider our first two-dimensional problem, where curved phase boundaries arise and so changing the parameter $A$ will affect the results through the Gibbs-Thomson effect.
 In particular, we follow the example from appendix A.2 of [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773), where a disc of initial radius $r=0.1$ melts into a liquid of initially uniform temperature.
 A video showcasing the evolution of the temperature field is shown below.
 
@@ -115,17 +122,17 @@ A video showcasing the evolution of the temperature field is shown below.
 
 [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773) provide a semi-analytic solution for the case in which surface energy is zero and the melting temperature on the phase boundary remains equal to $T_m$.
 Below, we reproduce the two figures from their appendix.
-We compare the phase-field model for various values of $C$, keeping $\mathcal{S}=1$ and $A=1.2/\mathcal{S}C$.
+We compare the phase-field model for various values of $A$, keeping $\mathcal{S}=1$.
 
 {% include "axisymmetric_melting_radius.html" %}
 
 The initial development is quite similar in all cases, since the curvature of the interface is not too high.
-As the simulation develops and the disc shrinks, the interface curvature increases, leading to faster melting in the cases where $C$ is smaller.
-This matches the trend seen by [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773), and as $C$ gets larger, we appear to approach the semi-analytic solution associated with no Gibbs-Thomson effect.
+As the simulation develops and the disc shrinks, the interface curvature increases, leading to faster melting in the cases where $A$ is smaller.
+This matches the trend seen by [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773), and as $A$ gets larger, we appear to approach the semi-analytic solution associated with no Gibbs-Thomson effect.
 
 {% include "axisymmetric_melting_temperature.html" %}
 
-This trend is even clearer in the temperature profiles, where for cases with lower $C$ we see the interface temperature drop significantly as the disc melts.
+This trend is even clearer in the temperature profiles, where for cases with lower $A$ we see the interface temperature drop significantly as the disc melts.
 Reassuringly, despite such variation in the solid and phase boundary, the temperature profile in the liquid phase remains very similar between all cases.
 
 ## 2-D Rayleigh-Bénard convection with a melting boundary
