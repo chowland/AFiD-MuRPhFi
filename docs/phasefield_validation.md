@@ -1,5 +1,9 @@
 # Phase-field model validation
 
+On this page, we focus on a number of validation cases of the phase-field model used to simulate liquid-solid phase transitions.
+For information on the convergence of the model with grid spacing, please refer to the [convergence page](convergence).
+A more detailed overview of the setups considered here, including the initial conditions and any analytic solutions are provided in the examples pages on [Stefan problems](examples/stefan) and [flows coupled to phase change](examples/coupled_flows).
+
 ## 1-D melting from a hot boundary: phase-field parameters
 
 We begin by investigating the model parameter $a$ introduced by the phase-field method.
@@ -10,26 +14,6 @@ $$
 $$
 
 where $D=1.2/\mathcal{S}A Pe_T$ represents the diffusion coefficient of the phase field, and $S$ captures the strength of the coupling between the temperature field and the phase field.
-
-<!-- Since the thermal coupling term in the above equation is premultiplied by $1/\varepsilon^2$, where $\varepsilon$ is equal to the refined grid spacing, its magnitude can become very large.
-This can cause numerical instability of the phase-field equation if the time step is too large.
-From testing the [1-D melting example](examples/stefan.md) for a range of values of $A$ and $C$, we find the following restrictions for the time step:
-
-$A$  | $C$ | ${\Delta t}_\mathrm{max}$
-:--: | :-: | :------------------------
-1    | 1   | $10^{-3}$
-1    | 10  | $2\times 10^{-4}$
-1    | 100 | $2\times 10^{-5}$
-0.1  | 1   | $10^{-2}$
-0.1  | 10  | $2\times 10^{-3}$
-0.1  | 100 | $2\times 10^{-4}$
-0.01 | 1   | $10^{-1}$
-0.01 | 10  | $2\times 10^{-2}$
-0.01 | 100 | $2\times 10^{-3}$
-
-These tests were all performed with $Pe_T=10^3$, with a base resolution of $N_x = 512$ and a refined grid resolution of $N_x^r = 1024$.
-It is clear from these results that the prefactor $AC$ constrains the maximum possible time step.
-Since the model requires that $AC=1.2 \mathcal{S}^{-1}$, we anticipate the time step restriction to be less severe at high Stefan number. -->
 
 With that in mind, let us now consider how the value of $A$ affects the results produced by the phase-field method.
 As a reminder, $A=\varepsilon H\Delta T/\Gamma$, where $\Gamma$ is related to the surface energy of the interface.
@@ -61,34 +45,6 @@ Below we plot the temperature profile $T(x,t)$ for a range of discrete times bet
 The results at first seem almost indistinguishable from the analytic solution for each value of $A$.
 However on close inspection, we can see that the temperature in the solid phase near the phase boundary is slightly above the melting temperature $T=0$ for the cases $A>1$.
 This does not appear to play a significant role in the development of the temperature field in the liquid, or the interface position, but this result should be kept in mind when proceeding with the other validation cases.
-
-## 1-D Freezing from a cold boundary: resolution study
-
-Now we have a good idea of how the model parameters behave, we perform a convergence study to investigate how the accuracy of the simulation depends on the resolution, both of the base grid and the refined grid.
-We consider the inverse problem to that above, where a liquid phase freezes from a cold boundary and a solidification front moves across the domain.
-Thanks to the symmetry with the previous problem, the position of the phase boundary should be unchanged from that above.
-Following the above results, we perform these tests with phase-field parameter fixed at $A=100$.
-We vary the size of the base grid `nxm` between 64 and 512, and vary the size of the refined grid `nxmr` between 64 and 1024.
-
-{% include "freezing_convergence_interface.html" %}
-
-The results highlight the importance of high resolution for the phase-field variable.
-Even for the lowest base resolution of $N_x=64$, we find that the phase-field model tracks the interface reasonably accurately if the refined grid is sufficiently large, say $N_x^r=512$.
-Such a disparity between the resolutions does however result in some oscillations in the interface position due to the coupling between $\phi$ and the temperature field.
-Such oscillations only appear significant when the refined grid is more than twice as fine as the base grid.
-
-Inspection of the temperature profiles shows a similar trend, where under-resolution of the phase-field can lead to excessive diffusion at the phase boundary, and significant deviations from the melting temperature.
-
-{% include "freezing_convergence_temperature.html" %}
-
-For a more quantitative analysis, we plot the $L^2$ error of the interface position below.
-As suggested by the above figures, the $L^2$ error is predominantly controlled by the resolution of the refined grid, showing a convergence between first and second order.
-
-<figure markdown>
-  ![L2 error of interface position](figures/1DFreezing_convergence.svg){ width="100%" }
-  <figcaption markdown>$L^2$ error of the interface position as a function of resolution. The left panel shows trends with the resolution of the base grid, whereas the right panel shows the convergence with the refined grid resolution.
-  </figcaption>
-</figure>
 
 ## 1-D Freezing of a supercooled melt
 
