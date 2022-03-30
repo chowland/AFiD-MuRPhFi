@@ -143,6 +143,18 @@ subroutine CreateInitialConditions
         end do
     end if
 
+    if (gAxis==3 .and. active_T==0) then
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2) ! Convergence test
+                do k=1,nxm
+                    xxx = xm(k) ! Linear profile + sin perturbation
+                    temp(k,j,i) = tempbp(1,j,i) + (temptp(1,j,i) - tempbp(1,j,i))*xm(k)/alx3
+                    temp(k,j,i) = temp(k,j,i) + sin(2.0*pi*xxx/alx3) - sin(6.0*pi*xxx/alx3)
+                end do
+            end do
+        end do
+    end if
+
     if (gAxis==2 .and. inslwN==0) then  ! Ke et al comparison case
         t0 = 1.4195567
         do i=xstart(3),xend(3)
