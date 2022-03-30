@@ -10,9 +10,10 @@ import os
 from xml.etree.ElementTree import Element, SubElement
 from xml.dom import minidom
 from xml.etree import ElementTree
-from numpy import zeros
+from numpy import zeros, linspace
+from scipy.interpolate import interp1d
 
-from .afidtools import Grid
+from .afidtools import Grid, InputParams
 
 def generate_cut_xmf(folder, plane):
     """
@@ -218,6 +219,36 @@ def generate_field_xmf(folder, var):
     with open(folder+"/outputdir/"+var+"_fields.xmf","w") as f:
         f.write(formatted_xmf.toprettyxml(indent="  "))
 
+def interpolate_field_to_uniform(folder, var):
+    # Create directory to store uniform-gridded snapshots
+    os.makedirs(folder+"/outputdir/viz", exist_ok=True)
+    # Create uniform x-grid to interpolate to
+    grid = Grid(folder)
+    inputs = InputParams(folder)
+    nxm = grid.xm.size
+    nxu = nxm//2
+    xu = linspace(0, inputs.alx3, nxu+1)
+    xu = 0.5*(xu[:-1] + xu[1:])
+    # Pick corresponding grid for flow variable
+    if var=="vx":
+        xs = grid.xc
+    elif var=="sal" or var=="phi":
+        xs = grid.xmr
+    else:
+        xs = grid.xm
+    filelist = sorted(os.listdir(folder+"/outputdir/fields"))
+    fvlist = list(filter(lambda fname: var in fname, filelist))
+    for fname in fvlist:
+        with h5py.File(folder+"/outputdir/fields/"+fname, 'r') as f:
+            F = f['var'][()]
+        if var=="vx":
+            itp = interp1d(xs, F, kind='cubic', axis=-1)
+        else:
+            itp = interp1d(xs, F[:,:,:-1], kind='cubic', axis=-1)
+        F = itp(xu)
+        with h5py.File(folder+"/outputdir/viz/"+fname, 'a') as f:
+            f['var'] = F
+
 def generate_uniform_xmf(folder, var):
     """
     Generates an xmf file in the Xdmf format to allow reading of
@@ -233,23 +264,25 @@ def generate_uniform_xmf(folder, var):
     grid = Grid(folder)
     nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
     nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
-    dx, dy, dz = 1/nxm, grid.yc[-1]/nym, grid.zc[-1]/nzm
+    dx, dy, dz = grid.xc[-1]/nxm, grid.yc[-1]/nym, grid.zc[-1]/nzm
     if nxmr!=0:
-        dxr, dyr, dzr = 1/nxmr, grid.ycr[-1]/nymr, grid.zcr[-1]/nzmr
+        dxr, dyr, dzr = grid.xc[-1]/nxmr, grid.ycr[-1]/nymr, grid.zcr[-1]/nzmr
 
     # Store the appropriate grid sizes and names based on the variable
-    fulldims = (nzm, nym, nxm+1)
+    nxu = nxm//2
+    dx, dxr = grid.xc[-1]/nxu, grid.xc[-1]/nxu
+    fulldims = (nzm, nym, nxu)
     if var=="vx":
-        dims = (nzm, nym, nxm+1)
+        dims = (nzm, nym, nxu)
     elif var in "phisal":
         dims = (nzmr, nymr, nxmr)
-        fulldims = (nzmr, nymr, nxmr+1)
+        fulldims = (nzmr, nymr, nxu)
     else:
-        dims = (nzm, nym, nxm)
+        dims = (nzm, nym, nxu)
     
     # Collect indices of saved fields
     samplist = []
-    for file in os.listdir(folder+"/outputdir/fields"):
+    for file in os.listdir(folder+"/outputdir/viz"):
         if var in file:
             samplist.append(int(file[:5]))
     samplist.sort()
@@ -319,7 +352,7 @@ def generate_uniform_xmf(folder, var):
         var_data = var_data + (SubElement(var_slab[i], "DataItem", attrib={
             "Dimensions":"%i %i %i" % fulldims, "Format":"HDF"
         }),)
-        var_data[i].text = "fields/%05i_" % j + var +".h5:/var"
+        var_data[i].text = "viz/%05i_" % j + var +".h5:/var"
 
     # Convert xmf structure to string
     rough_xmf = ElementTree.tostring(Xdmf, "utf-8")
