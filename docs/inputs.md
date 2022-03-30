@@ -81,7 +81,9 @@ These are detailed below.
 
 #### Shear, pressure gradient, and melting condition
 - `xplusU` and `xminusU` specify the velocities (in the $y$-direction) of the upper and lower walls respectively.
-- `dPdy` and `dPdz` sets the mean pressure gradient in the$y$ and $z$ directions respectively.
+- `dPdy` and `dPdz` set mean pressure gradients in the $y$ and $z$ directions respectively.
+    - `dPdy` is interpreted as a target shear Reynolds number $Re_\tau = v_\tau H/2\nu$ where $v_\tau$ is the friction velocity in the $y$-direction. The pressure gradient is kept to a constant value such that in a statistically steady state $Re_\tau$ measured at the wall will match the target, i.e. that the dimensionless pressure gradient in the equations satsifies $G=8 Re_\tau^2/Gr$. This constant pressure gradient is simply added to the $y$-momentum equation in `ExplicitTermsVY`.
+    - `dPdz` is interpreted as a target bulk Reynolds number $Re_b=\langle w \rangle H/\nu$ where $\langle w\rangle$ is the volume-averaged $z$-component of velocity. The pressure gradient is adjusted at each time step to maintain this constant volume flux. We follow [Quadrio et al. (2016)](https://doi.org/10.1016/j.euromechflu.2015.09.005) in setting the wall-normal profile of the pressure gradient such that it remains consistent with the boundary conditions. This adjustment is performed in the subroutine `CorrectVelocity`.
 - `MELT` is a logical that implements a dynamic boundary condition for temperature and salinity according to the three-equation model for a melting boundary. With `MELT = 1`, the boundary at $x=0$ is treated as a stationary, planar wall of ice. **This feature is highly experimental and is not recommended for current use.**
 
 #### Phase-field parameters

@@ -19,7 +19,7 @@ subroutine ExplicitTermsVZ
     real    :: hzx,hzy,hzz,udy,udz
     real    :: udyq,udzq
     real    :: dzzvz,dyyvz,pf_eta
-    real    :: tempit, salit,volpen
+    real    :: tempit, salit,volpen!, Gz
 
     pf_eta = ren*(1.51044385*pf_eps)**2
 
@@ -101,7 +101,7 @@ subroutine ExplicitTermsVZ
                     +vz(kc,jmm,ic))*udyq
 
 !
-                dq(kc,jc,ic)=-(hzx+hzy+hzz)+dyyvz+dzzvz - dPdz
+                dq(kc,jc,ic)=-(hzx+hzy+hzz)+dyyvz+dzzvz
 !
             enddo
         enddo
