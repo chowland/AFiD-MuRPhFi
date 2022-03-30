@@ -107,15 +107,15 @@ If temperature is the dominant scalar, we set `FFscaleS = 0` and take the free-f
 In this case, the dimensionless equations take the form
 
 $$
-\partial_t \boldsymbol{u} + (\boldsymbol{u} \cdot \boldsymbol{\nabla}) \boldsymbol{u} = - \boldsymbol{\nabla} p + (T - {R_\rho}^{-1} C) \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\nabla^2 \boldsymbol{u} ,
+\partial_t \boldsymbol{u} + \boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = - \boldsymbol{\nabla} p + (T - {R_\rho}^{-1} C) \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\nabla^2 \boldsymbol{u} ,
 $$
 
 $$
-\partial_t T + (\boldsymbol{u} \cdot \boldsymbol{\nabla}) T = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T ,
+\partial_t T + \boldsymbol{\nabla} \cdot (\boldsymbol{u} T) = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T ,
 $$
 
 $$
-\partial_t C + (\boldsymbol{u} \cdot \boldsymbol{\nabla}) C = \frac{\tau}{\sqrt{Ra_T Pr}} \nabla^2 C .
+\partial_t C + \boldsymbol{\nabla} \cdot (\boldsymbol{u} C) = \frac{\tau}{\sqrt{Ra_T Pr}} \nabla^2 C .
 $$
 
 As with the temperature field, we can treat $C$ as a passive scalar by setting `active_S = 0` in the input file.
@@ -129,11 +129,11 @@ To start with, we consider the case with no salinity effects for simplicity.
 The (dimensionless) equations for the evolution of the velocity and temperature gain additional term due to volume penalisation in the solid and latent heat respectively, and now take the form
 
 $$
-\partial_t \boldsymbol{u} + (\boldsymbol{u} \cdot \boldsymbol{\nabla}) \boldsymbol{u} = - \boldsymbol{\nabla} p + T \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\left(\nabla^2 \boldsymbol{u} - \frac{\phi \boldsymbol{u}}{\eta}\right) ,
+\partial_t \boldsymbol{u} + \boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = - \boldsymbol{\nabla} p + T \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\left(\nabla^2 \boldsymbol{u} - \frac{\phi \boldsymbol{u}}{\eta}\right) ,
 $$
 
 $$
-\partial_t T + (\boldsymbol{u} \cdot \boldsymbol{\nabla}) T = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T + \mathcal{S}\partial_t \phi ,
+\partial_t T + \boldsymbol{\nabla} \cdot (\boldsymbol{u} T) = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T + \mathcal{S}\partial_t \phi ,
 $$
 
 where $\eta = (\beta \varepsilon)^2$ is the volume penalty coefficient for a dimensionless diffusive interface thickness $\varepsilon$ and $\mathcal{S}=L/c_p\Delta T$ is the Stefan number.
@@ -205,15 +205,15 @@ In this case, the velocity of the ice-water boundary depends on the gradients of
 In our non-dimensionalization (using the free-fall velocity scale for temperature), the full collection of equations reads as follows:
 
 $$
-\partial_t \boldsymbol{u} + (\boldsymbol{u} \cdot \boldsymbol{\nabla}) \boldsymbol{u} = - \boldsymbol{\nabla} p + (T - {R_\rho}^{-1} C) \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\nabla^2 \boldsymbol{u} ,
+\partial_t \boldsymbol{u} + \boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = - \boldsymbol{\nabla} p + (T - {R_\rho}^{-1} C) \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\nabla^2 \boldsymbol{u} ,
 $$
 
 $$
-\partial_t T + (\boldsymbol{u} \cdot \boldsymbol{\nabla}) T = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T + \mathcal{S} \partial_t \phi ,
+\partial_t T + \boldsymbol{\nabla} \cdot (\boldsymbol{u} T) = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T + \mathcal{S} \partial_t \phi ,
 $$
 
 $$
-\partial_t C + (\boldsymbol{u} \cdot \boldsymbol{\nabla}) C = \frac{\tau}{\sqrt{Ra_T Pr}} \left(\nabla^2 C - \frac{\boldsymbol{\nabla} \phi \cdot \boldsymbol{\nabla} C}{1 - \phi + \delta}\right) + \frac{C\partial_t \phi}{1 - \phi + \delta},
+\partial_t C + \boldsymbol{\nabla} \cdot (\boldsymbol{u} C) = \frac{\tau}{\sqrt{Ra_T Pr}} \left(\nabla^2 C - \frac{\boldsymbol{\nabla} \phi \cdot \boldsymbol{\nabla} C}{1 - \phi + \delta}\right) + \frac{C\partial_t \phi}{1 - \phi + \delta},
 $$
 
 $$
