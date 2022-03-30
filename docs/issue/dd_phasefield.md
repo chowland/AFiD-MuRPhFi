@@ -138,6 +138,7 @@ First, we inspect the temperature profile over time.
 This is in contrast to the analytic solution, which prescribes that the temperature in the solid (and at the interface) should be constant. -->
 The profiles match well, and the temperature in the solid remains at the constant value predicted by the analytic solution.
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
 {% include "temp_validation.html" %}
 
 <!-- Inspection of the salinity field reveals the cause for this temperature difference, and the greatest issue with the current phase-field implementation.
