@@ -102,23 +102,14 @@ The evolution of the system is shown in the following video:
   <source src="../assets/MeltingRBC.mp4" type="video/mp4">
 </video>
 
-We follow [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773) in performing a convergence study, now taking into account the resolutions of the two grids separately.
-The following plot presents the height of the phase boundary $\phi=0.5$ at the time $t=0.1 Pe$ for a range of resolutions.
-
-{% include "melting_RBC_interface_convergence.html" %}
-
-As in the previous cases, we see that the resolution of the phase field is most important for the accurate evolution of the phase boundary.
-This highlights a key advantage of our multiple-resolution technique, where only the phase-field variable needs evolving on the largest grid.
-The above figure presents results for the model parameters $A=0.01$, $C=100$.
-[Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773) found that the interface rose vertically as they increased the resolution of their simulation, whereas we do not observe such a monotonic trend.
-This is likely due to the different implementations of the phase-field method between that paper and that used here.
-
-Finally, we vary the model parameter $C$ to see the effect on the results.
-Below, we vary the value of $C$ while keeping $AC=1.2$ fixed, with a resolution of $n_x=512$, $n_x^r=1024$.
-As may be expected, the corners that emerge in the interface for $C=10^3$ are somewhat smoothed out by setting $C$ to a lower value.
-This highlights the importance of choosing $C$ based on realistic values of the surface energy for each simulation.
+We vary the model parameter $A$ to see the effect on the results, while keeping the resolution fixed with $n_x=512$, $n_x^r=1024$.
+As may be expected, the corners that emerge in the interface for $A=10^3$ are somewhat smoothed out by setting $A$ to a lower value.
+This highlights the importance of choosing $A$ based on realistic values of the surface energy for each simulation.
 
 {% include "melting_RBC_interface_parameters.html" %}
+
+In the above figure, we also compare the two implementations for imposing zero velocity in the solid phase.
+The simple immersed boundary method is used for the results shown in coloured lines, whereas the black dashed lines use the volume penalty method.
 
 ## Axisymmetric growth from a supercooled melt
 

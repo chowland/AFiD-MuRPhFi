@@ -83,3 +83,14 @@ Inspection of the temperature profiles shows a similar trend, where under-resolu
 {% include "freezing_convergence_temperature.html" %}
 
 ## Phase-field model: 2-D Melting Rayleigh-Bénard Convection
+
+We follow [Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773) in performing a convergence study, now taking into account the resolutions of the two grids separately.
+The following plot presents the height of the phase boundary $\phi=0.5$ at the time $t=0.1 Pe$ for a range of resolutions.
+
+{% include "melting_RBC_interface_convergence.html" %}
+
+As in the previous cases, we see that the resolution of the phase field is most important for the accurate evolution of the phase boundary.
+This highlights a key advantage of our multiple-resolution technique, where only the phase-field variable needs evolving on the largest grid.
+The above figure presents results for the model parameter $A=10$.
+[Favier et al. (2019)](https://doi.org/10.1017/jfm.2018.773) found that the interface rose vertically as they increased the resolution of their simulation, whereas we do not observe such a monotonic trend.
+This is likely due to the different implementations of the phase-field method between that paper and that used here.
