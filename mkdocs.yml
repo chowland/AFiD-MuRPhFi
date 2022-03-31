@@ -50,7 +50,6 @@ nav:
         - 'compilers.md'
         - 'convergence.md'
         - 'phasefield_validation.md'
-        - 'issue/dd_phasefield.md'
     - 'Technical Details':
         - 'equations.md'
         - 'numerics.md'

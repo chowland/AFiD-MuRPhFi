@@ -111,7 +111,7 @@ This highlights the importance of choosing $A$ based on realistic values of the 
 In the above figure, we also compare the two implementations for imposing zero velocity in the solid phase.
 The simple immersed boundary method is used for the results shown in coloured lines, whereas the black dashed lines use the volume penalty method.
 
-## Axisymmetric growth from a supercooled melt
+<!-- ## Axisymmetric growth from a supercooled melt
 
 Finally, we investigate the problem of a solid disc that grows in a supercooled liquid.
 In the absence of the Gibbs-Thomson effect, there is an analytic solution to this problem in an unbounded domain, as detailed on the [examples page](examples/stefan.md#2-d-axisymmetric-growth-of-a-disc-from-a-supercooled-melt) for Stefan problems.
@@ -153,16 +153,60 @@ Below, we plot the radial temperature profiles over time in the simulation.
 The initial agreement is very good, although the insulating boundary conditions cause the temperatures at the outer boundaries to increase over time beyond that of the unbounded analytic solution.
 Nevertheless, the gradients close to the phase boundary remain consistent with the exact solution even at these later times.
 
-{% include "2d_supercool_temperature.html" %}
+{% include "2d_supercool_temperature.html" %} -->
 
-## Next on the validation list
+## 1-D multicomponent diffusive melting
+
+This validation case considers the diffusive example from [Martin and Kauffman (1977)](https://doi.org/10.1175/1520-0485(1977)007%3C0272:AEATSO%3E2.0.CO;2) described [here](stefan\1-d-multicomponent-melting-martin-and-kauffman-1977).
+Below, we present the results obtained from a run of the phase-field model with $Pe_T=10^3$, $Pe_S=10^4$, $\mathcal{S}=2.5$, $A=1$, and $\Lambda=0.4$.
+No-flux boundary conditions are applied to $T$ and $C$ at $x=0$ and $x=1$, and a resolution of $512$ points is used for $T$, whereas $C$ and $\phi$ are resolved on a grid of $1024$ points.
+As a reminder, the governing equations for the multicomponent phase-field model are
+
+$$
+\partial_t T = \kappa_T \nabla^2 T + \mathcal{S} \partial_t \phi ,
+$$
+
+$$
+\partial_t C = \kappa_S \left(\nabla^2 C - \frac{\boldsymbol{\nabla} \phi \cdot \boldsymbol{\nabla} C}{1 - \phi + \delta}\right) + \frac{C\partial_t \phi}{1 - \phi + \delta},
+$$
+
+$$
+\partial_t \phi = D  \nabla^2 \phi - \frac{D}{\varepsilon^2} \phi (1 - \phi) [1 - 2\phi + A(T +\Lambda C)] .
+$$
+
+The simulation is initialised with the analytic solution given above at time $t=1$, and an initial phase-field profile of
+
+$$
+\phi = \frac{1}{2}\left[ 1 + \tanh \left(\frac{x - h_0}{2\varepsilon} \right) \right]
+$$
+
+where $h_0 = 2\alpha /\sqrt{Pe_T}$ is the corresponding interface position.
+
+First, we inspect the temperature profile over time.
+The profiles match well, and the temperature in the solid remains at the constant value predicted by the analytic solution.
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+{% include "temp_validation.html" %}
+
+Inspection of the salinity field reveals good agreement once again in the liquid, although the output of the model does not jump to zero in the solid.
+Salinity must be continuous at the phase boundary, which does not match the physical solution, but we already know that the salinity must be zero in the solid phase.
+The phase-field model is set up such that the correct boundary conditions are applied at the interface, making the solution in the liquid reliable.
+
+{% include "sal_validation.html" %}
+
+As further evidence of the model's good agreement, we plot the salinity profiles such that the concentration is set to zero in the solid phase ($\phi>0.5$):
+
+{% include "sal_validation_trunc.html" %}
+
+The evolution of the phase-field interface over time also recovers the analytic $t^{1/2}$ expression near-perfectly:
+
+{% include "phi_validation.html" %}
+
+<!-- ## Next on the validation list
 
 As things stand, we are happy with the validation of the phase-field code, particularly for standard melting and freezing dynamics.
 Before starting any new projects that involve simulating supercooled liquids or multicomponent problems (where temperature and salinity affect the phase transition), we should run further validation cases:
 
 - Mullins-Sekerka instability
     - quantitative predicitons from growing planar front
-    - qualitative dynamics of dendritic growth from a perturbed disc
-- Double-diffusive melting dynamics
-    - [Martin & Kauffman (1977)](https://doi.org/10.1175/1520-0485(1977)007<0272:AEATSO>2.0.CO;2) diffusive example?
-    - Perhaps the Davis textbook has more examples for this including morphodynamic instability?
+    - qualitative dynamics of dendritic growth from a perturbed disc -->
