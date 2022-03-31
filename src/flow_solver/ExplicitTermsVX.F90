@@ -15,11 +15,12 @@ subroutine ExplicitTermsVX
     use decomp_2d, only: xstart,xend
     implicit none
     integer :: jc,kc
-    integer :: km,kp,jmm,jpp,ic,imm,ipp
+    integer :: km,kp,jm,jp,ic,im,ip
     real    :: hxx,hxy,hxz
     real    :: udz,udy,tempit,salit,volpen
     real    :: udzq,udyq
     real    :: dzzvx,dyyvx,pf_eta
+    real, dimension(nxm) :: idx
     
     pf_eta = ren*(1.51044385*pf_eps)**2
     
@@ -28,6 +29,10 @@ subroutine ExplicitTermsVX
     
     udyq=dyq/ren
     udzq=dzq/ren
+
+    do kc=1,nxm
+        idx(kc) = 1.0/udx3m(kc)
+    end do
     
     !$OMP  PARALLEL DO &
     !$OMP   DEFAULT(none) &
@@ -38,11 +43,11 @@ subroutine ExplicitTermsVX
     !$OMP   PRIVATE(jmm,jpp,tempit) &
     !$OMP   PRIVATE(hxx,hxy,hxz,dzzvx,dyyvx)
     do ic=xstart(3),xend(3)
-        imm=ic-1
-        ipp=ic+1
+        im=ic-1
+        ip=ic+1
         do jc=xstart(2),xend(2)
-            jmm=jc-1
-            jpp=jc+1
+            jm=jc-1
+            jp=jc+1
             do kc=2,nxm
                 km=kc-1
                 kp=kc+1
@@ -55,10 +60,14 @@ subroutine ExplicitTermsVX
                 !                d   t      
                 !
                 !
-                hxz=(((vz(kc,jc,ipp)+vz(km,jc,ipp)) &
-                *(vx(kc,jc,ipp)+vx(kc,jc,ic))) &
-                -((vz(kc,jc,ic)+vz(km,jc,ic)) &
-                *(vx(kc,jc,ic)+vx(kc,jc,imm))))*udz
+                ! hxz=(((vz(kc,jc,ipp)+vz(km,jc,ipp)) &
+                ! *(vx(kc,jc,ipp)+vx(kc,jc,ic))) &
+                ! -((vz(kc,jc,ic)+vz(km,jc,ic)) &
+                ! *(vx(kc,jc,ic)+vx(kc,jc,imm))))*udz
+                hxz = udx3c(kc)*udz*( &
+                    (idx(km)*vz(km,jc,ip) + idx(kc)*vz(kc,jc,ip))*(vx(kc,jc,ip) + vx(kc,jc,ic)) &
+                    - (idx(km)*vz(km,jc,ic) + idx(kc)*vz(kc,jc,ic))*(vx(kc,jc,ic) + vx(kc,jc,im)) &
+                )
                 !
                 !    vx vy term
                 !
@@ -67,10 +76,14 @@ subroutine ExplicitTermsVX
                 !             -----------
                 !                d   r      
                 !
-                hxy=(((vy(kc,jpp,ic)+vy(km,jpp,ic)) &
-                *(vx(kc,jpp,ic)+vx(kc,jc,ic))) &
-                -((vy(kc,jc,ic)+vy(km,jc,ic)) &
-                *(vx(kc,jc,ic)+vx(kc,jmm,ic))))*udy
+                ! hxy=(((vy(kc,jpp,ic)+vy(km,jpp,ic)) &
+                ! *(vx(kc,jpp,ic)+vx(kc,jc,ic))) &
+                ! -((vy(kc,jc,ic)+vy(km,jc,ic)) &
+                ! *(vx(kc,jc,ic)+vx(kc,jmm,ic))))*udy
+                hxy = udx3c(kc)*udy*( &
+                    (idx(km)*vy(km,jp,ic) + idx(kc)*vy(kc,jp,ic))*(vx(kc,jp,ic) + vx(kc,jc,ic)) &
+                    - (idx(km)*vy(km,jc,ic) + idx(kc)*vy(kc,jc,ic))*(vx(kc,jc,ic) + vx(kc,jm,ic)) &
+                )
                 !
                 !    vx vx term
                 !
@@ -86,15 +99,15 @@ subroutine ExplicitTermsVX
                 !
                 !   z second derivatives of vx
                 !
-                dzzvx=(vx(kc,jc,imm) &
+                dzzvx=(vx(kc,jc,im) &
                 -2.0*vx(kc,jc,ic) &
-                +vx(kc,jc,ipp))*udzq
+                +vx(kc,jc,ip))*udzq
                 !
                 !   y second derivatives of vx
                 !
-                dyyvx=(vx(kc,jmm,ic) &
+                dyyvx=(vx(kc,jm,ic) &
                 -2.0*vx(kc,jc,ic) &
-                +vx(kc,jpp,ic))*udyq
+                +vx(kc,jp,ic))*udyq
                 
                 
                 qcap(kc,jc,ic) =-(hxx+hxy+hxz)+dyyvx+dzzvx
