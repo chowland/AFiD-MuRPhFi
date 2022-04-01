@@ -5,7 +5,7 @@ MACHINE=PC_GNU
 # SNELLIUS: 2021 foss/2021a HDF5/1.10.7-gompi-2021a
 # iSNELLIUS: 2021 intel/2021a FFTW/3.3.9-intel-2021a HDF5/1.10.7-iimpi-2021a
 # IRENE: flavor/hdf5/parallel hdf5 fftw3/gnu
-# MARENOSTRUM: fftw hdf5
+# MARENOSTRUM: fabric intel mkl impi hdf5 fftw szip
 # SUPERMUC: fftw hdf5 szip
 
 #=======================================================================
@@ -43,10 +43,8 @@ ifeq ($(MACHINE),IRENE)
 	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) $(HDF5_LIBS)
 endif
 ifeq ($(MACHINE),MARENOSTRUM)
-	FC = h5pfc -fpp -r8 -O3 $(FFTW_FFLAGS)
-	BLAS_LIBS = -L$(MKLROOT)/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
-	HDF5_LIBS = -lhdf5_fortran -lhdf5  -lsz -lz -ldl -lm
-	LDFLAGS = $(FFTW_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
+	FC = h5pfc -fpp -r8 -O3 -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW_FFLAGS)
+	LDFLAGS = $(FFTW_LIBS) -mkl=sequential
 endif
 ifeq ($(MACHINE),SUPERMUC)
 	FC = h5pfc -fpp -r8 -O3
