@@ -39,7 +39,11 @@ subroutine InterpPhiMgrd
         end do
     end do
 
-    call interpolate_xyz_to_coarse(tpdvr, phic(1:nxm,:,:))
+    if ((xmr(1) < xm(1)) .and. (xmr(nxmr) > xm(nxm))) then
+        call interpolate_xyz_to_coarse_fast(tpdvr, phic(1:nxm,:,:))
+    else
+        call interpolate_xyz_to_coarse(tpdvr, phic(1:nxm,:,:))
+    end if
  
     return
 

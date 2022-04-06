@@ -5,7 +5,7 @@ subroutine InterpSalMgrd
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
-    use HermiteInterpolations, only: interpolate_xyz_to_coarse
+    use HermiteInterpolations, only: interpolate_xyz_to_coarse, interpolate_xyz_to_coarse_fast
     implicit none
 
     integer  :: ic,jc,kc, icr,jcr,kcr
@@ -36,7 +36,11 @@ subroutine InterpSalMgrd
         end do
     end do
 
-    call interpolate_xyz_to_coarse(tpdvr, salc(1:nxm,:,:))
+    if ((xmr(1) < xm(1)) .and. (xmr(nxmr) > xm(nxm))) then
+        call interpolate_xyz_to_coarse_fast(tpdvr, salc(1:nxm,:,:))
+    else
+        call interpolate_xyz_to_coarse(tpdvr, salc(1:nxm,:,:))
+    end if
 
     !CJH Not appropriate for staggered grid
     ! do ic=xstart(3),xend(3)
