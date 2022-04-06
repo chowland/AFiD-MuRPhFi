@@ -62,9 +62,9 @@ subroutine CalcMeanProfiles
                 vzT(k) = vzT(k) + 0.5*(vz(k,j,i)+vz(k,j,i+1))*temp(k,j,i)*inym*inzm
 
                 Trms(k) = Trms(k) + temp(k,j,i)**2*inym*inzm
-                vxrms(k) = vxrms(k) + (0.5*(vx(k,j,i)+vx(k+1,j,i)))**2*inym*inzm
-                vyrms(k) = vyrms(k) + (0.5*(vy(k,j,i)+vy(k,j+1,i)))**2*inym*inzm
-                vzrms(k) = vzrms(k) + (0.5*(vz(k,j,i)+vz(k,j,i+1)))**2*inym*inzm
+                vxrms(k) = vxrms(k) + 0.5*(vx(k,j,i)**2+vx(k+1,j,i)**2)*inym*inzm
+                vyrms(k) = vyrms(k) + 0.5*(vy(k,j,i)**2+vy(k,j+1,i)**2)*inym*inzm
+                vzrms(k) = vzrms(k) + 0.5*(vz(k,j,i)**2+vz(k,j,i+1)**2)*inym*inzm
 
                 vxvy(k) = vxvy(k) + 0.25*(vx(k,j,i)+vx(k+1,j,i))*(vy(k,j,i)+vy(k,j+1,i))*inym*inzm
                 vxvz(k) = vxvz(k) + 0.25*(vx(k,j,i)+vx(k+1,j,i))*(vz(k,j,i)+vz(k,j,i+1))*inym*inzm

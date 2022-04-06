@@ -70,7 +70,7 @@ subroutine ReadInputFile
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy
-        read(15,*) pf_A, pf_C, pf_S, pf_Tm, pf_IBM, pf_IC
+        read(15,*) pf_D, pf_A, pf_S, pf_Tm, pf_IBM, pf_IC
 301     format(a4)
     close(15)
 
@@ -120,9 +120,15 @@ subroutine ReadInputFile
     pecs = ren*pras
     pi = 2.d0*dasin(1.d0)
 
-    pf_A = 1.2/pect/pf_S/pf_C
+    pf_D = 1.2/pect/pf_S/pf_A
     pf_eps = 1.0/nxmr
     pf_Lambda = 2.8e-3/Rrho
+    if (ismaster .and. salinity) then
+        write(*,*) "Density ratio: ",Rrho
+        if (phasefield) then
+            write(*,*) "Liquidus slope: ",pf_Lambda
+        end if
+    end if
 
     return
 end subroutine ReadInputFile

@@ -75,7 +75,7 @@ The coefficients $\alpha$, $A$, and $B$ can be determined through the boundary c
 Specifically, they satisfy the following relations:
 
 $$
-\alpha e^{\alpha^2} \mathrm{erfc}(\alpha) = \frac{1+\Lambda}{\mathcal{S}\sqrt{\pi}}\left[ 1 - \frac{\Lambda}{1+\Lambda} f(\alpha/\sqrt{\tau})\right] , \quad \textrm{where} \ f(\gamma) = \frac{\gamma \sqrt{\pi} \mathrm{erfc}(-\gamma)}{e^{-\gamma^2} + \gamma \sqrt{\pi}\mathrm{erfc}(-\gamma)} ,
+\alpha e^{\alpha^2} \mathrm{erfc}(-\alpha) = \frac{1+\Lambda}{\mathcal{S}\sqrt{\pi}}\left[ 1 - \frac{\Lambda}{1+\Lambda} f(\alpha/\sqrt{\tau})\right] , \quad \textrm{where} \ f(\gamma) = \frac{\gamma \sqrt{\pi} \mathrm{erfc}(-\gamma)}{e^{-\gamma^2} + \gamma \sqrt{\pi}\mathrm{erfc}(-\gamma)} ,
 $$
 
 $$
@@ -94,7 +94,7 @@ The origin for the similarity variable has been shifted such that the initial po
 Note the constant values of $T$ and $C$ and the interface, as well as the significant jump in $C$ at the interface.
 
 <video width="100%" controls>
-  <source src="../../assets/diffusive_S2_5.mp4" type="video/mp4">
+  <source src="../../assets/1D_DD_analytic.mp4" type="video/mp4">
 </video>
 
 ## Phase-field model
@@ -138,6 +138,7 @@ First, we inspect the temperature profile over time.
 This is in contrast to the analytic solution, which prescribes that the temperature in the solid (and at the interface) should be constant. -->
 The profiles match well, and the temperature in the solid remains at the constant value predicted by the analytic solution.
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
 {% include "temp_validation.html" %}
 
 <!-- Inspection of the salinity field reveals the cause for this temperature difference, and the greatest issue with the current phase-field implementation.

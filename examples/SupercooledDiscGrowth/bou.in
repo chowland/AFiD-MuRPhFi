@@ -16,7 +16,7 @@ NREAD       IRESET
 
 Time steps / time limit (wall/flow) 
 NTST        WALLTIMEMAX     TMAX
-1000000     30              10.0
+1000000     600              10.0
 
 Time interval for saving stats/movie frames
 TOUT    TFRAME  SAVE_3D
@@ -51,5 +51,5 @@ xplusU  xminusU     dPdy    dPdz    MELT
 0.0     0.0         0.0     0.0     0
 
 Phase-field parameters
-pf_A(*Pe)   pf_C    pf_S    pf_Tm   IBM     pf_IC
+pf_D(*Pe)   pf_A    pf_S    pf_Tm   IBM     pf_IC
 0.48        1.0     2.5     1.0     0       2

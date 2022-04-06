@@ -20,7 +20,7 @@ subroutine ExplicitTermsPhi
     real    :: dyyp,dzzp
     real    :: pf_B, bcl
 
-    pf_B = pf_A / (pf_eps)**2
+    pf_B = pf_D / (pf_eps)**2
 
     udzrq=dzqr
     udyrq=dyqr
@@ -38,15 +38,15 @@ subroutine ExplicitTermsPhi
                 dzzp = (phi(kc,jc,ip) - 2.0*phi(kc,jc,ic) + phi(kc,jc,im))*udzrq
                 ! Extra nonlinear terms
                 nlphi = pf_B*phi(kc,jc,ic)*(1.0 - phi(kc,jc,ic)) &
-                        *(1.0 - 2.0*phi(kc,jc,ic) + pf_C*(tempr(kc,jc,ic) - pf_Tm))
+                        *(1.0 - 2.0*phi(kc,jc,ic) + pf_A*(tempr(kc,jc,ic) - pf_Tm))
 
-                hphi(kc,jc,ic) = pf_A*(dyyp + dzzp) - nlphi
+                hphi(kc,jc,ic) = pf_D*(dyyp + dzzp) - nlphi
             end do
         end do
     end do
 
     if (salinity) then
-        bcl = pf_B*pf_C*pf_Lambda
+        bcl = pf_B*pf_A*pf_Lambda
         do ic=xstartr(3),xendr(3)
             im=ic-1
             ip=ic+1

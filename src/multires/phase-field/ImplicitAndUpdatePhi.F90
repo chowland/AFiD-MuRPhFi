@@ -21,7 +21,7 @@ subroutine ImplicitAndUpdatePhi
     real    :: alpec,dxxp
     real    :: app,acc,amm
 
-    alpec=al*pf_A
+    alpec=al*pf_D
 
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
@@ -56,11 +56,11 @@ subroutine ImplicitAndUpdatePhi
         enddo
     enddo
     
-    iF(ANY(IsNaN(rhsr))) then
-        write(*,*)nrank,'NaN in rhsr pre-solve'
-        write(*,*)'Please try to reduce dtmax in bou.in'
-        call MPI_Abort(MPI_COMM_WORLD,1,ierr)
-    end if
+    ! iF(ANY(IsNaN(rhsr))) then
+    !     write(*,*)nrank,'NaN in rhsr pre-solve'
+    !     write(*,*)'Please try to reduce dtmax in bou.in'
+    !     call MPI_Abort(MPI_COMM_WORLD,1,ierr)
+    ! end if
 
 !  Solve equation and update salinity
 

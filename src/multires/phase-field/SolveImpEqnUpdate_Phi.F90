@@ -22,7 +22,7 @@ subroutine SolveImpEqnUpdate_Phi
 !   The coefficients are normalized to prevent floating
 !   point errors.
 
-    betadx=0.5d0*al*dt/pecs
+    betadx=0.5d0*al*dt*pf_D
 
     do kc=1,nxmr
         ackl_b=1.0d0/(1.-ac3sskr(kc)*betadx)

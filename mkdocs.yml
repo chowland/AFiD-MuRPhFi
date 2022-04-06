@@ -12,11 +12,13 @@ markdown_extensions:
     - pymdownx.arithmatex:
         generic: true
     - attr_list
+    - md_in_html
 extra_css:
     - https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css
 extra_javascript:
     - javascripts/config.js
     - https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js
+    - https://cdn.plot.ly/plotly-2.9.0.min.js
 plugins:
     - macros:
         include_dir: docs/figures
@@ -48,7 +50,6 @@ nav:
         - 'compilers.md'
         - 'convergence.md'
         - 'phasefield_validation.md'
-        - 'issue/dd_phasefield.md'
     - 'Technical Details':
         - 'equations.md'
         - 'numerics.md'

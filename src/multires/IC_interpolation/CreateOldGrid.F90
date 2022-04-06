@@ -57,6 +57,14 @@ subroutine CreateOldGrid
         if (istr3ro==0) call uniform_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3)
     end if
 
+    ! Option 1: Centre-focused clustering
+
+    if (istr3o==1) call centre_focus_grid(xco(1:nxo),xmo(1:nxmo),nxmo,alx3,str3o)
+
+    if (multires) then
+        if (istr3ro==1) call centre_focus_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3,str3o)
+    end if
+
     ! Option 4: Hyperbolic tangent-type clustering
 
     if (istr3o==4) call tanh_grid(xco(1:nxo),xmo(1:nxmo),nxmo,alx3,str3o)

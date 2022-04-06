@@ -105,9 +105,9 @@
           call update_halo(phic,lvlhalo)
         end if
 
-        iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX'
-        iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY'
-        iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ'
+        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX'
+        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY'
+        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ'
         ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI'
 
         enddo

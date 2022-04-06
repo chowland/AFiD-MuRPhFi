@@ -14,9 +14,10 @@ subroutine CreateInitialConditions
     use decomp_2d, only: xstart,xend
     use mpih
     implicit none
-    integer :: j,k,i,kmid
+    integer :: j,k,i,kmid, io
     real :: xxx,yyy,zzz,eps,varptb,amp
-    real :: h0,t0,Lambda,r, x0, A
+    real :: h0,t0,Lambda,r, x0, A, B, alpha
+    logical :: exists
 
     call random_seed()
 
@@ -33,21 +34,32 @@ subroutine CreateInitialConditions
     end if
 
     if (gAxis == 1) then
-        !CJH: RBC initial condition as used in AFiD 1.0
-        eps = 0.01
-        do i=xstart(3),xend(3)
-            do j=xstart(2),xend(2)
-                do k=1,nxm
-                    xxx = xc(k)
-                    yyy = ym(j)
-                    vx(k,j,i) = vx(k,j,i) - eps*xxx**2*(1.0 - xxx)**2*cos(2.0*pi*yyy/ylen)
-
-                    xxx = xm(k)
-                    yyy = yc(j)
-                    vy(k,j,i) = vy(k,j,i) + 2.0*eps*xxx*(1.0 - xxx)*(1.0 - 2.0*xxx)*sin(2.0*pi*yyy/ylen)/pi
+        if ((RayT < 0) .and. (RayS <0)) then
+            !CJH: Stratified shear layer initial condition
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        vy(k,j,i) = tanh(xm(k) - alx3/2.0)
+                    end do
                 end do
             end do
-        end do
+        else
+            !CJH: RBC initial condition as used in AFiD 1.0
+            eps = 0.01
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xc(k)
+                        yyy = ym(j)
+                        vx(k,j,i) = vx(k,j,i) - eps*xxx**2*(1.0 - xxx)**2*cos(2.0*pi*yyy/ylen)
+
+                        xxx = xm(k)
+                        yyy = yc(j)
+                        vy(k,j,i) = vy(k,j,i) + 2.0*eps*xxx*(1.0 - xxx)*(1.0 - 2.0*xxx)*sin(2.0*pi*yyy/ylen)/pi
+                    end do
+                end do
+            end do
+        end if
     else if (gAxis == 2) then
         if (inslwN==1) then
         !CJH Laminar vertical convection as in Batchelor (1954)
@@ -114,31 +126,58 @@ subroutine CreateInitialConditions
         end do
     end if
 
-    ! Assign linear temperature profile in the nodes k=1 to k=nxm
-    do i=xstart(3),xend(3)
-        do j=xstart(2),xend(2)
-            do k=1,nxm
-                xxx = xm(k)
-                temp(k,j,i) = tempbp(1,j,i) + (temptp(1,j,i) - tempbp(1,j,i))*xm(k)/alx3
+    if ((RayT < 0) .and. (RayS < 0)) then
+        !CJH: Stratified shear layer + noise in centre
+        eps = 1e-2
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    temp(k,j,i) = tanh(xm(k) - 0.5*alx3)
+                    call random_number(varptb)
+                    temp(k,j,i) = temp(k,j,i) + &
+                            cosh(xm(k) - 0.5*alx3)**(-2)*eps*(2.0*varptb - 1.0)
+                end do
             end do
         end do
-    end do
+    else
+        ! Assign linear temperature profile in the nodes k=1 to k=nxm
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    xxx = xm(k)
+                    temp(k,j,i) = tempbp(1,j,i) + (temptp(1,j,i) - tempbp(1,j,i))*xm(k)/alx3
+                end do
+            end do
+        end do
 
-    ! Add noise in the temperature profile
-    eps = 1e-3
-    do i=xstart(3),xend(3)
-        do j=xstart(2),xend(2)
-            do k=1,nxm
-                call random_number(varptb)
-                if (abs(xm(k)-0.5) + eps > 0.5) then
-                  amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
-                  temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
-                else
-                  temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
-                end if
+        ! Add noise in the temperature profile
+        eps = 1e-3
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    call random_number(varptb)
+                    if (abs(xm(k)-0.5) + eps > 0.5) then
+                    amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
+                    temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
+                    else
+                    temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
+                    end if
+                end do
             end do
         end do
-    end do
+    end if
+
+    if (gAxis==3 .and. active_T==0) then
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2) ! Convergence test
+                do k=1,nxm
+                    xxx = xm(k) ! Linear profile + sin perturbation
+                    temp(k,j,i) = tempbp(1,j,i) + (temptp(1,j,i) - tempbp(1,j,i))*xm(k)/alx3
+                    temp(k,j,i) = temp(k,j,i) + sin(2.0*pi*xxx/alx3) - sin(6.0*pi*xxx/alx3)
+                end do
+            end do
+        end do
+    end if
 
     if (gAxis==2 .and. inslwN==0) then  ! Ke et al comparison case
         t0 = 1.4195567
@@ -244,18 +283,68 @@ subroutine CreateInitialConditions
 
         if (salinity) then
             if (pf_IC==1) then
-                t0 = 1
+                inquire(file="pfparam.in", exist=exists)
+                if (exists) then
+                    open(newunit=io, file="pfparam.in", status="old", action="read")
+                    read(io, *) A, B, alpha
+                    close(io)
+                    if (ismaster) then
+                        write(*,*) "Input parameter file exists!"
+                        write(*,*) "A = ", A
+                        write(*,*) "B = ", B
+                        write(*,*) "alpha = ", alpha
+                    end if
+                else
+                    A = 1.132
+                    B = 0.3796
+                    alpha = 3.987e-2
+                end if
+                t0 = 1e-3
                 x0 = 0.8
-                Lambda = 0.19742 !0.24041
-                h0 = x0 + 2*Lambda*sqrt(t0/pect)
-                A = 0.90954 !0.90293
+                h0 = x0 + 2*alpha*sqrt(t0)
                 do i=xstart(3),xend(3)
                     do j=xstart(2),xend(2)
                         do k=1,nxm
                             if (xm(k) <= h0) then
-                                temp(k,j,i) = 1 - A*erfc((x0 - xm(k))*sqrt(pect/t0)/2.0)
+                                temp(k,j,i) = 1 - A*erfc((x0 - xm(k))/sqrt(t0)/2.0)
                             else
-                                temp(k,j,i) = 1 - A*erfc(-Lambda)
+                                temp(k,j,i) = 1 - A*erfc(-alpha)
+                            end if
+                        end do
+                    end do
+                end do
+            else if (pf_IC==2) then
+                inquire(file="pfparam.in", exist=exists)
+                if (exists) then
+                    open(newunit=io, file="pfparam.in", status="old", action="read")
+                    read(io, *) A, B, alpha
+                    close(io)
+                    if (ismaster) then
+                        write(*,*) "Input parameter file exists!"
+                        write(*,*) "A = ", A
+                        write(*,*) "B = ", B
+                        write(*,*) "alpha = ", alpha
+                    end if
+                else
+                    A = 1.132
+                    B = 0.3796
+                    alpha = 3.987e-2
+                end if
+                t0 = 1e-3
+                h0 = 0.1 - 2*alpha*sqrt(t0)
+                eps = 5e-3
+                do i=xstart(3),xend(3)
+                    do j=xstart(2),xend(2)
+                        do k=1,nxm
+                            call random_number(varptb)
+                            if (abs(ym(j) - ylen/2.0) <= h0) then
+                                temp(k,j,i) = 1.0 - A*erfc(-alpha)
+                            else if (ym(j) < ylen/2.0) then
+                                temp(k,j,i) = 1.0 - A*erfc((ylen/2.0 - h0 - ym(j))/sqrt(t0)/2.0) &
+                                                + eps*(2.d0*varptb - 1.d0)
+                            else
+                                temp(k,j,i) = 1.0 - A*erfc((ym(j) - ylen/2.0 - h0)/sqrt(t0)/2.0) &
+                                + eps*(2.d0*varptb - 1.d0)
                             end if
                         end do
                     end do
