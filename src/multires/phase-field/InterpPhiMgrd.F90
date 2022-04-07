@@ -15,7 +15,7 @@ subroutine InterpPhiMgrd
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
-    use HermiteInterpolations, only: interpolate_xyz_to_coarse
+    use HermiteInterpolations, only: interpolate_xyz_to_coarse, interpolate_xyz_to_coarse_fast
     implicit none
 
     integer  :: ic,jc,kc, icr,jcr,kcr
