@@ -13,7 +13,7 @@ subroutine AddLatentHeat
 
     use param
     use local_arrays, only: hro
-    use mgrd_arrays, only: rhsr, cxsalc, cysalc, czsalc, irangr, jrangr, krangr, tpdvr
+    use mgrd_arrays
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
