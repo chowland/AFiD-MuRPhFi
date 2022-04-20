@@ -13,7 +13,7 @@ subroutine Mkmov_zcut
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
-    use mgrd_arrays, only: sal, phi, phic, tempr
+    use mgrd_arrays, only: sal, phi, phic, tempr!, vxr, vyr
     implicit none
     character(70) :: filename
     character(30) :: dsetname
@@ -61,6 +61,10 @@ subroutine Mkmov_zcut
             if (salinity) then
                 call h5gcreate_f(file_id, "sal", group_id, hdf_error)
                 call h5gclose_f(group_id, hdf_error)
+                ! call h5gcreate_f(file_id, "vyr", group_id, hdf_error)
+                ! call h5gclose_f(group_id, hdf_error)
+                ! call h5gcreate_f(file_id, "vxr", group_id, hdf_error)
+                ! call h5gclose_f(group_id, hdf_error)
             end if
             if (phasefield) then
                 call h5gcreate_f(file_id, "phi", group_id, hdf_error)
@@ -239,6 +243,51 @@ subroutine Mkmov_zcut
                     mem_space_id = memspace, xfer_prp = plist_id)
             call h5pclose_f(plist_id, hdf_error)
             call h5dclose_f(dset_sal, hdf_error)
+            
+            ! Create and write refined velocity data
+            ! dsetname = trim("vyr/"//frame)
+            ! call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
+            ! if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
+            ! call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_sal, hdf_error)
+            ! call h5dget_space_f(dset_sal, filespace, hdf_error)
+            ! call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
+            ! call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+            ! call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
+            ! call h5dwrite_f(&
+            !         dset_sal, H5T_NATIVE_DOUBLE,&
+            !         vyr(1:nxmr,xstartr(2):xendr(2),ic),&
+            !         data_count,  hdf_error, file_space_id = filespace,&
+            !         mem_space_id = memspace, xfer_prp = plist_id)
+            ! call h5pclose_f(plist_id, hdf_error)
+            ! call h5dclose_f(dset_sal, hdf_error)
+            
+            ! call h5sclose_f(memspace, hdf_error)
+            ! call h5sclose_f(filespace, hdf_error)
+
+            ! ! Redefine dataspaces to match size of vxr arrays in x
+            ! dims(1) = nxr
+            ! data_count(1) = nxr
+    
+            ! ! Create dataspace (file & memory)
+            ! call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+            ! call h5screate_simple_f(ndims, data_count, memspace, hdf_error)
+
+            ! ! Create and write refined velocity data
+            ! dsetname = trim("vxr/"//frame)
+            ! call h5lexists_f(file_id, dsetname, dsetexists, hdf_error)
+            ! if (dsetexists) call h5ldelete_f(file_id, dsetname, hdf_error)
+            ! call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset_sal, hdf_error)
+            ! call h5dget_space_f(dset_sal, filespace, hdf_error)
+            ! call h5sselect_hyperslab_f (filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
+            ! call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+            ! call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
+            ! call h5dwrite_f(&
+            !         dset_sal, H5T_NATIVE_DOUBLE,&
+            !         vxr(1:nxr,xstartr(2):xendr(2),ic),&
+            !         data_count,  hdf_error, file_space_id = filespace,&
+            !         mem_space_id = memspace, xfer_prp = plist_id)
+            ! call h5pclose_f(plist_id, hdf_error)
+            ! call h5dclose_f(dset_sal, hdf_error)
             
             call h5sclose_f(memspace, hdf_error)
             call h5sclose_f(filespace, hdf_error)

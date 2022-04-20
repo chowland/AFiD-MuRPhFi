@@ -11,3 +11,4 @@ tmp
 examples/*/*.svg
 examples/*/*.ipynb
 *.ipynb_checkpoints
+*.out

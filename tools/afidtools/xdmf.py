@@ -10,7 +10,7 @@ import os
 from xml.etree.ElementTree import Element, SubElement
 from xml.dom import minidom
 from xml.etree import ElementTree
-from numpy import zeros, linspace
+from numpy import zeros, linspace, float32
 from scipy.interpolate import interp1d
 
 from .afidtools import Grid, InputParams
@@ -232,22 +232,27 @@ def interpolate_field_to_uniform(folder, var):
     # Pick corresponding grid for flow variable
     if var=="vx":
         xs = grid.xc
+        nyu, nzu = grid.ym.size//2, grid.zm.size//2
     elif var=="sal" or var=="phi":
         xs = grid.xmr
+        nyu, nzu = grid.ymr.size//2, grid.zmr.size//2
     else:
         xs = grid.xm
+        nyu, nzu = grid.ym.size//2, grid.zm.size//2
     filelist = sorted(os.listdir(folder+"/outputdir/fields"))
     fvlist = list(filter(lambda fname: var in fname, filelist))
+    Funi = zeros((nzu, nyu, nxu), dtype=float32)
     for fname in fvlist:
-        with h5py.File(folder+"/outputdir/fields/"+fname, 'r') as f:
-            F = f['var'][()]
-        if var=="vx":
-            itp = interp1d(xs, F, kind='cubic', axis=-1)
-        else:
-            itp = interp1d(xs, F[:,:,:-1], kind='cubic', axis=-1)
-        F = itp(xu)
+        for k in range(nzu):
+            with h5py.File(folder+"/outputdir/fields/"+fname, 'r') as f:
+                F = f['var'][2*k,::2,:]
+            if var=="vx":
+                itp = interp1d(xs, F, kind='cubic', axis=-1)
+            else:
+                itp = interp1d(xs, F[:,:-1], kind='cubic', axis=-1)
+            Funi[k,:,:] = itp(xu)
         with h5py.File(folder+"/outputdir/viz/"+fname, 'a') as f:
-            f['var'] = F
+            f['var'] = Funi
 
 def generate_uniform_xmf(folder, var):
     """
@@ -264,21 +269,17 @@ def generate_uniform_xmf(folder, var):
     grid = Grid(folder)
     nxm, nym, nzm = grid.xm.size, grid.ym.size, grid.zm.size
     nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
-    dx, dy, dz = grid.xc[-1]/nxm, grid.yc[-1]/nym, grid.zc[-1]/nzm
-    if nxmr!=0:
-        dxr, dyr, dzr = grid.xc[-1]/nxmr, grid.ycr[-1]/nymr, grid.zcr[-1]/nzmr
 
     # Store the appropriate grid sizes and names based on the variable
     nxu = nxm//2
-    dx, dxr = grid.xc[-1]/nxu, grid.xc[-1]/nxu
     fulldims = (nzm, nym, nxu)
-    if var=="vx":
-        dims = (nzm, nym, nxu)
-    elif var in "phisal":
-        dims = (nzmr, nymr, nxmr)
-        fulldims = (nzmr, nymr, nxu)
+    if var in "phisal":
+        nyu, nzu = nymr//2, nzmr//2
     else:
-        dims = (nzm, nym, nxu)
+        nyu, nzu = nym//2, nzm//2
+    dx, dy, dz = grid.xc[-1]/nxu, grid.yc[-1]/nyu, grid.zc[-1]/nzu
+    fulldims = (nzm, nym, nxu)
+    dims = fulldims
     
     # Collect indices of saved fields
     samplist = []
@@ -321,22 +322,12 @@ def generate_uniform_xmf(folder, var):
         geom = geom + (SubElement(fields[i], "Geometry", attrib={
             "GeometryType":"ORIGIN_DXDYDZ"
         }),)
+
         origin_data = origin_data + (SubElement(geom[i], "DataItem", attrib={"Dimensions":"3"}),)
-        if var=="vx":
-            origin_data[i].text = 3*"%.5f " % (0, dy/2, dz/2)
-        elif var=="vy":
-            origin_data[i].text = 3*"%.5f " % (dx/2, 0, dz/2)
-        elif var=="vz":
-            origin_data[i].text = 3*"%.5f " % (dx/2, dy/2, 0)
-        elif var=="temp":
-            origin_data[i].text = 3*"%.5f " % (dx/2, dy/2, dz/2)
-        else:
-            origin_data[i].text = 3*"%.5f " % (dxr/2, dyr/2, dzr/2)
+        origin_data[i].text = 3*"%.5f " % (dz/2, dy/2, dx/2)
+
         step_data = step_data + (SubElement(geom[i], "DataItem", attrib={"Dimensions":"3"}),)
-        if var in "phisal":
-            step_data[i].text = 3*"%.5f " % (dxr, dyr, dzr)
-        else:
-            step_data[i].text = 3*"%.5f " % (dx, dy, dz)
+        step_data[i].text = 3*"%.5f " % (dz, dy, dx)
 
         var_att = var_att + (SubElement(fields[i], "Attribute", attrib={
             "Name":var, "AttributeType":"Scalar", "Center":"Node"

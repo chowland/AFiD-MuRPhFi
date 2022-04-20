@@ -1,10 +1,11 @@
 # Choose the machine being used
-# Options: PC_GNU, PC_INTEL, CARTESIUS, IRENE, MARENOSTRUM, SUPERMUC
+# Options: PC_GNU, PC_INTEL, (i)SNELLIUS, IRENE, MARENOSTRUM, SUPERMUC
 MACHINE=PC_GNU
 # Modules required for each HPC system as follows:
-# CARTESIUS: 2019 intel/2018b HDF5 FFTW
+# SNELLIUS: 2021 foss/2021a HDF5/1.10.7-gompi-2021a
+# iSNELLIUS: 2021 intel/2021a FFTW/3.3.9-intel-2021a HDF5/1.10.7-iimpi-2021a
 # IRENE: flavor/hdf5/parallel hdf5 fftw3/gnu
-# MARENOSTRUM: fftw hdf5
+# MARENOSTRUM: fabric intel mkl impi hdf5 fftw szip
 # SUPERMUC: fftw hdf5 szip
 
 #=======================================================================
@@ -26,14 +27,13 @@ ifeq ($(MACHINE),PC_INTEL)
 # FC += -DSHM -DSHM_DEBUG
 	LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
 endif
-ifeq ($(MACHINE),CARTESIUS)
-	FC = h5pfc -fpp -r8 -O3 -xAVX -axCORE-AVX2
-	BLAS_LIBS = -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
-	HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
-	LDFLAGS = -lfftw3 $(BLAS_LIBS) $(HDF5_LIBS)
+ifeq ($(MACHINE),iSNELLIUS)
+	FC = h5pfc -fpp -r8 -O3 -align array64byte -fma -ftz -fomit-frame-pointer
+	LDFLAGS = -lfftw3 -mkl=sequential
 endif
 ifeq ($(MACHINE),SNELLIUS)
-	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -w -fallow-argument-mismatch -O3
+	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -w -fallow-argument-mismatch
+	FC += -O3 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer
 	BLAS_LIBS = -lscalapack -lopenblas -ldl
 	LDFLAGS = -lfftw3 $(BLAS_LIBS)
 endif
@@ -43,10 +43,8 @@ ifeq ($(MACHINE),IRENE)
 	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) $(HDF5_LIBS)
 endif
 ifeq ($(MACHINE),MARENOSTRUM)
-	FC = h5pfc -fpp -r8 -O3 $(FFTW_FFLAGS)
-	BLAS_LIBS = -L$(MKLROOT)/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
-	HDF5_LIBS = -lhdf5_fortran -lhdf5  -lsz -lz -ldl -lm
-	LDFLAGS = $(FFTW_LIBS) $(BLAS_LIBS) $(HDF5_LIBS)
+	FC = h5pfc -fpp -r8 -O3 -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW_FFLAGS)
+	LDFLAGS = $(FFTW_LIBS) -mkl=sequential
 endif
 ifeq ($(MACHINE),SUPERMUC)
 	FC = h5pfc -fpp -r8 -O3

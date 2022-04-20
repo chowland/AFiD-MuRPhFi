@@ -14,10 +14,10 @@ subroutine CreateICSal
     use decomp_2d, only: xstartr,xendr
     use mpih
     implicit none
-    integer :: i,k,j, kmid, io
+    integer :: i,k,j, kmid
     real :: xxx,yyy,eps,varptb,amp
     real :: gamma, t0, x0, h0, A, B, alpha
-    logical :: exists
+    real, dimension(11) :: yh, zh
 
     call random_seed()
     eps=5e-3
@@ -76,16 +76,7 @@ subroutine CreateICSal
 
     if (phasefield) then
         if (pf_IC==1) then
-            inquire(file="pfparam.in", exist=exists)
-            if (exists) then
-                open(newunit=io, file="pfparam.in", status="old", action="read")
-                read(io, *) A, B, alpha
-                close(io)
-            else
-                A = 1.132
-                B = 0.3796
-                alpha = 3.987e-2
-            end if
+            call read_phase_field_params(A, B, alpha)
             t0 = 1e-3
             x0 = 0.8
             h0 = x0 + 2*alpha*sqrt(t0)
@@ -97,16 +88,7 @@ subroutine CreateICSal
                 end do
             end do
         else if (pf_IC==2) then
-            inquire(file="pfparam.in", exist=exists)
-            if (exists) then
-                open(newunit=io, file="pfparam.in", status="old", action="read")
-                read(io, *) A, B, alpha
-                close(io)
-            else
-                A = 1.132
-                B = 0.3796
-                alpha = 3.987e-2
-            end if
+            call read_phase_field_params(A, B, alpha)
             t0 = 1e-3
             h0 = 0.1 - 2*alpha*sqrt(t0)
             do i=xstartr(3),xendr(3)
@@ -120,6 +102,32 @@ subroutine CreateICSal
                     end do
                 end do
             end do
+        else if (pf_IC==3) then
+            call read_phase_field_params(A, B, alpha)
+            ! Scallop initial condition
+            yh = [0.0, ylen/3, 2*ylen/3, ylen, &
+                    ylen/6, ylen/2, 5*ylen/6, &
+                    0.0, ylen/3, 2*ylen/3, ylen]
+            zh(1:4) = 0.0
+            zh(5:7) = zlen/2
+            zh(8:11) = zlen
+            x0 = 0.8
+            gamma = 0.9
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    h0 = 0.0
+                    do k=1,11
+                        h0 = max(h0, x0 - gamma*((ymr(j) - yh(k))**2 + (zmr(i) - zh(k))**2))
+                    end do
+                    do k=1,nxmr
+                        call random_number(varptb)
+                        sal(k,j,i) = 1.0 - B*erfc((h0 - xmr(k))/10/pf_eps) &
+                                        + eps*(2.d0*varptb - 1.d0)
+                    end do
+                end do
+            end do
+
+
         else
             kmid = nxmr/2
             do i=xstartr(3),xendr(3)

@@ -17,9 +17,9 @@ subroutine CreateICPF
 
     implicit none
 
-    integer :: i,j,k,kmid, io
+    integer :: i,j,k,kmid
     real :: r, x0, lambda, h0, t0, A, B, alpha
-    logical :: exists
+    real, dimension(11) :: yh, zh
 
     if (pf_IC == 1) then ! 1D freezing validation
         do i=xstartr(3),xendr(3)
@@ -69,16 +69,7 @@ subroutine CreateICPF
 
     if (salinity) then ! Ice above salty water
         if (pf_IC==1) then
-            inquire(file="pfparam.in", exist=exists)
-            if (exists) then
-                open(newunit=io, file="pfparam.in", status="old", action="read")
-                read(io, *) A, B, alpha
-                close(io)
-            else
-                A = 1.132
-                B = 0.3796
-                alpha = 3.987e-2
-            end if
+            call read_phase_field_params(A, B, alpha)
             t0 = 1e-3
             x0 = 0.8
             h0 = x0 + 2*alpha*sqrt(t0)
@@ -90,16 +81,7 @@ subroutine CreateICPF
                 end do
             end do
         else if (pf_IC==2) then
-            inquire(file="pfparam.in", exist=exists)
-            if (exists) then
-                open(newunit=io, file="pfparam.in", status="old", action="read")
-                read(io, *) A, B, alpha
-                close(io)
-            else
-                A = 1.132
-                B = 0.3796
-                alpha = 3.987e-2
-            end if
+            call read_phase_field_params(A, B, alpha)
             t0 = 1e-3
             h0 = 0.1 - 2*alpha*sqrt(t0)
             do i=xstartr(3),xendr(3)
@@ -110,6 +92,28 @@ subroutine CreateICPF
                     end do
                 end do
             end do
+        else if (pf_IC==3) then
+            ! Scallop initial condition
+            yh = [0.0, ylen/3, 2*ylen/3, ylen, &
+                    ylen/6, ylen/2, 5*ylen/6, &
+                    0.0, ylen/3, 2*ylen/3, ylen]
+            zh(1:4) = 0.0
+            zh(5:7) = zlen/2
+            zh(8:11) = zlen
+            x0 = 0.8
+            A = 0.9
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    h0 = 0.0
+                    do k=1,11
+                        h0 = max(h0, x0 - A*((ymr(j) - yh(k))**2 + (zmr(i) - zh(k))**2))
+                    end do
+                    do k=1,nxmr
+                        phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - h0)/2/pf_eps))
+                    end do
+                end do
+            end do
+
         else
             kmid = nxmr/2
             do i=xstartr(3),xendr(3)
@@ -128,3 +132,22 @@ subroutine CreateICPF
     return
 
 end subroutine CreateICPF
+
+subroutine read_phase_field_params(A, B, alpha)
+    implicit none
+    real, intent(out) :: A, B, alpha
+
+    integer :: io
+    logical :: exists
+
+    inquire(file="pfparam.in", exist=exists)
+    if (exists) then
+        open(newunit=io, file="pfparam.in", status="old", action="read")
+        read(io, *) A, B, alpha
+        close(io)
+    else
+        A = 1.132
+        B = 0.3796
+        alpha = 3.987e-2
+    end if
+end subroutine read_phase_field_params

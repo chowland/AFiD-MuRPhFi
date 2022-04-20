@@ -13,6 +13,7 @@ module HermiteInterpolations
     public interpolation_indices, construct_stencil, &
             interpolate_xyz_to_refined, &
             interpolate_xyz_to_coarse, &
+            interpolate_xyz_to_coarse_fast, &
             interpolate_xyz_old_to_new, &
             interpolate_xyz_old_to_new_ref
 
@@ -195,6 +196,39 @@ contains
         end do
 
     end subroutine interpolate_xyz_to_coarse
+
+    subroutine interpolate_xyz_to_coarse_fast(rvar, cvar)
+        real, dimension(-1:,xstartr(2)-lvlhalo:,xstartr(3)-lvlhalo:), intent(in) :: rvar
+        real, dimension(:,xstart(2)-lvlhalo:,xstart(3)-lvlhalo:), intent(out) :: cvar
+
+        real, dimension(4,4,4) :: qv3
+        real, dimension(4,4) :: qv2
+        real, dimension(4) :: qv1
+
+        integer :: ic, jc, kc, icr, jcr, kcr
+
+        do ic=xstart(3),xend(3)
+            icr = krangs(ic)
+            do jc=xstart(2),xend(2)
+                jcr = jrangs(jc)
+                do kc=1,nxm
+                    kcr = irangs(kc)
+    
+                    qv3 = rvar(kcr-2:kcr+1,jcr-2:jcr+1,icr-2:icr+1)
+
+                    qv2(:,:) = qv3(:,:,1)*czsalc(1,ic) + qv3(:,:,2)*czsalc(2,ic) &
+                            + qv3(:,:,3)*czsalc(3,ic) + qv3(:,:,4)*czsalc(4,ic)
+
+                    qv1(:) = qv2(:,1)*cysalc(1,jc) + qv2(:,2)*cysalc(2,jc) &
+                            + qv2(:,3)*cysalc(3,jc) + qv2(:,4)*cysalc(4,jc)
+                    
+                    cvar(kc,jc,ic) = sum(qv1(1:4)*cxsalc(1:4,kc))
+
+                end do
+            end do
+        end do
+
+    end subroutine interpolate_xyz_to_coarse_fast
 
     subroutine interpolate_xyz_old_to_new(ovar, nvar)
         real, dimension(-1:,xstarto(2)-lvlhalo:,xstarto(3)-lvlhalo:), intent(in) :: ovar

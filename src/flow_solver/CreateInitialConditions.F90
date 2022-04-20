@@ -17,6 +17,7 @@ subroutine CreateInitialConditions
     integer :: j,k,i,kmid, io
     real :: xxx,yyy,zzz,eps,varptb,amp
     real :: h0,t0,Lambda,r, x0, A, B, alpha
+    real, dimension(11) :: yh, zh
     logical :: exists
 
     call random_seed()
@@ -283,22 +284,7 @@ subroutine CreateInitialConditions
 
         if (salinity) then
             if (pf_IC==1) then
-                inquire(file="pfparam.in", exist=exists)
-                if (exists) then
-                    open(newunit=io, file="pfparam.in", status="old", action="read")
-                    read(io, *) A, B, alpha
-                    close(io)
-                    if (ismaster) then
-                        write(*,*) "Input parameter file exists!"
-                        write(*,*) "A = ", A
-                        write(*,*) "B = ", B
-                        write(*,*) "alpha = ", alpha
-                    end if
-                else
-                    A = 1.132
-                    B = 0.3796
-                    alpha = 3.987e-2
-                end if
+                call read_phase_field_params(A, B, alpha)
                 t0 = 1e-3
                 x0 = 0.8
                 h0 = x0 + 2*alpha*sqrt(t0)
@@ -314,22 +300,7 @@ subroutine CreateInitialConditions
                     end do
                 end do
             else if (pf_IC==2) then
-                inquire(file="pfparam.in", exist=exists)
-                if (exists) then
-                    open(newunit=io, file="pfparam.in", status="old", action="read")
-                    read(io, *) A, B, alpha
-                    close(io)
-                    if (ismaster) then
-                        write(*,*) "Input parameter file exists!"
-                        write(*,*) "A = ", A
-                        write(*,*) "B = ", B
-                        write(*,*) "alpha = ", alpha
-                    end if
-                else
-                    A = 1.132
-                    B = 0.3796
-                    alpha = 3.987e-2
-                end if
+                call read_phase_field_params(A, B, alpha)
                 t0 = 1e-3
                 h0 = 0.1 - 2*alpha*sqrt(t0)
                 eps = 5e-3
@@ -345,6 +316,34 @@ subroutine CreateInitialConditions
                             else
                                 temp(k,j,i) = 1.0 - A*erfc((ym(j) - ylen/2.0 - h0)/sqrt(t0)/2.0) &
                                 + eps*(2.d0*varptb - 1.d0)
+                            end if
+                        end do
+                    end do
+                end do
+            else if (pf_IC==3) then
+                call read_phase_field_params(A, B, alpha)
+                ! Scallop initial condition
+                yh = [0.0, ylen/3, 2*ylen/3, ylen, &
+                        ylen/6, ylen/2, 5*ylen/6, &
+                        0.0, ylen/3, 2*ylen/3, ylen]
+                zh(1:4) = 0.0
+                zh(5:7) = zlen/2
+                zh(8:11) = zlen
+                x0 = 0.8
+                amp = 0.9
+                eps = 5e-3
+                do i=xstart(3),xend(3)
+                    do j=xstart(2),xend(2)
+                        h0 = 0.0
+                        do k=1,11
+                            h0 = max(h0, x0 - amp*((ym(j) - yh(k))**2 + (zm(i) - zh(k))**2))
+                        end do
+                        do k=1,nxm
+                            call random_number(varptb)
+                            if (xm(k) <= h0) then
+                                temp(k,j,i) = 1.0 + eps*(2.d0*varptb - 1.d0)
+                            else
+                                temp(k,j,i) = 1.0 - A*erfc(-alpha)
                             end if
                         end do
                     end do
