@@ -76,19 +76,19 @@ subroutine CalcMeanProfiles
         end do
     end do
 
-    call MpiAllSumReal1D(Tbar,nxm)
-    call MpiAllSumReal1D(vybar,nxm)
-    call MpiAllSumReal1D(vzbar,nxm)
-    call MpiAllSumReal1D(vxT,nxm)
-    call MpiAllSumReal1D(vyT,nxm)
-    call MpiAllSumReal1D(vzT,nxm)
-    call MpiAllSumReal1D(Trms,nxm)
-    call MpiAllSumReal1D(vxrms,nxm)
-    call MpiAllSumReal1D(vyrms,nxm)
-    call MpiAllSumReal1D(vzrms,nxm)
-    call MpiAllSumReal1D(vxvy,nxm)
-    call MpiAllSumReal1D(vxvz,nxm)
-    call MpiAllSumReal1D(vyvz,nxm)
+    call MpiSumReal1D(Tbar,nxm)
+    call MpiSumReal1D(vybar,nxm)
+    call MpiSumReal1D(vzbar,nxm)
+    call MpiSumReal1D(vxT,nxm)
+    call MpiSumReal1D(vyT,nxm)
+    call MpiSumReal1D(vzT,nxm)
+    call MpiSumReal1D(Trms,nxm)
+    call MpiSumReal1D(vxrms,nxm)
+    call MpiSumReal1D(vyrms,nxm)
+    call MpiSumReal1D(vzrms,nxm)
+    call MpiSumReal1D(vxvy,nxm)
+    call MpiSumReal1D(vxvz,nxm)
+    call MpiSumReal1D(vyvz,nxm)
 
     do k=1,nxm
         Tbar(k) = Tbar(k)*inym*inzm
@@ -132,13 +132,7 @@ subroutine CalcMeanProfiles
         end do
     end do
 
-    call MpiAllSumReal1D(chiT,nxm)
-
-    ! do k=1,nxm
-    !     ap(k) = g3rc(k)/g3rc(k+1)*0.5*dx/g3rm(k)
-    !     am(k) = -g3rc(k+1)/g3rc(k)*0.5*dx/g3rm(k)
-    !     ac(k) = -(ap(k) + am(k))
-    ! end do
+    call MpiSumReal1D(chiT,nxm)
 
     ! do i=xstart(3),xend(3)
     !     ip = i + 1
@@ -214,7 +208,7 @@ subroutine CalcMeanProfiles
         end do
     end do
 
-    call MpiAllSumReal1D(eps2,nxm)
+    call MpiSumReal1D(epsilon,nxm)
 
     do k=1,nxm
         epsilon(k) = epsilon(k)/ren
@@ -240,11 +234,11 @@ subroutine CalcMeanProfiles
             end do
         end do
 
-        call MpiAllSumReal1D(Sbar,nxmr)
-        call MpiAllSumReal1D(vxS,nxmr)
-        call MpiAllSumReal1D(vyS,nxmr)
-        call MpiAllSumReal1D(vzS,nxmr)
-        call MpiAllSumReal1D(Srms,nxmr)
+        call MpiSumReal1D(Sbar,nxmr)
+        call MpiSumReal1D(vxS,nxmr)
+        call MpiSumReal1D(vyS,nxmr)
+        call MpiSumReal1D(vzS,nxmr)
+        call MpiSumReal1D(Srms,nxmr)
 
         do k=1,nxmr
             Srms(k) = sqrt(Srms(k))
@@ -269,7 +263,7 @@ subroutine CalcMeanProfiles
             end do
         end do
 
-        call MpiAllSumReal1D(chiS,nxmr)
+        call MpiSumReal1D(chiS,nxmr)
 
         do k=1,nxmr
             chiS(k) = chiS(k)/pecs
@@ -290,8 +284,7 @@ subroutine CalcMeanProfiles
             end do
         end do
 
-        call MpiAllSumReal1D(phibar,nxmr)
-        call MpiAllSumReal1D(phirms,nxmr)
+        call MpiSumReal1D(phibar,nxmr)
 
         do k=1,nxmr
             phirms(k) = sqrt(phirms(k))
