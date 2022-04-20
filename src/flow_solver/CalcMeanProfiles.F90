@@ -21,11 +21,11 @@ subroutine CalcMeanProfiles
     integer :: i, j, k, im, ip, jm, jp, km, kp
     real :: inym, inzm, inymr, inzmr, tdx, tdxr
     real :: tii(2)
-    real, dimension(nxm) :: Tbar, Trms, chiT
+    real, dimension(nxm) :: Tbar, Trms, chiT, chiT2
     real, dimension(nxm) :: vxT, vyT, vzT
     real, dimension(nxm) :: vxrms, vyrms, vzrms
     real, dimension(nxm) :: vybar, vzbar
-    real, dimension(nxm) :: epsilon, eps2
+    real, dimension(nxm) :: epsilon
     real, dimension(nxm) :: vxvy, vxvz, vyvz
     real, dimension(nxmr) :: Sbar, Srms, chiS
     real, dimension(nxmr) :: vxS, vyS, vzS
@@ -97,7 +97,6 @@ subroutine CalcMeanProfiles
         vxT(k) = vxT(k)*inym*inzm
         vyT(k) = vyT(k)*inym*inzm
         vzT(k) = vzT(k)*inym*inzm
-        ! CONTINUE COMPACTING HERE!!
         Trms(k) = sqrt(Trms(k)*inym*inzm)
         vxrms(k) = sqrt(vxrms(k)*inym*inzm)
         vyrms(k) = sqrt(vyrms(k)*inym*inzm)
@@ -136,40 +135,36 @@ subroutine CalcMeanProfiles
 
     ! do i=xstart(3),xend(3)
     !     ip = i + 1
+    !     im = i - 1
     !     do j=xstart(2),xend(2)
+    !         jp = j + 1
+    !         jm = j - 1
     !         do k=1,nxm
+    !             chiT2(k) = chiT2(k) + &     ! (dT/dz)^2 + (dT/dy)^2
+    !                     0.5*dz**2*((temp(k,j,ip) - temp(k,j,i))**2 + (temp(k,j,i) - temp(k,j,im))**2) + &
+    !                     0.5*dy**2*((temp(k,jp,i) - temp(k,j,i))**2 + (temp(k,j,i) - temp(k,jm,i))**2)
+    !         end do
+    !         k = 1
+    !         kp = 2
+    !         chiT2(k) = chiT2(k) + &
+    !                 0.5*((temp(kp,j,i) - temp(k,j,i))**2*udx3c(kp)**2 + &
+    !                     TfixS*(temp(k,j,i) - tempbp(1,j,i))**2/xm(k)**2)
+    !         do k=2,nxm-1
     !             kp = k + 1
     !             km = k - 1
-    !             chiT(k) = chiT(k) + &
-    !                     (ap(k)*temp(kp,j,i) + ac(k)*temp(k,j,i) + am(k)*temp(km,j,i))**2 &
+    !             chiT2(k) = chiT2(k) + &     ! (dT/dx)^2
+    !                     0.5*((temp(kp,j,i) - temp(k,j,i))**2*udx3c(kp)**2 + &
+    !                          (temp(k,j,i) - temp(km,j,i))**2*udx3c(k)**2)
     !         end do
+    !         k = nxm
+    !         km = nxm - 1
+    !         chiT2(k) = chiT2(k) + &
+    !                 0.5*(TfixN*(temptp(1,j,i) - temp(k,j,i))**2/(alx3 - xm(k))**2 + &
+    !                     (temp(k,j,i) - temp(km,j,i))**2*udx3c(k)**2)
+    !     end do
+    ! end do
 
-    do i=xstart(3),xend(3)
-        do j=xstart(2),xend(2)
-            do k=1,nxm
-                epsilon(k) = epsilon(k) + ((vz(k,j,i+1)-vz(k,j,i))*dz)**2*inym*inzm &   ! (dw/dz)^2
-                                      & + (0.25*(vy(k,j+1,i+1)+vy(k,j,i+1)-vy(k,j+1,i-1)-vy(k,j,i-1))*dz)**2*inym*inzm & ! (dv/dz)^2
-                                      & + (0.25*(vx(k+1,j,i+1)+vx(k,j,i+1)-vx(k+1,j,i-1)-vx(k,j,i-1))*dz)**2*inym*inzm & ! (du/dz)^2
-                                      & + (0.25*(vz(k,j+1,i+1)+vz(k,j+1,i)-vz(k,j-1,i+1)-vz(k,j-1,i))*dy)**2*inym*inzm & ! (dw/dy)^2
-                                      & + ((vy(k,j+1,i)-vy(k,j,i))*dy)**2*inym*inzm &   ! (dv/dy)^2
-                                      & + (0.25*(vx(k+1,j+1,i)+vx(k,j+1,i)-vx(k+1,j-1,i)-vx(k,j-1,i))*dy)**2*inym*inzm & ! (du/dy)^2
-                                      & + ((vx(k+1,j,i)-vx(k,j,i))*udx3m(k))**2*inym*inzm   ! (du/dx)^2
-            end do
-            tdx = 0.25*dx/g3rm(1)
-            epsilon(1) = epsilon(1) + ((vz(2,j,i+1)+vz(2,j,i)+vz(1,j,i+1)+vz(1,j,i)          )*tdx)**2*inym*inzm &  
-                                  & + ((vy(2,j+1,i)+vy(2,j,i)+vy(1,j+1,i)+vy(1,j,i)-2*xminusU)*tdx)**2*inym*inzm
-            do k=2,nxm-1
-                tdx = 0.25*dx/g3rm(k)
-                epsilon(k) = epsilon(k) + ((vz(k+1,j,i+1)+vz(k+1,j,i)-vz(k-1,j,i+1)-vz(k-1,j,i))*tdx)**2*inym*inzm &    ! (dw/dx)^2
-                                      & + ((vy(k+1,j+1,i)+vy(k+1,j,i)-vy(k-1,j+1,i)-vy(k-1,j,i))*tdx)**2*inym*inzm      ! (dv/dx)^2
-            end do
-            tdx = 0.25*dx/g3rm(nxm)
-            epsilon(nxm) = epsilon(nxm) + ((        -vz(nxm-1,j,i+1)-vz(nxm-1,j,i)-vz(nxm,j,i+1)-vz(nxm,j,i))*tdx)**2*inym*inzm &
-                                      & + ((2*xplusU-vy(nxm-1,j+1,i)-vy(nxm-1,j,i)-vy(nxm,j+1,i)-vy(nxm,j,i))*tdx)**2*inym*inzm
-        end do
-    end do
-
-    call MpiAllSumReal1D(epsilon,nxm)
+    ! call MpiSumReal1D(chiT2,nxm)
 
     do i=xstart(3),xend(3)
         ip = i + 1
@@ -180,7 +175,7 @@ subroutine CalcMeanProfiles
             do k=1,nxm
                 kp = k + 1
                 km = k - 1
-                eps2(k) = eps2(k) + ((vz(k,j,ip)-vz(k,j,i))*dz)**2 &   ! (dw/dz)^2
+                epsilon(k) = epsilon(k) + ((vz(k,j,ip)-vz(k,j,i))*dz)**2 &   ! (dw/dz)^2
                                 & + 0.125*dz**2*((vy(k,jp,ip) - vy(k,jp,im))**2 + (vy(k,j,ip) - vy(k,j,im))**2) & ! (dv/dz)^2
                                 & + 0.125*dz**2*((vx(kp,j,ip) - vx(kp,j,im))**2 + (vx(k,j,ip) - vx(k,j,im))**2) & ! (du/dz)^2
                                 & + 0.125*dy**2*((vz(k,jp,ip) - vz(k,jm,ip))**2 + (vz(k,jp,i) - vz(k,jm,i))**2) & ! (dw/dy)^2
@@ -189,7 +184,7 @@ subroutine CalcMeanProfiles
                                 & + ((vx(k+1,j,i)-vx(k,j,i))*udx3m(k))**2   ! (du/dx)^2
             end do
             tdx = 0.125*(dx/g3rm(1))**2
-            eps2(1) = eps2(1) + tdx*((vz(2,j,ip) - vz(1,j,ip) + inslws*2.0*(vz(1,j,ip) - 0.0))**2 &
+            epsilon(1) = epsilon(1) + tdx*((vz(2,j,ip) - vz(1,j,ip) + inslws*2.0*(vz(1,j,ip) - 0.0))**2 &
                                    + (vz(2,j,i) - vz(1,j,i) + inslws*2.0*(vz(1,j,i) - 0.0))**2) &
                             & + tdx*((vy(2,jp,i) - vy(1,jp,i) + inslws*2.0*(vy(1,jp,i) - xminusU))**2 &
                                    + (vy(2,j,i) - vy(1,j,i) + inslws*2.0*(vy(1,j,i) - xminusU))**2)
@@ -197,11 +192,11 @@ subroutine CalcMeanProfiles
                 kp = k + 1
                 km = k - 1
                 tdx = 0.125*(dx/g3rm(k))**2
-                eps2(k) = eps2(k) + tdx*((vz(kp,j,ip) - vz(km,j,ip))**2 + (vz(kp,j,i) - vz(km,j,i))**2) &    ! (dw/dx)^2
+                epsilon(k) = epsilon(k) + tdx*((vz(kp,j,ip) - vz(km,j,ip))**2 + (vz(kp,j,i) - vz(km,j,i))**2) &    ! (dw/dx)^2
                                 & + tdx*((vy(kp,jp,i) - vy(km,jp,i))**2 + (vy(kp,j,i) - vy(km,j,i))**2)      ! (dv/dx)^2
             end do
             tdx = 0.125*(dx/g3rm(nxm))**2
-            eps2(nxm) = eps2(nxm) + tdx*((vz(nxm,j,ip) - vz(nxm-1,j,ip) + inslws*2.0*(0.0 - vz(nxm,j,ip)))**2 &
+            epsilon(nxm) = epsilon(nxm) + tdx*((vz(nxm,j,ip) - vz(nxm-1,j,ip) + inslws*2.0*(0.0 - vz(nxm,j,ip)))**2 &
                                        + (vz(nxm,j,i) - vz(nxm-1,j,i) + inslws*2.0*(0.0 - vz(nxm,j,i)))**2) &
                                 & + tdx*((vy(nxm,jp,i) - vy(nxm-1,jp,i) + inslws*2.0*(vy(nxm,jp,i) - xplusU))**2 &
                                        + (vy(nxm,j,i) - vy(nxm-1,j,i) + inslws*2.0*(vy(nxm,j,i) - xplusU))**2)
@@ -211,9 +206,9 @@ subroutine CalcMeanProfiles
     call MpiSumReal1D(epsilon,nxm)
 
     do k=1,nxm
-        epsilon(k) = epsilon(k)/ren
         chiT(k) = chiT(k)*inym*inzm/pect
-        eps2(k) = eps2(k)*inym*inzm/ren
+        ! chiT2(k) = chiT2(k)*inym*inzm/pect
+        epsilon(k) = epsilon(k)*inym*inzm/ren
     end do
 
     if (salinity) then
@@ -285,6 +280,7 @@ subroutine CalcMeanProfiles
         end do
 
         call MpiSumReal1D(phibar,nxmr)
+        call MpiSumReal1D(phirms,nxmr)
 
         do k=1,nxmr
             phirms(k) = sqrt(phirms(k))
@@ -344,10 +340,10 @@ subroutine CalcMeanProfiles
         dsetname = trim("chiT/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,chiT,nxm)
         
-        dsetname = trim("epsilon/"//nstat)
-        call HdfSerialWriteReal1D(dsetname,filename,epsilon,nxm)
+        ! dsetname = trim("chiT2/"//nstat)
+        ! call HdfSerialWriteReal1D(dsetname,filename,chiT2,nxm)
         
-        dsetname = trim("eps2/"//nstat)
+        dsetname = trim("epsilon/"//nstat)
         call HdfSerialWriteReal1D(dsetname,filename,epsilon,nxm)
         
         if (salinity) then
@@ -428,9 +424,9 @@ subroutine HdfCreateMeansFile(filename)
     call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"chiT",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
+    ! call h5gcreate_f(file_id,"chiT2",group_id,hdf_error)
+    ! call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"epsilon",group_id,hdf_error)
-    call h5gclose_f(group_id,hdf_error)
-    call h5gcreate_f(file_id,"eps2",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
     if (salinity) then
         call h5gcreate_f(file_id,"Sbar",group_id,hdf_error)
