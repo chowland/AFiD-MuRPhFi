@@ -5,7 +5,7 @@ from scipy.special import erfc
 
 ### INPUTS
 # Prandtl & Schmidt numbers
-Pr, Sc = 10.0, 1000.0
+Pr, Sc = 1.0, 10.0
 # Density ratio
 Rrho = 7e-3
 ###
@@ -15,7 +15,7 @@ tau = Pr/Sc
 # Far-field temperature (degree C)
 DT = 5.0
 # Stefan number
-S = 80.0/DT
+S = 2.5 # 80.0/DT
 # Dimensionless liquidus slope
 Lambda = 2.8e-3/Rrho
 # Far-field salinity (g/kg)
@@ -44,8 +44,10 @@ a0 = np.interp(0, lhs - rhs, alpha)
 A = a0*np.exp(a0**2)*S*qpi
 B = (1 + Lambda - A*erfc(-a0))/Lambda/erfc(-a0/np.sqrt(tau))
 
-real_ratio = Rrho*(A*erfc(-a0)/B*erfc(-a0/np.sqrt(tau)))
+real_ratio = Rrho*(A*erfc(-a0)/B/erfc(-a0/np.sqrt(tau)))
 print("Effective density ratio: ", real_ratio)
+print("Interface melting temperature: ", DT*(1.0 - A*erfc(-a0)), "deg C")
+print("Interface salinity: ", DS*(1.0 - B*erfc(-a0/np.sqrt(tau))), "g/kg")
 
 x0 = 0.8
 t0 = 1e-4
