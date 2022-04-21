@@ -11,17 +11,19 @@
 !                                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      subroutine ImplicitAndUpdateVX
-      use param
-      use local_arrays, only: vx,rhs,rux,qcap,pr
-      use decomp_2d, only: xstart,xend
-      implicit none
-      integer :: jc,kc
-      integer :: km,kp,ic
-      real    :: alre,udx3
-      real    :: amm,acc,app,dxp,dxxvx
+subroutine ImplicitAndUpdateVX
+    use param
+    use local_arrays, only: vx,rhs,rux,qcap,pr
+    use decomp_2d, only: xstart,xend
+    use ibm_param
+    implicit none
+    integer :: jc,kc
+    integer :: km,kp,ic,ke
+    real    :: alre,udx3
+    real    :: amm,acc,app,dxp,dxxvx
+    real    :: usaldto,q3e
 
-      alre=al/ren
+    alre=al/ren
 
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &
@@ -32,50 +34,68 @@
 !$OMP   PRIVATE(ic,jc,kc,km,kp) &
 !$OMP   PRIVATE(amm,acc,app,udx3) &
 !$OMP   PRIVATE(dxxvx,dxp)
-      do ic=xstart(3),xend(3)
-      do jc=xstart(2),xend(2)
-      do kc=2,nxm
-      km=kc-1
-      kp=kc+1
-      udx3 = al*udx3c(kc)
-      amm=am3ck(kc)
-      acc=ac3ck(kc)
-      app=ap3ck(kc)
+    do ic=xstart(3),xend(3)
+        do jc=xstart(2),xend(2)
+            do kc=2,nxm
+                km = kc-1
+                kp = kc+1
+                udx3 = al*udx3c(kc)
+                amm = am3ck(kc)
+                acc = ac3ck(kc)
+                app = ap3ck(kc)
 
 !   Second derivative in x-direction of vx
 !
-            dxxvx=vx(kp,jc,ic)*app &
-                +vx(kc,jc,ic)*acc &
-                +vx(km,jc,ic)*amm
+                dxxvx=vx(kp,jc,ic)*app &
+                    +vx(kc,jc,ic)*acc &
+                    +vx(km,jc,ic)*amm
 
 !  component of grad(pr) along x direction
 !
-            dxp=(pr(kc,jc,ic)-pr(km,jc,ic))*udx3
+                dxp=(pr(kc,jc,ic)-pr(km,jc,ic))*udx3
 
 !    Calculate right hand side of Eq. 5 (VO96)
 !
-            rhs(kc,jc,ic)=(ga*qcap(kc,jc,ic)+ro*rux(kc,jc,ic) &
-                          +alre*dxxvx-dxp)*dt 
+                rhs(kc,jc,ic)=(ga*qcap(kc,jc,ic)+ro*rux(kc,jc,ic) &
+                                +alre*dxxvx-dxp)*dt 
 
 !    Store the non-linear terms for the calculation of 
 !    the next timestep
 
-            rux(kc,jc,ic)=qcap(kc,jc,ic)
-      enddo
-      enddo
-      enddo
+                rux(kc,jc,ic)=qcap(kc,jc,ic)
+            end do
+        end do
+    end do
 !$OMP END PARALLEL DO
+
+    iF(ANY(IsNaN(rhs))) write(*,*) 'NaN in rhs'
 
 !  Solve equation and update velocity
 
-      call SolveImpEqnUpdate_X
+    if (IBM) then
+        forclo = 1.d0
+        usaldto = 1.0/aldto
+        do n=1,npunx
+            ic = indgeo(3,n,1)
+            jc = indgeo(3,n,2)
+            kc = indgeo(3,n,3)
+            forclo(kc,jc,ic) = 0.d0
+            ke = indgeoe(3,n,3)
+            q3e = ((al*dt + aldto)*vx(ke,jc,ic) - al*dt*q3bo(n))*usaldto
+            rhs(kc,jc,ic) = -vx(kc,jc,ic) + q3e*distb(3,n)
+            q3bo(n) = vx(ke,jc,ic)
+        end do
+        iF(ANY(IsNaN(rhs))) write(*,*) 'NaN in rhs pre-ibm implicit solve'
+        call SolveImpEqnUpdate_X_ibm
+    else
+        call SolveImpEqnUpdate_X
+    end if
 
 !  Set boundary conditions on the vertical velocity at top
 !  and bottom plates. This seems necessary.
 
-      vx(1,:,:)=0.0d0
-      vx(nx,:,:)=0.0d0
+    vx(1,:,:)=0.0d0
+    vx(nx,:,:)=0.0d0
 
-      return
-      end
-!
+    return
+end subroutine ImplicitAndUpdateVX

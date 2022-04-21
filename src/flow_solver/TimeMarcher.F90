@@ -10,25 +10,30 @@
 !                                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      subroutine TimeMarcher
-      use param
-      use local_arrays
-      use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
-      use mpih
-      use decomp_2d
-      implicit none
-      integer :: ns
-      integer :: j,k,i
+subroutine TimeMarcher
+    use param
+    use local_arrays
+    use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
+    use mpih
+    use decomp_2d
+    use ibm_param, only: aldto
+    implicit none
+    integer :: ns
+    integer :: j,k,i
 
-      beta=dt/ren*0.5d0
+    beta = dt/ren*0.5d0
 
-      do ns=1,nsst                                                 
+    do ns=1,nsst                                                 
 
 !RO     Coefficients for time marching integration (alpha, gamma, rho)
-
-        al=alm(ns)
-        ga=gam(ns)
-        ro=rom(ns)
+        if(ntime.le.1) then
+            aldto = alm(1)*dt
+        else
+            aldto = al*dt
+        end if
+        al = alm(ns)
+        ga = gam(ns)
+        ro = rom(ns)
 
         if (melt) call UpdateBCs
 
@@ -48,11 +53,21 @@
         if (salinity) call ExplicitTermsSal !Refined
         if (phasefield) call AddLatentHeat
 
+        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX pre-implicit',ns
+        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY pre-implicit',ns
+        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ pre-implicit',ns
+        ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP pre-implicit',ns
+
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ
         call ImplicitAndUpdateTemp
         if (salinity) call ImplicitAndUpdateSal !Refined
+
+        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX post-implicit',ns
+        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY post-implicit',ns
+        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ post-implicit',ns
+        ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP post-implicit',ns
 
         if (phasefield .and. IBM) call ImmersedBoundary
 
@@ -69,12 +84,12 @@
 !memory usage.  Time spent on this copy is 0.1% for 65^3 grid.
 
         do i=xstart(3),xend(3)
-          do j=xstart(2),xend(2)
-            do k=1,nxm
-              dphhalo(k,j,i) = dph(k,j,i)
-            enddo
-          enddo
-        enddo
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    dphhalo(k,j,i) = dph(k,j,i)
+                end do
+            end do
+        end do
 
         call update_halo(dphhalo,lvlhalo)
 
@@ -90,28 +105,28 @@
         if (phasefield) call update_halo(phi,lvlhalo)
 
         if (salinity) then
-          call InterpVelMgrd !Vel from base mesh to refined mesh
-          call update_halo(vxr,lvlhalo)
-          call update_halo(vyr,lvlhalo)
-          call update_halo(vzr,lvlhalo)
-          call InterpSalMgrd !Sal from refined mesh to base mesh
-          call update_halo(salc,lvlhalo)
+            call InterpVelMgrd !Vel from base mesh to refined mesh
+            call update_halo(vxr,lvlhalo)
+            call update_halo(vyr,lvlhalo)
+            call update_halo(vzr,lvlhalo)
+            call InterpSalMgrd !Sal from refined mesh to base mesh
+            call update_halo(salc,lvlhalo)
         end if
 
         if (phasefield) then
-          call InterpTempMgrd
-          call update_halo(tempr,lvlhalo)
-          call InterpPhiMgrd
-          call update_halo(phic,lvlhalo)
+            call InterpTempMgrd
+            call update_halo(tempr,lvlhalo)
+            call InterpPhiMgrd
+            call update_halo(phic,lvlhalo)
         end if
 
-        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX'
-        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY'
-        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ'
-        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI'
+        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX',ns
+        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY',ns
+        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ',ns
+        ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in PHI',ns
 
-        enddo
+    end do
 
 
-      return
-      end
+    return
+end subroutine TimeMarcher

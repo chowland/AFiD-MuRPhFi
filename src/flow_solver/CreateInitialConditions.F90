@@ -115,7 +115,7 @@ subroutine CreateInitialConditions
     end if
 
     ! Set velocity to zero if we are using the phase-field method
-    if (melt .or. phasefield) then
+    if (melt .or. phasefield .or. IBM) then
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                 do k=1,nxm

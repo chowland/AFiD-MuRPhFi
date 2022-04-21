@@ -107,15 +107,19 @@ OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
 	obj/InterpTempMgrd.o obj/SolveImpEqnUpdate_Phi.o obj/CreateICPF.o \
 	obj/ImmersedBoundary.o
 
+# # Object files associated with the immersed boundary method
+OBJS += obj/SolveImpEqnUpdate_Temp_ibm.o obj/SolveImpEqnUpdate_X_ibm.o \
+	obj/SolveImpEqnUpdate_YZ_ibm.o obj/topogr_ibm.o obj/SolveImpEqnUpdate_Sal_ibm.o 
+
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
-	obj/HermiteInterpolations.o obj/GridModule.o
+	obj/HermiteInterpolations.o obj/GridModule.o obj/ibm_param.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
-	HermiteInterpolations.F90 GridModule.F90
+	HermiteInterpolations.F90 GridModule.F90 ibm_param.F90
 
 #============================================================================ 
 #  make PROGRAM   
@@ -138,6 +142,8 @@ $(OBJDIR)/decomp_2d.o: src/flow_solver/2decomp/decomp_2d.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
 	$(FC) -c -o $@ $< $(LDFLAGS) 
+$(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
+	$(FC) -c -o $@ $< $(LDFLAGS) 
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/flow_solver/%.F90 $(MOBJS)
@@ -149,6 +155,8 @@ $(OBJDIR)/%.o: src/multires/IC_interpolation/%.F90 $(MOBJS)
 $(OBJDIR)/%.o: src/multires/phase-field/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/multires/salinity/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: src/ibm/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 
 #============================================================================

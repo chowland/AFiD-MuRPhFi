@@ -156,6 +156,8 @@ program AFiD
 
     endif
 
+    if (IBM) call topogr
+
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)
     call update_halo(vy,lvlhalo)
