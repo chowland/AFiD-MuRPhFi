@@ -24,7 +24,7 @@ TOUT    TFRAME  SAVE_3D
 
 Domain size (keep ALX3 = 1.0)
 ALX3   YLEN   ZLEN
-1.0    2.0    0.01
+1.0    0.577    0.01
 
 Grid stretching parameters
 ISTR3   STR3    ISTR3R
