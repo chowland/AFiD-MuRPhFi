@@ -3,9 +3,10 @@ module ibm_param
       integer :: npunx,npuny,npunz,npunte,mpun,npuntr
       integer :: n
       real :: aldto
-      parameter (mpun=30000)
+      parameter (mpun=50000)
       real,allocatable,dimension(:,:,:) :: forclo, forclor
       real,allocatable,dimension(:,:) :: plth1, plth2
+      logical,allocatable,dimension(:,:,:) :: solidr
       integer,dimension(3,mpun,3) :: indgeo, indgeoe
       integer,dimension(mpun,3) :: indgeot, indgeoet
       integer,dimension(mpun,3) :: indgeor, indgeoer
