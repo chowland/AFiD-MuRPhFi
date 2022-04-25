@@ -21,7 +21,15 @@ subroutine CreateICSal
 
     call random_seed()
     eps=5e-3
-    if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
+    if (IBM) then
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    sal(k,j,i) = 0.5*tanh((xmr(k) - 0.5 + 0.01*sin(2.0*pi*ymr(j)/ylen*5.0))/0.01)
+                end do
+            end do
+        end do
+    else if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
         ! For DDC initialise with uniform salinity
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
