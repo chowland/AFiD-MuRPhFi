@@ -1,6 +1,6 @@
 # Choose the machine being used
 # Options: PC_GNU, PC_INTEL, (i)SNELLIUS, IRENE, MARENOSTRUM, SUPERMUC
-MACHINE=PC_GNU
+MACHINE=iSNELLIUS
 # Modules required for each HPC system as follows:
 # SNELLIUS: 2021 foss/2021a HDF5/1.10.7-gompi-2021a
 # iSNELLIUS: 2021 intel/2021a FFTW/3.3.9-intel-2021a HDF5/1.10.7-iimpi-2021a
@@ -33,7 +33,7 @@ ifeq ($(MACHINE),iSNELLIUS)
 endif
 ifeq ($(MACHINE),SNELLIUS)
 	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -w -fallow-argument-mismatch
-	FC += -O3 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer
+	FC += -O2 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer
 	BLAS_LIBS = -lscalapack -lopenblas -ldl
 	LDFLAGS = -lfftw3 $(BLAS_LIBS)
 endif
