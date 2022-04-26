@@ -11,6 +11,7 @@
 subroutine ExplicitTermsSal
     use param
     use mgrd_arrays, only: vxr,vyr,vzr,sal,hsal,phi,rhsr
+    use ibm_param, only: solidr
     use decomp_2d, only: xstartr,xendr
     implicit none
     integer :: jc,kc,ic
@@ -56,8 +57,22 @@ subroutine ExplicitTermsSal
             hsy=(vyr(kc,jp,ic)*(sal(kc,jp,ic)+sal(kc,jc,ic))- &
                     vyr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc,jm,ic)) &
                 )*udyr
-            dzzs=(sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
-            dyys=(sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
+            ! dzzs=(sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
+            ! dyys=(sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
+            if (solidr(kc,jc,ip)) then
+                dzzs = (sal(kc,jc,im) - sal(kc,jc,ic))*udzrq
+            elseif (solidr(kc,jc,im)) then
+                dzzs = (sal(kc,jc,ip) - sal(kc,jc,ic))*udzrq
+            else
+                dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
+            end if
+            if (solidr(kc,jp,ic)) then
+                dyys = (sal(kc,jm,ic) - sal(kc,jc,ic))*udyrq
+            elseif (solidr(kc,jm,ic)) then
+                dyys = (sal(kc,jp,ic) - sal(kc,jc,ic))*udyrq
+            else
+                dyys = (sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
+            end if
             hsal(kc,jc,ic) = -(hsx+hsy+hsz)+dyys+dzzs
 
             do kc=2,nxmr-1
@@ -102,16 +117,29 @@ subroutine ExplicitTermsSal
         !
         !   zz second derivatives of sal
         !
-                dzzs=(sal(kc,jc,ip) &
-                -2.0*sal(kc,jc,ic) &
-                    +sal(kc,jc,im))*udzrq
-            
+                ! dzzs=(sal(kc,jc,ip) &
+                ! -2.0*sal(kc,jc,ic) &
+                !     +sal(kc,jc,im))*udzrq
+                if (solidr(kc,jc,ip)) then
+                    dzzs = (sal(kc,jc,im) - sal(kc,jc,ic))*udzrq
+                elseif (solidr(kc,jc,im)) then
+                    dzzs = (sal(kc,jc,ip) - sal(kc,jc,ic))*udzrq
+                else
+                    dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
+                end if
         !
         !   yy second derivatives of sal
         !
-                dyys=(sal(kc,jp,ic) &
-                -2.0*sal(kc,jc,ic) &
-                    +sal(kc,jm,ic))*udyrq
+                ! dyys=(sal(kc,jp,ic) &
+                ! -2.0*sal(kc,jc,ic) &
+                !     +sal(kc,jm,ic))*udyrq
+                if (solidr(kc,jp,ic)) then
+                    dyys = (sal(kc,jm,ic) - sal(kc,jc,ic))*udyrq
+                elseif (solidr(kc,jm,ic)) then
+                    dyys = (sal(kc,jp,ic) - sal(kc,jc,ic))*udyrq
+                else
+                    dyys = (sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
+                end if
 
                 hsal(kc,jc,ic) = -(hsx+hsy+hsz)+dyys+dzzs
             enddo
@@ -128,8 +156,22 @@ subroutine ExplicitTermsSal
             hsy=(vyr(kc,jp,ic)*(sal(kc,jp,ic)+sal(kc,jc,ic))- &
                 vyr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc,jm,ic)) &
                 )*udyr
-            dzzs=(sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
-            dyys=(sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
+            if (solidr(kc,jc,ip)) then
+                dzzs = (sal(kc,jc,im) - sal(kc,jc,ic))*udzrq
+            elseif (solidr(kc,jc,im)) then
+                dzzs = (sal(kc,jc,ip) - sal(kc,jc,ic))*udzrq
+            else
+                dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
+            end if
+            if (solidr(kc,jp,ic)) then
+                dyys = (sal(kc,jm,ic) - sal(kc,jc,ic))*udyrq
+            elseif (solidr(kc,jm,ic)) then
+                dyys = (sal(kc,jp,ic) - sal(kc,jc,ic))*udyrq
+            else
+                dyys = (sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
+            end if
+            ! dzzs=(sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
+            ! dyys=(sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
             hsal(kc,jc,ic) = -(hsx+hsy+hsz)+dyys+dzzs
 
         enddo

@@ -6,6 +6,7 @@ subroutine topogr
     use param
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use ibm_param
+    use mgrd_arrays, only: sal
     implicit none
     integer :: i,j,k,l,kstartp, nc, Npart
     integer :: km,kp,jm,jp,im,ip,mm
@@ -73,30 +74,29 @@ subroutine topogr
     
     allocate(forclo(1:nx,xstart(2):xend(2),xstart(3):xend(3)))
     if (salinity) then
-        allocate(forclor(1:nxr,xstartr(2):xendr(2),xstartr(3):xendr(3)))
+        allocate(forclor(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)))
+        allocate(solidr(1:nxmr,xstartr(2)-1:xendr(2)+1,xstartr(3)-1:xendr(3)+1))
     end if
 
     forclo = 0.0
-    nc = 3
+    nc = 5
     Lhex = 1.0/3/nc/ylen
     radius = 0.4*Lhex
-    ! Npart = (nc + 1)*(nc + 1) + nc*nc
-    Npart = (nc - 1)*(nc + 1) + nc*nc
+    Npart = (nc + 1)*(nc + 1) + nc*nc
+    ! Npart = (nc - 1)*(nc + 1) + nc*nc
     allocate(xpart(1:Npart))
     allocate(ypart(1:Npart))
 
     i = 1
     ! do j=0,nc
-    do j=1,nc
-        if (j<nc) then
-            xe = real(j)/real(nc)
-            do k=0,nc
-                ye = Lhex*real(k)
-                xpart(i) = xe
-                ypart(i) = ye
-                i = i + 1
-            end do
-        end if
+    do j=0,nc
+        xe = real(j)/real(nc)
+        do k=0,nc
+            ye = Lhex*real(k)
+            xpart(i) = xe
+            ypart(i) = ye
+            i = i + 1
+        end do
         if (j>0) then
             xe = (real(j) - 0.5)/real(nc)*alx3
             do k=1,nc
@@ -386,6 +386,7 @@ subroutine topogr
     if(allocated(plth2)) deallocate(plth2)
     
     if (salinity) then
+        
         allocate(plth1(1:nzmr,1:nymr))
         allocate(plth2(1:nzmr,1:nymr))
         plth1=1.d0
@@ -407,6 +408,35 @@ subroutine topogr
         forclor = 0.0d0
         !
 
+        do i=xstartr(3)-1,xendr(3)+1
+            do j=xstartr(2)-1,xendr(2)+1
+                do k=1,nxmr
+                    xe = xmr(k)
+                    ye = ymr(j)
+                    do nc=1,Npart
+                        ! x-position of solid centre
+                        xem = xpart(nc)
+                        yem = ypart(nc)
+                        r2 = (xe - xem)**2 + (ye - yem)**2
+                        solidr(k,j,i) = solidr(k,j,i) .or. (r2<radius**2)
+                        ! if (solidr(k,j,i)) then
+                        !     forclor(k,j,i) = 1.0
+                        ! end if
+                    end do
+                end do
+            end do
+        end do
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    if (solidr(k,j,i)) then
+                        forclor(k,j,i) = 1.0
+                        sal(k,j,i) = 0.0
+                    end if
+                end do
+            end do
+        end do
+
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
@@ -419,66 +449,66 @@ subroutine topogr
                     !    SOLID PART
                     !           
 
+                    if (forclor(k,j,i) > 0.9) then
+                        n = n + 1
+                        indgeor(n,1) = i
+                        indgeor(n,2) = j
+                        indgeor(n,3) = k
+                        indgeoer(n,1) = i
+                        indgeoer(n,2) = j 
+                        indgeoer(n,3) = k
+                        distbr(n) = 0.0
+                        salfix(n) = 0.0
 
-                    if(xe.lt.plth1(j,i)) then
-                        n=n+1
-                        indgeor(n,1)=i
-                        indgeor(n,2)=j
-                        indgeor(n,3)=k
-                        indgeoer(n,1)=i
-                        indgeoer(n,2)=j
-                        indgeoer(n,3)=k
-                        distbr(n)= 0.
-                        salfix(n) = salbp(1,j,i)
+                !   FLUID
+                !   -----   BOUNDARY
+                !   SOLID
 
-                    elseif(xe.gt.(alx3-plth2(j,i))) then
-                        n=n+1
-                        indgeor(n,1)=i
-                        indgeor(n,2)=j
-                        indgeor(n,3)=k
-                        indgeoer(n,1)=i
-                        indgeoer(n,2)=j
-                        indgeoer(n,3)=k
-                        distbr(n)= 0.
-                        salfix(n) = saltp(1,j,i)
-                    
-                !
-                !    LOWER FLUID/PLATE BOUNDARY
-                !
-                    elseif((xe.ge.plth1(j,i)).and.(xem.lt.plth1(j,i))) then
-                        n=n+1
-                        indgeor(n,1)=i
-                        indgeor(n,2)=j
-                        indgeor(n,3)=k
-                        indgeoer(n,1)=i
-                        indgeoer(n,2)=j 
-                        indgeoer(n,3)=kp
-                        delta1x=(xep-xe)
-                        delta2x=(xe-plth1(j,i))
-                        distbr(n)= delta2x/(delta1x+delta2x)
-                        salfix(n) = salbp(1,j,i)
-                !
-                !    UPPER FLUID/PLATE BOUNDARY
-                !
-                    elseif((xe.le.(alx3-plth2(j,i))).and.(xep.gt.(alx3-plth2(j,i)))) &
-                        then
-                        n=n+1
-                        indgeor(n,1)=i
-                        indgeor(n,2)=j
-                        indgeor(n,3)=k
-                        indgeoer(n,1)=i
-                        indgeoer(n,2)=j 
-                        indgeoer(n,3)=km
-                        delta1x=(xe-xem)
-                        delta2x=((alx3-plth2(j,i))-xe)
-                        distbr(n)= delta2x/(delta1x+delta2x)
-                        salfix(n) = saltp(1,j,i)
+                    elseif (forclor(k,j,i) < forclor(km,j,i)) then
+                        n = n+1
+                        indgeor(n,1) = i
+                        indgeor(n,2) = j
+                        indgeor(n,3) = k
+                        indgeoer(n,1) = i
+                        indgeoer(n,2) = j 
+                        indgeoer(n,3) = kp
+                        delta1x = (xep - xe)
+                        delta2x = 1.0
+                        do nc=1,Npart
+                            xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
+                            if (xe > xem) delta2x = min(delta2x, xe - xem)
+                        end do
+                        ! distbr(n) = delta2x/(delta1x + delta2x)
+                        distbr(n) = 1.0
+                        salfix(n) = 0.0
+
+                !   SOLID
+                !   -----   BOUNDARY
+                !   FLUID
+
+                    elseif (forclor(k,j,i) < forclor(kp,j,i)) then
+                        n = n+1
+                        indgeor(n,1) = i
+                        indgeor(n,2) = j
+                        indgeor(n,3) = k
+                        indgeoer(n,1) = i
+                        indgeoer(n,2) = j 
+                        indgeoer(n,3) = km
+                        delta1x = (xe - xem)
+                        do nc=1,Npart
+                            xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
+                            if (xep > xe) delta2x = min(delta2x, xep - xe)
+                        end do
+                        ! distbr(n)= delta2x/(delta1x + delta2x)
+                        distbr(n) = 1.0
+                        salfix(n) = 0.0
                     
                     end if
                                     
                 end do
             end do
         end do
+
         if(n.gt.mpun) &
             write(*,*) 'Dim max di indgeore e'' stata superata n=',n
         npuntr = n

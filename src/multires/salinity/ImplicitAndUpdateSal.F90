@@ -20,7 +20,7 @@ subroutine ImplicitAndUpdateSal
     integer :: km,kp,ke
     real    :: alpec,dxxs
     real    :: app,acc,amm
-    real    :: usaldto,sale  
+    real    :: usaldto,sale
 
     alpec=al/pecs
 
@@ -72,24 +72,24 @@ subroutine ImplicitAndUpdateSal
 
 !  Solve equation and update salinity
 
-    ! if (IBM) then
-    !     forclor = 1.d0
-    !     usaldto = 1.0/aldto
-    !     do n=1,npuntr
-    !         ic = indgeor(n,1)
-    !         jc = indgeor(n,2)
-    !         kc = indgeor(n,3)
-    !         forclor(kc,jc,ic) = 0.d0
-    !         ke = indgeoer(n,3)
-    !         sale = ((al*dt + aldto)*sal(ke,jc,ic) - al*dt*salb(n))*usaldto
-    !         rhsr(kc,jc,ic) = -sal(kc,jc,ic) + sale*distbr(n) &
-    !                         + (1.0 - distbr(n))*salfix(n)
-    !         salb(n) = sal(ke,jc,ic)
-    !     end do
-    !     call SolveImpEqnUpdate_Sal_ibm
-    ! else
+    if (IBM) then
+        forclor = 1.d0
+        usaldto = 1.0/aldto
+        do n=1,npuntr
+            ic = indgeor(n,1)
+            jc = indgeor(n,2)
+            kc = indgeor(n,3)
+            forclor(kc,jc,ic) = 0.d0
+            ke = indgeoer(n,3)
+            sale = ((al*dt + aldto)*sal(ke,jc,ic) - al*dt*salb(n))*usaldto
+            rhsr(kc,jc,ic) = -sal(kc,jc,ic) + sale*distbr(n) !&
+                            ! + (1.0 - distbr(n))*salfix(n)
+            salb(n) = sal(ke,jc,ic)
+        end do
+        call SolveImpEqnUpdate_Sal_ibm
+    else
         call SolveImpEqnUpdate_Sal
-    ! end if
+    end if
 
     return
 end subroutine ImplicitAndUpdateSal
