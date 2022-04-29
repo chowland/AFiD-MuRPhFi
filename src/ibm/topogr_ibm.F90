@@ -455,53 +455,61 @@ subroutine topogr
                         indgeor(n,2) = j
                         indgeor(n,3) = k
                         indgeoer(n,1) = i
-                        indgeoer(n,2) = j 
-                        indgeoer(n,3) = k
-                        distbr(n) = 0.0
+                        indgeoer(n,2) = j
+                        if (forclor(kp,j,i) < 0.1) then
+                            indgeoer(n,3) = kp
+                            distbr(n) = 1.0
+                        elseif (forclor(km,j,i) < 0.1) then
+                            indgeoer(n,3) = km
+                            distbr(n) = 1.0
+                        else
+                            indgeoer(n,3) = k
+                            distbr(n) = 0.0
+                        end if
                         salfix(n) = 0.0
 
                 !   FLUID
                 !   -----   BOUNDARY
                 !   SOLID
 
-                    elseif (forclor(k,j,i) < forclor(km,j,i)) then
-                        n = n+1
-                        indgeor(n,1) = i
-                        indgeor(n,2) = j
-                        indgeor(n,3) = k
-                        indgeoer(n,1) = i
-                        indgeoer(n,2) = j 
-                        indgeoer(n,3) = kp
-                        delta1x = (xep - xe)
-                        delta2x = 1.0
-                        do nc=1,Npart
-                            xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
-                            if (xe > xem) delta2x = min(delta2x, xe - xem)
-                        end do
-                        ! distbr(n) = delta2x/(delta1x + delta2x)
-                        distbr(n) = 1.0
-                        salfix(n) = 0.0
+                    ! elseif (forclor(k,j,i) < forclor(km,j,i)) then
+                    !     n = n+1
+                    !     indgeor(n,1) = i
+                    !     indgeor(n,2) = j
+                    !     indgeor(n,3) = k
+                    !     indgeoer(n,1) = i
+                    !     indgeoer(n,2) = j 
+                    !     indgeoer(n,3) = kp
+                    !     delta1x = (xep - xe)
+                    !     delta2x = 1.0
+                    !     do nc=1,Npart
+                    !         xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
+                    !         if (xe > xem) delta2x = min(delta2x, xe - xem)
+                    !     end do
+                    !     ! distbr(n) = delta2x/(delta1x + delta2x)
+                    !     distbr(n) = 1.0
+                    !     salfix(n) = 0.0
 
                 !   SOLID
                 !   -----   BOUNDARY
                 !   FLUID
 
-                    elseif (forclor(k,j,i) < forclor(kp,j,i)) then
-                        n = n+1
-                        indgeor(n,1) = i
-                        indgeor(n,2) = j
-                        indgeor(n,3) = k
-                        indgeoer(n,1) = i
-                        indgeoer(n,2) = j 
-                        indgeoer(n,3) = km
-                        delta1x = (xe - xem)
-                        do nc=1,Npart
-                            xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
-                            if (xep > xe) delta2x = min(delta2x, xep - xe)
-                        end do
-                        ! distbr(n)= delta2x/(delta1x + delta2x)
-                        distbr(n) = 1.0
-                        salfix(n) = 0.0
+                    ! elseif (forclor(k,j,i) < forclor(kp,j,i)) then
+                    !     n = n+1
+                    !     indgeor(n,1) = i
+                    !     indgeor(n,2) = j
+                    !     indgeor(n,3) = k
+                    !     indgeoer(n,1) = i
+                    !     indgeoer(n,2) = j 
+                    !     indgeoer(n,3) = km
+                    !     delta1x = (xe - xem)
+                    !     do nc=1,Npart
+                    !         xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
+                    !         if (xep > xe) delta2x = min(delta2x, xep - xe)
+                    !     end do
+                    !     ! distbr(n)= delta2x/(delta1x + delta2x)
+                    !     distbr(n) = 1.0
+                    !     salfix(n) = 0.0
                     
                     end if
                                     
