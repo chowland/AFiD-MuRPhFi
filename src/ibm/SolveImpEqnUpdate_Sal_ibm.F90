@@ -30,9 +30,9 @@ subroutine SolveImpEqnUpdate_Sal_ibm
         do jc=xstartr(2),xendr(2)
             do kc=1,nxmr
                 ackl_b = 1.0d0/(1.-ac3sskr(kc)*betadx*forclor(kc,jc,ic))
-                amkl(kc) = -am3sskr(kc)*betadx*ackl_b
+                amkl(kc) = -am3sskr(kc)*betadx*ackl_b*forclor(kc,jc,ic)
                 ackl(kc) = 1.0d0
-                apkl(kc) = -ap3sskr(kc)*betadx*ackl_b
+                apkl(kc) = -ap3sskr(kc)*betadx*ackl_b*forclor(kc,jc,ic)
                 fkl(kc) = rhsr(kc,jc,ic)*ackl_b
             end do
             fkl(nxr) = 0.d0
