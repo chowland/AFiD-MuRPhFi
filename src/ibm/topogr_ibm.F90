@@ -450,21 +450,28 @@ subroutine topogr
                     !           
 
                     if (forclor(k,j,i) > 0.9) then
-                        n = n + 1
-                        indgeor(n,1) = i
-                        indgeor(n,2) = j
-                        indgeor(n,3) = k
-                        indgeoer(n,1) = i
-                        indgeoer(n,2) = j
                         if (forclor(kp,j,i) < 0.1) then
+                            n = n + 1
+                            indgeor(n,1) = i
+                            indgeor(n,2) = j
+                            indgeor(n,3) = k
+                            indgeoer(n,1) = i
+                            indgeoer(n,2) = j
                             indgeoer(n,3) = kp
                             distbr(n) = 1.0
                         elseif (forclor(km,j,i) < 0.1) then
+                            n = n + 1
+                            indgeor(n,1) = i
+                            indgeor(n,2) = j
+                            indgeor(n,3) = k
+                            indgeoer(n,1) = i
+                            indgeoer(n,2) = j
                             indgeoer(n,3) = km
                             distbr(n) = 1.0
                         else
-                            indgeoer(n,3) = k
-                            distbr(n) = 0.0
+                            ! indgeoer(n,3) = k
+                            ! distbr(n) = 0.0
+                            ! sal(k,j,i) = 0.0
                         end if
                         salfix(n) = 0.0
 
