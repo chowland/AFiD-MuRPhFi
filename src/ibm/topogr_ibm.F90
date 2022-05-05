@@ -431,7 +431,6 @@ subroutine topogr
                 do k=1,nxmr
                     if (solidr(k,j,i)) then
                         forclor(k,j,i) = 1.0
-                        sal(k,j,i) = 0.0
                     end if
                 end do
             end do
