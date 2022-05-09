@@ -14,7 +14,7 @@ subroutine topogr
     real    :: xe, xem, xep
     real    :: ye, yem, yep
     real    :: ze, zem, zep
-    real    :: delta1x, delta2x, r2, Lhex, radius
+    real    :: delta1x, delta2x, r2, Lhex, radius, porosity
     integer,allocatable :: ind1(:), ind2(:)
     real,allocatable :: xpart(:), ypart(:)
     ! infig=1
@@ -79,11 +79,13 @@ subroutine topogr
     end if
 
     forclo = 0.0
-    nc = 5
-    Lhex = 1.0/3/nc/ylen
-    radius = 0.4*Lhex
-    Npart = (nc + 1)*(nc + 1) + nc*nc
-    ! Npart = (nc - 1)*(nc + 1) + nc*nc
+    porosity = 0.426
+    ! Interpret RayT input as target pore-scale Rayleigh number
+    nc = nint((2.0*ylen*(1.0 - porosity)/3.0/pi)**0.5 * (RayS/RayT)**(1.0/3.0))
+    if (ismaster) write(*,*) "Number of lattice columns: ",nc
+    Lhex = 1.0/nc/ylen
+    radius = (ylen*(1.0 - porosity)/6.0/pi)**0.5/nc
+    Npart = (nc + 1)*(3*nc + 1) + 3*nc*nc
     allocate(xpart(1:Npart))
     allocate(ypart(1:Npart))
 
@@ -91,7 +93,7 @@ subroutine topogr
     ! do j=0,nc
     do j=0,nc
         xe = real(j)/real(nc)
-        do k=0,nc
+        do k=0,3*nc
             ye = Lhex*real(k)
             xpart(i) = xe
             ypart(i) = ye
@@ -99,7 +101,7 @@ subroutine topogr
         end do
         if (j>0) then
             xe = (real(j) - 0.5)/real(nc)*alx3
-            do k=1,nc
+            do k=1,3*nc
                 ye = Lhex*(real(k) - 0.5)
                 xpart(i) = xe
                 ypart(i) = ye
