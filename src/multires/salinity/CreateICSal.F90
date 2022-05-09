@@ -27,8 +27,8 @@ subroutine CreateICSal
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
                     call random_number(varptb)
-                    sal(k,j,i) = 0.5*tanh((xmr(k) - 0.5)/1e-7)! + 0.01*sin(2.0*pi*ymr(j)/ylen*5.0))/0.01)
-                    sal(k,j,i) = sal(k,j,i) + eps/cosh((xmr(k) - 0.5)/0.01)**2*varptb
+                    sal(k,j,i) = 0.5*tanh((xmr(k) - 0.5 + 0.01*sin(3*2.0*pi*ymr(j)/ylen))/1e-7)
+                    ! sal(k,j,i) = sal(k,j,i) + eps/cosh((xmr(k) - 0.5)/0.01)**2*varptb
                 end do
             end do
         end do
