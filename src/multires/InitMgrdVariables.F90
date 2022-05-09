@@ -62,6 +62,10 @@ subroutine InitMgrdVariables
     call AllocateInt1dArray(jrangc,0,ny)
     call AllocateInt1dArray(krangc,0,nz)
 
+    call AllocateInt1dArray(irangb,0,nx+1)
+    call AllocateInt1dArray(jrangb,0,ny)
+    call AllocateInt1dArray(krangb,0,nz)
+
     call AllocateInt1dArray(irangr,0,nxr)
     call AllocateInt1dArray(jrangr,0,nyr)
     call AllocateInt1dArray(krangr,0,nzr)
@@ -81,6 +85,10 @@ subroutine InitMgrdVariables
     call AllocateReal2DArray(cxrs,1,4,1,nxmr)
     call AllocateReal2DArray(cyrs,1,4,1,nymr)
     call AllocateReal2DArray(czrs,1,4,1,nzmr)
+
+    call AllocateReal2DArray(cxphic,1,4,1,nxm)
+    call AllocateReal2DArray(cyphic,1,4,1,nym)
+    call AllocateReal2DArray(czphic,1,4,1,nzm)
 
     call AllocateReal2DArray(cxsalc,1,4,1,nx)
     call AllocateReal2DArray(cysalc,1,4,1,nym)
