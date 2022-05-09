@@ -82,7 +82,7 @@ subroutine InitMgrdVariables
     call AllocateReal2DArray(cyrs,1,4,1,nymr)
     call AllocateReal2DArray(czrs,1,4,1,nzmr)
 
-    call AllocateReal2DArray(cxsalc,1,4,1,nxm)
+    call AllocateReal2DArray(cxsalc,1,4,1,nx)
     call AllocateReal2DArray(cysalc,1,4,1,nym)
     call AllocateReal2DArray(czsalc,1,4,1,nzm)
 

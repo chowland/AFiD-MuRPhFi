@@ -22,8 +22,8 @@ subroutine topogr
     q2bo=0.d0
     q3bo=0.d0
     densb=0.d0 
-    allocate(plth1(1:nzm,1:nym))
-    allocate(plth2(1:nzm,1:nym))
+    allocate(plth1(1:nym,1:nzm))
+    allocate(plth2(1:nym,1:nzm))
     plth1=1.d0
     plth2=1.d0
     
@@ -387,8 +387,8 @@ subroutine topogr
     
     if (salinity) then
         
-        allocate(plth1(1:nzmr,1:nymr))
-        allocate(plth2(1:nzmr,1:nymr))
+        allocate(plth1(1:nymr,1:nzmr))
+        allocate(plth2(1:nymr,1:nzmr))
         plth1=1.d0
         plth2=1.d0
 
@@ -472,7 +472,7 @@ subroutine topogr
                             ! distbr(n) = 0.0
                             ! sal(k,j,i) = 0.0
                         end if
-                        salfix(n) = 0.0
+                        ! salfix(n) = 0.0
 
                 !   FLUID
                 !   -----   BOUNDARY
