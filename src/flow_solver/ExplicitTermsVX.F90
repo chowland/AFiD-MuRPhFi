@@ -133,8 +133,7 @@ subroutine ExplicitTermsVX
             do ic=xstart(3),xend(3)
                 do jc=xstart(2),xend(2)
                     do kc=2,nxm
-                        km=kc-1
-                        salit =active_S*0.5d0*(salc(kc,jc,ic)+salc(km,jc,ic))
+                        salit = active_S*salc(kc,jc,ic)
                         qcap(kc,jc,ic) = qcap(kc,jc,ic) - bycs*salit
                     end do
                 end do

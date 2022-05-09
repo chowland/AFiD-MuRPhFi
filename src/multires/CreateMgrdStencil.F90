@@ -4,6 +4,8 @@ subroutine CreateMgrdStencil
     use HermiteInterpolations
     implicit none
 
+    integer, dimension(0:nxr) :: irange
+
     ! Construct stencils in x direction
     ! cell edge grid (vx)
     call interpolation_indices(irangc, xc(1:nx), xcr(1:nxr), alx3)
@@ -18,6 +20,14 @@ subroutine CreateMgrdStencil
     ! refined cell centre grid (sal, phi)
     call interpolation_indices(irangr, xmr(1:nxmr), xm(1:nxm), alx3)
     call construct_stencil(cxphic, xmr(1:nxmr), xm(1:nxm), alx3, irangr, "x")
+    if (gAxis==1) then
+        call interpolation_indices(irange, xmr(1:nxmr), xc(1:nx), alx3)
+        call construct_stencil(cxsalc, xmr(1:nxmr), xc(1:nx), alx3, irange, "x")
+        call interpolation_indices(irangb, xc(1:nx), xmr(1:nxmr), alx3)
+    else
+        irangb = irangs
+        cxsalc(:,:) = cxphic(:,:)
+    end if
 
     ! Construct stencils in y direction
     ! cell edge grid (vy)

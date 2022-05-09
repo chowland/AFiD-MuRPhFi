@@ -2,10 +2,11 @@ module HermiteInterpolations
     use decomp_2d, only: xstart, xstartr, xend, xendr
     use mgrd_arrays, only: irangs, jrangs, krangs, &
                             irangr, jrangr, krangr, &
+                            irangb, jrangb, krangb, &
                             cxrs, cyrs, czrs, &
                             cxsalc, cysalc, czsalc, &
                             cxphic, cyphic, czphic
-    use param, only: nxm, nxmr, lvlhalo
+    use param, only: nx, nxm, nxmr, lvlhalo, ny, nym, nz, nzm
     use input_grids, only: nxmo, nxmro, xstarto, xendo, &
                             irangsr, jrangsr, krangsr
     implicit none
@@ -198,15 +199,36 @@ contains
 
     end subroutine interpolate_xyz_to_coarse
 
-    subroutine interpolate_xyz_to_coarse_fast(rvar, cvar)
+    subroutine interpolate_xyz_to_coarse_fast(rvar, cvar, vname)
         real, dimension(-1:,xstartr(2)-lvlhalo:,xstartr(3)-lvlhalo:), intent(in) :: rvar
         real, dimension(:,xstart(2)-lvlhalo:,xstart(3)-lvlhalo:), intent(out) :: cvar
+        character(len=3), intent(in) :: vname
 
         real, dimension(4,4,4) :: qv3
         real, dimension(4,4) :: qv2
         real, dimension(4) :: qv1
 
+        real, dimension(4,nx ) :: cx
+        real, dimension(4,nym) :: cy
+        real, dimension(4,nzm) :: cz
+
+        integer, dimension(0:nx+1) :: irang
+        integer, dimension(0:ny  ) :: jrang
+        integer, dimension(0:nz  ) :: krang
+
         integer :: ic, jc, kc, icr, jcr, kcr
+
+        if (vname=="sal") then
+            cx(:,:) = cxsalc(:,:)
+            cy(:,:) = cysalc(:,:)
+            cz(:,:) = czsalc(:,:)
+            irang = irangb
+        else
+            cx(:,:) = cxphic(:,:)
+            cy(:,:) = cyphic(:,:)
+            cz(:,:) = czphic(:,:)
+            irang = irangs
+        end if
 
         do ic=xstart(3),xend(3)
             icr = krangs(ic)
