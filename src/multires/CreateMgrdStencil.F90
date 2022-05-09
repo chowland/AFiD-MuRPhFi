@@ -17,7 +17,7 @@ subroutine CreateMgrdStencil
 
     ! refined cell centre grid (sal, phi)
     call interpolation_indices(irangr, xmr(1:nxmr), xm(1:nxm), alx3)
-    call construct_stencil(cxsalc, xmr(1:nxmr), xm(1:nxm), alx3, irangr, "x")
+    call construct_stencil(cxphic, xmr(1:nxmr), xm(1:nxm), alx3, irangr, "x")
 
     ! Construct stencils in y direction
     ! cell edge grid (vy)
@@ -32,7 +32,7 @@ subroutine CreateMgrdStencil
 
     ! refined cell centre grid (sal, phi)
     call interpolation_indices(jrangr, ymr(1:nymr), ym(1:nym), ylen)
-    call construct_stencil(cysalc, ymr(1:nymr), ym(1:nym), ylen, jrangr, "y")
+    call construct_stencil(cyphic, ymr(1:nymr), ym(1:nym), ylen, jrangr, "y")
 
     ! Construct stencils in z direction
     ! cell edge grid (vz)
@@ -47,7 +47,7 @@ subroutine CreateMgrdStencil
 
     ! refined cell centre grid (sal, phi)
     call interpolation_indices(krangr, zmr(1:nzmr), zm(1:nzm), zlen)
-    call construct_stencil(czsalc, zmr(1:nzmr), zm(1:nzm), zlen, krangr, "z")
+    call construct_stencil(czphic, zmr(1:nzmr), zm(1:nzm), zlen, krangr, "z")
 
     return
 end subroutine CreateMgrdStencil

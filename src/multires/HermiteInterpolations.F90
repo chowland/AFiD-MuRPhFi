@@ -3,7 +3,8 @@ module HermiteInterpolations
     use mgrd_arrays, only: irangs, jrangs, krangs, &
                             irangr, jrangr, krangr, &
                             cxrs, cyrs, czrs, &
-                            cxsalc, cysalc, czsalc
+                            cxsalc, cysalc, czsalc, &
+                            cxphic, cyphic, czphic
     use param, only: nxm, nxmr, lvlhalo
     use input_grids, only: nxmo, nxmro, xstarto, xendo, &
                             irangsr, jrangsr, krangsr
@@ -180,13 +181,13 @@ contains
                     qv3 = rvar(kcr-1:kcr+2,jcr-1:jcr+2,icr-1:icr+2)
 
                     do ic=max(krangr(icr),xstart(3)),min(krangr(icr+1)-1,xend(3))
-                        qv2(:,:) = qv3(:,:,1)*czsalc(1,ic) + qv3(:,:,2)*czsalc(2,ic) &
-                                 + qv3(:,:,3)*czsalc(3,ic) + qv3(:,:,4)*czsalc(4,ic)
+                        qv2(:,:) = qv3(:,:,1)*czphic(1,ic) + qv3(:,:,2)*czphic(2,ic) &
+                                 + qv3(:,:,3)*czphic(3,ic) + qv3(:,:,4)*czphic(4,ic)
                         do jc=max(jrangr(jcr),xstart(2)),min(jrangr(jcr+1)-1,xend(2))
-                            qv1(:) = qv2(:,1)*cysalc(1,jc) + qv2(:,2)*cysalc(2,jc) &
-                                   + qv2(:,3)*cysalc(3,jc) + qv2(:,4)*cysalc(4,jc)
+                            qv1(:) = qv2(:,1)*cyphic(1,jc) + qv2(:,2)*cyphic(2,jc) &
+                                   + qv2(:,3)*cyphic(3,jc) + qv2(:,4)*cyphic(4,jc)
                             do kc=max(irangr(kcr),1),min(irangr(kcr+1)-1,nxm)
-                                cvar(kc,jc,ic) = sum(qv1(1:4)*cxsalc(1:4,kc))
+                                cvar(kc,jc,ic) = sum(qv1(1:4)*cxphic(1:4,kc))
                             end do
                         end do
                     end do
@@ -216,13 +217,13 @@ contains
     
                     qv3 = rvar(kcr-2:kcr+1,jcr-2:jcr+1,icr-2:icr+1)
 
-                    qv2(:,:) = qv3(:,:,1)*czsalc(1,ic) + qv3(:,:,2)*czsalc(2,ic) &
-                            + qv3(:,:,3)*czsalc(3,ic) + qv3(:,:,4)*czsalc(4,ic)
+                    qv2(:,:) = qv3(:,:,1)*czphic(1,ic) + qv3(:,:,2)*czphic(2,ic) &
+                            + qv3(:,:,3)*czphic(3,ic) + qv3(:,:,4)*czphic(4,ic)
 
-                    qv1(:) = qv2(:,1)*cysalc(1,jc) + qv2(:,2)*cysalc(2,jc) &
-                            + qv2(:,3)*cysalc(3,jc) + qv2(:,4)*cysalc(4,jc)
+                    qv1(:) = qv2(:,1)*cyphic(1,jc) + qv2(:,2)*cyphic(2,jc) &
+                            + qv2(:,3)*cyphic(3,jc) + qv2(:,4)*cyphic(4,jc)
                     
-                    cvar(kc,jc,ic) = sum(qv1(1:4)*cxsalc(1:4,kc))
+                    cvar(kc,jc,ic) = sum(qv1(1:4)*cxphic(1:4,kc))
 
                 end do
             end do
