@@ -78,7 +78,6 @@ subroutine topogr
         allocate(solidr(1:nxmr,xstartr(2)-1:xendr(2)+1,xstartr(3)-1:xendr(3)+1))
     end if
 
-    forclo = 0.0
     porosity = 0.426
     ! Interpret RayT input as target pore-scale Rayleigh number
     nc = nint((2.0*ylen*(1.0 - porosity)/3.0/pi)**0.5 * (RayS/RayT)**(1.0/3.0))
@@ -114,6 +113,7 @@ subroutine topogr
     do l = 1,3 !{ start do over the 3 velocity components
         n=0
         
+        forclo = 0.0
         !     l = 1   Q_1 vel. component (VZ)
         !     l = 2   Q_2 vel. component (VY)
         !     l = 3   Q_3 vel. component (VX)
