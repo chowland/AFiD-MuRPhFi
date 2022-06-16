@@ -59,18 +59,23 @@ subroutine ExplicitTermsSal
                 )*udyr
             ! dzzs=(sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
             ! dyys=(sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
-            if (solidr(kc,jc,ip)) then
-                dzzs = (sal(kc,jc,im) - sal(kc,jc,ic))*udzrq
-            elseif (solidr(kc,jc,im)) then
-                dzzs = (sal(kc,jc,ip) - sal(kc,jc,ic))*udzrq
+            if (IBM) then
+                if (solidr(kc,jc,ip)) then
+                    dzzs = (sal(kc,jc,im) - sal(kc,jc,ic))*udzrq
+                elseif (solidr(kc,jc,im)) then
+                    dzzs = (sal(kc,jc,ip) - sal(kc,jc,ic))*udzrq
+                else
+                    dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
+                end if
+                if (solidr(kc,jp,ic)) then
+                    dyys = (sal(kc,jm,ic) - sal(kc,jc,ic))*udyrq
+                elseif (solidr(kc,jm,ic)) then
+                    dyys = (sal(kc,jp,ic) - sal(kc,jc,ic))*udyrq
+                else
+                    dyys = (sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
+                end if
             else
                 dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
-            end if
-            if (solidr(kc,jp,ic)) then
-                dyys = (sal(kc,jm,ic) - sal(kc,jc,ic))*udyrq
-            elseif (solidr(kc,jm,ic)) then
-                dyys = (sal(kc,jp,ic) - sal(kc,jc,ic))*udyrq
-            else
                 dyys = (sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
             end if
             hsal(kc,jc,ic) = -(hsx+hsy+hsz)+dyys+dzzs
@@ -117,27 +122,29 @@ subroutine ExplicitTermsSal
         !
         !   zz second derivatives of sal
         !
-                ! dzzs=(sal(kc,jc,ip) &
-                ! -2.0*sal(kc,jc,ic) &
-                !     +sal(kc,jc,im))*udzrq
-                if (solidr(kc,jc,ip)) then
-                    dzzs = (sal(kc,jc,im) - sal(kc,jc,ic))*udzrq
-                elseif (solidr(kc,jc,im)) then
-                    dzzs = (sal(kc,jc,ip) - sal(kc,jc,ic))*udzrq
-                else
-                    dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
-                end if
+                if (IBM) then
+                    if (solidr(kc,jc,ip)) then
+                        dzzs = (sal(kc,jc,im) - sal(kc,jc,ic))*udzrq
+                    elseif (solidr(kc,jc,im)) then
+                        dzzs = (sal(kc,jc,ip) - sal(kc,jc,ic))*udzrq
+                    else
+                        dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
+                    end if
         !
         !   yy second derivatives of sal
         !
                 ! dyys=(sal(kc,jp,ic) &
                 ! -2.0*sal(kc,jc,ic) &
                 !     +sal(kc,jm,ic))*udyrq
-                if (solidr(kc,jp,ic)) then
-                    dyys = (sal(kc,jm,ic) - sal(kc,jc,ic))*udyrq
-                elseif (solidr(kc,jm,ic)) then
-                    dyys = (sal(kc,jp,ic) - sal(kc,jc,ic))*udyrq
-                else
+                    if (solidr(kc,jp,ic)) then
+                        dyys = (sal(kc,jm,ic) - sal(kc,jc,ic))*udyrq
+                    elseif (solidr(kc,jm,ic)) then
+                        dyys = (sal(kc,jp,ic) - sal(kc,jc,ic))*udyrq
+                    else
+                        dyys = (sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
+                    end if
+                else !(no IBM)
+                    dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
                     dyys = (sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
                 end if
 
@@ -156,22 +163,25 @@ subroutine ExplicitTermsSal
             hsy=(vyr(kc,jp,ic)*(sal(kc,jp,ic)+sal(kc,jc,ic))- &
                 vyr(kc,jc,ic)*(sal(kc,jc,ic)+sal(kc,jm,ic)) &
                 )*udyr
-            if (solidr(kc,jc,ip)) then
-                dzzs = (sal(kc,jc,im) - sal(kc,jc,ic))*udzrq
-            elseif (solidr(kc,jc,im)) then
-                dzzs = (sal(kc,jc,ip) - sal(kc,jc,ic))*udzrq
+            if (IBM) then
+                if (solidr(kc,jc,ip)) then
+                    dzzs = (sal(kc,jc,im) - sal(kc,jc,ic))*udzrq
+                elseif (solidr(kc,jc,im)) then
+                    dzzs = (sal(kc,jc,ip) - sal(kc,jc,ic))*udzrq
+                else
+                    dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
+                end if
+                if (solidr(kc,jp,ic)) then
+                    dyys = (sal(kc,jm,ic) - sal(kc,jc,ic))*udyrq
+                elseif (solidr(kc,jm,ic)) then
+                    dyys = (sal(kc,jp,ic) - sal(kc,jc,ic))*udyrq
+                else
+                    dyys = (sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
+                end if
             else
                 dzzs = (sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
-            end if
-            if (solidr(kc,jp,ic)) then
-                dyys = (sal(kc,jm,ic) - sal(kc,jc,ic))*udyrq
-            elseif (solidr(kc,jm,ic)) then
-                dyys = (sal(kc,jp,ic) - sal(kc,jc,ic))*udyrq
-            else
                 dyys = (sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
             end if
-            ! dzzs=(sal(kc,jc,ip) - 2.0*sal(kc,jc,ic) + sal(kc,jc,im))*udzrq
-            ! dyys=(sal(kc,jp,ic) - 2.0*sal(kc,jc,ic) + sal(kc,jm,ic))*udyrq
             hsal(kc,jc,ic) = -(hsx+hsy+hsz)+dyys+dzzs
 
         enddo
