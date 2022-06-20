@@ -4,7 +4,9 @@ subroutine CreateMgrdStencil
     use HermiteInterpolations
     implicit none
 
-    integer, dimension(0:nxr) :: irange
+    integer, dimension(0:nxr) :: irange !< temporary index counter in x
+    integer, dimension(0:nyr) :: jrange !< temporary index counter in y
+    integer, dimension(0:nzr) :: krange !< temporary index counter in z
 
     ! Construct stencils in x direction
     ! cell edge grid (vx)
@@ -43,6 +45,14 @@ subroutine CreateMgrdStencil
     ! refined cell centre grid (sal, phi)
     call interpolation_indices(jrangr, ymr(1:nymr), ym(1:nym), ylen)
     call construct_stencil(cyphic, ymr(1:nymr), ym(1:nym), ylen, jrangr, "y")
+    if (gAxis==2) then
+        call interpolation_indices(jrange, ymr(1:nymr), yc(1:nym), ylen)
+        call construct_stencil(cysalc, ymr(1:nymr), yc(1:nym), ylen, jrange, "y")
+        call interpolation_indices(jrangb, yc(1:nym), ymr(1:nymr), ylen)
+    else
+        jrangb = jrangs
+        cysalc(:,:) = cyphic(:,:)
+    end if
 
     ! Construct stencils in z direction
     ! cell edge grid (vz)
@@ -58,6 +68,14 @@ subroutine CreateMgrdStencil
     ! refined cell centre grid (sal, phi)
     call interpolation_indices(krangr, zmr(1:nzmr), zm(1:nzm), zlen)
     call construct_stencil(czphic, zmr(1:nzmr), zm(1:nzm), zlen, krangr, "z")
+    if (gAxis==3) then
+        call interpolation_indices(krange, zmr(1:nzmr), zc(1:nzm), zlen)
+        call construct_stencil(czsalc, zmr(1:nzmr), zc(1:nzm), zlen, krange, "z")
+        call interpolation_indices(krangb, zc(1:nzm), zmr(1:nzmr), zlen)
+    else
+        krangb = krangs
+        czsalc(:,:) = czphic(:,:)
+    end if
 
     return
 end subroutine CreateMgrdStencil
