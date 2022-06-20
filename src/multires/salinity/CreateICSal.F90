@@ -27,7 +27,8 @@ subroutine CreateICSal
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
                     call random_number(varptb)
-                    sal(k,j,i) = 0.5*tanh((xmr(k) - 0.5 + 0.01*sin(3*2.0*pi*ymr(j)/ylen))/1e-7)
+                    ! Use pf_IC input parameter as mode number for initial perturbation
+                    sal(k,j,i) = 0.5*tanh((xmr(k) - 0.5 + 0.01*sin(pf_IC*2.0*pi*ymr(j)/ylen))/1e-7)
                     ! sal(k,j,i) = sal(k,j,i) + eps/cosh((xmr(k) - 0.5)/0.01)**2*varptb
                 end do
             end do
