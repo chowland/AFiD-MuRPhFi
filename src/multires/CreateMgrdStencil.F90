@@ -28,7 +28,7 @@ subroutine CreateMgrdStencil
         call interpolation_indices(irangb, xc(1:nx), xmr(1:nxmr), alx3)
     else
         irangb = irangs
-        cxsalc(:,:) = cxphic(:,:)
+        cxsalc(:,1:nxm) = cxphic(:,:)
     end if
 
     ! Construct stencils in y direction
