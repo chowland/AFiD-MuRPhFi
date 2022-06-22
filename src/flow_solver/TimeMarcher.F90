@@ -69,7 +69,7 @@ subroutine TimeMarcher
         ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ post-implicit',ns
         ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP post-implicit',ns
 
-        if (phasefield .and. IBM) call ImmersedBoundary
+        ! if (phasefield .and. IBM) call ImmersedBoundary
 
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
