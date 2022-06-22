@@ -95,7 +95,7 @@ subroutine Mkmov_xcut
     call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
     call h5dwrite_f(&
             dset_vx, H5T_NATIVE_DOUBLE,&
-            vx(ic,xstart(2):xend(2),xstart(3):xend(3)),&
+            vx(max(ic,2),xstart(2):xend(2),xstart(3):xend(3)),&
             data_count,  hdf_error, file_space_id = filespace,&
             mem_space_id = memspace, xfer_prp = plist_id)
     call h5pclose_f(plist_id, hdf_error)
