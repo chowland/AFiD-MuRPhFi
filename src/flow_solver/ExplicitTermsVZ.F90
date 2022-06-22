@@ -145,7 +145,7 @@ subroutine ExplicitTermsVZ
     end if
 !$OMP END PARALLEL DO
 
-    if (phasefield .and. .not.IBM) then
+    if (phasefield) then
         do ic=xstart(3),xend(3)
             imm=ic-1
             do jc=xstart(2),xend(2)

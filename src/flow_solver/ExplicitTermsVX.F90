@@ -152,7 +152,7 @@ subroutine ExplicitTermsVX
         end if
     end if
     
-    if (phasefield .and. .not.IBM) then
+    if (phasefield) then
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
                 do kc=2,nxm
