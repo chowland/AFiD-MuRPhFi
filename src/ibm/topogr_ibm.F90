@@ -15,6 +15,7 @@ subroutine topogr
     real    :: ye, yem, yep
     real    :: ze, zem, zep
     real    :: delta1x, delta2x, r2, Lhex, radius, porosity
+    real    :: solid_temp
     integer,allocatable :: ind1(:), ind2(:)
     real,allocatable :: xpart(:), ypart(:)
     ! infig=1
@@ -281,7 +282,26 @@ subroutine topogr
     n=0
     forclo =0.0d0
     !
+    ! Track location of solid circles:
+    do i=xstart(3),xend(3)
+        do j=xstart(2),xend(2)
+            do k=1,nxm
+                xe = xm(k)
+                ye = ym(j)
+                do nc=1,Npart
+                    ! x-position of solid centre
+                    xem = xpart(nc)
+                    yem = ypart(nc)
+                    r2 = (xe - xem)**2 + (ye - yem)**2
+                    if (r2<radius**2) then
+                        forclo(k,j,i) = 1.0
+                    end if
+                end do
+            end do
+        end do
+    end do
 
+    solid_temp = 0.0 ! Modify this to set fixed temperature value in solid
     do i=xstart(3),xend(3)
         do j=xstart(2),xend(2)
             do k=1,nxm
@@ -294,8 +314,7 @@ subroutine topogr
             !    SOLID PART
             !           
 
-
-                if(xe.lt.plth1(j,i)) then
+                if (forclo(k,j,i)>0.9) then
                     n=n+1
                     indgeot(n,1)=i
                     indgeot(n,2)=j
@@ -304,26 +323,9 @@ subroutine topogr
                     indgeoet(n,2)=j
                     indgeoet(n,3)=k
                     distbt(n)= 0.
-                    temb(n) = tempbp(1,j,i)
-                    !             forclo(k,j,i) = 1.
+                    temb(n) = solid_temp
 
-                elseif(xe.gt.(alx3-plth2(j,i))) then
-                    n=n+1
-                    indgeot(n,1)=i
-                    indgeot(n,2)=j
-                    indgeot(n,3)=k
-                    indgeoet(n,1)=i
-                    indgeoet(n,2)=j
-                    indgeoet(n,3)=k
-                    distbt(n)= 0.
-                    temb(n) = temptp(1,j,i)
-                    !             forclo(k,j,i) = 1.
-                    !            end if
-                
-            !
-            !    LOWER FLUID/PLATE BOUNDARY
-            !
-                elseif((xe.ge.plth1(j,i)).and.(xem.lt.plth1(j,i))) then
+                elseif (forclo(k,j,i)<forclo(km,j,i)) then
                     n=n+1
                     indgeot(n,1)=i
                     indgeot(n,2)=j
@@ -332,14 +334,15 @@ subroutine topogr
                     indgeoet(n,2)=j 
                     indgeoet(n,3)=kp
                     delta1x=(xep-xe)
-                    delta2x=(xe-plth1(j,i))
-                    distbt(n)= delta2x/(delta1x+delta2x)
-                    temb(n) = tempbp(1,j,i)
-            !
-            !    UPPER FLUID/PLATE BOUNDARY
-            !
-                elseif((xe.le.(alx3-plth2(j,i))).and.(xep.gt.(alx3-plth2(j,i)))) &
-                    then
+                    delta2x = 1.0
+                    do nc=1,Npart
+                        xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
+                        if (xe > xem) delta2x = min(delta2x, xe - xem)
+                    end do
+                    distbt(n) = delta2x/(delta1x+delta2x)
+                    temb(n) = solid_temp
+
+                elseif (forclo(k,j,i)<forclo(kp,j,i)) then
                     n=n+1
                     indgeot(n,1)=i
                     indgeot(n,2)=j
@@ -348,32 +351,14 @@ subroutine topogr
                     indgeoet(n,2)=j 
                     indgeoet(n,3)=km
                     delta1x=(xe-xem)
-                    delta2x=((alx3-plth2(j,i))-xe)
-                    distbt(n)= delta2x/(delta1x+delta2x)
-                    temb(n) = temptp(1,j,i)
-                            
-            ! elseif (j==1.or.j==nym) then
-            !     if(ifnoslipy.eq.1) then      ! SL
-            !         n=n+1
-            !         indgeot(n,1)=i
-            !         indgeot(n,2)=j
-            !         indgeot(n,3)=k
-            !         indgeoet(n,1)=i
-            !         indgeoet(n,2)=j
-            !         indgeoet(n,3)=k
-            !         distbt(n)= 0.
-            !     endif
-            ! elseif (i==1.or.i==nzm) then
-            !     if(ifnoslipz.eq.1) then        ! SL
-            !         n=n+1
-            !         indgeot(n,1)=i
-            !         indgeot(n,2)=j
-            !         indgeot(n,3)=k
-            !         indgeoet(n,1)=i
-            !         indgeoet(n,2)=j
-            !         indgeoet(n,3)=k
-            !         distbt(n)= 0.
-            !     endif
+                    ! delta2x=((alx3-plth2(j,i))-xe)
+                    delta2x = 1.0
+                    do nc=1,Npart
+                        xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
+                        if (xep > xe) delta2x = min(delta2x, xep - xe)
+                    end do
+                    distbt(n) = delta2x/(delta1x+delta2x)
+                    temb(n) = solid_temp
                 end if
                                 
             end do
