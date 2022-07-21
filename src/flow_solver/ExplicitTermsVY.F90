@@ -30,7 +30,11 @@ subroutine ExplicitTermsVY
     udz=dz*0.25
 
     !CJH Treat dPdy input variable as Re_tau
-    Gy = 8.0*dPdy**2/ren**2
+    if (inslwn==0 .or. inslws==0) then
+        Gy = dPdy**2/ren**2
+    else
+        Gy = 8.0*dPdy**2/ren**2
+    end if
 
 !$OMP  PARALLEL DO &
 !$OMP  DEFAULT(none) &
