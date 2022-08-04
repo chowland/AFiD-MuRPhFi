@@ -78,10 +78,13 @@ subroutine ImplicitAndUpdateTemp
             kc = indgeot(n,3)
             forclo(kc,jc,ic) = 0.d0
             ke = indgeoet(n,3)
-            dense = ((al*dt + aldto)*temp(ke,jc,ic) - al*dt*densb(n))*usaldto
-            rhs(kc,jc,ic) = -temp(kc,jc,ic) + dense*distbt(n) &
+            ! dense = ((al*dt + aldto)*temp(ke,jc,ic) - al*dt*densb(n))*usaldto
+            ! rhs(kc,jc,ic) = -temp(kc,jc,ic) + dense*distbt(n) &
+            !                 + (1.0 - distbt(n))*temb(n)
+            rhs(kc,jc,ic) = distbt(n)*temp(ke,jc,ic) - temp(kc,jc,ic) &
                             + (1.0 - distbt(n))*temb(n)
-            densb(n)= temp(ke,jc,ic)
+            hro(kc,jc,ic) = distbt(n)
+            ! densb(n)= temp(ke,jc,ic)
         end do
         call SolveImpEqnUpdate_Temp_ibm
     else

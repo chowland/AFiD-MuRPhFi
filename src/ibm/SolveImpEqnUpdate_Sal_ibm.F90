@@ -16,7 +16,7 @@ subroutine SolveImpEqnUpdate_Sal_ibm
     ! use param_particle      ! SL
     implicit none
     real, dimension(nxr) :: amkl,apkl,ackl,fkl
-    integer :: jc,kc,info,ipkv(nxmr),ic,nrhs
+    integer :: jc,kc,info,ipkv(nxmr),ic,nrhs,km,kp
     real :: betadx,ackl_b
     real :: amkT(nxmr-1),ackT(nxmr),apkT(nxmr-1),appk(nxmr-2)
 
@@ -29,10 +29,14 @@ subroutine SolveImpEqnUpdate_Sal_ibm
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
             do kc=1,nxmr
+                km = kc - 1
+                kp = kc + 1
                 ackl_b = 1.0d0/(1.-ac3sskr(kc)*betadx*forclor(kc,jc,ic))
-                amkl(kc) = -am3sskr(kc)*betadx*ackl_b*forclor(kc,jc,ic)
+                amkl(kc) = -am3sskr(kc)*betadx*ackl_b*forclor(kc,jc,ic) &
+                            - (1.0 - forclor(kc,jc,ic))*forclor(km,jc,ic)
                 ackl(kc) = 1.0d0
-                apkl(kc) = -ap3sskr(kc)*betadx*ackl_b*forclor(kc,jc,ic)
+                apkl(kc) = -ap3sskr(kc)*betadx*ackl_b*forclor(kc,jc,ic) &
+                            - (1.0 - forclor(kc,jc,ic))*forclor(kp,jc,ic)
                 fkl(kc) = rhsr(kc,jc,ic)*ackl_b
             end do
             fkl(nxr) = 0.d0

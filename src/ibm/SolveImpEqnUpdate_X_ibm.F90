@@ -11,7 +11,7 @@
 
 subroutine SolveImpEqnUpdate_X_ibm
     use param
-    use local_arrays, only : vx,rhs
+    use local_arrays, only : vx,rhs,qcap
     use decomp_2d, only: xstart,xend
     use ibm_param, only: forclo
     implicit none
@@ -19,7 +19,7 @@ subroutine SolveImpEqnUpdate_X_ibm
     real :: amkT(nx-1),apkT(nx-1)
     real :: appk(nx-2)
     real :: ackT(nx)
-    integer :: jc,kc,info,ic
+    integer :: jc,kc,info,ic,km,kp
     integer :: ipkv(nx)
     real :: betadx,ackl_b
 
@@ -37,10 +37,14 @@ subroutine SolveImpEqnUpdate_X_ibm
         do jc=xstart(2),xend(2)
             fkl(1)= 0.d0
             do kc=2,nxm
+                km = kc - 1
+                kp = kc + 1
                 ackl_b=1.0d0/(1.0d0-ac3ck(kc)*forclo(kc,jc,ic)*betadx)
-                amkl(kc)=-am3ssk(kc)*betadx*forclo(kc,jc,ic)*ackl_b
+                amkl(kc)=-am3ssk(kc)*betadx*forclo(kc,jc,ic)*ackl_b &
+                         - (1.0 - forclo(kc,jc,ic))*forclo(km,jc,ic)*qcap(kc,jc,ic)
                 ackl(kc)=1.d0
-                apkl(kc)=-ap3ssk(kc)*betadx*forclo(kc,jc,ic)*ackl_b
+                apkl(kc)=-ap3ssk(kc)*betadx*forclo(kc,jc,ic)*ackl_b &
+                         - (1.0 - forclo(kc,jc,ic))*forclo(kp,jc,ic)*qcap(kc,jc,ic)
                 fkl(kc) = rhs(kc,jc,ic)*ackl_b 
             end do
             fkl(nx)= 0.d0

@@ -30,10 +30,12 @@ Again, we set $F(\boldsymbol{x})=0$ at these points, so do not solve the Navier-
 Rather, we aim to interpolate the velocity linearly between the boundary and the second point into the liquid:
 
 $$
-u_k^{l+1} \approx \frac{\delta_2}{\delta_1 + \delta_2} u_{k+1}^{l+1} .
+u_k^{l+1} \approx \frac{\delta_2}{\delta_1 + \delta_2} u_{k+1}^{l+1} ,
 $$
 
-We also have to approximate the temporal evolution of $V_{k+1}$ to calculate this.
+where $\delta_1$ is the $x$-distance between the first two grid points in the fluid, and $\delta_2$ is the $x$-distance between the first fluid grid point and the solid boundary.
+
+<!-- We also have to approximate the temporal evolution of $V_{k+1}$ to calculate this.
 To do this, we record the previous time step and assume the acceleration remains approximately constant close to the boundary
 
 $$
@@ -44,7 +46,25 @@ Putting all this together, the expression used for $RHS^*$ is
 
 $$
 \Delta u = RHS^* = -u_k^l + \frac{\delta_2}{\delta_1 + \delta_2} \left(u_{k+1}^l + \frac{\alpha_l}{\alpha_{l-1}} (u_{k+1}^l - u_{k+1}^{l-1}) \right)
+$$ -->
+Since the interpolation involves the adjacent velocity at the next time step, this requires a further modification to the implicit solver.
+Rewriting in terms of the velocity increments, the condition we want to impose is
+
 $$
+\Delta u_k - \frac{\delta_2}{\delta_1 + \delta_2} \Delta u_{k+1} = \frac{\delta_2}{\delta_1 + \delta_2} u_{k+1}^l - u_k^l
+$$
+
+Note also that $k+1$ will be replaced by $k-1$ for boundary points where the liquid phase is below the solid boundary.
+We modify the matrix solve to include this by adding, for example
+
+$$
+- (1 - F(x_k)) F(x_{k+1}) \frac{\delta_2}{\delta_1 + \delta_2}
+$$
+
+to the tridiagonal term.
+Recall that $F(x)$ is zero in the solid *and* at the boundary points, so this term is only nonzero when $x_k$ is a boundary point and $x_{k+1}$ is in the fluid.
+An analogous term is added to the lower diagonal.
+This step is performed in the `SolveImpEqnUpdate*_ibm` routines, where the distance ratio in the above expressions is stored in the explicit term storage array (e.g. `qcap`, `dph`, `dq`) which is no longer needed during the implicit solve.
 
 ### Temperature at the boundary
 
@@ -66,8 +86,10 @@ In the wall-normal direction, we simply apply a similar approach to that above.
 Considering the concentration field $C$, we assume that $\partial_x C=0$ across the boundary by setting $C_{k}$ equal to $C_{k+1}$:
 
 $$
-C_k^{l+1}\approx C_{k+1}^{l+1} \approx C_{k+1}^l + \frac{(\alpha \Delta t)_l}{(\alpha \Delta t)_{l-1}} (C_{k+1}^l - C_{k+1}^{l-1})
+C_k^{l+1} = C_{k+1}^{l+1} \ \Rightarrow \Delta C_k - \Delta C_{k+1} = C_{k+1}^l - C_k^l
 $$
+
+This is implemented in the same way as above into the implicit solver, just without any length ratios since they are not needed here.
 
 In the horizontal directions, there is no implicit step, so we cannot apply direct forcing for the immersed boundary method.
 To apply the zero-gradient condition, we locate the points adjacent to the boundary.

@@ -9,7 +9,7 @@
 !                                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
-subroutine SolveImpEqnUpdate_YZ_ibm(q,rhs,fcl)
+subroutine SolveImpEqnUpdate_YZ_ibm(q,rhs,fcl,lfac)
     use param
     use decomp_2d, only: xstart,xend
     implicit none
@@ -18,8 +18,9 @@ subroutine SolveImpEqnUpdate_YZ_ibm(q,rhs,fcl)
     real,intent(inout) :: rhs(1:nx,xstart(2):xend(2), &
                         &      xstart(3):xend(3))
     real,intent(in) :: fcl(1:nx,xstart(2):xend(2),xstart(3):xend(3))
+    real,intent(in) :: lfac(1:nx,xstart(2):xend(2),xstart(3):xend(3))
     real, dimension(nx) :: amkl,apkl,ackl,fkl
-    integer :: jc,kc,info,ipkv(nxm),ic
+    integer :: jc,kc,info,ipkv(nxm),ic,km,kp
     real :: betadx,ackl_b
     real :: amkT(nxm-1),ackT(nxm),apkT(nxm-1),appk(nx-3)
 
@@ -29,10 +30,14 @@ subroutine SolveImpEqnUpdate_YZ_ibm(q,rhs,fcl)
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
             do kc=1,nxm
+                km = kc - 1
+                kp = kc + 1
                 ackl_b = 1.0d0/(1.0d0 - ac3sk(kc)*fcl(kc,jc,ic)*betadx)
-                amkl(kc) = -am3sk(kc)*fcl(kc,jc,ic)*betadx*ackl_b
+                amkl(kc) = -am3sk(kc)*fcl(kc,jc,ic)*betadx*ackl_b &
+                            - (1.0 - fcl(kc,jc,ic))*fcl(km,jc,ic)*lfac(kc,jc,ic)
                 ackl(kc) = 1.d0
-                apkl(kc) = -ap3sk(kc)*fcl(kc,jc,ic)*betadx*ackl_b
+                apkl(kc) = -ap3sk(kc)*fcl(kc,jc,ic)*betadx*ackl_b &
+                            - (1.0 - fcl(kc,jc,ic))*fcl(kp,jc,ic)*lfac(kc,jc,ic)
                 fkl(kc) = rhs(kc,jc,ic)*ackl_b 
             end do
             amkT = amkl(2:nxm)

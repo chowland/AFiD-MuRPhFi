@@ -81,10 +81,11 @@ subroutine ImplicitAndUpdateSal
             kc = indgeor(n,3)
             forclor(kc,jc,ic) = 0.d0
             ke = indgeoer(n,3)
-            sale = ((al*dt + aldto)*sal(ke,jc,ic) - al*dt*salb(n))*usaldto
-            rhsr(kc,jc,ic) = -sal(kc,jc,ic) + sale*distbr(n) !&
+            ! sale = ((al*dt + aldto)*sal(ke,jc,ic) - al*dt*salb(n))*usaldto
+            ! rhsr(kc,jc,ic) = -sal(kc,jc,ic) + sale*distbr(n) !&
                             ! + (1.0 - distbr(n))*salfix(n)
-            salb(n) = sal(ke,jc,ic)
+            rhsr(kc,jc,ic) = sal(ke,jc,ic) - sal(kc,jc,ic)
+            ! salb(n) = sal(ke,jc,ic)
         end do
         call SolveImpEqnUpdate_Sal_ibm
     else

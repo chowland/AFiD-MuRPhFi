@@ -78,11 +78,13 @@ subroutine ImplicitAndUpdateVZ
             kc = indgeo(1,n,3)
             forclo(kc,jc,ic) = 0.d0
             ke = indgeoe(1,n,3)
-            q1e = ((al*dt + aldto)*vz(ke,jc,ic) - al*dt*q1bo(n))*usaldto
-            rhs(kc,jc,ic) = -vz(kc,jc,ic) + q1e*distb(1,n)
-            q1bo(n) = vz(ke,jc,ic)
+            ! q1e = ((al*dt + aldto)*vz(ke,jc,ic) - al*dt*q1bo(n))*usaldto
+            ! rhs(kc,jc,ic) = -vz(kc,jc,ic) + q1e*distb(1,n)
+            rhs(kc,jc,ic) = distb(1,n)*vz(ke,jc,ic) - vz(kc,jc,ic)
+            dq(kc,jc,ic) = distb(1,n)
+            ! q1bo(n) = vz(ke,jc,ic)
         end do
-        call SolveImpEqnUpdate_YZ_ibm(vz,rhs,forclo)
+        call SolveImpEqnUpdate_YZ_ibm(vz,rhs,forclo,dq)
     else
         call SolveImpEqnUpdate_YZ(vz,rhs)
     end if
