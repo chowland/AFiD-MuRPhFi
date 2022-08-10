@@ -30,8 +30,8 @@ subroutine SolveImpEqnUpdate_YZ_ibm(q,rhs,fcl,lfac)
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
             do kc=1,nxm
-                km = kc - 1
-                kp = kc + 1
+                km = min(1,kc - 1)
+                kp = max(kc + 1,nxm)
                 ackl_b = 1.0d0/(1.0d0 - ac3sk(kc)*fcl(kc,jc,ic)*betadx)
                 amkl(kc) = -am3sk(kc)*fcl(kc,jc,ic)*betadx*ackl_b &
                             - (1.0 - fcl(kc,jc,ic))*fcl(km,jc,ic)*lfac(kc,jc,ic)
