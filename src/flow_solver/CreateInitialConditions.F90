@@ -214,6 +214,16 @@ subroutine CreateInitialConditions
         end do
     end if
 
+    if (IBM .and. dPdy/=0) then
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    temp(k,j,i) = 0.0
+                end do
+            end do
+        end do
+    end if
+
     if (phasefield) then
 
         if (pf_IC == 1) then        ! 1D moving interface example
