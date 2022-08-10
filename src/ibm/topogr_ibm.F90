@@ -300,6 +300,23 @@ subroutine topogr
     !
     !     INDICES FOR TEMPERATURE
     !
+
+    ! Specify topography shape on temperature grid
+    if (solidtype==2) then
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                ye = ym(j)
+                ze = zm(i)
+                do k=1,Npart
+                    yem = ypart(k)
+                    zem = xpart(k)
+                    plth1(j,i) = min(plth1(j,i), 0.2*(8.0/ylen)**2*((ye - yem)**2 + (ze - zem)**2))
+                end do
+                ! plth2(j,i) = plth1(j,i)
+            end do
+        end do
+    end if
+
     n=0
     forclo =0.0d0
     !
