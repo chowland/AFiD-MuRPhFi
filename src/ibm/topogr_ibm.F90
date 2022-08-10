@@ -144,10 +144,9 @@ subroutine topogr
         !     l = 3   Q_3 vel. component (VX)
         !
 
-        plth1(:,:) = 1.0
         ! Construct surface height for scallop shape
-        !! CURRENTLY NOT GIVING WHAT I WANT, WORK IN PROGRESS...
         if (solidtype==2) then
+            plth1(:,:) = 1.0
             do i=xstart(3),xend(3)
                 do j=xstart(2),xend(2)
                     ye = ym(j)
@@ -157,7 +156,7 @@ subroutine topogr
                     do k=1,Npart
                         yem = ypart(k)
                         zem = xpart(k)
-                        plth1(j,i) = min(plth1(j,i), 0.2*(8.0/ylen)**2*((ye - yem)**2 + (ze - zem)**2))
+                        plth1(j,i) = min(plth1(j,i), 0.2*(8.0/ylen)**2*((ye - yem)**2 + 3*(ze - zem)**2))
                     end do
                     ! plth2(j,i) = plth1(j,i)
                 end do
@@ -303,6 +302,7 @@ subroutine topogr
 
     ! Specify topography shape on temperature grid
     if (solidtype==2) then
+        plth1(:,:) = 1.0
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                 ye = ym(j)
@@ -310,7 +310,7 @@ subroutine topogr
                 do k=1,Npart
                     yem = ypart(k)
                     zem = xpart(k)
-                    plth1(j,i) = min(plth1(j,i), 0.2*(8.0/ylen)**2*((ye - yem)**2 + (ze - zem)**2))
+                    plth1(j,i) = min(plth1(j,i), 0.2*(8.0/ylen)**2*((ye - yem)**2 + 3*(ze - zem)**2))
                 end do
                 ! plth2(j,i) = plth1(j,i)
             end do
