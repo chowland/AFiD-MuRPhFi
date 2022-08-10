@@ -18,6 +18,11 @@ subroutine topogr
     real    :: solid_temp
     integer,allocatable :: ind1(:), ind2(:)
     real,allocatable :: xpart(:), ypart(:)
+    integer :: solidtype
+
+    ! Choose IBM geometry (1=hexagonal porous matrix, 2=scallop)
+    solidtype = 1
+
     ! infig=1
     q1bo=0.d0
     q2bo=0.d0
@@ -29,21 +34,16 @@ subroutine topogr
     plth2=1.d0
     
     ! if(ifrough.eq.1) then
-    do i=1,nzm
-        do j=1,nym
+    ! do i=1,nzm
+    !     do j=1,nym
             !            plth1(j,i)=abs(dcos(10*pi*zm(i)/zlen) &
             !                      +dcos(10*pi*ym(j)/ylen))*0.01
             ! plth1(j,i)=dsin(2*pi/rlambda*ym(j)-pi/2)*rheight/2 + rheight/2
             !            plth2(j,i)=abs(dcos(10*pi*zm(i)/zlen)  &
             !                      +dcos(10*pi*ym(j)/ylen))*0.01
             ! plth2(j,i)=dsin(2*pi/rlambda*ym(j)-pi/2)*rheight/2 + rheight/2
-            do k=1,4
-                ye = ylen/8.0 + real(k - 1)*ylen/4.0
-                plth1(j,i) = min(plth1(j,i), 0.1*(8.0/ylen)**2*(ym(j) - ye)**2)
-            end do
-            plth2(j,i) = plth1(j,i)
-        end do
-    end do
+    !     end do
+    ! end do
     ! endif
     
     ! if(ifrough.eq.2) then         ! ratchet
@@ -79,36 +79,60 @@ subroutine topogr
         allocate(solidr(1:nxmr,xstartr(2)-1:xendr(2)+1,xstartr(3)-1:xendr(3)+1))
     end if
 
-    porosity = 0.426
-    ! Interpret RayT input as target pore-scale Rayleigh number
-    nc = nint((2.0*ylen*(1.0 - porosity)/3.0/pi)**0.5 * (RayS/RayT)**(1.0/3.0))
-    if (ismaster) write(*,*) "Number of lattice columns: ",nc
-    Lhex = 1.0/nc/ylen
-    radius = (ylen*(1.0 - porosity)/6.0/pi)**0.5/nc
-    Npart = (nc + 1)*(3*nc + 1) + 3*nc*nc
-    allocate(xpart(1:Npart))
-    allocate(ypart(1:Npart))
+    ! Build array of solid circle positions
+    if (solidtype==1) then
+        porosity = 0.426
+        ! Interpret RayT input as target pore-scale Rayleigh number
+        nc = nint((2.0*ylen*(1.0 - porosity)/3.0/pi)**0.5 * (RayS/RayT)**(1.0/3.0))
+        if (ismaster) write(*,*) "Number of lattice columns: ",nc
+        Lhex = 1.0/nc/ylen
+        radius = (ylen*(1.0 - porosity)/6.0/pi)**0.5/nc
+        Npart = (nc + 1)*(3*nc + 1) + 3*nc*nc
+        allocate(xpart(1:Npart))
+        allocate(ypart(1:Npart))
 
-    i = 1
-    ! do j=0,nc
-    do j=0,nc
-        xe = real(j)/real(nc)
-        do k=0,3*nc
-            ye = Lhex*real(k)
-            xpart(i) = xe
-            ypart(i) = ye
-            i = i + 1
-        end do
-        if (j>0) then
-            xe = (real(j) - 0.5)/real(nc)*alx3
-            do k=1,3*nc
-                ye = Lhex*(real(k) - 0.5)
+        i = 1
+        ! do j=0,nc
+        do j=0,nc
+            xe = real(j)/real(nc)
+            do k=0,3*nc
+                ye = Lhex*real(k)
                 xpart(i) = xe
                 ypart(i) = ye
                 i = i + 1
             end do
-        end if
-    end do
+            if (j>0) then
+                xe = (real(j) - 0.5)/real(nc)*alx3
+                do k=1,3*nc
+                    ye = Lhex*(real(k) - 0.5)
+                    xpart(i) = xe
+                    ypart(i) = ye
+                    i = i + 1
+                end do
+            end if
+        end do
+    elseif (solidtype==2) then
+        Npart = 14
+        allocate(xpart(1:Npart))
+        allocate(ypart(1:Npart))
+        i = 1
+        do j=0,4
+            ye = real(j)*ylen/4.0
+            do k=0,1
+                xe = real(k)
+                xpart(i) = xe
+                ypart(i) = ye
+                i = i + 1
+            end do
+            if (j>0) then
+                ye = (real(j) - 0.5)*ylen/4.0
+                xe = 0.5
+                xpart(i) = xe
+                ypart(i) = ye
+                i = i + 1
+            end if
+        end do
+    end if
 
     
     do l = 1,3 !{ start do over the 3 velocity components
@@ -119,7 +143,28 @@ subroutine topogr
         !     l = 2   Q_2 vel. component (VY)
         !     l = 3   Q_3 vel. component (VX)
         !
-        ! Track location of solid circles:
+
+        plth1(:,:) = 1.0
+        ! Construct surface height for scallop shape
+        !! CURRENTLY NOT GIVING WHAT I WANT, WORK IN PROGRESS...
+        if (solidtype==2) then
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    ye = ym(j)
+                    ze = zm(i)
+                    if (l==1) ze = zc(i)
+                    if (l==2) ye = yc(j)
+                    do k=1,Npart
+                        yem = ypart(k)
+                        zem = xpart(k)
+                        plth1(j,i) = min(plth1(j,i), 0.2*(8.0/ylen)**2*((ye - yem)**2 + (ze - zem)**2))
+                    end do
+                    ! plth2(j,i) = plth1(j,i)
+                end do
+            end do
+        end if
+
+        ! Track location of solid on each grid:
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                 do k=1,nxm
@@ -127,15 +172,21 @@ subroutine topogr
                     ye = ym(j)
                     if (l==3) xe = xc(k)
                     if (l==2) ye = yc(j)
-                    do nc=1,Npart
-                        ! x-position of solid centre
-                        xem = xpart(nc)
-                        yem = ypart(nc)
-                        r2 = (xe - xem)**2 + (ye - yem)**2
-                        if (r2<radius**2) then
+                    if (solidtype == 1) then
+                        do nc=1,Npart
+                            ! x-position of solid centre
+                            xem = xpart(nc)
+                            yem = ypart(nc)
+                            r2 = (xe - xem)**2 + (ye - yem)**2
+                            if (r2<radius**2) then
+                                forclo(k,j,i) = 1.0
+                            end if
+                        end do
+                    else if (solidtype == 2) then
+                        if (xe < plth1(j,i)) then
                             forclo(k,j,i) = 1.0
                         end if
-                    end do
+                    end if
                 end do
             end do
         end do
@@ -155,11 +206,11 @@ subroutine topogr
                     end if
                     ye = ym(j)
                     if (l==2) ye = yc(j)
+
                     !
                     !    SOLID PART
                     !
                     
-                    ! if ((xe.lt.plth1(j,i))) then
                     if (forclo(k,j,i)>0.9) then
                         n=n+1
                         indgeo(l,n,1)=i
@@ -169,20 +220,9 @@ subroutine topogr
                         indgeoe(l,n,2)=j
                         indgeoe(l,n,3)=k
                         distb(l,n)= 0.
-                    ! elseif(xe.gt.(alx3-plth2(j,i))) then
-                        
-                    !     n=n+1
-                    !     indgeo(l,n,1)=i
-                    !     indgeo(l,n,2)=j
-                    !     indgeo(l,n,3)=k
-                    !     indgeoe(l,n,1)=i
-                    !     indgeoe(l,n,2)=j
-                    !     indgeoe(l,n,3)=k
-                    !     distb(l,n)= 0.
                         
                     !    LOWER FLUID/PLATE BOUNDARY
                     !
-                    ! elseif((xe.ge.plth1(j,i)).and.(xem.lt.plth1(j,i))) then
                     elseif (forclo(k,j,i)<forclo(km,j,i)) then
                         n=n+1
                         indgeo(l,n,1)=i
@@ -192,19 +232,20 @@ subroutine topogr
                         indgeoe(l,n,2)=j 
                         indgeoe(l,n,3)=kp
                         delta1x=(xep-xe)
-                        ! delta2x=(xe-plth1(j,i))
-                        delta2x = 1.0
-                        do nc=1,Npart
-                            xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
-                            if (xe > xem) delta2x = min(delta2x, xe - xem)
-                        end do
+                        if (solidtype==1) then
+                            delta2x = 1.0
+                            do nc=1,Npart
+                                xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
+                                if (xe > xem) delta2x = min(delta2x, xe - xem)
+                            end do
+                        elseif (solidtype==2) then
+                            delta2x = xe - plth1(j,i)
+                        end if
                         distb(l,n) = delta2x/(delta1x+delta2x)
                                 
                     !
                     !    UPPER FLUID/PLATE BOUNDARY
                     !
-                    ! elseif((xe.le.(alx3-plth2(j,i))).and.(xep.gt.(alx3-plth2(j,i)))) &
-                    !     then
                     elseif (forclo(k,j,i)<forclo(kp,j,i)) then
                         n=n+1
                         indgeo(l,n,1)=i
@@ -214,36 +255,16 @@ subroutine topogr
                         indgeoe(l,n,2)=j 
                         indgeoe(l,n,3)=km
                         delta1x=(xe-xem)
+                        if (solidtype==1) then
+                            delta2x = 1.0
+                            do nc=1,Npart
+                                xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
+                                if (xep > xe) delta2x = min(delta2x, xep - xe)
+                            end do
+                        end if
                         ! delta2x=((alx3-plth2(j,i))-xe)
-                        delta2x = 1.0
-                        do nc=1,Npart
-                            xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
-                            if (xep > xe) delta2x = min(delta2x, xep - xe)
-                        end do
                         distb(l,n) = delta2x/(delta1x+delta2x)
-                                        
-                    ! elseif (j==1.or.j==nym) then
-                    !     if(ifnoslipy.eq.1) then
-                    !         n=n+1
-                    !         indgeo(l,n,1)=i
-                    !         indgeo(l,n,2)=j
-                    !         indgeo(l,n,3)=k
-                    !         indgeoe(l,n,1)=i
-                    !         indgeoe(l,n,2)=j
-                    !         indgeoe(l,n,3)=k
-                    !         distb(l,n)= 0.
-                    !     endif
-                    ! elseif (i==1.or.i==nzm) then
-                    !     if(ifnoslipz.eq.1) then
-                    !         n=n+1
-                    !         indgeo(l,n,1)=i
-                    !         indgeo(l,n,2)=j
-                    !         indgeo(l,n,3)=k
-                    !         indgeoe(l,n,1)=i
-                    !         indgeoe(l,n,2)=j
-                    !         indgeoe(l,n,3)=k
-                    !         distb(l,n)= 0.
-                    !     endif
+
                     end if
                                             
                 end do
@@ -282,26 +303,32 @@ subroutine topogr
     n=0
     forclo =0.0d0
     !
-    ! Track location of solid circles:
+    ! Track location of solid on temperature grid:
     do i=xstart(3),xend(3)
         do j=xstart(2),xend(2)
             do k=1,nxm
                 xe = xm(k)
                 ye = ym(j)
-                do nc=1,Npart
-                    ! x-position of solid centre
-                    xem = xpart(nc)
-                    yem = ypart(nc)
-                    r2 = (xe - xem)**2 + (ye - yem)**2
-                    if (r2<radius**2) then
+                if (solidtype==1) then
+                    do nc=1,Npart
+                        ! x-position of solid centre
+                        xem = xpart(nc)
+                        yem = ypart(nc)
+                        r2 = (xe - xem)**2 + (ye - yem)**2
+                        if (r2<radius**2) then
+                            forclo(k,j,i) = 1.0
+                        end if
+                    end do
+                elseif (solidtype==2) then
+                    if (xe < plth1(j,i)) then
                         forclo(k,j,i) = 1.0
                     end if
-                end do
+                end if
             end do
         end do
     end do
 
-    solid_temp = 0.0 ! Modify this to set fixed temperature value in solid
+    solid_temp = 1.0 ! Modify this to set fixed temperature value in solid
     do i=xstart(3),xend(3)
         do j=xstart(2),xend(2)
             do k=1,nxm
@@ -334,11 +361,15 @@ subroutine topogr
                     indgeoet(n,2)=j 
                     indgeoet(n,3)=kp
                     delta1x=(xep-xe)
-                    delta2x = 1.0
-                    do nc=1,Npart
-                        xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
-                        if (xe > xem) delta2x = min(delta2x, xe - xem)
-                    end do
+                    if (solidtype==1) then
+                        delta2x = 1.0
+                        do nc=1,Npart
+                            xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
+                            if (xe > xem) delta2x = min(delta2x, xe - xem)
+                        end do
+                    elseif (solidtype==2) then
+                        delta2x = xe - plth1(j,i)
+                    end if
                     distbt(n) = delta2x/(delta1x+delta2x)
                     temb(n) = solid_temp
 
@@ -351,12 +382,14 @@ subroutine topogr
                     indgeoet(n,2)=j 
                     indgeoet(n,3)=km
                     delta1x=(xe-xem)
+                    if (solidtype==1) then
+                        delta2x = 1.0
+                        do nc=1,Npart
+                            xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
+                            if (xep > xe) delta2x = min(delta2x, xep - xe)
+                        end do
+                    end if
                     ! delta2x=((alx3-plth2(j,i))-xe)
-                    delta2x = 1.0
-                    do nc=1,Npart
-                        xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
-                        if (xep > xe) delta2x = min(delta2x, xep - xe)
-                    end do
                     distbt(n) = delta2x/(delta1x+delta2x)
                     temb(n) = solid_temp
                 end if
@@ -383,7 +416,7 @@ subroutine topogr
             do j=1,nymr
                 do k=1,4
                     ye = ylen/8.0 + real(k - 1)*ylen/4.0
-                    plth1(j,i) = min(plth1(j,i), 0.1*(8.0/ylen)**2*(ymr(j) - ye)**2)
+                    plth1(j,i) = min(plth1(j,i), 0.2*(8.0/ylen)**2*(ymr(j) - ye)**2)
                 end do
                 plth2(j,i) = plth1(j,i)
             end do
@@ -400,24 +433,18 @@ subroutine topogr
                 do k=1,nxmr
                     xe = xmr(k)
                     ye = ymr(j)
-                    do nc=1,Npart
-                        ! x-position of solid centre
-                        xem = xpart(nc)
-                        yem = ypart(nc)
-                        r2 = (xe - xem)**2 + (ye - yem)**2
-                        solidr(k,j,i) = solidr(k,j,i) .or. (r2<radius**2)
-                        ! if (solidr(k,j,i)) then
-                        !     forclor(k,j,i) = 1.0
-                        ! end if
-                    end do
-                end do
-            end do
-        end do
-        do i=xstartr(3),xendr(3)
-            do j=xstartr(2),xendr(2)
-                do k=1,nxmr
-                    if (solidr(k,j,i)) then
-                        forclor(k,j,i) = 1.0
+                    if (solidtype==1) then
+                        do nc=1,Npart
+                            ! x-position of solid centre
+                            xem = xpart(nc)
+                            yem = ypart(nc)
+                            r2 = (xe - xem)**2 + (ye - yem)**2
+                            solidr(k,j,i) = solidr(k,j,i) .or. (r2<radius**2)
+                        end do
+                    elseif (solidtype==2) then
+                        if (xe < plth1(j,i)) then
+                            solidr(k,j,i) = .true.
+                        end if
                     end if
                 end do
             end do
@@ -435,8 +462,8 @@ subroutine topogr
                     !    SOLID PART
                     !           
 
-                    if (forclor(k,j,i) > 0.9) then
-                        if (forclor(kp,j,i) < 0.1) then
+                    if (solidr(k,j,i)) then
+                        if (.not. solidr(kp,j,i)) then
                             n = n + 1
                             indgeor(n,1) = i
                             indgeor(n,2) = j
@@ -445,7 +472,7 @@ subroutine topogr
                             indgeoer(n,2) = j
                             indgeoer(n,3) = kp
                             distbr(n) = 1.0
-                        elseif (forclor(km,j,i) < 0.1) then
+                        elseif (.not. solidr(km,j,i)) then
                             n = n + 1
                             indgeor(n,1) = i
                             indgeor(n,2) = j
