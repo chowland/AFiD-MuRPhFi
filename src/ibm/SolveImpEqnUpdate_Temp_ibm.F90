@@ -38,8 +38,8 @@ subroutine SolveImpEqnUpdate_Temp_ibm
             do kc=1,nxm
 ! SL ==================================================   
                 ! if(ifparticle.eq.0) then
-                km = kc - 1
-                kp = kc + 1
+                km = max(1,kc - 1)
+                kp = min(kc + 1,nxm)
                 ackl_b=1.0d0/(1.-ac3ssk(kc)*forclo(kc,jc,ic)*betadx)
                 amkl(kc)=-am3ssk(kc)*forclo(kc,jc,ic)*betadx*ackl_b &
                         - (1.0 - forclo(kc,jc,ic))*forclo(km,jc,ic)*hro(kc,jc,ic)

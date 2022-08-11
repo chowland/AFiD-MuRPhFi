@@ -29,8 +29,8 @@ subroutine SolveImpEqnUpdate_Sal_ibm
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
             do kc=1,nxmr
-                km = kc - 1
-                kp = kc + 1
+                km = max(1,kc - 1)
+                kp = min(kc + 1,nxmr)
                 ackl_b = 1.0d0/(1.-ac3sskr(kc)*betadx*forclor(kc,jc,ic))
                 amkl(kc) = -am3sskr(kc)*betadx*ackl_b*forclor(kc,jc,ic) &
                             - (1.0 - forclor(kc,jc,ic))*forclor(km,jc,ic)
