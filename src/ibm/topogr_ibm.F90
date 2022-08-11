@@ -18,10 +18,11 @@ subroutine topogr
     real    :: solid_temp
     integer,allocatable :: ind1(:), ind2(:)
     real,allocatable :: xpart(:), ypart(:)
-    integer :: solidtype
+    ! integer :: solidtype
 
     ! Choose IBM geometry (1=hexagonal porous matrix, 2=scallop)
-    solidtype = 1
+    ! Now from bou.in
+    ! solidtype = 2
 
     ! infig=1
     q1bo=0.d0

@@ -8,11 +8,12 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 subroutine ReadInputFile
     use param
+    use ibm_param, only: solidtype
     implicit none
     character(len=4) :: dummy
     integer flagstat,flagbal,flagmelt
     integer :: flagMR, flagsal, flagPF
-    integer :: FFscaleS, pf_IBM
+    integer :: FFscaleS!, pf_IBM
     logical fexist
 
     open(unit=15,file='bou.in',status='old')
@@ -70,7 +71,7 @@ subroutine ReadInputFile
         read(15,301) dummy
         read(15,301) dummy
         read(15,301) dummy
-        read(15,*) pf_D, pf_A, pf_S, pf_Tm, pf_IBM, pf_IC
+        read(15,*) pf_D, pf_A, pf_S, pf_Tm, solidtype, pf_IC
 301     format(a4)
     close(15)
 
@@ -83,7 +84,7 @@ subroutine ReadInputFile
     nzr=nzmr+1
 
     ! Prescribe booleans
-    if (pf_IBM.ne.0) IBM = .true.
+    if (solidtype.ne.0) IBM = .true.
 
     ! if(flagstat.ne.0) statcal = .true.
     if(idtv.eq.0) variabletstep = .false.
