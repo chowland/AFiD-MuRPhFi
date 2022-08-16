@@ -162,6 +162,18 @@ subroutine topogr
                     ! plth2(j,i) = plth1(j,i)
                 end do
             end do
+        ! Streamwise riblets
+        elseif (solidtype==3) then
+            plth1(:,:) = 0.0
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    ye = ym(j)
+                    ze = zm(i)
+                    if (l==1) ze = zc(i)
+                    if (l==2) ye = yc(j)
+                    plth1(j,i) = (2.0d0)*MIN((MOD(ze,0.025d0)),(0.025d0-MOD(ze,0.025d0)))
+                end do
+            end do
         end if
 
         ! Track location of solid on each grid:
@@ -182,7 +194,7 @@ subroutine topogr
                                 forclo(k,j,i) = 1.0
                             end if
                         end do
-                    else if (solidtype == 2) then
+                    else if (solidtype > 1) then
                         if (xe < plth1(j,i)) then
                             forclo(k,j,i) = 1.0
                         end if
@@ -238,7 +250,7 @@ subroutine topogr
                                 xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
                                 if (xe > xem) delta2x = min(delta2x, xe - xem)
                             end do
-                        elseif (solidtype==2) then
+                        elseif (solidtype > 1) then
                             delta2x = xe - plth1(j,i)
                         end if
                         distb(l,n) = delta2x/(delta1x+delta2x)
@@ -316,6 +328,16 @@ subroutine topogr
                 ! plth2(j,i) = plth1(j,i)
             end do
         end do
+    ! Streamwise riblets
+    elseif (solidtype==3) then
+        plth1(:,:) = 0.0
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                ye = ym(j)
+                ze = zm(i)
+                plth1(j,i) = (2.0d0)*MIN((MOD(ze,0.025d0)),(0.025d0-MOD(ze,0.025d0)))
+            end do
+        end do
     end if
 
     n=0
@@ -337,7 +359,7 @@ subroutine topogr
                             forclo(k,j,i) = 1.0
                         end if
                     end do
-                elseif (solidtype==2) then
+                elseif (solidtype > 1) then
                     if (xe < plth1(j,i)) then
                         forclo(k,j,i) = 1.0
                     end if
@@ -385,7 +407,7 @@ subroutine topogr
                             xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
                             if (xe > xem) delta2x = min(delta2x, xe - xem)
                         end do
-                    elseif (solidtype==2) then
+                    elseif (solidtype > 1) then
                         delta2x = xe - plth1(j,i)
                     end if
                     distbt(n) = delta2x/(delta1x+delta2x)
