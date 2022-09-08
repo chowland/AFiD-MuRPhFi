@@ -5,7 +5,7 @@ module GridModule
     private
     public uniform_grid, tanh_grid, cheb_grid, asym_cheb_grid, &
             second_derivative_coeff, centre_focus_grid, &
-            natural_BL_grid
+            natural_BL_grid, sym_natural_BL_grid
 
 contains
 
@@ -183,6 +183,41 @@ contains
         end do
 
     end subroutine natural_BL_grid
+
+    subroutine sym_natural_BL_grid(c_grd, m_grd, Nm, grd_len, Schmidt)
+        !! Natural grid space scaling for turbulent boundary layers
+        !! following Pirozzoli & Orlandi (2021) J. Comp. Phys.
+        real, intent(out) :: c_grd(:), m_grd(:)
+        integer, intent(in) :: Nm
+        real, intent(in) :: grd_len
+        real, intent(in) :: Schmidt
+
+        integer :: j, jm, nh
+        real :: c_eta, alpha, jb, dyw, Lh
+
+        jb = 16.0
+        c_eta = 0.8
+        alpha = 1.5
+        dyw = 0.1
+
+        nh = Nm/2
+        do j=1,nh+1
+            jm = j - 1
+            c_grd(j) = 1/(1.0 + (jm/jb)**2)*(dyw*jm + &
+                    (0.75*alpha*c_eta*jm/Schmidt**0.5)**(4.0/3.0)*(jm/jb)**2)
+        end do
+        Lh = 2.0*c_grd(nh+1)
+        do j=1,nh
+            c_grd(Nm + 2 - j) = Lh - c_grd(j)
+        end do
+        ! Rescale grid to match domain size
+        c_grd(:) = c_grd(:)/c_grd(Nm+1)*grd_len
+
+        do j=1,Nm
+            m_grd(j) = 0.5*(c_grd(j) + c_grd(j+1))
+        end do
+
+    end subroutine sym_natural_BL_grid
 
     subroutine second_derivative_coeff(ap3 ,ac3, am3, x, xlen, fix_up, fix_low)
         ! Returns second derivative coefficients ap3, ac3, am3
