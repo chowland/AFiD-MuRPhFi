@@ -7,6 +7,7 @@ subroutine topogr
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use ibm_param
     use mgrd_arrays, only: sal
+    use mpih
     implicit none
     integer :: i,j,k,l,kstartp, nc, Npart
     integer :: km,kp,jm,jp,im,ip,mm
@@ -15,16 +16,10 @@ subroutine topogr
     real    :: ye, yem, yep
     real    :: ze, zem, zep
     real    :: delta1x, delta2x, r2, Lhex, radius, porosity
-    real    :: solid_temp
+    real    :: solid_temp, rp, tp, amp
     integer,allocatable :: ind1(:), ind2(:)
     real,allocatable :: xpart(:), ypart(:)
-    ! integer :: solidtype
 
-    ! Choose IBM geometry (1=hexagonal porous matrix, 2=scallop)
-    ! Now from bou.in
-    ! solidtype = 2
-
-    ! infig=1
     q1bo=0.d0
     q2bo=0.d0
     q3bo=0.d0
@@ -33,33 +28,6 @@ subroutine topogr
     allocate(plth2(1:nym,1:nzm))
     plth1=1.d0
     plth2=1.d0
-    
-    ! if(ifrough.eq.1) then
-    ! do i=1,nzm
-    !     do j=1,nym
-            !            plth1(j,i)=abs(dcos(10*pi*zm(i)/zlen) &
-            !                      +dcos(10*pi*ym(j)/ylen))*0.01
-            ! plth1(j,i)=dsin(2*pi/rlambda*ym(j)-pi/2)*rheight/2 + rheight/2
-            !            plth2(j,i)=abs(dcos(10*pi*zm(i)/zlen)  &
-            !                      +dcos(10*pi*ym(j)/ylen))*0.01
-            ! plth2(j,i)=dsin(2*pi/rlambda*ym(j)-pi/2)*rheight/2 + rheight/2
-    !     end do
-    ! end do
-    ! endif
-    
-    ! if(ifrough.eq.2) then         ! ratchet
-    !     do i=1,nzm
-    !         do k=1,nr 
-    !             do j=nym/nr*(k-1)+1,nym/nr*k
-    !                 !              plth1(j,i)=0.025-(ym(j)-int(ym(j)/0.05)*0.05)/2.0
-    !                 !              plth2(j,i)=(ym(j)-int(ym(j)/0.05)*0.05)/2.0
-    !                 plth1(j,i)=0.025-(ym(j)-0.05d0*(k-1))/2.d0
-    !                 plth2(j,i)=(ym(j)-0.05d0*(k-1))/2.d0
-    !             enddo
-    !         enddo
-    !     enddo
-    ! endif
-    
     
     npunx=0
     npuny=0
@@ -88,30 +56,46 @@ subroutine topogr
         if (ismaster) write(*,*) "Number of lattice columns: ",nc
         Lhex = 1.0/nc/ylen
         radius = (ylen*(1.0 - porosity)/6.0/pi)**0.5/nc
+        amp = radius*(sqrt(pi/2.0/3.0**0.5/(1.0 - porosity)) - 1)
         Npart = (nc + 1)*(3*nc + 1) + 3*nc*nc
         allocate(xpart(1:Npart))
         allocate(ypart(1:Npart))
 
-        i = 1
-        ! do j=0,nc
-        do j=0,nc
-            xe = real(j)/real(nc)
-            do k=0,3*nc
-                ye = Lhex*real(k)
-                xpart(i) = xe
-                ypart(i) = ye
-                i = i + 1
-            end do
-            if (j>0) then
-                xe = (real(j) - 0.5)/real(nc)*alx3
+        ! Compute solid centres on root process
+        if (ismaster) then
+            i = 1
+            call random_seed()
+            do j=0,nc
+                xe = real(j)/real(nc)
                 do k=1,3*nc
-                    ye = Lhex*(real(k) - 0.5)
-                    xpart(i) = xe
-                    ypart(i) = ye
+                    ye = Lhex*real(k)
+                    call random_number(rp)
+                    call random_number(tp)
+                    xpart(i) = xe + amp*rp*cos(2*pi*tp)
+                    ypart(i) = ye + amp*rp*sin(2*pi*tp)
                     i = i + 1
+                    if (k==3*nc) then
+                        xpart(i) = xpart(i-1)
+                        ypart(i) = ypart(i-1) - ylen
+                        i = i + 1
+                    end if
                 end do
-            end if
-        end do
+                if (j>0) then
+                    xe = (real(j) - 0.5)/real(nc)*alx3
+                    do k=1,3*nc
+                        ye = Lhex*(real(k) - 0.5)
+                        call random_number(rp)
+                        call random_number(tp)
+                        xpart(i) = xe + amp*rp*cos(2*pi*tp)
+                        ypart(i) = ye + amp*rp*sin(2*pi*tp)
+                        i = i + 1
+                    end do
+                end if
+            end do
+        end if
+        ! Broadcast centre positions to all processes
+        call MPI_BCAST(xpart, Npart, MDP, 0, MPI_COMM_WORLD, ierr)
+        call MPI_BCAST(ypart, Npart, MDP, 0, MPI_COMM_WORLD, ierr)
     elseif (solidtype==2) then
         Npart = 14
         allocate(xpart(1:Npart))
