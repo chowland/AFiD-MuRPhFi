@@ -9,16 +9,16 @@ subroutine topogr
     use mgrd_arrays, only: sal
     use mpih
     implicit none
-    integer :: i,j,k,l,kstartp, nc, Npart
+    integer :: i,j,k,l,kstartp, nc, Npart, ncz
     integer :: km,kp,jm,jp,im,ip,mm
     
     real    :: xe, xem, xep
     real    :: ye, yem, yep
     real    :: ze, zem, zep
     real    :: delta1x, delta2x, r2, Lhex, radius, porosity
-    real    :: solid_temp, rp, tp, amp
+    real    :: solid_temp, rp, tp, amp, rx, ry, rz
     integer,allocatable :: ind1(:), ind2(:)
-    real,allocatable :: xpart(:), ypart(:)
+    real,allocatable :: xpart(:), ypart(:), zpart(:)
 
     q1bo=0.d0
     q2bo=0.d0
@@ -117,6 +117,77 @@ subroutine topogr
                 i = i + 1
             end if
         end do
+
+    elseif (solidtype==4) then
+        porosity = 0.426
+        nc = nint(3.0/2.0/sqrt(6.0)*(3*sqrt(2.0)*(1.0 - porosity)*RayS/RayT/pi)**(1.0/3.0))
+        if (ismaster) write(*,*) "Number of lattice layers: ",nc
+        ncz = nint(sqrt(3.0)*zlen/ylen*nc)
+        rx = 3.0/4.0/sqrt(6.0)/nc
+        ry = 0.5/sqrt(3.0)/nc*ylen
+        rz = 0.5*zlen/ncz
+        radius = (3.0*ylen*zlen/16.0/pi/nc**2/ncz)**(1.0/3.0)
+        if (ismaster) write(*,*) "Bead radius: ",radius
+        Npart = (ncz + 1)*((nc + 1)**2 + nc**2) + ncz*(nc *(2*nc + 1))
+        allocate(xpart(1:Npart))
+        allocate(ypart(1:Npart))
+        allocate(zpart(1:Npart))
+
+        ! Compute solid centres on root process
+        if (ismaster) then
+            n = 1
+            do k=0,nc
+                xe = 4.0*k*sqrt(6.0)/3.0*rx
+                do i=0,ncz
+                    do j=0,nc
+                        ye = 2.0*sqrt(3.0)*j*ry
+                        ze = 2.0*i*rz
+                        xpart(n) = xe
+                        ypart(n) = ye
+                        zpart(n) = ze
+                        n = n + 1
+                    end do
+                end do
+                do i=1,ncz
+                    do j=1,nc
+                        ye = (2.0*j - 1.0)*sqrt(3.0)*ry
+                        ze = (2.0*i - 1.0)*rz
+                        xpart(n) = xe
+                        ypart(n) = ye
+                        zpart(n) = ze
+                        n = n + 1
+                    end do
+                end do
+            end do
+            do k=1,nc
+                xe = 2.0*(2.0*k - 1.0)*sqrt(6.0)/3.0*rx
+                do i=0,ncz
+                    do j=1,nc
+                        ye = sqrt(3.0)*(2.0*j - 2.0/3.0)*ry
+                        ze = sqrt(2.0*i)*rz
+                        xpart(n) = xe
+                        ypart(n) = ye
+                        zpart(n) = ze
+                        n = n + 1
+                    end do
+                end do
+                do i=1,ncz
+                    do j=1,nc
+                        ye = sqrt(3.0)*(2.0*(j - 1.0) + 1.0/3.0)*ry
+                        ze = (2.0*i - 1.0)*rz
+                        xpart(n) = xe
+                        ypart(n) = ye
+                        zpart(n) = ze
+                        n = n + 1
+                    end do
+                end do
+            end do
+        end if
+        ! Broadcast centre positions to all processes
+        call MPI_BCAST(xpart, Npart, MDP, 0, MPI_COMM_WORLD, ierr)
+        call MPI_BCAST(ypart, Npart, MDP, 0, MPI_COMM_WORLD, ierr)
+        call MPI_BCAST(zpart, Npart, MDP, 0, MPI_COMM_WORLD, ierr)
+
     end if
 
     
@@ -155,30 +226,38 @@ subroutine topogr
                     ze = zm(i)
                     if (l==1) ze = zc(i)
                     if (l==2) ye = yc(j)
-                    plth1(j,i) = (2.0d0)*MIN((MOD(ze,0.025d0)),(0.025d0-MOD(ze,0.025d0)))
+                    r2 = 0.05
+                    plth1(j,i) = (2.0d0)*MIN((MOD(ze,r2)),(r2-MOD(ze,r2)))
                 end do
             end do
         end if
 
         ! Track location of solid on each grid:
         do i=xstart(3),xend(3)
+            ze = zm(i)
+            if (l==1) ze = zc(i)
             do j=xstart(2),xend(2)
+                ye = ym(j)
+                if (l==2) ye = yc(j)
                 do k=1,nxm
                     xe = xm(k)
-                    ye = ym(j)
                     if (l==3) xe = xc(k)
-                    if (l==2) ye = yc(j)
-                    if (solidtype == 1) then
+                    if (mod(solidtype,3) == 1) then
                         do nc=1,Npart
                             ! x-position of solid centre
                             xem = xpart(nc)
                             yem = ypart(nc)
-                            r2 = (xe - xem)**2 + (ye - yem)**2
+                            if (solidtype==4) then
+                                zem = zpart(nc)
+                                r2 = (xe - xem)**2 + (ye - yem)**2 + (ze - zem)**2
+                            else
+                                r2 = (xe - xem)**2 + (ye - yem)**2
+                            end if
                             if (r2<radius**2) then
                                 forclo(k,j,i) = 1.0
                             end if
                         end do
-                    else if (solidtype > 1) then
+                    else
                         if (xe < plth1(j,i)) then
                             forclo(k,j,i) = 1.0
                         end if
@@ -188,7 +267,11 @@ subroutine topogr
         end do
 
         do i=xstart(3),xend(3)
+            ze = zm(i)
+            if (l==1) ze = zc(i)
             do j=xstart(2),xend(2)
+                ye = ym(j)
+                if (l==2) ye = yc(j)
                 do k=1,nxm
                     km=kmv(k)
                     kp=kpv(k)
@@ -200,8 +283,6 @@ subroutine topogr
                         xem=xc(km)
                         xep=xc(kp)
                     end if
-                    ye = ym(j)
-                    if (l==2) ye = yc(j)
 
                     !
                     !    SOLID PART
@@ -234,7 +315,13 @@ subroutine topogr
                                 xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
                                 if (xe > xem) delta2x = min(delta2x, xe - xem)
                             end do
-                        elseif (solidtype > 1) then
+                        elseif (solidtype==4) then
+                            delta2x = 1.0
+                            do nc=1,Npart
+                                xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
+                                if (xe > xem) delta2x = min(delta2x, xe - xem)
+                            end do
+                        else
                             delta2x = xe - plth1(j,i)
                         end if
                         distb(l,n) = delta2x/(delta1x+delta2x)
@@ -255,6 +342,12 @@ subroutine topogr
                             delta2x = 1.0
                             do nc=1,Npart
                                 xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
+                                if (xep > xe) delta2x = min(delta2x, xep - xe)
+                            end do
+                        elseif (solidtype==4) then
+                            delta2x = 1.0
+                            do nc=1,Npart
+                                xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
                                 if (xep > xe) delta2x = min(delta2x, xep - xe)
                             end do
                         end if
@@ -329,21 +422,27 @@ subroutine topogr
     !
     ! Track location of solid on temperature grid:
     do i=xstart(3),xend(3)
+        ze = zm(i)
         do j=xstart(2),xend(2)
+            ye = ym(j)
             do k=1,nxm
                 xe = xm(k)
-                ye = ym(j)
-                if (solidtype==1) then
+                if (mod(solidtype,3)==1) then
                     do nc=1,Npart
                         ! x-position of solid centre
                         xem = xpart(nc)
                         yem = ypart(nc)
-                        r2 = (xe - xem)**2 + (ye - yem)**2
+                        if (solidtype==4) then
+                            zem = zpart(nc)
+                            r2 = (xe - xem)**2 + (ye - yem)**2 + (ze - zem)**2
+                        else
+                            r2 = (xe - xem)**2 + (ye - yem)**2
+                        end if
                         if (r2<radius**2) then
                             forclo(k,j,i) = 1.0
                         end if
                     end do
-                elseif (solidtype > 1) then
+                else
                     if (xe < plth1(j,i)) then
                         forclo(k,j,i) = 1.0
                     end if
@@ -354,7 +453,9 @@ subroutine topogr
 
     solid_temp = 1.0 ! Modify this to set fixed temperature value in solid
     do i=xstart(3),xend(3)
+        ze = zm(i)
         do j=xstart(2),xend(2)
+            ye = ym(j)
             do k=1,nxm
                 km=kmv(k)
                 kp=kpv(k)
@@ -391,7 +492,13 @@ subroutine topogr
                             xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
                             if (xe > xem) delta2x = min(delta2x, xe - xem)
                         end do
-                    elseif (solidtype > 1) then
+                    elseif (solidtype==4) then
+                        delta2x = 1.0
+                        do nc=1,Npart
+                            xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
+                            if (xe > xem) delta2x = min(delta2x, xe - xem)
+                        end do
+                    else
                         delta2x = xe - plth1(j,i)
                     end if
                     distbt(n) = delta2x/(delta1x+delta2x)
@@ -411,6 +518,12 @@ subroutine topogr
                         do nc=1,Npart
                             xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
                             if (xep > xe) delta2x = min(delta2x, xep - xe)
+                        end do
+                    elseif (solidtype==4) then
+                        delta2x = 1.0
+                        do nc=1,Npart
+                            xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
+                            if (xep > xe) delta2x = min(delta2x, xe - xem)
                         end do
                     end if
                     ! delta2x=((alx3-plth2(j,i))-xe)
@@ -453,19 +566,25 @@ subroutine topogr
         !
 
         do i=xstartr(3)-1,xendr(3)+1
+            ze = zmr(i)
             do j=xstartr(2)-1,xendr(2)+1
+                ye = ymr(j)
                 do k=1,nxmr
                     xe = xmr(k)
-                    ye = ymr(j)
-                    if (solidtype==1) then
+                    if (mod(solidtype,3)==1) then
                         do nc=1,Npart
                             ! x-position of solid centre
                             xem = xpart(nc)
                             yem = ypart(nc)
-                            r2 = (xe - xem)**2 + (ye - yem)**2
+                            if (solidtype==4) then
+                                zem = zpart(nc)
+                                r2 = (xe - xem)**2 + (ye - yem)**2 + (ze - zem)**2
+                            else
+                                r2 = (xe - xem)**2 + (ye - yem)**2
+                            end if
                             solidr(k,j,i) = solidr(k,j,i) .or. (r2<radius**2)
                         end do
-                    elseif (solidtype==2) then
+                    else
                         if (xe < plth1(j,i)) then
                             solidr(k,j,i) = .true.
                         end if
@@ -571,5 +690,6 @@ subroutine topogr
     end if
     if(allocated(xpart)) deallocate(xpart)
     if(allocated(ypart)) deallocate(ypart)
+    if(allocated(zpart)) deallocate(zpart)
     return
 end subroutine topogr
