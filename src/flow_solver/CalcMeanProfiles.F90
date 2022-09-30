@@ -216,17 +216,34 @@ subroutine CalcMeanProfiles
         inymr = 1.d0/nymr
         inzmr = 1.d0/nzmr
 
-        do i=xstartr(3),xendr(3)
-            do j=xstartr(2),xendr(2)
-                do k=1,nxmr
-                    Sbar(k) = Sbar(k) + sal(k,j,i)*inymr*inzmr
-
-                    vxS(k) = vxS(k) + 0.5*(vxr(k,j,i)+vxr(k+1,j,i))*sal(k,j,i)*inymr*inzmr
-                    vyS(k) = vyS(k) + 0.5*(vyr(k,j,i)+vyr(k,j+1,i))*sal(k,j,i)*inymr*inzmr
-                    vzS(k) = vzS(k) + 0.5*(vzr(k,j,i)+vzr(k,j,i+1))*sal(k,j,i)*inymr*inzmr
+        if (IBM) then
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,nxmr
+                        ! Only record data from fluid phase
+                        if (.not. solidr(k,j,i)) then
+                            Sbar(k) = Sbar(k) + sal(k,j,i)*inymr*inzmr
+                        end if
+                        ! NB This is zero in solid anyway, so no need for an if
+                        vxS(k) = vxS(k) + 0.5*(vxr(k,j,i)+vxr(k+1,j,i))*sal(k,j,i)*inymr*inzmr
+                        vyS(k) = vyS(k) + 0.5*(vyr(k,j,i)+vyr(k,j+1,i))*sal(k,j,i)*inymr*inzmr
+                        vzS(k) = vzS(k) + 0.5*(vzr(k,j,i)+vzr(k,j,i+1))*sal(k,j,i)*inymr*inzmr
+                    end do
                 end do
             end do
-        end do
+        else
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,nxmr
+                        Sbar(k) = Sbar(k) + sal(k,j,i)*inymr*inzmr
+
+                        vxS(k) = vxS(k) + 0.5*(vxr(k,j,i)+vxr(k+1,j,i))*sal(k,j,i)*inymr*inzmr
+                        vyS(k) = vyS(k) + 0.5*(vyr(k,j,i)+vyr(k,j+1,i))*sal(k,j,i)*inymr*inzmr
+                        vzS(k) = vzS(k) + 0.5*(vzr(k,j,i)+vzr(k,j,i+1))*sal(k,j,i)*inymr*inzmr
+                    end do
+                end do
+            end do
+        end if
 
         if (IBM) then
             do i=xstartr(3),xendr(3)
