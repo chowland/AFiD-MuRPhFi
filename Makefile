@@ -1,6 +1,6 @@
 # Choose the machine being used
 # Options: PC_GNU, PC_INTEL, (i)SNELLIUS, IRENE, MARENOSTRUM, SUPERMUC
-MACHINE=PC_GNU
+MACHINE=IRENE_SKL
 # Modules required for each HPC system as follows:
 # SNELLIUS: 2021 foss/2021a HDF5/1.10.7-gompi-2021a
 # iSNELLIUS: 2021 intel/2021a FFTW/3.3.9-intel-2021a HDF5/1.10.7-iimpi-2021a
@@ -37,7 +37,15 @@ ifeq ($(MACHINE),SNELLIUS)
 	BLAS_LIBS = -lscalapack -lopenblas -ldl
 	LDFLAGS = -lfftw3 $(BLAS_LIBS)
 endif
-ifeq ($(MACHINE),IRENE)
+ifeq ($(MACHINE),IRENE_SKL)
+	FC = h5pfc -fpp -r8 -O3 -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW3_FFLAGS)
+	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) -ldl
+endif
+ifeq ($(MACHINE),IRENE_KNL)
+	FC = h5pfc -fpp -r8 -O3 -xMIC-AVX512 -fma -align array64byte -finline-functions $(FFTW3_FFLAGS)
+	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) -ldl
+endif
+ifeq ($(MACHINE),IRENE_ROME)
 	FC = h5pfc -fpp -r8 -O3 -mavx2 $(FFTW3_FFLAGS)
 	HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
 	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) $(HDF5_LIBS)
