@@ -37,7 +37,15 @@ ifeq ($(MACHINE),SNELLIUS)
 	BLAS_LIBS = -lscalapack -lopenblas -ldl
 	LDFLAGS = -lfftw3 $(BLAS_LIBS)
 endif
-ifeq ($(MACHINE),IRENE)
+ifeq ($(MACHINE),IRENE_SKL)
+	FC = h5pfc -fpp -r8 -O3 -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW3_FFLAGS)
+	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) -ldl
+endif
+ifeq ($(MACHINE),IRENE_KNL)
+	FC = h5pfc -fpp -r8 -O3 -xMIC-AVX512 -fma -align array64byte -finline-functions $(FFTW3_FFLAGS)
+	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) -ldl
+endif
+ifeq ($(MACHINE),IRENE_ROME)
 	FC = h5pfc -fpp -r8 -O3 -mavx2 $(FFTW3_FFLAGS)
 	HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
 	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) $(HDF5_LIBS)
@@ -112,9 +120,12 @@ OBJS += obj/SolveImpEqnUpdate_Temp_ibm.o obj/SolveImpEqnUpdate_X_ibm.o \
 	obj/SolveImpEqnUpdate_YZ_ibm.o obj/topogr_ibm.o obj/SolveImpEqnUpdate_Sal_ibm.o \
 	obj/DeallocateIBMVars.o
 
+# Object files for plane writing
+OBJS += obj/mean_zplane.o
+
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
-	obj/HermiteInterpolations.o obj/GridModule.o obj/ibm_param.o
+	obj/HermiteInterpolations.o obj/GridModule.o obj/h5_tools.o obj/means.o obj/ibm_param.o
 
 #=======================================================================
 #  Files that create modules:
@@ -148,6 +159,8 @@ $(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/flow_solver/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: src/h5tools/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/multires/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
