@@ -107,9 +107,12 @@ OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
 	obj/InterpTempMgrd.o obj/SolveImpEqnUpdate_Phi.o obj/CreateICPF.o \
 	obj/ImmersedBoundary.o
 
+# Object files for plane writing
+OBJS += obj/mean_zplane.o
+
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
-	obj/HermiteInterpolations.o obj/GridModule.o
+	obj/HermiteInterpolations.o obj/GridModule.o obj/h5_tools.o obj/means.o
 
 #=======================================================================
 #  Files that create modules:
@@ -141,6 +144,8 @@ $(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/flow_solver/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: src/h5tools/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/multires/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
