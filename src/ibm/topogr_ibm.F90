@@ -126,7 +126,7 @@ subroutine topogr
         rx = 3.0/4.0/sqrt(6.0)/nc
         ry = 0.5/sqrt(3.0)/nc*ylen
         rz = 0.5*zlen/ncz
-        radius = (3.0*ylen*zlen/16.0/pi/nc**2/ncz)**(1.0/3.0)
+        radius = (3.0*ylen*zlen/16.0/pi/nc**2/ncz*(1.0 - porosity))**(1.0/3.0)
         if (ismaster) write(*,*) "Bead radius: ",radius
         Npart = (ncz + 1)*((nc + 1)**2 + nc**2) + ncz*(nc *(2*nc + 1))
         allocate(xpart(1:Npart))
@@ -164,7 +164,7 @@ subroutine topogr
                 do i=0,ncz
                     do j=1,nc
                         ye = sqrt(3.0)*(2.0*j - 2.0/3.0)*ry
-                        ze = sqrt(2.0*i)*rz
+                        ze = 2.0*i*rz
                         xpart(n) = xe
                         ypart(n) = ye
                         zpart(n) = ze
