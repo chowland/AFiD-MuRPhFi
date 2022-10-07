@@ -18,7 +18,7 @@ program AFiD
     integer :: prow=0,pcol=0
     integer :: lfactor,lfactor2
     character(100) :: arg
-    logical :: nanexist
+    logical :: nanexist, write_mean_planes=.true.
     real,allocatable,dimension(:,:) :: dummy,dscan,dbot
     integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
@@ -198,6 +198,10 @@ program AFiD
     call Mkmov_xcut
     call Mkmov_ycut
     call Mkmov_zcut
+    if (write_mean_planes) then
+        call mean_yplane
+        call mean_zplane
+    end if
     
     if (ismaster) write(*,*) "Writing 3D fields"
     call WriteFlowField(.false.)
@@ -291,6 +295,10 @@ program AFiD
             call Mkmov_xcut
             call Mkmov_ycut
             call Mkmov_zcut
+            if (write_mean_planes) then
+                call mean_yplane
+                call mean_zplane
+            end if
         endif
 
         if(ntime.eq.1.or.mod(time,tout).lt.dt) then
