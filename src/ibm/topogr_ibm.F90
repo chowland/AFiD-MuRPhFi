@@ -367,6 +367,7 @@ subroutine topogr
             if(n.gt.mpun)  &
             write(*,*) 'Dim max di indgeot e'' stata superata n=',n
             npunz= n
+            if (ismaster) write(*,*) 'npunz: ',npunz
             !        write(6,332)npunz
             ! 332  format(5x,'For Q_1 N ='i7)
         end if
@@ -374,6 +375,7 @@ subroutine topogr
             if(n.gt.mpun)   &
             write(*,*) 'Dim max di indgeor e'' stata superata n=',n
             npuny= n
+            if (ismaster) write(*,*) 'npuny: ',npuny
             !        write(6,331)npuny
             ! 331  format(5x,'For Q_2 N ='i7)
         end if
@@ -381,6 +383,7 @@ subroutine topogr
             if(n.gt.mpun)  &
             write(*,*) 'Dim max di indgeoz e'' stata superata n=',n
             npunx= n
+            if (ismaster) write(*,*) 'npunx: ',npunx
             !        write(6,330)npunx
             ! 330  format(5x,'For Q_3 N ='i7)
         end if
