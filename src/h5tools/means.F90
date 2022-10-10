@@ -1,7 +1,7 @@
 module means
     use mpih
     use decomp_2d
-    use param, only: nym, nymr, nzm, nzmr, IBM
+    use param, only: nxmr, nym, nymr, nzm, nzmr, IBM
     use ibm_param, only: solidr
     implicit none
 
