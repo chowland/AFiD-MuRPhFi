@@ -120,7 +120,7 @@ subroutine topogr
         end do
 
     elseif (solidtype==4) then
-        porosity = 0.426
+        porosity = 0.426 ! 0.37
         nc = nint(3.0/2.0/sqrt(6.0)*(3*sqrt(2.0)*(1.0 - porosity)*RayS/RayT/pi)**(1.0/3.0))
         if (ismaster) write(*,*) "Number of lattice layers: ",nc
         ncz = nint(sqrt(3.0)*zlen/ylen*nc)
@@ -302,59 +302,59 @@ subroutine topogr
                         
                     !    LOWER FLUID/PLATE BOUNDARY
                     !
-                    elseif (forclo(k,j,i)<forclo(km,j,i)) then
-                        n=n+1
-                        indgeo(l,n,1)=i
-                        indgeo(l,n,2)=j
-                        indgeo(l,n,3)=k
-                        indgeoe(l,n,1)=i
-                        indgeoe(l,n,2)=j 
-                        indgeoe(l,n,3)=kp
-                        delta1x=(xep-xe)
-                        if (solidtype==1) then
-                            delta2x = 1.0
-                            do nc=1,Npart
-                                xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
-                                if (xe > xem) delta2x = min(delta2x, xe - xem)
-                            end do
-                        elseif (solidtype==4) then
-                            delta2x = 1.0
-                            do nc=1,Npart
-                                xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
-                                if (xe > xem) delta2x = min(delta2x, xe - xem)
-                            end do
-                        else
-                            delta2x = xe - plth1(j,i)
-                        end if
-                        distb(l,n) = delta2x/(delta1x+delta2x)
+                    ! elseif (forclo(k,j,i)<forclo(km,j,i)) then
+                    !     n=n+1
+                    !     indgeo(l,n,1)=i
+                    !     indgeo(l,n,2)=j
+                    !     indgeo(l,n,3)=k
+                    !     indgeoe(l,n,1)=i
+                    !     indgeoe(l,n,2)=j 
+                    !     indgeoe(l,n,3)=kp
+                    !     delta1x=(xep-xe)
+                    !     if (solidtype==1) then
+                    !         delta2x = 1.0
+                    !         do nc=1,Npart
+                    !             xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
+                    !             if (xe > xem) delta2x = min(delta2x, xe - xem)
+                    !         end do
+                    !     elseif (solidtype==4) then
+                    !         delta2x = 1.0
+                    !         do nc=1,Npart
+                    !             xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
+                    !             if (xe > xem) delta2x = min(delta2x, xe - xem)
+                    !         end do
+                    !     else
+                    !         delta2x = xe - plth1(j,i)
+                    !     end if
+                    !     distb(l,n) = delta2x/(delta1x+delta2x)
                                 
-                    !
-                    !    UPPER FLUID/PLATE BOUNDARY
-                    !
-                    elseif (forclo(k,j,i)<forclo(kp,j,i)) then
-                        n=n+1
-                        indgeo(l,n,1)=i
-                        indgeo(l,n,2)=j
-                        indgeo(l,n,3)=k
-                        indgeoe(l,n,1)=i
-                        indgeoe(l,n,2)=j 
-                        indgeoe(l,n,3)=km
-                        delta1x=(xe-xem)
-                        if (solidtype==1) then
-                            delta2x = 1.0
-                            do nc=1,Npart
-                                xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
-                                if (xep > xe) delta2x = min(delta2x, xep - xe)
-                            end do
-                        elseif (solidtype==4) then
-                            delta2x = 1.0
-                            do nc=1,Npart
-                                xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
-                                if (xep > xe) delta2x = min(delta2x, xep - xe)
-                            end do
-                        end if
-                        ! delta2x=((alx3-plth2(j,i))-xe)
-                        distb(l,n) = delta2x/(delta1x+delta2x)
+                    ! !
+                    ! !    UPPER FLUID/PLATE BOUNDARY
+                    ! !
+                    ! elseif (forclo(k,j,i)<forclo(kp,j,i)) then
+                    !     n=n+1
+                    !     indgeo(l,n,1)=i
+                    !     indgeo(l,n,2)=j
+                    !     indgeo(l,n,3)=k
+                    !     indgeoe(l,n,1)=i
+                    !     indgeoe(l,n,2)=j 
+                    !     indgeoe(l,n,3)=km
+                    !     delta1x=(xe-xem)
+                    !     if (solidtype==1) then
+                    !         delta2x = 1.0
+                    !         do nc=1,Npart
+                    !             xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
+                    !             if (xep > xe) delta2x = min(delta2x, xep - xe)
+                    !         end do
+                    !     elseif (solidtype==4) then
+                    !         delta2x = 1.0
+                    !         do nc=1,Npart
+                    !             xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
+                    !             if (xep > xe) delta2x = min(delta2x, xep - xe)
+                    !         end do
+                    !     end if
+                    !     ! delta2x=((alx3-plth2(j,i))-xe)
+                    !     distb(l,n) = delta2x/(delta1x+delta2x)
 
                     end if
                                             
