@@ -300,8 +300,8 @@ subroutine topogr
                         indgeoe(l,n,3)=k
                         distb(l,n)= 0.
                         
-                    !    LOWER FLUID/PLATE BOUNDARY
-                    !
+                    ! !    LOWER FLUID/PLATE BOUNDARY
+                    ! !
                     ! elseif (forclo(k,j,i)<forclo(km,j,i)) then
                     !     n=n+1
                     !     indgeo(l,n,1)=i
