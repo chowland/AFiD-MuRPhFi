@@ -10,9 +10,9 @@ subroutine topogr
     use mpih
     implicit none
     integer :: i,j,k,l,kstartp, nc, Npart, ncz
-    integer :: km,kp,jm,jp,im,ip,mm
+    integer :: km,kp,jm,jp,im,ip,mm!,kup,klo
     
-    real    :: xe, xem, xep
+    real    :: xe, xem, xep!, xlo, xup
     real    :: ye, yem, yep
     real    :: ze, zem, zep
     real    :: delta1x, delta2x, r2, Lhex, radius, porosity
@@ -46,6 +46,7 @@ subroutine topogr
     if (salinity) then
         allocate(forclor(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)))
         allocate(solidr(1:nxmr,xstartr(2)-1:xendr(2)+1,xstartr(3)-1:xendr(3)+1))
+        ! allocate(solidr(-1:nxmr+1,xstartr(2)-2:xendr(2)+2,xstartr(3)-2:xendr(3)+2))
     end if
 
     ! Build array of solid circle positions
@@ -183,6 +184,7 @@ subroutine topogr
                 end do
             end do
         end if
+
         ! Broadcast centre positions to all processes
         call MPI_BCAST(xpart, Npart, MDP, 0, MPI_COMM_WORLD, ierr)
         call MPI_BCAST(ypart, Npart, MDP, 0, MPI_COMM_WORLD, ierr)
@@ -593,6 +595,8 @@ subroutine topogr
             end do
         end do
 
+        ! klo = 1
+        ! kup = 2
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
@@ -604,6 +608,56 @@ subroutine topogr
                     !
                     !    SOLID PART
                     !           
+
+                    !!!! ALTERNATIVE
+                    ! ! Get indices of boundary to set up interpolation in solid
+                    ! if (k==1) then
+                    !     if (solidr(k,j,i)) then
+                    !         klo = 1
+                    !         kup = 2
+                    !         do while (solidr(kup,j,i))
+                    !             kup = kup + 1
+                    !         end do
+                    !     end if
+                    ! end if
+                    ! if (solidr(kp,j,i) .and. .not.solidr(k,j,i)) then
+                    !     klo = k
+                    !     kup = kp
+                    !     do while (solidr(kup,j,i) .and. kup<nxmr)
+                    !         kup = kup + 1
+                    !     end do
+                    ! end if
+
+                    ! if (klo==1) then
+                    !     xlo = 0.0
+                    ! else
+                    !     xlo = xmr(klo+1)
+                    ! end if
+                    ! if (kup==nxmr) then
+                    !     xup = alx3
+                    ! else
+                    !     xup = xmr(kup-1)
+                    ! end if
+
+                    ! if (solidr(k,j,i)) then
+                    !     n = n + 1
+                    !     indgeor(n,1) = i
+                    !     indgeor(n,2) = j
+                    !     indgeor(n,3) = k
+                    !     if (klo==1) then
+                    !         indgeorlo(n) = kup
+                    !     else
+                    !         indgeorlo(n) = klo
+                    !     end if
+                    !     if (kup==nxmr) then
+                    !         indgeorup(n) = klo
+                    !     else
+                    !         indgeorup(n) = kup
+                    !     end if
+                    !     distbrlo(n) = (xup - xe)/(xup - xlo)
+                    !     distbrup(n) = (xe - xlo)/(xup - xlo)
+                    ! end if
+                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                     if (solidr(k,j,i)) then
                         if (.not. solidr(kp,j,i)) then
