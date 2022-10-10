@@ -21,8 +21,7 @@ subroutine topogr
     real,allocatable :: xpart(:), ypart(:), zpart(:)
 
     !! Variables for writing details of solid centres to file
-    integer :: io
-    logical :: exists
+    character(len=30) :: dsetname, filename
 
     q1bo=0.d0
     q2bo=0.d0
@@ -97,19 +96,12 @@ subroutine topogr
                     end do
                 end if
             end do
-        end if
-
-        inquire(file="outputdir/solid_centres.txt", exist=exists)
-        if (exists) then
-            open(newunit=io, file="outputdir/solid_centres.txt", status="replace", action="write")
-            write(io, *) xpart
-            write(io, *) ypart
-            close(io)
-        else
-            open(newunit=io, file="outputdir/solid_centres.txt", status="new", action="write")
-            write(io, *) xpart
-            write(io, *) ypart
-            close(io)
+            filename = trim("outputdir/solid_centres.h5")
+            call HdfCreateBlankFile(filename)
+            dsetname = trim("xpart")
+            call HdfSerialWriteReal1D(dsetname, filename, xpart, Npart)
+            dsetname = trim("ypart")
+            call HdfSerialWriteReal1D(dsetname, filename, ypart, Npart)
         end if
 
         ! Broadcast centre positions to all processes
@@ -201,6 +193,14 @@ subroutine topogr
                     end do
                 end do
             end do
+            filename = trim("outputdir/solid_centres.h5")
+            call HdfCreateBlankFile(filename)
+            dsetname = trim("xpart")
+            call HdfSerialWriteReal1D(dsetname, filename, xpart, Npart)
+            dsetname = trim("ypart")
+            call HdfSerialWriteReal1D(dsetname, filename, ypart, Npart)
+            dsetname = trim("zpart")
+            call HdfSerialWriteReal1D(dsetname, filename, zpart, Npart)
         end if
 
         ! Broadcast centre positions to all processes
