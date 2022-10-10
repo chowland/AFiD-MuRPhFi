@@ -20,6 +20,10 @@ subroutine topogr
     integer,allocatable :: ind1(:), ind2(:)
     real,allocatable :: xpart(:), ypart(:), zpart(:)
 
+    !! Variables for writing details of solid centres to file
+    integer :: io
+    logical :: exists
+
     q1bo=0.d0
     q2bo=0.d0
     q3bo=0.d0
@@ -94,6 +98,20 @@ subroutine topogr
                 end if
             end do
         end if
+
+        inquire(file="outputdir/solid_centres.txt", exist=exists)
+        if (exists) then
+            open(newunit=io, file="outputdir/solid_centres.txt", status="replace", action="write")
+            write(io, *) xpart
+            write(io, *) ypart
+            close(io)
+        else
+            open(newunit=io, file="outputdir/solid_centres.txt", status="new", action="write")
+            write(io, *) xpart
+            write(io, *) ypart
+            close(io)
+        end if
+
         ! Broadcast centre positions to all processes
         call MPI_BCAST(xpart, Npart, MDP, 0, MPI_COMM_WORLD, ierr)
         call MPI_BCAST(ypart, Npart, MDP, 0, MPI_COMM_WORLD, ierr)
