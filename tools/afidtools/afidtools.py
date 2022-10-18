@@ -148,6 +148,18 @@ def read_cut(folder, var, idx, plane):
         A = np.array(f[varname][()])
     return A
 
+def read_plane_mean(folder, var, idx, plane):
+    """
+    Returns a 2D plane of sample number `idx` of the variable `var`.
+    `plane` can be 'y' or 'z' and specifies which dimension
+    is averaged over to obtain the plane. `folder` specifies the root directory
+    of the simulation.
+    """
+    varname = var+"/"+"%05d" % idx
+    with h5py.File(folder+"/outputdir/flowmov/movie_"+plane+"mean.h5","r") as f:
+        A = np.array(f[varname][()])
+    return A
+
 def continua_master_from_input(folder, time=0.0):
     """
     This function generates the file `continua_master.h5` needed to run
