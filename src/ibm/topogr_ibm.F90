@@ -57,7 +57,7 @@ subroutine topogr
 
     ! Build array of solid circle positions
     if (solidtype==1) then
-        porosity = 0.426
+        porosity = 0.37
         ! Interpret RayT input as target pore-scale Rayleigh number
         nc = nint((2.0*ylen*(1.0 - porosity)/3.0/pi)**0.5 * (RayS/RayT)**(1.0/3.0))
         if (ismaster) write(*,*) "Number of lattice columns: ",nc
@@ -133,7 +133,7 @@ subroutine topogr
         end do
 
     elseif (solidtype==4) then
-        porosity = 0.426 ! 0.37
+        porosity = 0.37
         nc = nint(3.0/2.0/sqrt(6.0)*(3*sqrt(2.0)*(1.0 - porosity)*RayS/RayT/pi)**(1.0/3.0))
         if (ismaster) write(*,*) "Number of lattice layers: ",nc
         ncz = nint(sqrt(3.0)*zlen/ylen*nc)
