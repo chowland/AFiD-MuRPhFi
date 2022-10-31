@@ -70,22 +70,6 @@ subroutine ImplicitAndUpdateTemp
 !$OMP END PARALLEL DO
 
     if (IBM) then
-        forclo = 1.d0
-        usaldto = 1.0/aldto
-        do n=1,npunte
-            ic = indgeot(n,1)
-            jc = indgeot(n,2)
-            kc = indgeot(n,3)
-            forclo(kc,jc,ic) = 0.d0
-            ke = indgeoet(n,3)
-            ! dense = ((al*dt + aldto)*temp(ke,jc,ic) - al*dt*densb(n))*usaldto
-            ! rhs(kc,jc,ic) = -temp(kc,jc,ic) + dense*distbt(n) &
-            !                 + (1.0 - distbt(n))*temb(n)
-            rhs(kc,jc,ic) = distbt(n)*temp(ke,jc,ic) - temp(kc,jc,ic) &
-                            + (1.0 - distbt(n))*temb(n)
-            hro(kc,jc,ic) = distbt(n)
-            ! densb(n)= temp(ke,jc,ic)
-        end do
         call SolveImpEqnUpdate_Temp_ibm
     else
 !  Solve equation and update temperature

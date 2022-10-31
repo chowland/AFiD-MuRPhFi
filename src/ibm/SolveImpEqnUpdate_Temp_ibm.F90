@@ -12,11 +12,11 @@ subroutine SolveImpEqnUpdate_Temp_ibm
     use param
     use local_arrays, only : temp,rhs,hro
     use decomp_2d, only: xstart,xend
-    use ibm_param, only: forclo
+    use ibm_param, only: distbt, ibmaskt
     ! use param_particle      ! SL
     implicit none
     real, dimension(nx) :: amkl,apkl,ackl,fkl
-    integer :: jc,kc,info,ipkv(nxm),ic,nrhs,km,kp
+    integer :: jc,kc,info,ipkv(nxm),ic,nrhs,km,kp,n
     real :: betadx,ackl_b
     real :: amkT(nxm-1),ackT(nxm),apkT(nxm-1),appk(nxm-2)
     ! real :: kcpp,kcpm       ! SL
@@ -30,6 +30,8 @@ subroutine SolveImpEqnUpdate_Temp_ibm
 !   Call to LAPACK library to factor tridiagonal matrix.
 !   No solving is done in this call.
 
+    n = 1
+
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
 
@@ -40,13 +42,30 @@ subroutine SolveImpEqnUpdate_Temp_ibm
                 ! if(ifparticle.eq.0) then
                 km = max(1,kc - 1)
                 kp = min(kc + 1,nxm)
-                ackl_b=1.0d0/(1.-ac3ssk(kc)*forclo(kc,jc,ic)*betadx)
-                amkl(kc)=-am3ssk(kc)*forclo(kc,jc,ic)*betadx*ackl_b &
-                        - (1.0 - forclo(kc,jc,ic))*forclo(km,jc,ic)*hro(kc,jc,ic)
-                ackl(kc)=1.d0
-                apkl(kc)=-ap3ssk(kc)*forclo(kc,jc,ic)*betadx*ackl_b &
-                        - (1.0 - forclo(kc,jc,ic))*forclo(kp,jc,ic)*hro(kc,jc,ic)
-                ! end if
+                if (ibmaskt(kc,jc,ic) == 2) then ! Liquid phase
+                    ackl_b=1.0d0/(1.0d0-ac3ssk(kc)*betadx)
+                    amkl(kc)=-am3ssk(kc)*betadx*ackl_b
+                    ackl(kc)=1.d0
+                    apkl(kc)=-ap3ssk(kc)*betadx*ackl_b
+                    fkl(kc) = rhs(kc,jc,ic)*ackl_b
+                elseif (ibmaskt(kc,jc,ic) == 0) then ! Solid phase
+                    amkl(kc) = 0.d0
+                    ackl(kc) = 1.d0
+                    apkl(kc) = 0.d0
+                    fkl(kc) = -temp(kc,jc,ic)
+                elseif (ibmaskt(kc,jc,ic) == 1) then ! Upper boundary points
+                    amkl(kc) = 0.d0
+                    ackl(kc) = 1.d0
+                    apkl(kc) = -distbt(n)
+                    fkl(kc) = distbt(n)*temp(kp,jc,ic) - temp(kc,jc,ic)
+                    n = n + 1
+                elseif (ibmaskt(kc,jc,ic) == -1) then ! Lower boundary points
+                    amkl(kc) = -distbt(n)
+                    ackl(kc) = 1.d0
+                    apkl(kc) = 0.d0
+                    fkl(kc) = distbt(n)*temp(km,jc,ic) - temp(kc,jc,ic)
+                    n = n + 1
+                end if
         
                 ! if(ifparticle.ne.0) then    ! SL  consider kcp, rhocpcp
                     
@@ -59,7 +78,6 @@ subroutine SolveImpEqnUpdate_Temp_ibm
                 !     apkl(kc)=-ap3ssk(kc)*forclo(kc,jc,ic)*betadx*ackl_b*kcpp/rhocpcp(kc,jc,ic)
                 ! end if
 ! ======================================================
-                fkl(kc)=rhs(kc,jc,ic)*ackl_b
             end do
             fkl(nx)= 0.d0
             amkT=amkl(2:nxm)

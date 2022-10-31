@@ -73,21 +73,6 @@ subroutine ImplicitAndUpdateVX
 !  Solve equation and update velocity
 
     if (IBM) then
-        forclo = 1.d0
-        usaldto = 1.0/aldto
-        do n=1,npunx
-            ic = indgeo(3,n,1)
-            jc = indgeo(3,n,2)
-            kc = indgeo(3,n,3)
-            forclo(kc,jc,ic) = 0.d0
-            ke = indgeoe(3,n,3)
-            ! q3e = ((al*dt + aldto)*vx(ke,jc,ic) - al*dt*q3bo(n))*usaldto
-            ! rhs(kc,jc,ic) = -vx(kc,jc,ic) + q3e*distb(3,n)
-            rhs(kc,jc,ic) = distb(3,n)*vx(ke,jc,ic) - vx(kc,jc,ic)
-            qcap(kc,jc,ic) = distb(3,n)
-            ! q3bo(n) = vx(ke,jc,ic)
-        end do
-        iF(ANY(IsNaN(rhs))) write(*,*) 'NaN in rhs pre-ibm implicit solve'
         call SolveImpEqnUpdate_X_ibm
     else
         call SolveImpEqnUpdate_X
