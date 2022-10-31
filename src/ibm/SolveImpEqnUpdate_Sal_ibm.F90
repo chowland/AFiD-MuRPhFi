@@ -30,17 +30,17 @@ subroutine SolveImpEqnUpdate_Sal_ibm
             do kc=1,nxmr
                 km = max(1,kc - 1)
                 kp = min(kc + 1,nxmr)
-                if (ibmaskr(kc,jc,ic) == 2) then ! Liquid phase
+                if (mod(ibmaskr(kc,jc,ic),2) == 0) then ! Liquid phase (& solid)
                     ackl_b = 1.0d0/(1.-ac3sskr(kc)*betadx)
                     amkl(kc) = -am3sskr(kc)*betadx*ackl_b
                     ackl(kc) = 1.0d0
                     apkl(kc) = -ap3sskr(kc)*betadx*ackl_b
                     fkl(kc) = rhsr(kc,jc,ic)*ackl_b
-                elseif (ibmaskr(kc,jc,ic) == 0) then ! Solid phase
-                    amkl(kc) = 0.d0
-                    ackl(kc) = 1.d0
-                    apkl(kc) = 0.d0
-                    fkl(kc) = -sal(kc,jc,ic)
+                ! elseif (ibmaskr(kc,jc,ic) == 0) then ! Solid phase
+                !     amkl(kc) = 0.d0
+                !     ackl(kc) = 1.d0
+                !     apkl(kc) = 0.d0
+                !     fkl(kc) = -sal(kc,jc,ic)
                 elseif (ibmaskr(kc,jc,ic) == 1) then ! Upper boundary points (inside solid)
                     amkl(kc) = 0.d0
                     ackl(kc) = 1.d0
