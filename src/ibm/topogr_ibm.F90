@@ -19,6 +19,7 @@ subroutine topogr
     real    :: solid_temp, rp, tp, amp, rx, ry, rz
     integer,allocatable :: ind1(:), ind2(:)
     real,allocatable :: xpart(:), ypart(:), zpart(:)
+    integer :: ibmask(1:nx,xstart(2):xend(2),xstart(3):xend(3))
 
     !! Variables for writing details of solid centres to file
     character(len=30) :: dsetname, filename
@@ -47,12 +48,14 @@ subroutine topogr
     !     X_1 azimuthal direction
     !
     
-    
-    allocate(forclo(1:nx,xstart(2):xend(2),xstart(3):xend(3)))
+    allocate(ibmaskx(1:nx,xstart(2):xend(2),xstart(3):xend(3)))
+    allocate(ibmasky(1:nx,xstart(2):xend(2),xstart(3):xend(3)))
+    allocate(ibmaskz(1:nx,xstart(2):xend(2),xstart(3):xend(3)))
+    allocate(ibmaskt(1:nx,xstart(2):xend(2),xstart(3):xend(3)))
     if (salinity) then
-        allocate(forclor(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)))
         ! allocate(solidr(1:nxmr,xstartr(2)-1:xendr(2)+1,xstartr(3)-1:xendr(3)+1))
         allocate(solidr(-1:nxmr+1,xstartr(2)-2:xendr(2)+2,xstartr(3)-2:xendr(3)+2))
+        allocate(ibmaskr(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)))
     end if
 
     ! Build array of solid circle positions
@@ -213,11 +216,11 @@ subroutine topogr
 
     end if
 
-    
     do l = 1,3 !{ start do over the 3 velocity components
         n=0
         
-        forclo = 0.0
+        ibmask(:,:,:) = 2 ! Initialise mask as all liquid
+
         !     l = 1   Q_1 vel. component (VZ)
         !     l = 2   Q_2 vel. component (VY)
         !     l = 3   Q_3 vel. component (VX)
@@ -277,12 +280,12 @@ subroutine topogr
                                 r2 = (xe - xem)**2 + (ye - yem)**2
                             end if
                             if (r2<radius**2) then
-                                forclo(k,j,i) = 1.0
+                                ibmask(k,j,i) = 0
                             end if
                         end do
                     else
                         if (xe < plth1(j,i)) then
-                            forclo(k,j,i) = 1.0
+                            ibmask(k,j,i) = 0
                         end if
                     end if
                 end do
@@ -307,80 +310,64 @@ subroutine topogr
                         xep=xc(kp)
                     end if
 
-                    !
-                    !    SOLID PART
-                    !
-                    
-                    if (forclo(k,j,i)>0.9) then
-                        n=n+1
-                        indgeo(l,n,1)=i
-                        indgeo(l,n,2)=j
-                        indgeo(l,n,3)=k
-                        indgeoe(l,n,1)=i
-                        indgeoe(l,n,2)=j
-                        indgeoe(l,n,3)=k
-                        distb(l,n)= 0.
-                        
                     !    LOWER FLUID/PLATE BOUNDARY
                     !
-                    elseif (forclo(k,j,i)<forclo(km,j,i)) then
-                        if (velBCinterp) then
-                            n=n+1
-                            indgeo(l,n,1)=i
-                            indgeo(l,n,2)=j
-                            indgeo(l,n,3)=k
-                            indgeoe(l,n,1)=i
-                            indgeoe(l,n,2)=j 
-                            indgeoe(l,n,3)=kp
-                            delta1x=(xep-xe)
-                            if (solidtype==1) then
-                                delta2x = 1.0
-                                do nc=1,Npart
-                                    xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
+                    if ((ibmask(k,j,i)==2) .and. (ibmask(km,j,i)==0)) then
+                        n=n+1
+                        delta1x=(xep-xe)
+                        if (solidtype==1) then
+                            delta2x = 1.0
+                            do nc=1,Npart
+                                amp = radius**2 - (ye - ypart(nc))**2
+                                if (amp > 0) then
+                                    xem = xpart(nc) + sqrt(amp)
                                     if (xe > xem) delta2x = min(delta2x, xe - xem)
-                                end do
-                            elseif (solidtype==4) then
-                                delta2x = 1.0
-                                do nc=1,Npart
-                                    xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
+                                end if
+                            end do
+                        elseif (solidtype==4) then
+                            delta2x = 1.0
+                            do nc=1,Npart
+                                amp = radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2
+                                if (amp>0) then
+                                    xem = xpart(nc) + sqrt(amp)
                                     if (xe > xem) delta2x = min(delta2x, xe - xem)
-                                end do
-                            else
-                                delta2x = xe - plth1(j,i)
-                            end if
-                            distb(l,n) = delta2x/(delta1x+delta2x)
+                                end if
+                            end do
+                        else
+                            delta2x = xe - plth1(j,i)
                         end if
-                                
+                        distb(n,l) = delta2x/(delta1x+delta2x)
+                        ibmask(k,j,i) = 1
+                            
                     !
                     !    UPPER FLUID/PLATE BOUNDARY
                     !
-                    elseif (forclo(k,j,i)<forclo(kp,j,i)) then
-                        if (velBCinterp) then
-                            n=n+1
-                            indgeo(l,n,1)=i
-                            indgeo(l,n,2)=j
-                            indgeo(l,n,3)=k
-                            indgeoe(l,n,1)=i
-                            indgeoe(l,n,2)=j 
-                            indgeoe(l,n,3)=km
-                            delta1x=(xe-xem)
-                            if (solidtype==1) then
-                                delta2x = 1.0
-                                do nc=1,Npart
-                                    xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
+                    elseif ((ibmask(k,j,i)==2) .and. (ibmask(kp,j,i)==0)) then
+                        n=n+1
+                        delta1x=(xe-xem)
+                        if (solidtype==1) then
+                            delta2x = 1.0
+                            do nc=1,Npart
+                                amp = radius**2 - (ye - ypart(nc))**2
+                                if (amp > 0) then
+                                    xep = xpart(nc) - sqrt(amp)
                                     if (xep > xe) delta2x = min(delta2x, xep - xe)
-                                end do
-                            elseif (solidtype==4) then
-                                delta2x = 1.0
-                                do nc=1,Npart
-                                    xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
+                                end if
+                            end do
+                        elseif (solidtype==4) then
+                            delta2x = 1.0
+                            do nc=1,Npart
+                                amp = radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2
+                                if (amp>0) then
+                                    xep = xpart(nc) - sqrt(amp)
                                     if (xep > xe) delta2x = min(delta2x, xep - xe)
-                                end do
-                            end if
-                            ! delta2x=((alx3-plth2(j,i))-xe)
-                            distb(l,n) = delta2x/(delta1x+delta2x)
+                                end if
+                            end do
                         end if
-
+                        ! delta2x=((alx3-plth2(j,i))-xe)
+                        distb(n,l) = delta2x/(delta1x+delta2x)
+                        ibmask(k,j,i) = -1
+                        
                     end if
                                             
                 end do
@@ -395,6 +382,8 @@ subroutine topogr
             if (ismaster) write(*,*) 'npunz: ',npunz
             !        write(6,332)npunz
             ! 332  format(5x,'For Q_1 N ='i7)
+            ibmaskz(:,:,:) = ibmask
+            distz(:) = distb(:,1)
         end if
         if(l.eq.2) then
             if(n.gt.mpun)   &
@@ -403,6 +392,8 @@ subroutine topogr
             if (ismaster) write(*,*) 'npuny: ',npuny
             !        write(6,331)npuny
             ! 331  format(5x,'For Q_2 N ='i7)
+            ibmasky(:,:,:) = ibmask
+            disty(:) = distb(:,2)
         end if
         if(l.eq.3) then
             if(n.gt.mpun)  &
@@ -411,8 +402,10 @@ subroutine topogr
             if (ismaster) write(*,*) 'npunx: ',npunx
             !        write(6,330)npunx
             ! 330  format(5x,'For Q_3 N ='i7)
+            ibmaskx(:,:,:) = ibmask
+            distx(:) = distb(:,3)
         end if
-    end do   !} end do over the 3 velocity components 
+    end do   !} end do over the 3 velocity components
                             
                             
 
@@ -448,7 +441,7 @@ subroutine topogr
     end if
 
     n=0
-    forclo =0.0d0
+    ibmask(:,:,:) = 2
     !
     ! Track location of solid on temperature grid:
     do i=xstart(3),xend(3)
@@ -469,12 +462,12 @@ subroutine topogr
                             r2 = (xe - xem)**2 + (ye - yem)**2
                         end if
                         if (r2<radius**2) then
-                            forclo(k,j,i) = 1.0
+                            ibmask(k,j,i) = 0
                         end if
                     end do
                 else
                     if (xe < plth1(j,i)) then
-                        forclo(k,j,i) = 1.0
+                        ibmask(k,j,i) = 0
                     end if
                 end if
             end do
@@ -496,69 +489,59 @@ subroutine topogr
             !    SOLID PART
             !           
 
-                if (forclo(k,j,i)>0.9) then
+                if ((ibmask(k,j,i)==2) .and. (ibmask(km,j,i)==0)) then
                     n=n+1
-                    indgeot(n,1)=i
-                    indgeot(n,2)=j
-                    indgeot(n,3)=k
-                    indgeoet(n,1)=i
-                    indgeoet(n,2)=j
-                    indgeoet(n,3)=k
-                    distbt(n)= 0.
-                    temb(n) = solid_temp
-
-                elseif (forclo(k,j,i)<forclo(km,j,i)) then
-                    n=n+1
-                    indgeot(n,1)=i
-                    indgeot(n,2)=j
-                    indgeot(n,3)=k
-                    indgeoet(n,1)=i
-                    indgeoet(n,2)=j 
-                    indgeoet(n,3)=kp
                     delta1x=(xep-xe)
                     if (solidtype==1) then
                         delta2x = 1.0
                         do nc=1,Npart
-                            xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
-                            if (xe > xem) delta2x = min(delta2x, xe - xem)
+                            amp = radius**2 - (ye - ypart(nc))**2
+                            if (amp > 0) then
+                                xem = xpart(nc) + sqrt(amp)
+                                if (xe > xem) delta2x = min(delta2x, xe - xem)
+                            end if
                         end do
                     elseif (solidtype==4) then
                         delta2x = 1.0
                         do nc=1,Npart
-                            xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
-                            if (xe > xem) delta2x = min(delta2x, xe - xem)
+                            amp = radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2
+                            if (amp > 0) then
+                                xem = xpart(nc) + sqrt(amp)
+                                if (xe > xem) delta2x = min(delta2x, xe - xem)
+                            end if
                         end do
                     else
                         delta2x = xe - plth1(j,i)
                     end if
                     distbt(n) = delta2x/(delta1x+delta2x)
-                    temb(n) = solid_temp
+                    ibmask(k,j,i) = 1
 
-                elseif (forclo(k,j,i)<forclo(kp,j,i)) then
+                elseif ((ibmask(k,j,i)==2) .and. (ibmask(kp,j,i)==0)) then
                     n=n+1
-                    indgeot(n,1)=i
-                    indgeot(n,2)=j
-                    indgeot(n,3)=k
-                    indgeoet(n,1)=i
-                    indgeoet(n,2)=j 
-                    indgeoet(n,3)=km
                     delta1x=(xe-xem)
                     if (solidtype==1) then
                         delta2x = 1.0
                         do nc=1,Npart
-                            xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
-                            if (xep > xe) delta2x = min(delta2x, xep - xe)
+                            amp = radius**2 - (ye - ypart(nc))**2
+                            if (amp > 0) then    
+                                xep = xpart(nc) - sqrt(amp)
+                                if (xep > xe) delta2x = min(delta2x, xep - xe)
+                            end if
                         end do
                     elseif (solidtype==4) then
                         delta2x = 1.0
                         do nc=1,Npart
-                            xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2)
-                            if (xep > xe) delta2x = min(delta2x, xe - xem)
+                            amp = radius**2 - (ye - ypart(nc))**2 - (ze - zpart(nc))**2
+                            if (amp > 0) then
+                                xep = xpart(nc) - sqrt(amp)
+                                if (xep > xe) delta2x = min(delta2x, xep - xe)
+                            end if
                         end do
                     end if
                     ! delta2x=((alx3-plth2(j,i))-xe)
                     distbt(n) = delta2x/(delta1x+delta2x)
-                    temb(n) = solid_temp
+                    ibmask(k,j,i) = -1
+                    ! temb(n) = solid_temp
                 end if
                                 
             end do
@@ -569,6 +552,7 @@ subroutine topogr
     npunte= n
     !        write(6,329)npunte
     ! 329  format(5x,'For Temperature N ='i7)
+    ibmaskt(:,:,:) = ibmask
     if(allocated(plth1)) deallocate(plth1)
     if(allocated(plth2)) deallocate(plth2)
     
@@ -592,8 +576,7 @@ subroutine topogr
         !     INDICES FOR SALINITY
         !
         n = 0
-        forclor = 0.0d0
-        !
+        ibmaskr(:,:,:) = 2
 
         do i=xstartr(3)-1,xendr(3)+1
             ze = zmr(i)
@@ -623,6 +606,36 @@ subroutine topogr
             end do
         end do
 
+        do i=xstartr(3),xendr(3)
+            ze = zmr(i)
+            do j=xstartr(2),xendr(2)
+                ye = ymr(j)
+                do k=1,nxmr
+                    xe = xmr(k)
+                    if (mod(solidtype,3)==1) then
+                        do nc=1,Npart
+                            ! x-position of solid centre
+                            xem = xpart(nc)
+                            yem = ypart(nc)
+                            if (solidtype==4) then
+                                zem = zpart(nc)
+                                r2 = (xe - xem)**2 + (ye - yem)**2 + (ze - zem)**2
+                            else
+                                r2 = (xe - xem)**2 + (ye - yem)**2
+                            end if
+                            if (r2<radius**2) then
+                                ibmaskr(k,j,i) = 0
+                            end if
+                        end do
+                    else
+                        if (xe < plth1(j,i)) then
+                            ibmaskr(k,j,i) = 0
+                        end if
+                    end if
+                end do
+            end do
+        end do
+
         ! klo = 1
         ! kup = 2
         do i=xstartr(3),xendr(3)
@@ -637,127 +650,16 @@ subroutine topogr
                     !    SOLID PART
                     !           
 
-                    !!!! ALTERNATIVE
-                    ! ! Get indices of boundary to set up interpolation in solid
-                    ! if (k==1) then
-                    !     if (solidr(k,j,i)) then
-                    !         klo = 1
-                    !         kup = 2
-                    !         do while (solidr(kup,j,i))
-                    !             kup = kup + 1
-                    !         end do
-                    !     end if
-                    ! end if
-                    ! if (solidr(kp,j,i) .and. .not.solidr(k,j,i)) then
-                    !     klo = k
-                    !     kup = kp
-                    !     do while (solidr(kup,j,i) .and. kup<nxmr)
-                    !         kup = kup + 1
-                    !     end do
-                    ! end if
-
-                    ! if (klo==1) then
-                    !     xlo = 0.0
-                    ! else
-                    !     xlo = xmr(klo+1)
-                    ! end if
-                    ! if (kup==nxmr) then
-                    !     xup = alx3
-                    ! else
-                    !     xup = xmr(kup-1)
-                    ! end if
-
-                    ! if (solidr(k,j,i)) then
-                    !     n = n + 1
-                    !     indgeor(n,1) = i
-                    !     indgeor(n,2) = j
-                    !     indgeor(n,3) = k
-                    !     if (klo==1) then
-                    !         indgeorlo(n) = kup
-                    !     else
-                    !         indgeorlo(n) = klo
-                    !     end if
-                    !     if (kup==nxmr) then
-                    !         indgeorup(n) = klo
-                    !     else
-                    !         indgeorup(n) = kup
-                    !     end if
-                    !     distbrlo(n) = (xup - xe)/(xup - xlo)
-                    !     distbrup(n) = (xe - xlo)/(xup - xlo)
-                    ! end if
-                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                    if (solidr(k,j,i)) then
-                        if (.not. solidr(kp,j,i)) then
-                            n = n + 1
-                            indgeor(n,1) = i
-                            indgeor(n,2) = j
-                            indgeor(n,3) = k
-                            indgeoer(n,1) = i
-                            indgeoer(n,2) = j
-                            indgeoer(n,3) = kp
-                            distbr(n) = 1.0
-                        elseif (.not. solidr(km,j,i)) then
-                            n = n + 1
-                            indgeor(n,1) = i
-                            indgeor(n,2) = j
-                            indgeor(n,3) = k
-                            indgeoer(n,1) = i
-                            indgeoer(n,2) = j
-                            indgeoer(n,3) = km
-                            distbr(n) = 1.0
-                        else
-                            ! indgeoer(n,3) = k
-                            ! distbr(n) = 0.0
-                            ! sal(k,j,i) = 0.0
-                        end if
-                        ! salfix(n) = 0.0
-
-                !   FLUID
-                !   -----   BOUNDARY
-                !   SOLID
-
-                    ! elseif (forclor(k,j,i) < forclor(km,j,i)) then
-                    !     n = n+1
-                    !     indgeor(n,1) = i
-                    !     indgeor(n,2) = j
-                    !     indgeor(n,3) = k
-                    !     indgeoer(n,1) = i
-                    !     indgeoer(n,2) = j 
-                    !     indgeoer(n,3) = kp
-                    !     delta1x = (xep - xe)
-                    !     delta2x = 1.0
-                    !     do nc=1,Npart
-                    !         xem = xpart(nc) + sqrt(radius**2 - (ye - ypart(nc))**2)
-                    !         if (xe > xem) delta2x = min(delta2x, xe - xem)
-                    !     end do
-                    !     ! distbr(n) = delta2x/(delta1x + delta2x)
-                    !     distbr(n) = 1.0
-                    !     salfix(n) = 0.0
-
-                !   SOLID
-                !   -----   BOUNDARY
-                !   FLUID
-
-                    ! elseif (forclor(k,j,i) < forclor(kp,j,i)) then
-                    !     n = n+1
-                    !     indgeor(n,1) = i
-                    !     indgeor(n,2) = j
-                    !     indgeor(n,3) = k
-                    !     indgeoer(n,1) = i
-                    !     indgeoer(n,2) = j 
-                    !     indgeoer(n,3) = km
-                    !     delta1x = (xe - xem)
-                    !     do nc=1,Npart
-                    !         xep = xpart(nc) - sqrt(radius**2 - (ye - ypart(nc))**2)
-                    !         if (xep > xe) delta2x = min(delta2x, xep - xe)
-                    !     end do
-                    !     ! distbr(n)= delta2x/(delta1x + delta2x)
-                    !     distbr(n) = 1.0
-                    !     salfix(n) = 0.0
-                    
+                    if ((ibmaskr(k,j,i)==0) .and. (ibmaskr(kp,j,i)==2)) then
+                        n = n + 1
+                        ibmaskr(k,j,i) = 1
+                        distbr(n) = 1.0
+                    elseif ((ibmaskr(k,j,i)==0) .and. (ibmaskr(km,j,i)==2)) then
+                        n = n + 1
+                        ibmaskr(k,j,i) = -1
+                        distbr(n) = 1.0
                     end if
-                                    
+                        ! salfix(n) = 0.0
                 end do
             end do
         end do

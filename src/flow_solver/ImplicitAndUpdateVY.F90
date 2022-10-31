@@ -23,6 +23,7 @@ subroutine ImplicitAndUpdateVY
     real    :: amm,acc,app
     real    :: dyp,dxxvy
     real    :: usaldto,q2e
+    integer :: ibmask(1:nx,xstart(2):xend(2),xstart(3):xend(3))
 
 
     alre=al/ren
@@ -85,21 +86,8 @@ subroutine ImplicitAndUpdateVY
 !  Solve equation and update velocity
 
     if (IBM) then
-        forclo = 1.d0
-        usaldto = 1.0/aldto
-        do n=1,npuny
-            ic = indgeo(2,n,1)
-            jc = indgeo(2,n,2)
-            kc = indgeo(2,n,3)
-            forclo(kc,jc,ic) = 0.d0
-            ke = indgeoe(2,n,3)
-            ! q2e = ((al*dt + aldto)*vy(ke,jc,ic) - al*dt*q2bo(n))*usaldto
-            ! rhs(kc,jc,ic) = -vy(kc,jc,ic) + q2e*distb(2,n)
-            rhs(kc,jc,ic) = distb(2,n)*vy(ke,jc,ic) - vy(kc,jc,ic)
-            dph(kc,jc,ic) = distb(2,n)
-            ! q2bo(n) = vy(ke,jc,ic)
-        end do
-        call SolveImpEqnUpdate_YZ_ibm(vy,rhs,forclo,dph)
+        ibmask = ibmasky ! For some reason this is necessary to avoid a seg fault
+        call SolveImpEqnUpdate_YZ_ibm(vy,rhs,ibmasky,disty)
     else
         call SolveImpEqnUpdate_YZ(vy,rhs)
     end if

@@ -15,10 +15,15 @@ subroutine DeallocateIBMVariables
     implicit none
 
     ! Main array
-    call DestroyReal3DArray(forclo)
+    ! call DestroyReal3DArray(forclo)
+    if (allocated(ibmaskx)) deallocate(ibmaskx)
+    if (allocated(ibmasky)) deallocate(ibmasky)
+    if (allocated(ibmaskz)) deallocate(ibmaskz)
+    if (allocated(ibmaskt)) deallocate(ibmaskt)
+
     if (salinity) then
-        call DestroyReal3DArray(forclor)
         if(allocated(solidr)) deallocate(solidr)
+        if (allocated(ibmaskr)) deallocate(ibmaskr)
     end if
 
     return
