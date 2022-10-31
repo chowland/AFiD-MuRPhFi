@@ -27,10 +27,7 @@ subroutine topogr
     ! Flag for boundary interpolation for velocity
     logical, parameter :: velBCinterp = .true.
 
-    q1bo=0.d0
-    q2bo=0.d0
-    q3bo=0.d0
-    densb=0.d0 
+
     allocate(plth1(1:nym,1:nzm))
     allocate(plth2(1:nym,1:nzm))
     plth1=1.d0
