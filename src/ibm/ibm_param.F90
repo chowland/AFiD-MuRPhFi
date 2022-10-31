@@ -1,9 +1,10 @@
 module ibm_param
       implicit none
-      integer :: npunx,npuny,npunz,npunte,mpun,npuntr
+      integer :: npunx,npuny,npunz,npunte,mpun,mpunr,npuntr
       integer :: n, solidtype
       real :: aldto
-      parameter (mpun=50000)
+      parameter (mpun=200000)
+      parameter (mpunr=300000)
       real,allocatable,dimension(:,:,:) :: forclo, forclor
       real,allocatable,dimension(:,:) :: plth1, plth2
       logical,allocatable,dimension(:,:,:) :: solidr
