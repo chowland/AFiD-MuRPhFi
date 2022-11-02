@@ -23,7 +23,8 @@ subroutine ImplicitAndUpdateVY
     real    :: amm,acc,app
     real    :: dyp,dxxvy
     real    :: usaldto,q2e
-    integer :: ibmask(1:nx,xstart(2):xend(2),xstart(3):xend(3))
+    ! integer :: ibmask(1:nx,xstart(2):xend(2),xstart(3):xend(3))
+    ! real    :: dist(1:mpun)
 
 
     alre=al/ren
@@ -86,8 +87,10 @@ subroutine ImplicitAndUpdateVY
 !  Solve equation and update velocity
 
     if (IBM) then
-        ibmask = ibmasky ! For some reason this is necessary to avoid a seg fault
-        call SolveImpEqnUpdate_YZ_ibm(vy,rhs,ibmasky,disty)
+        ! ibmask = ibmasky(:,:,:) ! For some reason this is necessary to avoid a seg fault
+        ! dist = disty(:)
+        ! call SolveImpEqnUpdate_YZ_ibm(vy,rhs,ibmask,dist)
+        call SolveImpEqnUpdate_VY_ibm
     else
         call SolveImpEqnUpdate_YZ(vy,rhs)
     end if

@@ -142,7 +142,7 @@ subroutine topogr
         rz = 0.5*zlen/ncz
         radius = (ylen*zlen/8.0/pi/nc**2/ncz*(1.0 - porosity))**(1.0/3.0)
         if (ismaster) write(*,*) "Bead radius: ",radius
-        Npart = (ncz + 1)*((nc + 1)**2 + nc**2) + ncz*(nc *(2*nc + 1))
+        Npart = (ncz + 1)*((nc + 1)**2 + 2*nc**2) + ncz*3*nc*(nc + 1)
         allocate(xpart(1:Npart))
         allocate(ypart(1:Npart))
         allocate(zpart(1:Npart))
@@ -689,11 +689,11 @@ subroutine topogr
             end do
         end do
 
-        if(n.gt.mpun) &
+        if(n.gt.mpunr) &
             write(*,*) 'Dim max di indgeore e'' stata superata n=',n
         npuntr = n
-        !        write(6,329)npuntr
-        ! 329  format(5x,'For Salinity N ='i7)
+            if (ismaster) write(6,329)npuntr
+        329  format(5x,'For Salinity N ='i7)
         if(allocated(plth1)) deallocate(plth1)
         if(allocated(plth2)) deallocate(plth2)
     end if

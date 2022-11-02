@@ -17,7 +17,7 @@ subroutine SolveImpEqnUpdate_Temp_ibm
     implicit none
     real, dimension(nx) :: amkl,apkl,ackl,fkl
     integer :: jc,kc,info,ipkv(nxm),ic,nrhs,km,kp,n
-    real :: betadx,ackl_b
+    real :: betadx,ackl_b, Tb
     real :: amkT(nxm-1),ackT(nxm),apkT(nxm-1),appk(nxm-2)
     ! real :: kcpp,kcpm       ! SL
 
@@ -31,6 +31,8 @@ subroutine SolveImpEqnUpdate_Temp_ibm
 !   No solving is done in this call.
 
     n = 1
+    ! Fixed temperature of the immersed boundary
+    Tb = 1.d0
 
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
@@ -52,18 +54,18 @@ subroutine SolveImpEqnUpdate_Temp_ibm
                     amkl(kc) = 0.d0
                     ackl(kc) = 1.d0
                     apkl(kc) = 0.d0
-                    fkl(kc) = -temp(kc,jc,ic)
+                    fkl(kc) = -temp(kc,jc,ic) + Tb
                 elseif (ibmaskt(kc,jc,ic) == 1) then ! Upper boundary points
                     amkl(kc) = 0.d0
                     ackl(kc) = 1.d0
                     apkl(kc) = -distbt(n)
-                    fkl(kc) = distbt(n)*temp(kp,jc,ic) - temp(kc,jc,ic)
+                    fkl(kc) = distbt(n)*temp(kp,jc,ic) - temp(kc,jc,ic) + (1.0 - distbt(n))*Tb
                     n = n + 1
                 elseif (ibmaskt(kc,jc,ic) == -1) then ! Lower boundary points
                     amkl(kc) = -distbt(n)
                     ackl(kc) = 1.d0
                     apkl(kc) = 0.d0
-                    fkl(kc) = distbt(n)*temp(km,jc,ic) - temp(kc,jc,ic)
+                    fkl(kc) = distbt(n)*temp(km,jc,ic) - temp(kc,jc,ic) + (1.0 - distbt(n))*Tb
                     n = n + 1
                 end if
         

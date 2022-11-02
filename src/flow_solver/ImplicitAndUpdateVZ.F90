@@ -22,6 +22,8 @@ subroutine ImplicitAndUpdateVZ
     real    :: alre,amm,acc,app,udz
     real    :: dxxvz,dzp
     real    :: usaldto,q1e
+    ! integer :: ibmask(1:nx,xstart(2):xend(2),xstart(3):xend(3))
+    ! real    :: dist(1:mpun)
 
     alre=al/ren
     udz=dz*al
@@ -70,7 +72,10 @@ subroutine ImplicitAndUpdateVZ
 !$OMP END PARALLEL DO
 
     if (IBM) then
-        call SolveImpEqnUpdate_YZ_ibm(vz,rhs,ibmaskz,distz)
+        ! ibmask = ibmaskz(:,:,:) ! For some reason this is necessary to avoid a seg fault
+        ! dist = distz(:)
+        ! call SolveImpEqnUpdate_YZ_ibm(vz,rhs,ibmask,dist)
+        call SolveImpEqnUpdate_VZ_ibm
     else
         call SolveImpEqnUpdate_YZ(vz,rhs)
     end if
