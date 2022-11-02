@@ -25,6 +25,8 @@ subroutine SolveImpEqnUpdate_Sal_ibm
 
     betadx=0.5d0*al*dt/pecs
 
+    n = 1
+
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
             do kc=1,nxmr

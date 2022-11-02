@@ -27,6 +27,7 @@ subroutine SolveImpEqnUpdate_YZ_ibm(q,rhs,imask,dist)
 
     betadx = beta*al
     ackl(:) = 1.0d0
+    n = 1
 
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)

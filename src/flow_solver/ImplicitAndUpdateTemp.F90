@@ -20,7 +20,6 @@ subroutine ImplicitAndUpdateTemp
     integer :: km,kp,ke
     real    :: alpec,dxxt
     real    :: app,acc,amm
-    real    :: usaldto,dense
 
     alpec=al/pect
 
