@@ -29,7 +29,7 @@ ifeq ($(MACHINE),PC_INTEL)
 endif
 ifeq ($(MACHINE),iSNELLIUS)
 	FC = h5pfc -fpp -r8 -O3 -align array64byte -fma -ftz -fomit-frame-pointer
-	LDFLAGS = -lfftw3 -mkl=sequential
+	LDFLAGS = -lfftw3 -qmkl=sequential
 endif
 ifeq ($(MACHINE),SNELLIUS)
 	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -w -fallow-argument-mismatch
