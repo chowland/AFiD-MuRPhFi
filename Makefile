@@ -153,9 +153,17 @@ $(OBJDIR)/AuxiliaryRoutines.o: src/flow_solver/AuxiliaryRoutines.F90
 $(OBJDIR)/decomp_2d.o: src/flow_solver/2decomp/decomp_2d.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
-	$(FC) -c -o $@ $< $(LDFLAGS) 
+	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
-	$(FC) -c -o $@ $< $(LDFLAGS) 
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/GridModule.o: src/flow_solver/GridModule.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/HermiteInterpolations.o: src/multires/HermiteInterpolations.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/h5_tools.o: src/h5tools/h5_tools.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/means.o: src/h5tools/means.F90 obj/ibm_param.o
+	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/flow_solver/%.F90 $(MOBJS)
