@@ -134,15 +134,15 @@ subroutine topogr
 
     elseif (solidtype==4) then
         porosity = 0.37
-        nc = nint(3.0/2.0/sqrt(6.0)*(3*sqrt(2.0)*(1.0 - porosity)*RayS/RayT/pi)**(1.0/3.0))
+        nc = nint(1.0/sqrt(6.0)*(3*sqrt(2.0)*(1.0 - porosity)*RayS/RayT/pi)**(1.0/3.0))
         if (ismaster) write(*,*) "Number of lattice layers: ",nc
         ncz = nint(sqrt(3.0)*zlen/ylen*nc)
-        rx = 3.0/4.0/sqrt(6.0)/nc
+        rx = 0.5/sqrt(6.0)/nc
         ry = 0.5/sqrt(3.0)/nc*ylen
         rz = 0.5*zlen/ncz
-        radius = (3.0*ylen*zlen/16.0/pi/nc**2/ncz*(1.0 - porosity))**(1.0/3.0)
+        radius = (ylen*zlen/8.0/pi/nc**2/ncz*(1.0 - porosity))**(1.0/3.0)
         if (ismaster) write(*,*) "Bead radius: ",radius
-        Npart = (ncz + 1)*((nc + 1)**2 + nc**2) + ncz*(nc *(2*nc + 1))
+        Npart = (ncz + 1)*((nc + 1)**2 + 2*nc**2) + ncz*3*nc*(nc + 1)
         allocate(xpart(1:Npart))
         allocate(ypart(1:Npart))
         allocate(zpart(1:Npart))
@@ -150,8 +150,9 @@ subroutine topogr
         ! Compute solid centres on root process
         if (ismaster) then
             n = 1
+            ! First layer
             do k=0,nc
-                xe = 4.0*k*sqrt(6.0)/3.0*rx
+                xe = 2.0*k*sqrt(6.0)*rx
                 do i=0,ncz
                     do j=0,nc
                         ye = 2.0*sqrt(3.0)*j*ry
@@ -173,8 +174,9 @@ subroutine topogr
                     end do
                 end do
             end do
+            ! Second layer
             do k=1,nc
-                xe = 2.0*(2.0*k - 1.0)*sqrt(6.0)/3.0*rx
+                xe = 2.0*(3.0*k - 2.0)*sqrt(6.0)/3.0*rx
                 do i=0,ncz
                     do j=1,nc
                         ye = sqrt(3.0)*(2.0*j - 2.0/3.0)*ry
@@ -186,8 +188,8 @@ subroutine topogr
                     end do
                 end do
                 do i=1,ncz
-                    do j=1,nc
-                        ye = sqrt(3.0)*(2.0*(j - 1.0) + 1.0/3.0)*ry
+                    do j=0,nc
+                        ye = sqrt(3.0)*(2.0*j + 1.0/3.0)*ry
                         ze = (2.0*i - 1.0)*rz
                         xpart(n) = xe
                         ypart(n) = ye
@@ -196,6 +198,32 @@ subroutine topogr
                     end do
                 end do
             end do
+
+            ! Third layer
+            do k=1,nc
+                xe = 2.0*(3.0*k - 1.0)*sqrt(6.0)/3.0*rx
+                do i=0,ncz
+                    do j=1,nc
+                        ye = sqrt(3.0)*(2.0*j - 4.0/3.0)*ry
+                        ze = 2.0*i*rz
+                        xpart(n) = xe
+                        ypart(n) = ye
+                        zpart(n) = ze
+                        n = n + 1
+                    end do
+                end do
+                do i=1,ncz
+                    do j=0,nc
+                        ye = sqrt(3.0)*(2.0*j - 1.0/3.0)*ry
+                        ze = (2.0*i - 1.0)*rz
+                        xpart(n) = xe
+                        ypart(n) = ye
+                        zpart(n) = ze
+                        n = n + 1
+                    end do
+                end do
+            end do
+
             filename = trim("outputdir/solid_centres.h5")
             call HdfCreateBlankFile(filename)
             dsetname = trim("xpart")
@@ -661,11 +689,11 @@ subroutine topogr
             end do
         end do
 
-        if(n.gt.mpun) &
+        if(n.gt.mpunr) &
             write(*,*) 'Dim max di indgeore e'' stata superata n=',n
         npuntr = n
-        !        write(6,329)npuntr
-        ! 329  format(5x,'For Salinity N ='i7)
+            if (ismaster) write(6,329)npuntr
+        329  format(5x,'For Salinity N ='i7)
         if(allocated(plth1)) deallocate(plth1)
         if(allocated(plth2)) deallocate(plth2)
     end if

@@ -21,7 +21,6 @@ subroutine ImplicitAndUpdateVZ
     integer :: kmm,kpp,ke
     real    :: alre,amm,acc,app,udz
     real    :: dxxvz,dzp
-    real    :: usaldto,q1e
 
     alre=al/ren
     udz=dz*al

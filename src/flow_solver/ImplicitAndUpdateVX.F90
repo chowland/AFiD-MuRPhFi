@@ -21,7 +21,6 @@ subroutine ImplicitAndUpdateVX
     integer :: km,kp,ic,ke
     real    :: alre,udx3
     real    :: amm,acc,app,dxp,dxxvx
-    real    :: usaldto,q3e
 
     alre=al/ren
 
