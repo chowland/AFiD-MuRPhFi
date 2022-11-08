@@ -63,19 +63,21 @@ $$
 \boldsymbol{\nabla}\cdot\boldsymbol{u}^{l+1} = 0 \approx \boldsymbol{\nabla}\cdot\boldsymbol{\hat{u}} - \alpha_l \Delta t \nabla^2 \Phi^{l+1} .
 $$
 
-The derivatives in the periodic directions are computed using Fourier transforms, whereas the wall-normal derivatives use a finite difference.
-Denoting $\boldsymbol{\tilde{u}}$ and $\tilde{\Phi}$ as the ($yz$-)Fourier transforms of $\boldsymbol{\hat{u}}$ and $\Phi^{l+1}$ respectively, we can write
+The divergence of $\hat{\boldsymbol{u}}$ is computed using finite differences, and then Fourier transformed.
+The derivatives for the pressure correction in the periodic directions can be expressed using Fourier transforms, whereas the wall-normal derivative must use a finite difference.
+Denoting $\boldsymbol{\tilde{u}}$ and $\tilde{\Phi}$ as the ($yz$-)Fourier transforms of $\boldsymbol{\hat{u}}$ and $\Phi^{l+1}$ respectively, we can now write the problem as a linear system
 
 $$
-\mathcal{D}\tilde{u} - ik_y \tilde{v} - ik_z\tilde{w} = \alpha_l \Delta t\left( \mathcal{DG}\tilde{\Phi} - (k_y^2 + k_z^2)\tilde{\Phi}\right) ,
+\alpha_l \Delta t\left[ \mathcal{DG} - (k_y^2 + k_z^2)\mathcal{I}\right]\tilde{\Phi} = \widetilde{\nabla\cdot \boldsymbol{u}},
 $$
 
 where $\mathcal{D}$ is the wall-normal discrete divergence operator.
-Note that since we are aiming to set the divergence of $\boldsymbol{u}^{l+1}$ to zero, we use the composite discrete operator $\mathcal{DG}$ for the second derivative of $\Phi$ rather than the discrete Laplacian $\mathcal{L}$ used above in the equations of motion.
-These are *not* the same operator.
-The above equation can be expressed as a tridiagonal matrix problem for each Fourier mode and solved using similar LAPACK routines as described above for the semi-implicit step.
+For each Fourier mode $k_y$, $k_z$, this provides a 1-D linear system that can be expressed as a tridiagonal matrix and solved for $\tilde{\Phi}$ using similar LAPACK routines as for the implicit step above.
 This is performed in the `SolvePressureCorrection` subroutine.
 
+
+Note that since we are aiming to set the divergence of $\boldsymbol{u}^{l+1}$ to zero, we use the composite discrete operator $\mathcal{DG}$ for the second derivative of $\Phi$ rather than the discrete Laplacian $\mathcal{L}$ used above in the equations of motion.
+These are *not* the same operator.
 For completeness, the composite operator $\mathcal{DG}$ takes the form
 
 $$
