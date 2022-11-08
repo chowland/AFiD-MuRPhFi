@@ -26,6 +26,7 @@ subroutine topogr
 
     ! Flag for boundary interpolation for velocity
     logical, parameter :: velBCinterp = .true.
+    logical :: fexist
 
 
     allocate(plth1(1:nym,1:nzm))
@@ -70,41 +71,52 @@ subroutine topogr
 
         ! Compute solid centres on root process
         if (ismaster) then
-            i = 1
-            call random_seed()
-            do j=0,nc
-                xe = real(j)/real(nc)
-                do k=1,3*nc
-                    ye = Lhex*real(k)
-                    call random_number(rp)
-                    call random_number(tp)
-                    xpart(i) = xe + amp*rp*cos(2*pi*tp)
-                    ypart(i) = ye + amp*rp*sin(2*pi*tp)
-                    i = i + 1
-                    if (k==3*nc) then
-                        xpart(i) = xpart(i-1)
-                        ypart(i) = ypart(i-1) - ylen
-                        i = i + 1
-                    end if
-                end do
-                if (j>0) then
-                    xe = (real(j) - 0.5)/real(nc)*alx3
+            filename = trim("outputdir/solid_centres.h5")
+            inquire(file=filename, exist=fexist)
+            ! If locations already prescribed, read them from file
+            if (fexist) then
+                write(*,*) "Reading solid matrix from file."
+                dsetname = trim("xpart")
+                call HdfSerialReadReal1D(dsetname, filename, xpart, Npart)
+                dsetname = trim("ypart")
+                call HdfSerialReadReal1D(dsetname, filename, ypart, Npart)
+            ! Otherwise, construct the porous matrix
+            else
+                i = 1
+                call random_seed()
+                do j=0,nc
+                    xe = real(j)/real(nc)
                     do k=1,3*nc
-                        ye = Lhex*(real(k) - 0.5)
+                        ye = Lhex*real(k)
                         call random_number(rp)
                         call random_number(tp)
                         xpart(i) = xe + amp*rp*cos(2*pi*tp)
                         ypart(i) = ye + amp*rp*sin(2*pi*tp)
                         i = i + 1
+                        if (k==3*nc) then
+                            xpart(i) = xpart(i-1)
+                            ypart(i) = ypart(i-1) - ylen
+                            i = i + 1
+                        end if
                     end do
-                end if
-            end do
-            filename = trim("outputdir/solid_centres.h5")
-            call HdfCreateBlankFile(filename)
-            dsetname = trim("xpart")
-            call HdfSerialWriteReal1D(dsetname, filename, xpart, Npart)
-            dsetname = trim("ypart")
-            call HdfSerialWriteReal1D(dsetname, filename, ypart, Npart)
+                    if (j>0) then
+                        xe = (real(j) - 0.5)/real(nc)*alx3
+                        do k=1,3*nc
+                            ye = Lhex*(real(k) - 0.5)
+                            call random_number(rp)
+                            call random_number(tp)
+                            xpart(i) = xe + amp*rp*cos(2*pi*tp)
+                            ypart(i) = ye + amp*rp*sin(2*pi*tp)
+                            i = i + 1
+                        end do
+                    end if
+                end do
+                call HdfCreateBlankFile(filename)
+                dsetname = trim("xpart")
+                call HdfSerialWriteReal1D(dsetname, filename, xpart, Npart)
+                dsetname = trim("ypart")
+                call HdfSerialWriteReal1D(dsetname, filename, ypart, Npart)
+            end if
         end if
 
         ! Broadcast centre positions to all processes
@@ -149,89 +161,103 @@ subroutine topogr
 
         ! Compute solid centres on root process
         if (ismaster) then
-            n = 1
-            ! First layer
-            do k=0,nc
-                xe = 2.0*k*sqrt(6.0)*rx
-                do i=0,ncz
-                    do j=0,nc
-                        ye = 2.0*sqrt(3.0)*j*ry
-                        ze = 2.0*i*rz
-                        xpart(n) = xe
-                        ypart(n) = ye
-                        zpart(n) = ze
-                        n = n + 1
-                    end do
-                end do
-                do i=1,ncz
-                    do j=1,nc
-                        ye = (2.0*j - 1.0)*sqrt(3.0)*ry
-                        ze = (2.0*i - 1.0)*rz
-                        xpart(n) = xe
-                        ypart(n) = ye
-                        zpart(n) = ze
-                        n = n + 1
-                    end do
-                end do
-            end do
-            ! Second layer
-            do k=1,nc
-                xe = 2.0*(3.0*k - 2.0)*sqrt(6.0)/3.0*rx
-                do i=0,ncz
-                    do j=1,nc
-                        ye = sqrt(3.0)*(2.0*j - 2.0/3.0)*ry
-                        ze = 2.0*i*rz
-                        xpart(n) = xe
-                        ypart(n) = ye
-                        zpart(n) = ze
-                        n = n + 1
-                    end do
-                end do
-                do i=1,ncz
-                    do j=0,nc
-                        ye = sqrt(3.0)*(2.0*j + 1.0/3.0)*ry
-                        ze = (2.0*i - 1.0)*rz
-                        xpart(n) = xe
-                        ypart(n) = ye
-                        zpart(n) = ze
-                        n = n + 1
-                    end do
-                end do
-            end do
-
-            ! Third layer
-            do k=1,nc
-                xe = 2.0*(3.0*k - 1.0)*sqrt(6.0)/3.0*rx
-                do i=0,ncz
-                    do j=1,nc
-                        ye = sqrt(3.0)*(2.0*j - 4.0/3.0)*ry
-                        ze = 2.0*i*rz
-                        xpart(n) = xe
-                        ypart(n) = ye
-                        zpart(n) = ze
-                        n = n + 1
-                    end do
-                end do
-                do i=1,ncz
-                    do j=0,nc
-                        ye = sqrt(3.0)*(2.0*j - 1.0/3.0)*ry
-                        ze = (2.0*i - 1.0)*rz
-                        xpart(n) = xe
-                        ypart(n) = ye
-                        zpart(n) = ze
-                        n = n + 1
-                    end do
-                end do
-            end do
-
+            ! Check if a file prescribing the solid centres already exists
             filename = trim("outputdir/solid_centres.h5")
-            call HdfCreateBlankFile(filename)
-            dsetname = trim("xpart")
-            call HdfSerialWriteReal1D(dsetname, filename, xpart, Npart)
-            dsetname = trim("ypart")
-            call HdfSerialWriteReal1D(dsetname, filename, ypart, Npart)
-            dsetname = trim("zpart")
-            call HdfSerialWriteReal1D(dsetname, filename, zpart, Npart)
+            inquire(file=filename, exist=fexist)
+            ! Read the solid centres if already existing
+            if (fexist) then
+                write(*,*) "Reading solid matrix from file."
+                dsetname = trim("xpart")
+                call HdfSerialReadReal1D(dsetname, filename, xpart, Npart)
+                dsetname = trim("ypart")
+                call HdfSerialReadReal1D(dsetname, filename, ypart, Npart)
+                dsetname = trim("zpart")
+                call HdfSerialReadReal1D(dsetname, filename, zpart, Npart)
+            ! Construct the pore matrix otherwise
+            else
+                n = 1
+                ! First layer
+                do k=0,nc
+                    xe = 2.0*k*sqrt(6.0)*rx
+                    do i=0,ncz
+                        do j=0,nc
+                            ye = 2.0*sqrt(3.0)*j*ry
+                            ze = 2.0*i*rz
+                            xpart(n) = xe
+                            ypart(n) = ye
+                            zpart(n) = ze
+                            n = n + 1
+                        end do
+                    end do
+                    do i=1,ncz
+                        do j=1,nc
+                            ye = (2.0*j - 1.0)*sqrt(3.0)*ry
+                            ze = (2.0*i - 1.0)*rz
+                            xpart(n) = xe
+                            ypart(n) = ye
+                            zpart(n) = ze
+                            n = n + 1
+                        end do
+                    end do
+                end do
+                ! Second layer
+                do k=1,nc
+                    xe = 2.0*(3.0*k - 2.0)*sqrt(6.0)/3.0*rx
+                    do i=0,ncz
+                        do j=1,nc
+                            ye = sqrt(3.0)*(2.0*j - 2.0/3.0)*ry
+                            ze = 2.0*i*rz
+                            xpart(n) = xe
+                            ypart(n) = ye
+                            zpart(n) = ze
+                            n = n + 1
+                        end do
+                    end do
+                    do i=1,ncz
+                        do j=0,nc
+                            ye = sqrt(3.0)*(2.0*j + 1.0/3.0)*ry
+                            ze = (2.0*i - 1.0)*rz
+                            xpart(n) = xe
+                            ypart(n) = ye
+                            zpart(n) = ze
+                            n = n + 1
+                        end do
+                    end do
+                end do
+
+                ! Third layer
+                do k=1,nc
+                    xe = 2.0*(3.0*k - 1.0)*sqrt(6.0)/3.0*rx
+                    do i=0,ncz
+                        do j=1,nc
+                            ye = sqrt(3.0)*(2.0*j - 4.0/3.0)*ry
+                            ze = 2.0*i*rz
+                            xpart(n) = xe
+                            ypart(n) = ye
+                            zpart(n) = ze
+                            n = n + 1
+                        end do
+                    end do
+                    do i=1,ncz
+                        do j=0,nc
+                            ye = sqrt(3.0)*(2.0*j - 1.0/3.0)*ry
+                            ze = (2.0*i - 1.0)*rz
+                            xpart(n) = xe
+                            ypart(n) = ye
+                            zpart(n) = ze
+                            n = n + 1
+                        end do
+                    end do
+                end do
+
+                call HdfCreateBlankFile(filename)
+                dsetname = trim("xpart")
+                call HdfSerialWriteReal1D(dsetname, filename, xpart, Npart)
+                dsetname = trim("ypart")
+                call HdfSerialWriteReal1D(dsetname, filename, ypart, Npart)
+                dsetname = trim("zpart")
+                call HdfSerialWriteReal1D(dsetname, filename, zpart, Npart)
+            end if
         end if
 
         ! Broadcast centre positions to all processes
