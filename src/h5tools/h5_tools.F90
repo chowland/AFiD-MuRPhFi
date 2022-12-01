@@ -89,7 +89,7 @@ subroutine write_H5_plane(file_id, varname, var, axis)
             dims(1) = nxm
         end if
     end if
-    if (index('phisal', trim(varname)) /= 0) then
+    if (index('phisal2', trim(varname)) /= 0) then
         dims = [nxmr, nzmr]
         data_offset = [0, xstartr(3) - 1]
         if (axis=='x') then
