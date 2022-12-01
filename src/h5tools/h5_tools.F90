@@ -47,6 +47,10 @@ subroutine h5_add_slice_groups(file_id)
     if (salinity) then
         call h5gcreate_f(file_id, "sal", group_id, hdf_error)
         call h5gclose_f(group_id, hdf_error)
+        if (IBM) then
+            call h5gcreate_f(file_id, "sal2", group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+        end if
     end if
 
     if (phasefield) then

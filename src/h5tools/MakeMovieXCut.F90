@@ -25,6 +25,7 @@ subroutine Mkmov_xcut
 
     ! Select plane - plane next to lower wall
     ic = 1
+    if (IBM) ic = nxm/2
 
     ! Record filename as string
     filename = trim("outputdir/flowmov/movie_xcut.h5")
@@ -54,12 +55,18 @@ subroutine Mkmov_xcut
         !! Repeat on refined grid to save salinity
         ! Select wall plane index for refined grid
         ic = 1
+        if (IBM) ic = nxmr/2
 
         call h5_open_or_create(file_id, filename, comm, fexist)
         if (.not. fexist) call h5_add_slice_groups(file_id)
 
         varname = 'sal'
         call write_H5_plane(file_id, varname, sal(ic, xstartr(2):xendr(2), xstartr(3):xendr(3)), 'x')
+        if (IBM) then
+            varname = 'sal2'
+            ic = ic + 52
+            call write_H5_plane(file_id, varname, sal(ic, xstartr(2):xendr(2), xstartr(3):xendr(3)), 'x')
+        end if
 
         call h5fclose_f(file_id, hdf_error)
 
