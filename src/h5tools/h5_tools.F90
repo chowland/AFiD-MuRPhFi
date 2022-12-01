@@ -1,7 +1,7 @@
 module h5_tools
     use HDF5
     use mpih, only: MPI_INFO_NULL
-    use param, only: salinity, phasefield, nx, nxm, nym, nzm, time, tframe, nxmr, nymr, nzmr
+    use param, only: salinity, phasefield, nx, nxm, nym, nzm, time, tframe, nxmr, nymr, nzmr, IBM
     use decomp_2d, only: xstart, xstartr
     implicit none
 
