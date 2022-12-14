@@ -166,8 +166,8 @@ subroutine ReadFlowInterp(prow,pcol)
 
     if (resetlogstime) time = 0.d0
     
-    ! Increase max sim time by the end time in continua files
-    tmax = tmax + time
+    ! ! Increase max sim time by the end time in continua files
+    ! tmax = tmax + time
 
     return
 
