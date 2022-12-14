@@ -5,7 +5,7 @@ module GridModule
     private
     public uniform_grid, tanh_grid, cheb_grid, asym_cheb_grid, &
             second_derivative_coeff, centre_focus_grid, &
-            natural_BL_grid, sym_natural_BL_grid
+            natural_BL_grid, sym_natural_BL_grid, scallop_grid
 
 contains
 
@@ -218,6 +218,48 @@ contains
         end do
 
     end subroutine sym_natural_BL_grid
+
+    subroutine scallop_grid(c_grd, m_grd, Nm, grd_len, Retau, dw)
+        !! Natural grid space scaling for turbulent boundary layers
+        !! following Pirozzoli & Orlandi (2021) J. Comp. Phys.
+        real, intent(out) :: c_grd(:), m_grd(:)
+        integer, intent(in) :: Nm
+        real, intent(in) :: grd_len, Retau, dw
+
+        integer :: k, ks
+        real :: alpha, kb, dyw, sig, dxlo, dxup, dxsmooth
+
+        ! Index of roughness height
+        kb = 0.2*Retau/dw
+        ! Scale to Kolmogorov of upper grid spacing
+        alpha = 8.0/(Nm + 1 - kb) * Retau**0.5*(1.0 - 5**(-0.5))
+        if (alpha > 2) then
+            write(*,*) "WARNING: upper grid spacing predicted >2x Kolmogorov"
+        elseif (alpha < 0) then
+            write(*,*) "ERROR: wall spacing too small"
+        end if
+
+        ! Smoothing region in k
+        ks = 20
+
+        do k=1,Nm
+            ! Uniform grid spacing in scallop region
+            dxlo = dw
+            ! Match LK+ == 0.25 x+^0.5
+            dxup = alpha/4.0*(alpha/8.0*(k - kb) + (Retau/5.0)**0.5)
+            ! Sigmoid function for smooth transition
+            sig = 0.5*(1.0 + tanh((k - kb)/ks))
+            dxsmooth = (1.0 - sig)*dxlo + sig*dxup
+            c_grd(k+1) = c_grd(k) + dxsmooth
+        end do
+        ! Rescale grid to match domain size
+        c_grd(:) = c_grd(:)/c_grd(Nm+1)*grd_len
+
+        do k=1,Nm
+            m_grd(k) = 0.5*(c_grd(k) + c_grd(k+1))
+        end do
+
+    end subroutine scallop_grid
 
     subroutine second_derivative_coeff(ap3 ,ac3, am3, x, xlen, fix_up, fix_low)
         ! Returns second derivative coefficients ap3, ac3, am3
