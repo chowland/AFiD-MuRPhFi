@@ -197,10 +197,10 @@ subroutine CalcMeanProfiles
                                 & + tdx*((vy(kp,jp,i) - vy(km,jp,i))**2 + (vy(kp,j,i) - vy(km,j,i))**2)      ! (dv/dx)^2
             end do
             tdx = 0.125*(dx/g3rm(nxm))**2
-            epsilon(nxm) = epsilon(nxm) + tdx*((vz(nxm,j,ip) - vz(nxm-1,j,ip) + inslws*2.0*(0.0 - vz(nxm,j,ip)))**2 &
-                                       + (vz(nxm,j,i) - vz(nxm-1,j,i) + inslws*2.0*(0.0 - vz(nxm,j,i)))**2) &
-                                & + tdx*((vy(nxm,jp,i) - vy(nxm-1,jp,i) + inslws*2.0*(vy(nxm,jp,i) - xplusU))**2 &
-                                       + (vy(nxm,j,i) - vy(nxm-1,j,i) + inslws*2.0*(vy(nxm,j,i) - xplusU))**2)
+            epsilon(nxm) = epsilon(nxm) + tdx*((vz(nxm,j,ip) - vz(nxm-1,j,ip) + inslwn*2.0*(0.0 - vz(nxm,j,ip)))**2 &
+                                       + (vz(nxm,j,i) - vz(nxm-1,j,i) + inslwn*2.0*(0.0 - vz(nxm,j,i)))**2) &
+                                & + tdx*((vy(nxm,jp,i) - vy(nxm-1,jp,i) + inslwn*2.0*(xplusU - vy(nxm,jp,i)))**2 &
+                                       + (vy(nxm,j,i) - vy(nxm-1,j,i) + inslwn*2.0*(xplusU - vy(nxm,j,i)))**2)
         end do
     end do
 
