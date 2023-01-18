@@ -11,16 +11,16 @@ program AFiD
 
 !$    use omp_lib
     implicit none
-    integer :: errorcode, nthreads, i, j, k
+    integer :: errorcode!, nthreads, i, j, k
     real    :: instCFL,CFLmr,dmax,dmaxr
     real    :: ti(2), tin(3), minwtdt
-    real :: ts, varptb,chksum
+    real :: ts!, varptb,chksum
     integer :: prow=0,pcol=0
     integer :: lfactor,lfactor2
     character(100) :: arg
     logical :: nanexist, write_mean_planes=.true.
-    real,allocatable,dimension(:,:) :: dummy,dscan,dbot
-    integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
+    ! real,allocatable,dimension(:,:) :: dummy,dscan,dbot
+    ! integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
 !*******************************************************
 !******* Read input file bou.in by all processes********
