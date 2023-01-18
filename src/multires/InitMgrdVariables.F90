@@ -70,6 +70,9 @@ subroutine InitMgrdVariables
     call AllocateInt1dArray(jrangr,0,nyr)
     call AllocateInt1dArray(krangr,0,nzr)
 
+    call AllocateInt1dArray(yc_to_ymr,0,ny)
+    call AllocateInt1dArray(zc_to_zmr,0,nz)
+
     call AllocateReal2DArray(cxvx,1,4,1,nxr)
     call AllocateReal2DArray(cxvy,1,4,1,nxmr)
     call AllocateReal2DArray(cxvz,1,4,1,nxmr)
@@ -93,6 +96,13 @@ subroutine InitMgrdVariables
     call AllocateReal2DArray(cxsalc,1,4,1,nx)
     call AllocateReal2DArray(cysalc,1,4,1,nym)
     call AllocateReal2DArray(czsalc,1,4,1,nzm)
+
+    if (IBM) then
+        if (phasefield) then
+            call AllocateReal2DArray(cych,1,4,1,nym)
+            call AllocateReal2DArray(czch,1,4,1,nzm)
+        end if
+    end if
 
 !-------------------------------------------------
 ! Arrays with ghost cells

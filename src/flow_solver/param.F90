@@ -124,15 +124,18 @@ module mgrd_arrays
     integer,allocatable,dimension(:) :: irangc,jrangc,krangc
     integer,allocatable,dimension(:) :: irangb,jrangb,krangb
     integer,allocatable,dimension(:) :: irangr,jrangr,krangr
+    integer,allocatable,dimension(:) :: yc_to_ymr, zc_to_zmr
     real,allocatable,dimension(:,:,:) :: sal,rhsr,rusal,hsal
     real,allocatable,dimension(:,:) :: cxvx, cxvy, cxvz, cxrs, cxsalc, cxphic
     real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs, cysalc, cyphic
     real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs, czsalc, czphic
+    real,allocatable,dimension(:,:) :: cych, czch
     real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
     real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
     real,allocatable,dimension(:,:,:) :: salc
     real,allocatable,dimension(:,:,:) :: tempr,Tplaner
     real,allocatable,dimension(:,:,:) :: phi,phic,ruphi,hphi
+    real,allocatable,dimension(:,:) :: solid_height, height_vx, height_vy, height_vz
 end module mgrd_arrays
 !===============================================================
 module stat_arrays

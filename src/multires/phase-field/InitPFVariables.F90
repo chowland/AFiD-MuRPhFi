@@ -27,5 +27,12 @@ subroutine InitPFVariables
     ! Coarse array for phi or d(phi)/dt
     call AllocateReal3DArray(phic,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
 
+    if (IBM) then
+        call AllocateReal2DArray(solid_height,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+        call AllocateReal2DArray(height_vx,xstart(2),xend(2),xstart(3),xend(3))
+        call AllocateReal2DArray(height_vy,xstart(2),xend(2),xstart(3),xend(3))
+        call AllocateReal2DArray(height_vz,xstart(2),xend(2),xstart(3),xend(3))
+    end if
+
     return
 end subroutine InitPFVariables

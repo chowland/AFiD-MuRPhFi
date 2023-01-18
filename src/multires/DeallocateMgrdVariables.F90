@@ -61,6 +61,9 @@ subroutine DeallocateMgrdVariables
     call DestroyInt1dArray(jrangb)   !CS mgrd
     call DestroyInt1dArray(krangb)   !CS mgrd
 
+    call DestroyInt1dArray(yc_to_ymr)
+    call DestroyInt1dArray(zc_to_zmr)
+
     call DestroyReal2DArray(cxvx) !CS mgrd
     call DestroyReal2DArray(cxvy) !CS mgrd
     call DestroyReal2DArray(cxvz) !CS mgrd
@@ -84,6 +87,13 @@ subroutine DeallocateMgrdVariables
     call DestroyReal2DArray(cxphic)
     call DestroyReal2DArray(cyphic)
     call DestroyReal2DArray(czphic)
+
+    if (IBM) then
+        if (phasefield) then
+            call DestroyReal2DArray(cych)
+            call DestroyReal2DArray(czch)
+        end if
+    end if
 
     call DestroyReal3DArray(vxr)
     call DestroyReal3DArray(vyr)

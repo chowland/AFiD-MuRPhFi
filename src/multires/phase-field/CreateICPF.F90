@@ -129,6 +129,17 @@ subroutine CreateICPF
         end if
     end if
 
+    if (IBM) then
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                h0 = 0.25 + (ymr(j) - 0.5)**2
+                do k=1,nxmr
+                    phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - h0)/2/pf_eps))
+                end do
+            end do
+        end do
+    end if
+
     return
 
 end subroutine CreateICPF

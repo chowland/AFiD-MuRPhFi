@@ -58,6 +58,8 @@ subroutine TimeMarcher
         ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ pre-implicit',ns
         ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP pre-implicit',ns
 
+        if (phasefield .and. IBM) call UpdateIBMLocation
+
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ

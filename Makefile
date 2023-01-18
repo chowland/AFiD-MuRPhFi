@@ -108,7 +108,7 @@ OBJS += obj/ExplicitTermsSal.o obj/ImplicitAndUpdateSal.o obj/SolveImpEqnUpdate_
 OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
 	obj/ImplicitAndUpdatePhi.o obj/InitPFVariables.o obj/InterpPhiMgrd.o \
 	obj/InterpTempMgrd.o obj/SolveImpEqnUpdate_Phi.o obj/CreateICPF.o \
-	obj/ImmersedBoundary.o
+	obj/ImmersedBoundary.o obj/UpdateIBMLocation.o
 
 # # Object files associated with the immersed boundary method
 OBJS += obj/SolveImpEqnUpdate_Temp_ibm.o obj/SolveImpEqnUpdate_X_ibm.o \
@@ -120,13 +120,14 @@ OBJS += obj/mean_zplane.o
 
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
-	obj/HermiteInterpolations.o obj/GridModule.o obj/h5_tools.o obj/means.o obj/ibm_param.o
+	obj/HermiteInterpolations.o obj/GridModule.o obj/h5_tools.o obj/means.o \
+	obj/ibm_param.o obj/IBMTools.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
-	HermiteInterpolations.F90 GridModule.F90 ibm_param.F90
+	HermiteInterpolations.F90 GridModule.F90 ibm_param.F90 IBMTools.F90
 
 #============================================================================ 
 #  make PROGRAM   
@@ -153,11 +154,13 @@ $(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/GridModule.o: src/flow_solver/GridModule.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/HermiteInterpolations.o: src/multires/HermiteInterpolations.F90
+$(OBJDIR)/HermiteInterpolations.o: src/multires/HermiteInterpolations.F90 obj/ibm_param.o
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/h5_tools.o: src/h5tools/h5_tools.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/means.o: src/h5tools/means.F90 obj/ibm_param.o
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/IBMTools.o: src/ibm/IBMTools.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)

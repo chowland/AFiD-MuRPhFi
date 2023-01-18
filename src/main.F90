@@ -157,7 +157,14 @@ program AFiD
 
     endif
 
-    if (IBM) call topogr
+!CS   Create multigrid stencil for interpolation
+    if (multires) call CreateMgrdStencil
+    if (phasefield .and. IBM) call CreatePFStencil
+
+    if (IBM) then
+        call topogr
+        if (phasefield) call UpdateIBMLocation
+    end if
 
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)
@@ -168,8 +175,6 @@ program AFiD
     if (phasefield) call update_halo(phi,lvlhalo)
     call update_halo(pr,lvlhalo)
 
-!CS   Create multigrid stencil for interpolation
-    if (multires) call CreateMgrdStencil
 
 !CS   Interpolate initial values
     if (salinity) then
