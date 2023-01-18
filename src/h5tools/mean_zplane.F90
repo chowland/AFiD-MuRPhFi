@@ -1,9 +1,9 @@
 
 subroutine mean_zplane
-    use param, only: nx, nzm
+    use param, only: nx
     use mpih
     use hdf5
-    use decomp_2d, only: xstart,xend,xsize,xstartr,xendr,DECOMP_2D_COMM_CART_X,nrank
+    use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
     use mgrd_arrays, only: sal, phi
     use h5_tools
@@ -13,7 +13,7 @@ subroutine mean_zplane
     character(70) :: filename
     character(4) :: varname
     real, allocatable :: uplane(:,:), vplane(:,:), wplane(:,:), Tplane(:,:)
-    integer :: comm, zrank, i, j, bufsize
+    integer :: comm, zrank
     integer(HID_T) :: file_id
     logical :: fexist
 
@@ -114,10 +114,10 @@ subroutine mean_zplane
 end subroutine mean_zplane
 
 subroutine mean_yplane
-    use param, only: nx, nym
+    use param, only: nx
     use mpih
     use hdf5
-    use decomp_2d, only: xstart,xend,xsize,xstartr,xendr,DECOMP_2D_COMM_CART_X,nrank
+    use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
     use mgrd_arrays, only: sal, phi
     use h5_tools
@@ -127,7 +127,7 @@ subroutine mean_yplane
     character(70) :: filename
     character(4) :: varname
     real, allocatable :: uplane(:,:), vplane(:,:), wplane(:,:), Tplane(:,:)
-    integer :: comm, yrank, i, j, bufsize
+    integer :: comm, yrank
     integer(HID_T) :: file_id
     logical :: fexist
 
