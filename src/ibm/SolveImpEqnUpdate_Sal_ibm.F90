@@ -12,10 +12,10 @@ subroutine SolveImpEqnUpdate_Sal_ibm
     use param
     use mgrd_arrays, only: sal,rhsr
     use decomp_2d, only: xstartr,xendr
-    use ibm_param, only: ibmaskr, distbr
+    use ibm_param, only: ibmaskr
     implicit none
     real, dimension(nxr) :: amkl,apkl,ackl,fkl
-    integer :: jc,kc,info,ipkv(nxmr),ic,nrhs,km,kp,n
+    integer :: jc,kc,info,ipkv(nxmr),ic,km,kp,n
     real :: betadx,ackl_b
     real :: amkT(nxmr-1),ackT(nxmr),apkT(nxmr-1),appk(nxmr-2)
 
