@@ -14,17 +14,17 @@ subroutine calc_interface_height(ph, h)
     real :: dxx(nxmr)
     integer :: i,j,k,kp
 
-    h(:,:) = 1.0
+    h(:,:) = 0.0
 
     dxx = d3xcr(1:nxmr)/dxr
     do i=xstartr(3)-lvlhalo,xendr(3)+lvlhalo
         do j=xstartr(2)-lvlhalo,xendr(2)+lvlhalo
             do k=1,nxmr
-                ! h(j,i) = h(j,i) - ph(k,j,i)*dxx(k)
-                kp = k + 1
-                if (ph(k,j,i) < 0.5 .and. ph(kp,j,i) >= 0.5) then
-                    h(j,i) = xmr(k) + (xmr(kp) - xmr(k))*(0.5 - ph(k,j,i))/(ph(kp,j,i) - ph(k,j,i))
-                end if
+                h(j,i) = h(j,i) + ph(k,j,i)*dxx(k)
+                ! kp = k + 1
+                ! if (ph(k,j,i) <= 0.5 .and. ph(kp,j,i) > 0.5) then
+                !     h(j,i) = xmr(k) + (xmr(kp) - xmr(k))*(0.5 - ph(k,j,i))/(ph(kp,j,i) - ph(k,j,i))
+                ! end if
             end do
         end do
     end do
@@ -121,9 +121,9 @@ subroutine mask_above_height(h, ibmask, grd)
             ye = ym(j)
             if (grd=='y') ye = yc(j)
             do k=1,nxm
-                xe = xm(k)
-                if (grd=='x') xe = xc(k)
-                if (xe > h(j,i)) then
+                xe = alx3 - xm(k)
+                if (grd=='x') xe = alx3 - xc(k)
+                if (xe < h(j,i)) then
                     ibmask(k,j,i) = 0
                 end if
             end do
