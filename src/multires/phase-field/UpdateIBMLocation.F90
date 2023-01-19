@@ -6,9 +6,6 @@ subroutine UpdateIBMLocation
     use IBMTools
     
     ! Integrate phi vertically to calculate height profile for solid
-    ! call calc_interface_height(&
-    !     phi(:,xstartr(2)-lvlhalo:xendr(2)+lvlhalo,xstartr(3)-lvlhalo:xendr(3)+lvlhlo),&
-    !     solid_height)
     call calc_interface_height(phi,solid_height)
     ! if (ismaster) write(*,*) 'height at first index:', solid_height(1,1)
 
@@ -16,9 +13,12 @@ subroutine UpdateIBMLocation
     call interp_height_to_vel_grid(solid_height, height_vx, height_vy, height_vz)
 
     ! Build `ibmaskX` variables from height profile
-    call mask_below_height(height_vx, ibmaskx, 'x')
-    call mask_below_height(height_vy, ibmasky, 'y')
-    call mask_below_height(height_vz, ibmaskz, 'z')
+    ! call mask_below_height(height_vx, ibmaskx, 'x')
+    ! call mask_below_height(height_vy, ibmasky, 'y')
+    ! call mask_below_height(height_vz, ibmaskz, 'z')
+    call mask_above_height(height_vx, ibmaskx, 'x')
+    call mask_above_height(height_vy, ibmasky, 'y')
+    call mask_above_height(height_vz, ibmaskz, 'z')
 
     ! For each velocity grid, store the interpolation values for the boundary points
     call calc_IBM_interpolation(height_vx, ibmaskx, distx, 'x')
