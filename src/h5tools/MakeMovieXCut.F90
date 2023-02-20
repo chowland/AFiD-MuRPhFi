@@ -14,6 +14,7 @@ subroutine Mkmov_xcut
     use local_arrays, only: vz,vy,vx,temp
     use mgrd_arrays, only: sal,phi
     use h5_tools
+    use param, only: IBM
     implicit none
     character(70) :: filename
     character(4) :: varname
