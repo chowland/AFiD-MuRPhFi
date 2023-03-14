@@ -18,7 +18,7 @@ subroutine CreateICPF
     implicit none
 
     integer :: i,j,k,kmid
-    real :: r, x0, lambda, h0, t0, A, B, alpha
+    real :: r, x0, h0, t0, A, B, alpha
     real, dimension(11) :: yh, zh
 
     if (pf_IC == 1) then ! 1D freezing validation
