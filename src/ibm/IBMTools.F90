@@ -12,6 +12,7 @@ subroutine calc_interface_height(ph, h)
     !< input variable 
     real, intent(out) :: h(xstartr(2)-lvlhalo:,xstartr(3)-lvlhalo:)
     real :: dxx(nxmr)
+    integer :: i,j,k,kp
 
     h(:,:) = 0.0
 
@@ -20,6 +21,10 @@ subroutine calc_interface_height(ph, h)
         do j=xstartr(2)-lvlhalo,xendr(2)+lvlhalo
             do k=1,nxmr
                 h(j,i) = h(j,i) + ph(k,j,i)*dxx(k)
+                ! kp = k + 1
+                ! if (ph(k,j,i) <= 0.5 .and. ph(kp,j,i) > 0.5) then
+                !     h(j,i) = xmr(k) + (xmr(kp) - xmr(k))*(0.5 - ph(k,j,i))/(ph(kp,j,i) - ph(k,j,i))
+                ! end if
             end do
         end do
     end do
@@ -34,7 +39,7 @@ subroutine interp_height_to_vel_grid(hr, hcx, hcy, hcz)
 
     real :: hv2(4,4)
     real :: hv1(4)
-    integer :: icc, jcc
+    integer :: ic, jc, icr, jcr, icc, jcc
 
     do ic=xstart(3),xend(3)
         icr = krangs(ic)
@@ -58,12 +63,20 @@ subroutine interp_height_to_vel_grid(hr, hcx, hcy, hcz)
 
 end subroutine
 
+
+!> Takes an input height profile `h` (function of y and z)
+!>  and outputs a 3D integer array `ibmask` equal to 2 in liquid
+!> and equal to 0 in the solid phase
+!> grd should be 'x', 'y', or 'z' to denote whether the profile
+!> is on the grid for vx, vy, or vz
+!> ASSUMES SOLID BELOW LIQUID
 subroutine mask_below_height(h, ibmask, grd)
     real, intent(in) :: h(xstart(2):,xstart(3):)
     integer, intent(out) :: ibmask(1:,xstart(2):,xstart(3):)
     character, intent(in) :: grd
 
     real :: ze, ye, xe
+    integer :: i,j,k
 
     ibmask(:,:,:) = 2
 
@@ -85,13 +98,48 @@ subroutine mask_below_height(h, ibmask, grd)
 
 end subroutine mask_below_height
 
+!> Takes an input height profile `h` (function of y and z)
+!>  and outputs a 3D integer array `ibmask` equal to 2 in liquid
+!> and equal to 0 in the solid phase
+!> grd should be 'x', 'y', or 'z' to denote whether the profile
+!> is on the grid for vx, vy, or vz
+!> ASSUMES LIQUID BELOW SOLID
+subroutine mask_above_height(h, ibmask, grd)
+    real, intent(in) :: h(xstart(2):,xstart(3):)
+    integer, intent(out) :: ibmask(1:,xstart(2):,xstart(3):)
+    character, intent(in) :: grd
+
+    real :: ze, ye, xe
+    integer :: i,j,k
+
+    ibmask(:,:,:) = 2
+
+    do i=xstart(3),xend(3)
+        ze = zm(i)
+        if (grd=='z') ze = zc(i)
+        do j=xstart(2),xend(2)
+            ye = ym(j)
+            if (grd=='y') ye = yc(j)
+            do k=1,nxm
+                xe = alx3 - xm(k)
+                if (grd=='x') xe = alx3 - xc(k)
+                if (xe < h(j,i)) then
+                    ibmask(k,j,i) = 0
+                end if
+            end do
+        end do
+    end do
+
+end subroutine mask_above_height
+
 subroutine calc_IBM_interpolation(h, ibmask, dist, grd)
     real, intent(in) :: h(xstart(2):,xstart(3):)
     integer, intent(inout) :: ibmask(1:,xstart(2):,xstart(3):)
     real, intent(out) :: dist(:)
     character, intent(in) :: grd
 
-    integer :: n
+    real :: xe,ye,ze
+    integer :: i,j,k,km,kp,n
 
     n = 0
 
@@ -113,12 +161,21 @@ subroutine calc_IBM_interpolation(h, ibmask, dist, grd)
                     xep = xc(kp)
                 end if
 
+                ! Liquid over solid
                 if ((ibmask(k,j,i)==2) .and. (ibmask(km,j,i)==0)) then
                     n = n + 1
                     d1x = xep - xe
                     d2x = xe - h(j,i)
                     dist(n) = d2x/(d1x + d2x)
                     ibmask(k,j,i) = 1
+
+                ! Liquid under solid
+                elseif ((ibmask(k,j,i)==2) .and. (ibmask(kp,j,i)==0)) then
+                    n = n + 1
+                    d1x = xe - xem
+                    d2x = alx3 - h(j,i) - xe
+                    dist(n) = d2x/(d1x + d2x)
+                    ibmask(k,j,i) = -1
                 end if
             end do
         end do

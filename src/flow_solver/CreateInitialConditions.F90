@@ -391,20 +391,20 @@ subroutine CreateInitialConditions
             end if
         end if
 
-        if (IBM) then
-            do i=xstart(3),xend(3)
-                do j=xstart(2),xend(2)
-                    h0 = 0.25 + (ym(j) - 0.5)**2
-                    do k=1,nxm
-                        if (xm(k) < h0) then
-                            temp(k,j,i) = 0.0
-                        else
-                            temp(k,j,i) = 1.0
-                        end if
-                    end do
-                end do
-            end do
-        end if
+        ! if (IBM) then
+        !     do i=xstart(3),xend(3)
+        !         do j=xstart(2),xend(2)
+        !             h0 = 0.25 + (ym(j) - 0.5)**2
+        !             do k=1,nxm
+        !                 if (xm(k) < h0) then
+        !                     temp(k,j,i) = 0.0
+        !                 else
+        !                     temp(k,j,i) = 1.0
+        !                 end if
+        !             end do
+        !         end do
+        !     end do
+        ! end if
 
     end if
 

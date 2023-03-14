@@ -161,6 +161,8 @@ program AFiD
     if (multires) call CreateMgrdStencil
     if (phasefield .and. IBM) call CreatePFStencil
 
+    if (phasefield) call update_halo(phi,lvlhalo)
+
     if (IBM) then
         call topogr
         if (phasefield) call UpdateIBMLocation
@@ -172,7 +174,6 @@ program AFiD
     call update_halo(vz,lvlhalo)
     call update_halo(temp,lvlhalo)
     if (salinity) call update_halo(sal,lvlhalo)
-    if (phasefield) call update_halo(phi,lvlhalo)
     call update_halo(pr,lvlhalo)
 
 
