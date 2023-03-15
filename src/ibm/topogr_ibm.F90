@@ -624,6 +624,7 @@ subroutine topogr
         !
         n = 0
         ibmaskr(:,:,:) = 2
+        solidr(:,:,:) = .false.
 
         do i=xstartr(3)-1,xendr(3)+1
             ze = zmr(i)
