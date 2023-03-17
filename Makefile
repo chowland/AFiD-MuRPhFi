@@ -16,9 +16,13 @@ MACHINE=PC_GNU
 OBJDIR=obj
 
 ifeq ($(MACHINE),PC_GNU)
-	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -O3
+	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -fallow-argument-mismatch -O3
+	# FC += -O0 -g -fbacktrace -Wall -Wextra
+	# FC += -Wpedantic
+	# FC += -Warray-temporaries
+	# FC += -fcheck=all -finit-real=snan -ffpe-trap=invalid #-std=f2018
 	# FC += -pg -fbacktrace -fbounds-check
-	LDFLAGS = -lfftw3 -llapack -lblas -ldl
+	LDFLAGS = -L$(HOME)/fftw-install/lib -lfftw3 -llapack -lblas -ldl
 endif
 ifeq ($(MACHINE),PC_INTEL)
 	FC = h5pfc -fpp -r8 -O3
