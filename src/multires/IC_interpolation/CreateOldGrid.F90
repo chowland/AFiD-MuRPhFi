@@ -15,13 +15,6 @@ subroutine CreateOldGrid
     use GridModule
     implicit none
 
-    real :: x1, x2, x3
-    real :: delet, etain, tstr3, z2dp
-
-    real, allocatable, dimension(:) :: etaz, etazm
-
-    integer :: i, j, k, nxp, nclip
-
     nxmo = nxo - 1
     nymo = nyo - 1
     nzmo = nzo - 1
