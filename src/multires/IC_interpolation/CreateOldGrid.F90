@@ -58,6 +58,22 @@ subroutine CreateOldGrid
         if (istr3ro==1) call centre_focus_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3,str3o)
     end if
 
+    ! Option 2: Natural turb BL clustering
+
+    if (istr3o==2) call natural_BL_grid(xco(1:nxo),xmo(1:nxmo),nxmo,alx3)
+
+    if (multires) then
+        if (istr3ro==2) call natural_BL_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3)
+    end if
+
+    ! Option 3: Symmetric natural turb BL clustering
+
+    if (istr3o==3) call sym_natural_BL_grid(xco(1:nxo),xmo(1:nxmo),nxmo,alx3, 1.0)
+
+    if (multires) then
+        if (istr3ro==3) call sym_natural_BL_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3, 1.0)
+    end if
+
     ! Option 4: Hyperbolic tangent-type clustering
 
     if (istr3o==4) call tanh_grid(xco(1:nxo),xmo(1:nxmo),nxmo,alx3,str3o)
