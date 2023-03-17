@@ -15,7 +15,7 @@ subroutine CreateICSal
     use mpih
     implicit none
     integer :: i,k,j, kmid
-    real :: xxx,yyy,eps,varptb,amp
+    real :: eps,varptb,amp
     real :: gamma, t0, x0, h0, A, B, alpha
     real, dimension(11) :: yh, zh
 

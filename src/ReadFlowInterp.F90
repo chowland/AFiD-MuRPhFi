@@ -13,8 +13,6 @@ subroutine ReadFlowInterp(prow,pcol)
 
     character*70 :: filnam,dsetname
 
-    integer :: i, j, k, ic, jc, kc
-
     real :: yleno, zleno
 
     logical :: fexist

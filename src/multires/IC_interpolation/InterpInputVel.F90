@@ -12,9 +12,8 @@ subroutine InterpInputVel
 
     integer  :: ic,jc,kc, ip,jp,kp, icr,jcr,kcr
     integer  :: jc0,jcr0, ic0,icr0
-    integer  :: comm_col,comm_row,comm,ierror
+    integer  :: comm_col,comm_row,ierror
 
-    real,dimension(4,4,4) :: qv3 
     real,dimension(4,4) :: qv2
     real,dimension(4) :: qv1
 

@@ -17,10 +17,7 @@ subroutine ImplicitAndUpdateSal
     use ibm_param
     implicit none
     integer :: jc,kc,ic
-    integer :: km,kp,ke
     real    :: alpec,dxxs
-    real    :: app,acc,amm
-    real    :: usaldto,sale
 
     alpec=al/pecs
 
@@ -40,24 +37,24 @@ subroutine ImplicitAndUpdateSal
 !   Calculate second derivative of salinty in the x-direction.
 !   This is the only term calculated implicitly for salinity.
                 if (kc.eq.1) then       !CJH Apply lower BC
-                    dxxs = sal(kc+1,jc,ic)*ap3sskr(kc) &
-                            + sal(kc,jc,ic)*ac3sskr(kc) &
-                            - (ap3sskr(kc) + ac3sskr(kc))*salbp(1,jc,ic)*SfixS
+                    dxxs= sal(kc+1,jc,ic)*ap3sskr(kc) &
+                        + sal(kc  ,jc,ic)*ac3sskr(kc) &
+                        - (ap3sskr(kc) + ac3sskr(kc))*salbp(1,jc,ic)*SfixS
                 elseif(kc.eq.nxmr) then !CJH Apply upper BC
-                    dxxs = sal(kc,jc,ic)*ac3sskr(kc) &
-                            + sal(kc-1,jc,ic)*am3sskr(kc) &
-                            - (am3sskr(kc) + ac3sskr(kc))*saltp(1,jc,ic)*SfixN
+                    dxxs= sal(kc  ,jc,ic)*ac3sskr(kc) &
+                        + sal(kc-1,jc,ic)*am3sskr(kc) &
+                        - (am3sskr(kc) + ac3sskr(kc))*saltp(1,jc,ic)*SfixN
                 else
-                    dxxs = sal(kc+1,jc,ic)*ap3sskr(kc) &
-                            + sal(kc  ,jc,ic)*ac3sskr(kc) &
-                            + sal(kc-1,jc,ic)*am3sskr(kc)
+                    dxxs= sal(kc+1,jc,ic)*ap3sskr(kc) &
+                        + sal(kc  ,jc,ic)*ac3sskr(kc) &
+                        + sal(kc-1,jc,ic)*am3sskr(kc)
                 end if
 
 
 !    Calculate right hand side of Eq. 5 (VO96)
 
                 rhsr(kc,jc,ic) = (ga*hsal(kc,jc,ic) + ro*rusal(kc,jc,ic) &
-                        + alpec*dxxs)*dt
+                                + alpec*dxxs)*dt
 
 !    Store the non-linear terms for the calculation of 
 !    the next timestep

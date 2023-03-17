@@ -11,18 +11,14 @@ subroutine InterpTempMgrd
 
     use param
     use local_arrays, only: temp
-    use mgrd_arrays, only: tempr,cxrs,cyrs,czrs,irangs,jrangs,krangs,tpdv
+    use mgrd_arrays, only: tempr,tpdv
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
     use HermiteInterpolations, only: interpolate_xyz_to_refined
     implicit none
 
-    integer :: ic,jc,kc,icr,jcr,kcr
-
-    real,dimension(4,4,4) :: qv3 
-    real,dimension(4,4) :: qv2
-    real,dimension(4) :: qv1
+    integer :: ic,jc,kc
 
     tempr(:,:,:) = 0.d0
 
