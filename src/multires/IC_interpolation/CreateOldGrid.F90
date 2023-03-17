@@ -82,6 +82,14 @@ subroutine CreateOldGrid
         if (istr3ro==4) call tanh_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3,str3o)
     end if
 
+    ! Option 5: Scallop-focused wall clustering
+
+    if (istr3==5) call scallop_grid(xco(1:nxo), xmo(1:nxmo), nxmo, alx3, dPdy, 0.5)
+
+    if (multires) then
+        if (istr3ro==5) call scallop_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3,dPdy, 0.5)
+    end if
+
     ! Option 6: Clipped Chebychev-type clustering
 
     if (istr3o==6) call cheb_grid(xco(1:nxo),xmo(1:nxmo),nxmo,alx3,str3o)

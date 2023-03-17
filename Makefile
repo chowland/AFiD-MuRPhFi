@@ -1,6 +1,6 @@
 # Choose the machine being used
 # Options: PC_GNU, PC_INTEL, (i)SNELLIUS, IRENE(_SKL/_ROME), MARENOSTRUM, SUPERMUC
-MACHINE=PC_GNU
+MACHINE=IRENE_SKL
 # Modules required for each HPC system as follows:
 # SNELLIUS: 2022 foss/2022a HDF5/1.12.2-gompi-2022a
 # iSNELLIUS: 2022 intel/2022a FFTW/3.3.10-GCC-11.3.0 HDF5/1.12.2-iimpi-2021a

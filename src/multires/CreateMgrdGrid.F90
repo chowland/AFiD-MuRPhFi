@@ -70,6 +70,11 @@ subroutine CreateMgrdGrid
     if (istr3r==4) call tanh_grid(xcr(1:nxr),xmr(1:nxmr),nxmr,alx3,str3)
 
 !
+!   OPTION 5: SCALLOP-FOCUSED LOWER WALL CLUSTERING
+!
+    if (istr3==5) call scallop_grid(xcr(1:nxr), xmr(1:nxmr), nxmr, alx3, dPdy, 0.5)
+
+!
 !     OPTION 6: CLIPPED CHEBYCHEV-TYPE CLUSTERING
 !
 

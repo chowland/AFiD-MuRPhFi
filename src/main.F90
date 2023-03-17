@@ -15,6 +15,7 @@ program AFiD
     real    :: instCFL,CFLmr,dmax,dmaxr
     real    :: ti(2), tin(3), minwtdt
     real :: ts!, varptb,chksum
+    real :: td(2)   !< debugging time measure
     integer :: prow=0,pcol=0
     integer :: lfactor,lfactor2
     character(100) :: arg
@@ -211,7 +212,12 @@ program AFiD
     end if
     
     if (ismaster) write(*,*) "Writing 3D fields"
+    call MpiBarrier
+    td(1) = MPI_WTIME()
     call WriteFlowField(.false.)
+    call MpiBarrier
+    td(2) = MPI_WTIME()
+    if (ismaster) write(*,*) "Flow field writing took: ",td(2)-td(1)
 
 !EP   Check divergence. Should be reduced to machine precision after the first
 !phcalc. Here it can still be high.

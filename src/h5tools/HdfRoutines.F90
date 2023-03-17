@@ -492,8 +492,11 @@
 
       call h5pclose_f(plist_id, hdf_error)
 
+      ! call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, hdf_error)
+      ! call h5pset_chunk_f(plist_id, ndims, data_count, hdf_error)
       call h5dcreate_f(file_id, 'var', H5T_NATIVE_DOUBLE, &
      &                filespace, dset, hdf_error)
+      ! call h5pclose_f(plist_id, hdf_error)
 
       call h5screate_simple_f(ndims, data_count, memspace, hdf_error) 
 
