@@ -1,12 +1,17 @@
 # Choose the machine being used
 # Options: PC_GNU, PC_INTEL, (i)SNELLIUS, IRENE(_SKL/_ROME), MARENOSTRUM, SUPERMUC
-MACHINE=IRENE_SKL
+MACHINE=PC
+FLAVOUR=GNU
 # Modules required for each HPC system as follows:
-# SNELLIUS: 2022 foss/2022a HDF5/1.12.2-gompi-2022a
-# iSNELLIUS: 2022 intel/2022a FFTW/3.3.10-GCC-11.3.0 HDF5/1.12.2-iimpi-2021a
-# IRENE: flavor/hdf5/parallel hdf5 fftw3/gnu
-# MARENOSTRUM: fabric intel mkl impi hdf5 fftw szip
-# SUPERMUC: fftw hdf5
+# SNELLIUS:
+#	GNU: 2022 foss/2022a HDF5/1.12.2-gompi-2022a
+# 	Intel: 2022 intel/2022a FFTW/3.3.10-GCC-11.3.0 HDF5/1.12.2-iimpi-2021a
+# IRENE (Intel): flavor/hdf5/parallel hdf5 fftw3/gnu
+# MARENOSTRUM (Intel): fabric intel mkl impi hdf5 fftw szip
+# SUPERMUC (Intel): fftw hdf5
+# DISCOVERER:
+#	GNU: hdf5/1/1.14/latest-gcc-openmpi fftw/3/latest-gcc-openmpi lapack
+#	Intel: hdf5/1/1.14/latest-intel-openmpi fftw/3/latest-gcc-openmpi mkl
 
 #=======================================================================
 #  Compiler options
@@ -15,43 +20,49 @@ MACHINE=IRENE_SKL
 # Object and module directory:
 OBJDIR=obj
 
-ifeq ($(MACHINE),PC_GNU)
-	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -fallow-argument-mismatch -O3
-	# FC += -O0 -g -fbacktrace -Wall -Wextra
-	# FC += -Wpedantic
-	# FC += -Warray-temporaries
-	# FC += -fcheck=all -finit-real=snan -ffpe-trap=invalid #-std=f2018
-	# FC += -pg -fbacktrace -fbounds-check
-	LDFLAGS = -L$(HOME)/fftw-install/lib -lfftw3 -llapack -lblas -ldl
+ifeq ($(FLAVOUR),GNU)
+	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -fallow-argument-mismatch
+else
+	FC = h5pfc -fpp -r8
 endif
-ifeq ($(MACHINE),PC_INTEL)
-	FC = h5pfc -fpp -r8 -O3
-## Traceback / Debug
-# FC += -r8 -O0 -g -traceback -check bounds 
-# FC += -DSHM -DSHM_DEBUG
-	LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -lhdf5 -lsz -lz -ldl -lm
+
+ifeq ($(MACHINE),PC)
+# GNU Debug Flags
+# FC += -O0 -g -fbacktrace -Wall -Wextra
+# FC += -Wpedantic
+# FC += -Warray-temporaries
+# FC += -fcheck=all -finit-real=snan -ffpe-trap=invalid #-std=f2018
+# FC += -pg -fbacktrace -fbounds-check
+# Intel Debug Flags
+# FC += -O0 -g -traceback -check bounds
+	ifeq ($(FLAVOUR),GNU)
+		LDFLAGS = -L$(HOME)/fftw-install/lib -lfftw3 -llapack -ldl
+	else
+		LDFLAGS = -lfftw3 -qmkl=sequential
+	endif
 endif
-ifeq ($(MACHINE),iSNELLIUS)
-	FC = h5pfc -fpp -r8 -O3 -align array64byte -fma -ftz -fomit-frame-pointer
-	LDFLAGS = -lfftw3 -qmkl=sequential
+ifeq ($(MACHINE),DISCOVERER)
+	ifeq ($(FLAVOUR),GNU)
+		LDFLAGS += -lfftw3 -llapack -ldl
+	else
+		LDFLAGS += -lfftw3 -qmkl=sequential
+	endif
 endif
 ifeq ($(MACHINE),SNELLIUS)
-	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -w -fallow-argument-mismatch
-	FC += -O2 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer
-	BLAS_LIBS = -lscalapack -lopenblas -ldl
-	LDFLAGS = -lfftw3 $(BLAS_LIBS)
+	ifeq ($(FLAVOUR),GNU)
+		FC += -O2 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer
+		LDFLAGS = -lfftw3 -lopenblas -ldl
+	else
+		FC += -align array64byte -fma -ftz -fomit-frame-pointer
+		LDFLAGS = -lfftw3 -qmkl=sequential
+	endif
 endif
-ifeq ($(MACHINE),IRENE_SKL)
-	FC = h5pfc -fpp -r8 -O3 -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW3_FFLAGS)
+ifeq ($(MACHINE),IRENE)
+	FC += -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW3_FFLAGS)
 	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) -ldl
 endif
-ifeq ($(MACHINE),IRENE_ROME)
-	FC = h5pfc -fpp -r8 -O3 -mavx2 $(FFTW3_FFLAGS)
-	HDF5_LIBS = -lhdf5_fortran -lhdf5 -lz -ldl -lm
-	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) $(HDF5_LIBS)
-endif
 ifeq ($(MACHINE),MARENOSTRUM)
-	FC = h5pfc -fpp -r8 -O3 -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW_FFLAGS)
+	FC += -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW_FFLAGS)
 	LDFLAGS = $(FFTW_LIBS) -mkl=sequential
 endif
 ifeq ($(MACHINE),SUPERMUC)
@@ -59,14 +70,10 @@ ifeq ($(MACHINE),SUPERMUC)
 	LDFLAGS = $(FFTW_LIB) $(HDF5_F90_SHLIB) $(HDF5_SHLIB) -qmkl=sequential
 endif
 
-ifeq ($(MACHINE),SNELLIUS)
+ifeq ($(FLAVOUR),GNU)
 	FC += -J $(OBJDIR)
 else
-	ifeq ($(MACHINE),PC_GNU)
-		FC += -J $(OBJDIR)
-	else
-		FC += -module $(OBJDIR)
-	endif
+	FC += -module $(OBJDIR)
 endif
 
 #=======================================================================
