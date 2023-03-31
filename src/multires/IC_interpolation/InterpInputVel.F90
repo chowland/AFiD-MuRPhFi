@@ -26,7 +26,7 @@ subroutine InterpInputVel
       !-- Allocate temporary arrays for velocities and gradients
     real,allocatable,dimension(:,:) :: dvyloc,dvybot, dvzloc,dvzbot
 
-    call AllocateReal3DArray(tpdvo,-1,nx+1, &
+    call AllocateReal3DArray(tpdvo,-1,nxo+1, &
             xstarto(2)-2,xendo(2)+2,xstarto(3)-2,xendo(3)+2)
 
     tpdvo(:,:,:) = 0.d0     ! Temporary gradient array - old
@@ -113,8 +113,8 @@ subroutine InterpInputVel
 
             !-- Boundary points, enforce zero velocity
             !CJH e.g. v=0 on x=0 => dv/dy=0 on x=0
-            tpdvo(0,jc,ic) = -tpdvo(1,jc,ic)
-            tpdvo(nxo,jc,ic) = -tpdvo(nxmo,jc,ic)
+            tpdvo(0,jc,ic) = (1-2*inslwS)*tpdvo(1,jc,ic)
+            tpdvo(nxo,jc,ic) = (1-2*inslwN)*tpdvo(nxmo,jc,ic)
 
         enddo
     enddo
@@ -135,8 +135,8 @@ subroutine InterpInputVel
                 vyxzc(kc,ic)=vyo(kc,jc0,ic) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
             enddo
             ! x boundaries
-            vyxzc(0,ic) = -vyxzc(1,ic)
-            vyxzc(nxo,ic) = -vyxzc(nxmo,ic)
+            vyxzc(0,ic) = (1-2*inslwS)*vyxzc(1,ic)
+            vyxzc(nxo,ic) = (1-2*inslwN)*vyxzc(nxmo,ic)
         enddo
 
         do ic=xstarto(3)-1,xendo(3)
