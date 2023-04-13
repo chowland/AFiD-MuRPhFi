@@ -113,6 +113,6 @@ subroutine InitMgrdVariables
     call AllocateReal3DArray(tpdvr,-1,nxr+1,xstartr(2)-2,xendr(2)+2,xstartr(3)-2,xendr(3)+2)
 
     ! RHS array without ghost cells
-    call AllocateReal3DArray(rhsr,1,nxr,xstartr(2),xendr(2),xstartr(3),xendr(3))
+    call AllocateReal3DArray(rhsr,1,nxmr,xstartr(2),xendr(2),xstartr(3),xendr(3))
     return
 end subroutine InitMgrdVariables

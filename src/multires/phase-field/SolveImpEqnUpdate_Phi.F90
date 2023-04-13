@@ -50,7 +50,7 @@ subroutine SolveImpEqnUpdate_Phi
         end do
     end do
 
-    call dgttrs('N',nxmr,nrhs,amkT,ackT,apkT,appk,ipkv,rhsr(1:nxmr,:,:),nxmr,info)
+    call dgttrs('N',nxmr,nrhs,amkT,ackT,apkT,appk,ipkv,rhsr,nxmr,info)
 
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
