@@ -13,6 +13,7 @@
       use param
       use decomp_2d, only: nrank, decomp_2d_finalize
       use decomp_2d_fft
+      use moisture, only: DeallocateMoistVariables
       implicit none
       logical, intent(in) :: normalexit
       integer :: errorcode
@@ -38,6 +39,7 @@
       if (salinity) call DeallocateSalVariables
       if (phasefield) call DeallocatePFVariables
       if (IBM) call DeallocateIBMVariables
+      if (moist) call DeallocateMoistVariables
       call HdfClose
       call decomp_2d_fft_finalize
       call decomp_2d_finalize

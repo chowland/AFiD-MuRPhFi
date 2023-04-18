@@ -17,6 +17,7 @@ subroutine TimeMarcher
     use mpih
     use decomp_2d
     use ibm_param, only: aldto
+    use moisture
     implicit none
     integer :: ns
     integer :: j,k,i
@@ -43,6 +44,8 @@ subroutine TimeMarcher
         call ExplicitTermsVZ
         call ExplicitTermsTemp
 
+        if (moist) call ExplicitHumidity
+
         if (phasefield) call ExplicitTermsPhi
         ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-implicit'
         if (phasefield) call ImplicitAndUpdatePhi
@@ -52,6 +55,8 @@ subroutine TimeMarcher
         ! varaible rhsr used to store d(phi)/dt for the following subroutines
         if (salinity) call ExplicitTermsSal !Refined
         if (phasefield) call AddLatentHeat
+
+        if (moist) call AddCondensation
 
         ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX pre-implicit',ns
         ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY pre-implicit',ns
@@ -66,6 +71,8 @@ subroutine TimeMarcher
         call ImplicitAndUpdateVZ
         call ImplicitAndUpdateTemp
         if (salinity) call ImplicitAndUpdateSal !Refined
+
+        if (moist) call ImplicitHumidity
 
         ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX post-implicit',ns
         ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY post-implicit',ns
@@ -106,6 +113,7 @@ subroutine TimeMarcher
         call update_halo(temp,lvlhalo)
         if (salinity) call update_halo(sal,lvlhalo)
         if (phasefield) call update_halo(phi,lvlhalo)
+        if (moist) call update_halo(humid,lvlhalo)
 
         if (salinity) then
             call InterpVelMgrd !Vel from base mesh to refined mesh
@@ -122,6 +130,8 @@ subroutine TimeMarcher
             call InterpPhiMgrd
             call update_halo(phic,lvlhalo)
         end if
+
+        if (moist) call UpdateSaturation
 
         ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX',ns
         ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY',ns

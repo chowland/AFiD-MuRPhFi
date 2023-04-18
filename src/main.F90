@@ -7,6 +7,7 @@ program AFiD
     use hdf5
     use decomp_2d
     use decomp_2d_fft
+    use moisture
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
 !$    use omp_lib
@@ -27,6 +28,9 @@ program AFiD
 !******* Read input file bou.in by all processes********
 !*******************************************************
 !
+
+    moist = .true.
+
     call ReadInputFile
     if (nzm==1 .or. nym==1) write_mean_planes = .false.
 
@@ -89,6 +93,7 @@ program AFiD
     if (multires) call InitMgrdVariables  !CS mgrd
     if (salinity) call InitSalVariables
     if (phasefield) call InitPFVariables
+    if (moist) call InitMoistVariables
 
     call CreateGrid
     if (multires) call CreateMgrdGrid     !CS mgrd
@@ -137,6 +142,7 @@ program AFiD
     call InitPressureSolver
     call SetTempBCs
     if (salinity) call SetSalBCs
+    if (moist) call SetHumidityBCs
 
     if(readflow) then
 
@@ -155,6 +161,7 @@ program AFiD
         call CreateInitialConditions
         if (salinity) call CreateICSal
         if (phasefield) call CreateICPF
+        if (moist) call CreateInitialHumidity
 
     endif
 
@@ -176,6 +183,7 @@ program AFiD
     call update_halo(temp,lvlhalo)
     if (salinity) call update_halo(sal,lvlhalo)
     call update_halo(pr,lvlhalo)
+    if (moist) call update_halo(humid,lvlhalo)
 
 
 !CS   Interpolate initial values

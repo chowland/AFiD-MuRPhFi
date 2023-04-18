@@ -132,13 +132,14 @@ OBJS += obj/mean_zplane.o
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
 	obj/HermiteInterpolations.o obj/GridModule.o obj/h5_tools.o obj/means.o \
-	obj/ibm_param.o obj/IBMTools.o
+	obj/ibm_param.o obj/IBMTools.o obj/moisture.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
-	HermiteInterpolations.F90 GridModule.F90 ibm_param.F90 IBMTools.F90
+	HermiteInterpolations.F90 GridModule.F90 ibm_param.F90 IBMTools.F90 \
+	moisture.F90
 
 #============================================================================ 
 #  make PROGRAM   
@@ -188,6 +189,8 @@ $(OBJDIR)/%.o: src/multires/phase-field/%.F90 $(MOBJS)
 $(OBJDIR)/%.o: src/multires/salinity/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/ibm/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: src/moist/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 
 #============================================================================

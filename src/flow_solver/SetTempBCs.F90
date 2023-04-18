@@ -56,6 +56,15 @@ subroutine SetTempBCs
             end do
         end if
     end if
+
+    if (moist) then
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                tempbp(1,jc,ic) = 0.0
+                temptp(1,jc,ic) = -1.0
+            end do
+        end do
+    end if
     
     call update_halo(temptp,lvlhalo)
     call update_halo(tempbp,lvlhalo)
