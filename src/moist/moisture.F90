@@ -89,7 +89,8 @@ subroutine CreateInitialHumidity
                 call random_number(rnum)
                 r = sqrt((ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2)
                 ! humid(kc,jc,ic) = humbp(1,jc,ic) + (humtp(1,jc,ic) - humbp(1,jc,ic))*xm(kc)
-                humid(kc,jc,ic) = qsat(kc,jc,ic)*0.5*(1.0 - tanh(100*(r - 0.1)))
+                ! humid(kc,jc,ic) = 1.1*qsat(kc,jc,ic)*0.5*(1.0 - tanh(100*(r - 0.1)))
+                humid(kc,jc,ic) = 0.5*(1.0 - tanh(100*(r - 0.1)))
                 ! humid(kc,jc,ic) = humid(kc,jc,ic) + 1e-3*rnum
                 ! humid(kc,jc,ic) = temp(kc,jc,ic)
             end do
