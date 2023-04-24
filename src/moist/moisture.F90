@@ -77,15 +77,19 @@ end subroutine SetHumidityBCs
 
 subroutine CreateInitialHumidity
     integer :: ic, jc, kc
-    real :: rnum
+    real :: rnum, r
 
     call random_seed()
+
+    call UpdateSaturation
 
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
             do kc=1,nxm
                 call random_number(rnum)
-                humid(kc,jc,ic) = humbp(1,jc,ic) + (humtp(1,jc,ic) - humbp(1,jc,ic))*xm(kc)
+                r = sqrt((ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2)
+                ! humid(kc,jc,ic) = humbp(1,jc,ic) + (humtp(1,jc,ic) - humbp(1,jc,ic))*xm(kc)
+                humid(kc,jc,ic) = qsat(kc,jc,ic)*0.5*(1.0 - tanh(100*(r - 0.1)))
                 ! humid(kc,jc,ic) = humid(kc,jc,ic) + 1e-3*rnum
                 ! humid(kc,jc,ic) = temp(kc,jc,ic)
             end do
@@ -93,8 +97,6 @@ subroutine CreateInitialHumidity
     end do
 
     call update_halo(humid,lvlhalo)
-
-    call UpdateSaturation
 
 end subroutine CreateInitialHumidity
 
@@ -316,6 +318,9 @@ subroutine CalcMoistStats
     inyzm = 1.0/nym/nzm
 
     filename = trim("outputdir/means.h5")
+
+    qbar(:) = 0.0;  qsbar(:) = 0.0;     qrms(:) = 0.0;      qrel(:) = 0.0
+    vxq(:) = 0.0;   vyq(:) = 0.0;       vzq(:) = 0.0
 
     do i=xstart(3),xend(3)
         ip = i + 1
