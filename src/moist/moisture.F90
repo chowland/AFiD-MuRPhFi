@@ -160,10 +160,10 @@ subroutine ExplicitHumidity
                 rkhumid(kc,jc,ic) = kappa_q*(dyyq + dzzq)
 
                 ! add -(q-q_s)/tau H(q-q_s) to rhs
-                ! if (humid(kc,jc,ic) > qsat(kc,jc,ic)) then
-                !     condensation = (qsat(kc,jc,ic) - humid(kc,jc,ic))*itau
-                !     rkhumid(kc,jc,ic) = rkhumid(kc,jc,ic) + condensation
-                ! end if
+                if (humid(kc,jc,ic) > qsat(kc,jc,ic)) then
+                    condensation = (qsat(kc,jc,ic) - humid(kc,jc,ic))*itau
+                    rkhumid(kc,jc,ic) = rkhumid(kc,jc,ic) + condensation
+                end if
 
             end do
         end do
