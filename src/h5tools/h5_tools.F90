@@ -1,7 +1,7 @@
 module h5_tools
     use HDF5
     use mpih, only: MPI_INFO_NULL
-    use param, only: salinity, phasefield, nx, nxm, nym, nzm, time, tframe, nxmr, nymr, nzmr, IBM
+    use param, only: salinity, phasefield, nx, nxm, nym, nzm, time, tframe, nxmr, nymr, nzmr, IBM, moist
     use decomp_2d, only: xstart, xstartr
     implicit none
 
@@ -55,6 +55,11 @@ subroutine h5_add_slice_groups(file_id)
 
     if (phasefield) then
         call h5gcreate_f(file_id, "phi", group_id, hdf_error)
+        call h5gclose_f(group_id, hdf_error)
+    end if
+
+    if (moist) then
+        call h5gcreate_f(file_id, "qhum", group_id, hdf_error)
         call h5gclose_f(group_id, hdf_error)
     end if
 end subroutine
