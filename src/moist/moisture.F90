@@ -292,4 +292,118 @@ subroutine SolveImpEqnUpdate_Humidity
     
 end subroutine SolveImpEqnUpdate_Humidity
 
+!> Calculate vertical profiles of moisture-related statistics and
+!! store them in means.h5
+subroutine CalcMoistStats
+
+    real, dimension(nxm) :: qbar    !! Horizontally-averaged specific humidity
+    real, dimension(nxm) :: qrms    !! Horizontally-averaged rms humidity
+    real, dimension(nxm) :: qsbar   !! Horizontally-averaged saturation humidity
+    real, dimension(nxm) :: qrel    !! Horizontally-averaged relative humidity (q/qs)
+
+    real, dimension(nxm) :: vxq     !! Advective flux of moisture (x)
+    real, dimension(nxm) :: vyq     !! Advective flux of moisture (y)
+    real, dimension(nxm) :: vzq     !! Advective flux of moisture (z)
+
+    real :: inyzm   !! 1.0/nym/nzm
+
+    character(30) :: dsetname   !! Dataset name for HDF5 file
+    character(30) :: filename   !! HDF5 file name for statistic storage
+    character( 5) :: nstat      !! Character string of statistic index
+
+    integer :: i, j, k, ip, jp
+
+    inyzm = 1.0/nym/nzm
+
+    filename = trim("outputdir/means.h5")
+
+    do i=xstart(3),xend(3)
+        ip = i + 1
+        do j=xstart(2),xend(2)
+            jp = j + 1
+            do k=1,nxm
+                qbar(k) = qbar(k) + humid(k,j,i)
+                qsbar(k) = qsbar(k) + qsat(k,j,i)
+                qrms(k) = qrms(k) + humid(k,j,i)**2
+                qrel(k) = qrel(k) + humid(k,j,i)/qsat(k,j,i)
+                vxq(k) = vxq(k) + 0.5*(vx(k,j,i) + vx(k+1,j,i))*humid(k,j,i)
+                vyq(k) = vyq(k) + 0.5*(vy(k,j,i) + vy(k,j,i))*humid(k,j,i)
+                vzq(k) = vzq(k) + 0.5*(vz(k,j,i) + vz(k,j,i))*humid(k,j,i)
+            end do
+        end do
+    end do
+
+    call MpiSumReal1D(qbar,nxm)
+    call MpiSumReal1D(qsbar,nxm)
+    call MpiSumReal1D(qrms,nxm)
+    call MpiSumReal1D(qrel,nxm)
+    call MpiSumReal1D(vxq,nxm)
+    call MpiSumReal1D(vyq,nxm)
+    call MpiSumReal1D(vzq,nxm)
+
+    do k=1,nxm
+        qbar(k) = qbar(k)*inyzm
+        qsbar(k) = qsbar(k)*inyzm
+        qrms(k) = sqrt(qrms(k)*inyzm)
+        qrel(k) = qrel(k)*inyzm
+        vxq(k) = vxq(k)*inyzm
+        vyq(k) = vyq(k)*inyzm
+        vzq(k) = vzq(k)*inyzm
+    end do
+
+    ! Store index as character string
+    write(nstat,"(i5.5)")nint(time/tout)
+
+    
+    if (ismaster) then
+        dsetname = trim("qbar/"//nstat)
+        call HdfSerialWriteReal1D(dsetname, filename, qbar, nxm)
+        dsetname = trim("qsbar/"//nstat)
+        call HdfSerialWriteReal1D(dsetname, filename, qsbar, nxm)
+        dsetname = trim("qrms/"//nstat)
+        call HdfSerialWriteReal1D(dsetname, filename, qrms, nxm)
+        dsetname = trim("qrel/"//nstat)
+        call HdfSerialWriteReal1D(dsetname, filename, qrel, nxm)
+        dsetname = trim("vxq/"//nstat)
+        call HdfSerialWriteReal1D(dsetname, filename, vxq, nxm)
+        dsetname = trim("vyq/"//nstat)
+        call HdfSerialWriteReal1D(dsetname, filename, vyq, nxm)
+        dsetname = trim("vzq/"//nstat)
+        call HdfSerialWriteReal1D(dsetname, filename, vzq, nxm)
+    end if
+
+    call MpiBarrier
+
+end subroutine CalcMoistStats
+
+!> Create the groups in the means.h5 file to store the
+!! moist-related statistics
+subroutine CreateMoistH5Groups(filename)
+    use HDF5
+    
+    character(30), intent(in) :: filename
+    integer(HID_T) :: file_id, group_id
+    integer :: hdf_error
+
+    call h5fopen_f(filename, H5F_ACC_RDWR_F, file_id, hdf_error)
+
+    call h5gcreate_f(file_id, "qbar", group_id, hdf_error)
+    call h5gclose_f(group_id, hdf_error)
+    call h5gcreate_f(file_id, "qsbar", group_id, hdf_error)
+    call h5gclose_f(group_id, hdf_error)
+    call h5gcreate_f(file_id, "qrms", group_id, hdf_error)
+    call h5gclose_f(group_id, hdf_error)
+    call h5gcreate_f(file_id, "qrel", group_id, hdf_error)
+    call h5gclose_f(group_id, hdf_error)
+    call h5gcreate_f(file_id, "vxq", group_id, hdf_error)
+    call h5gclose_f(group_id, hdf_error)
+    call h5gcreate_f(file_id, "vyq", group_id, hdf_error)
+    call h5gclose_f(group_id, hdf_error)
+    call h5gcreate_f(file_id, "vzq", group_id, hdf_error)
+    call h5gclose_f(group_id, hdf_error)
+
+    call h5fclose_f(file_id, hdf_error)
+
+end subroutine CreateMoistH5Groups
+
 end module moisture

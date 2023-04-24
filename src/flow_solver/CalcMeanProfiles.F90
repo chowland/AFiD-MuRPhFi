@@ -16,6 +16,7 @@ subroutine CalcMeanProfiles
     use mpih
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use ibm_param, only: solidr
+    use moisture, only: CalcMoistStats, CreateMoistH5Groups
     
     implicit none
 
@@ -28,9 +29,12 @@ subroutine CalcMeanProfiles
     real, dimension(nxm) :: vybar, vzbar
     real, dimension(nxm) :: epsilon
     real, dimension(nxm) :: vxvy, vxvz, vyvz
+    ! Salinity statistics
     real, dimension(nxmr) :: Sbar, Srms, chiS
     real, dimension(nxmr) :: vxS, vyS, vzS
+    ! Phase-field statistics
     real, dimension(nxmr) :: phibar, phirms
+
     character(5) :: nstat
     character(30) :: dsetname,filename
     logical :: fexist
@@ -380,6 +384,7 @@ subroutine CalcMeanProfiles
     if (.not.fexist) then
         if (ismaster) then
             call HdfCreateMeansFile(filename)
+            if (moist) call CreateMoistH5Groups(filename)
         end if
     end if
 
@@ -460,6 +465,8 @@ subroutine CalcMeanProfiles
             call HdfSerialWriteReal1D(dsetname,filename,phirms,nxmr)
         end if
     end if
+
+    if (moist) call CalcMoistStats
 
     call MpiBarrier
 
