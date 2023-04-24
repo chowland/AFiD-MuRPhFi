@@ -11,6 +11,7 @@
 subroutine SetTempBCs
     use param
     use decomp_2d
+    use moisture, only: beta_q
     implicit none
     integer :: ic,jc
     
@@ -61,7 +62,7 @@ subroutine SetTempBCs
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
                 tempbp(1,jc,ic) = 0.0
-                temptp(1,jc,ic) = -1.0
+                temptp(1,jc,ic) = beta_q - 1.0
             end do
         end do
     end if
