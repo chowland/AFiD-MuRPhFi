@@ -317,6 +317,9 @@ subroutine CalcMoistStats
 
     filename = trim("outputdir/means.h5")
 
+    qbar(:) = 0.0;  qsbar(:) = 0.0;     qrms(:) = 0.0;      qrel(:) = 0.0
+    vxq(:) = 0.0;   vyq(:) = 0.0;       vzq(:) = 0.0
+
     do i=xstart(3),xend(3)
         ip = i + 1
         do j=xstart(2),xend(2)
