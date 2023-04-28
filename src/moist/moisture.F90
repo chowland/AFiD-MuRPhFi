@@ -47,7 +47,9 @@ subroutine InitMoistVariables
     kappa_q = 1.0/pecq
     gamma_q = 0.19
     tau_q = 5e-5*sqrt(rayt*prat)    ! Vallis et al use diffusive scaling for nondimensionalisation
-
+    ! tau_q = 1e-4
+    dtmax = min(dtmax, 0.1*tau_q)
+    if (ismaster) write(*,*) 'tau, dtmax: ', tau_q, dtmax
     qfixN = 1
     qfixS = 1
 
