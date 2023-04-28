@@ -165,10 +165,14 @@ subroutine ExplicitHumidity
                 rkhumid(kc,jc,ic) = kappa_q*(dyyq + dzzq)
 
                 ! add -(q-q_s)/tau H(q-q_s) to rhs
-                if (humid(kc,jc,ic) > qsat(kc,jc,ic)) then
-                    condensation = (qsat(kc,jc,ic) - humid(kc,jc,ic))*itau
-                    rkhumid(kc,jc,ic) = rkhumid(kc,jc,ic) + condensation
-                end if
+                ! if (humid(kc,jc,ic) > qsat(kc,jc,ic)) then
+                !     condensation = (qsat(kc,jc,ic) - humid(kc,jc,ic))*itau
+                !     rkhumid(kc,jc,ic) = rkhumid(kc,jc,ic) + condensation
+                ! end if
+                condensation = (qsat(kc,jc,ic) - humid(kc,jc,ic))*itau &
+                    ! tanh approximation to Heaviside function
+                    *0.5*(1.0 + tanh(1e5*(humid(kc,jc,ic) - qsat(kc,jc,ic))))
+                rkhumid(kc,jc,ic) = rkhumid(kc,jc,ic) + condensation
 
             end do
         end do
@@ -187,10 +191,15 @@ subroutine AddCondensation
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
             do kc=1,nxm
-                if (humid(kc,jc,ic) > qsat(kc,jc,ic)) then
-                    condensation = gtau*(humid(kc,jc,ic) - qsat(kc,jc,ic))
-                    hro(kc,jc,ic) = hro(kc,jc,ic) + condensation
-                end if
+                ! if (humid(kc,jc,ic) > qsat(kc,jc,ic)) then
+                !     condensation = gtau*(humid(kc,jc,ic) - qsat(kc,jc,ic))
+                !     hro(kc,jc,ic) = hro(kc,jc,ic) + condensation
+                ! end if
+                condensation = (humid(kc,jc,ic) - qsat(kc,jc,ic))*gtau &
+                    ! tanh approximation to Heaviside function
+                    *0.5*(1.0 + tanh(1e5*(humid(kc,jc,ic) - qsat(kc,jc,ic))))
+                hro(kc,jc,ic) = hro(kc,jc,ic) + condensation
+
             end do
         end do
     end do
