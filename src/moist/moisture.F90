@@ -162,7 +162,7 @@ subroutine ExplicitHumidity
                 ! zz second derivative of humidity
                 dzzq = (humid(kc,jc,ip) - 2.0*humid(kc,jc,ic) + humid(kc,jc,im))*dzq
 
-                rkhumid(kc,jc,ic) = kappa_q*(dyyq + dzzq)
+                rkhumid(kc,jc,ic) = kappa_q*(dyyq + dzzq) - (hqx + hqy + hqz)
 
                 ! add -(q-q_s)/tau H(q-q_s) to rhs
                 ! if (humid(kc,jc,ic) > qsat(kc,jc,ic)) then
