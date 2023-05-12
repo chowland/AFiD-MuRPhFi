@@ -29,7 +29,8 @@ program AFiD
 !*******************************************************
 !
 
-    moist = .true.
+    ! Set `moist` to .true. if humid.in exists
+    inquire(file="humid.in", exist=moist)
 
     call ReadInputFile
     if (nzm==1 .or. nym==1) write_mean_planes = .false.
