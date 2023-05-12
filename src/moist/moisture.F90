@@ -39,22 +39,71 @@ subroutine InitMoistVariables
     call AllocateReal3DArray(humbp,1,1,xstart(2),xend(2),xstart(3),xend(3))
     call AllocateReal3DArray(humtp,1,1,xstart(2),xend(2),xstart(3),xend(3))
 
-    ! Parameter values to match Vallis et al (2019) examples
+    ! Default parameter values to match Vallis et al (2019) examples
 
     beta_q = 1.2
     alpha_q = 3.0
-    pecq = ren          ! Set Peclet equal to Reynolds
+    pecq = pect          ! Set humid Peclet equal to thermal
     kappa_q = 1.0/pecq
     gamma_q = 0.19
-    tau_q = 5e-5*sqrt(rayt*prat)    ! Vallis et al use diffusive scaling for nondimensionalisation
-    ! tau_q = 1e-4
-    dtmax = min(dtmax, 0.1*tau_q)
-    if (ismaster) write(*,*) 'tau, dtmax: ', tau_q, dtmax
+    tau_q = 5e-5*pect    ! Vallis et al use diffusive scaling for nondimensionalisation
     qfixN = 1
     qfixS = 1
 
+    ! Check if there is an extra input file, and update parameters
+    call ReadMoistParameters
+
+    dtmax = min(dtmax, 0.1*tau_q)
+    if (ismaster) write(*,*) 'tau, dtmax: ', tau_q, dtmax
+
 end subroutine InitMoistVariables
-    
+
+!> Read parameters from the humid.in input file
+subroutine ReadMoistParameters
+    logical :: exists, ifdiff
+    integer :: io, stat
+    real :: Sm !! humid-to-thermal diffusivity ratio
+
+    inquire(file="humid.in", exist=exists)
+    if (exists) then
+        open(file="humid.in", newunit=io, status="old", action="read")
+        read(io,*)
+        read(io,*)
+        read(io,*)
+        read(io,*)
+        read(io,*) alpha_q
+        read(io,*)
+        read(io,*)
+        read(io,*) beta_q
+        read(io,*)
+        read(io,*)
+        read(io,*) gamma_q
+        read(io,*)
+        read(io,*)
+        read(io,*) tau_q
+        read(io,*)
+        read(io,*)
+        read(io,*) ifdiff
+        read(io,*)
+        read(io,*)
+        read(io,*)
+        read(io,*) qfixN, qfixS
+        read(io,*)
+        read(io,*)
+        read(io,*) Sm
+        close(io)
+        pecq = pect/Sm
+        kappa_q = 1.0/pecq
+        if (ifdiff) tau_q = pect*tau_q
+    end if
+
+    if (ismaster) then
+        write(*,*) 'al, be, ga, tau'
+        write(*,*) alpha_q, beta_q, gamma_q, tau_q
+    end if
+
+end subroutine
+
 !> Deallocate the variables used for Rainy-Benard model
 subroutine DeallocateMoistVariables
 
