@@ -83,6 +83,17 @@ subroutine CreateInitialHumidity
 
     call random_seed()
 
+    do ic=xstart(3),xend(3)
+        do jc=xstart(2),xend(2)
+            do kc=1,nxm
+                call random_number(rnum)
+                temp(kc,jc,ic) = (1.0 - xm(kc))*xm(kc)*rnum*1e-3
+            end do
+        end do
+    end do
+
+    call update_halo(temp,lvlhalo)
+
     call UpdateSaturation
 
     do ic=xstart(3),xend(3)
