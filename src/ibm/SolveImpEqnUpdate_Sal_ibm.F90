@@ -10,7 +10,8 @@
 
 subroutine SolveImpEqnUpdate_Sal_ibm
     use param
-    use mgrd_arrays, only: sal,rhsr
+    use mgrd_arrays, only: rhsr
+    use afid_salinity, only: sal, PecS
     use decomp_2d, only: xstartr,xendr
     use ibm_param, only: ibmaskr
     implicit none

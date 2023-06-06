@@ -13,6 +13,7 @@ subroutine CreateInitialConditions
     use local_arrays, only: vy,vx,temp,vz
     use decomp_2d, only: xstart,xend
     use mpih
+    use afid_salinity, only: RayS
     implicit none
     integer :: j,k,i,kmid, io
     real :: xxx,yyy,zzz,eps,varptb,amp

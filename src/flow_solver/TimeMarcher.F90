@@ -13,7 +13,7 @@
 subroutine TimeMarcher
     use param
     use local_arrays
-    use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
+    use afid_salinity
     use mpih
     use decomp_2d
     use ibm_param, only: aldto
@@ -44,12 +44,22 @@ subroutine TimeMarcher
         call ExplicitTermsVZ
         call ExplicitTermsTemp
 
-        if (moist) call ExplicitHumidity
+        if (salinity) then
+            call ExplicitSalinity
+            
+            ! If using salinity as an active scalar, add its buoyancy contribution
+            ! to the relevant component of the momentum equation
+            if (active_S==1) then
+                if (gAxis==1) then
+                    call AddSalBuoyancy(qcap)
+                elseif (gAxis==2) then
+                    call AddSalBuoyancy(dph)
+                elseif (gAxis==3) then
+                    call AddSalBuoyancy(dq)
+                end if
+            end if
+        end if
 
-        if (phasefield) call ExplicitTermsPhi
-        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-implicit'
-        if (phasefield) call ImplicitAndUpdatePhi
-        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI post-implicit'
 
         !CJH: Phi must be updated before computing S explicit terms and latent heat
         ! varaible rhsr used to store d(phi)/dt for the following subroutines
@@ -70,7 +80,8 @@ subroutine TimeMarcher
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ
         call ImplicitAndUpdateTemp
-        if (salinity) call ImplicitAndUpdateSal !Refined
+
+        if (salinity) call ImplicitSalinity
 
         if (moist) call ImplicitHumidity
 
@@ -120,7 +131,7 @@ subroutine TimeMarcher
             call update_halo(vxr,lvlhalo)
             call update_halo(vyr,lvlhalo)
             call update_halo(vzr,lvlhalo)
-            call InterpSalMgrd !Sal from refined mesh to base mesh
+            call InterpSalMultigrid !Sal from refined mesh to base mesh
             call update_halo(salc,lvlhalo)
         end if
 

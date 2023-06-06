@@ -9,6 +9,7 @@
 subroutine ReadInputFile
     use param
     use ibm_param, only: solidtype
+    use afid_salinity, only: RayS, PraS, bycs, PecS, SfixN, SfixS
     implicit none
     character(len=4) :: dummy
     integer flagstat,flagbal,flagmelt

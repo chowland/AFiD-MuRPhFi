@@ -106,14 +106,14 @@ OBJS += obj/CreateMgrdGrid.o obj/InitMgrdVariables.o \
 
 # Object files associated with initial condition interpolation
 OBJS += obj/CreateNewInputStencil.o obj/CreateOldGrid.o obj/CreateNewSalStencil.o \
-	obj/InterpInputSal.o obj/InterpInputVel.o obj/InterpSalMgrd.o \
+	obj/InterpInputSal.o obj/InterpInputVel.o \
 	obj/InterpVelMgrd.o obj/InitInputVars.o obj/DeallocateInputVars.o \
-	obj/InterpInputPhi.o# obj/CreateInputStencil.o obj/CreateSalStencil.o
+	obj/InterpInputPhi.o# obj/InterpSalMgrd.o obj/CreateInputStencil.o obj/CreateSalStencil.o
 
 # Object files associated with the salinity field
-OBJS += obj/ExplicitTermsSal.o obj/ImplicitAndUpdateSal.o obj/SolveImpEqnUpdate_Sal.o \
-	obj/UpdateScalarBCs.o obj/CreateICSal.o obj/InitSalVariables.o \
-	obj/DeallocateSalVariables.o obj/SetSalBCs.o
+# OBJS += obj/ExplicitTermsSal.o obj/ImplicitAndUpdateSal.o obj/SolveImpEqnUpdate_Sal.o \
+# 	obj/UpdateScalarBCs.o obj/CreateICSal.o obj/InitSalVariables.o \
+# 	obj/DeallocateSalVariables.o obj/SetSalBCs.o
 
 # Object files associated with the phase-field method
 OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
@@ -132,14 +132,14 @@ OBJS += obj/mean_zplane.o
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
 	obj/HermiteInterpolations.o obj/GridModule.o obj/h5_tools.o obj/means.o \
-	obj/ibm_param.o obj/IBMTools.o obj/moisture.o
+	obj/ibm_param.o obj/IBMTools.o obj/moisture.o obj/salinity.o obj/phasefield.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
 	HermiteInterpolations.F90 GridModule.F90 ibm_param.F90 IBMTools.F90 \
-	moisture.F90
+	moisture.F90 salinity.F90 phasefield.F90
 
 #============================================================================ 
 #  make PROGRAM   
@@ -174,6 +174,8 @@ $(OBJDIR)/means.o: src/h5tools/means.F90 obj/ibm_param.o
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/IBMTools.o: src/ibm/IBMTools.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/salinity.o: src/salinity.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/moisture.o: src/moisture.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
@@ -188,8 +190,8 @@ $(OBJDIR)/%.o: src/multires/IC_interpolation/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/multires/phase-field/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/%.o: src/multires/salinity/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+# $(OBJDIR)/%.o: src/multires/salinity/%.F90 $(MOBJS)
+# 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/ibm/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 

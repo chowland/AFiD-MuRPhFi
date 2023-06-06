@@ -7,7 +7,7 @@ program AFiD
     use hdf5
     use decomp_2d
     use decomp_2d_fft
-    use moisture
+    use afid_salinity
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
 !$    use omp_lib
@@ -160,7 +160,7 @@ program AFiD
         instCFL=0.d0
 
         call CreateInitialConditions
-        if (salinity) call CreateICSal
+        if (salinity) call CreateInitialSalinity
         if (phasefield) call CreateICPF
         if (moist) call CreateInitialHumidity
 
@@ -190,7 +190,7 @@ program AFiD
 !CS   Interpolate initial values
     if (salinity) then
         call InterpVelMgrd
-        call InterpSalMgrd
+        call InterpSalMultigrid
     end if
     if (phasefield) then
         call InterpTempMgrd

@@ -293,7 +293,7 @@ end subroutine CalcPowerSpec
 subroutine WritePowerSpec
     use param
     use local_arrays, only: vz,vy,vx,temp
-    use mgrd_arrays, only: salc
+    use afid_salinity, only: salc
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use stat_arrays
     use mpih

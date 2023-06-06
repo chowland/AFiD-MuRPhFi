@@ -5,7 +5,7 @@ subroutine mean_zplane
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
-    use mgrd_arrays, only: sal, phi
+    use afid_salinity, only: sal
     use h5_tools
     use means
     implicit none
@@ -119,7 +119,7 @@ subroutine mean_yplane
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
-    use mgrd_arrays, only: sal, phi
+    use afid_salinity, only: sal
     use h5_tools
     use means
     implicit none

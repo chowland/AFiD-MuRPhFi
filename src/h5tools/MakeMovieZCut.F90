@@ -13,8 +13,7 @@ subroutine Mkmov_zcut
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp, pr
-    use mgrd_arrays, only: sal, phi, phic, tempr
-    use moisture, only: humid
+    use afid_salinity, only: sal
     use h5_tools
     implicit none
     character(70) :: filename

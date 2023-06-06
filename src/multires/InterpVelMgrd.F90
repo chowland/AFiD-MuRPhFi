@@ -3,6 +3,7 @@ subroutine InterpVelMgrd
     use param
     use local_arrays, only: vx,vy,vz
     use mgrd_arrays
+    use afid_salinity, only: vxr, vyr, vzr
     use mpih
     use decomp_2d
     use AuxiliaryRoutines

@@ -13,9 +13,9 @@ module param
     real      :: alx3,str3
     integer   :: istr3
     real      :: ylen,zlen
-    real      :: rayt,prat,rays,pras,dt,resid
+    real      :: rayt,prat,dt,resid !,rays,pras
     integer   :: inslws,inslwn
-    integer   :: TfixS,TfixN,SfixS,SfixN        !CJH option for fixed T/S BCs
+    integer   :: TfixS,TfixN!,SfixS,SfixN        !CJH option for fixed T/S BCs
     integer   :: gAxis      !CJH option to choose gravity axis
     real      :: xminusU,xplusU,dPdz,dPdy
     real      :: pf_A, pf_eps, pf_D, pf_S, pf_Tm, pf_Lambda
@@ -69,8 +69,8 @@ module param
     !******* Other variables ***********************************
     integer  :: nxm, nym, nzm
     integer  :: nxmr, nymr, nzmr   !CS mgrd
-    real :: ren, pect, pecs
-    real :: Rrho, byct, bycs
+    real :: ren, pect!, pecs
+    real :: Rrho, byct!, bycs
     real :: pi
     real :: al,ga,ro
     real :: beta
@@ -82,7 +82,7 @@ module param
     real, dimension(1:ndv) :: vmax
     real, dimension(1:3) :: gam,rom,alm
     real, allocatable, dimension(:,:,:) :: tempbp,temptp !CJH make BCs 3D arrays so we can use update_halo
-    real, allocatable, dimension(:,:,:) :: salbp,saltp
+    ! real, allocatable, dimension(:,:,:) :: salbp,saltp
     integer, dimension(5) :: spec_idx
 
     logical :: dumpslabs=.false.
@@ -125,14 +125,14 @@ module mgrd_arrays
     integer,allocatable,dimension(:) :: irangb,jrangb,krangb
     integer,allocatable,dimension(:) :: irangr,jrangr,krangr
     integer,allocatable,dimension(:) :: yc_to_ymr, zc_to_zmr
-    real,allocatable,dimension(:,:,:) :: sal,rhsr,rusal,hsal
+    real,allocatable,dimension(:,:,:) :: rhsr!,sal,rusal,hsal
     real,allocatable,dimension(:,:) :: cxvx, cxvy, cxvz, cxrs, cxsalc, cxphic
     real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs, cysalc, cyphic
     real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs, czsalc, czphic
     real,allocatable,dimension(:,:) :: cych, czch
-    real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
+    ! real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
     real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
-    real,allocatable,dimension(:,:,:) :: salc
+    ! real,allocatable,dimension(:,:,:) :: salc
     real,allocatable,dimension(:,:,:) :: tempr,Tplaner
     real,allocatable,dimension(:,:,:) :: phi,phic,ruphi,hphi
     real,allocatable,dimension(:,:) :: solid_height, height_vx, height_vy, height_vz

@@ -12,6 +12,7 @@ subroutine CreateMgrdGrid
     use param
     use AuxiliaryRoutines
     use GridModule
+    use afid_salinity, only: SfixS, SfixN, PraS
     implicit none
 
     integer :: kc

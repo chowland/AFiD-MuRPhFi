@@ -13,7 +13,7 @@ subroutine Mkmov_ycut
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
-    use mgrd_arrays, only: sal,phi
+    use afid_salinity, only: sal
     use h5_tools
     implicit none
     character(70) :: filename

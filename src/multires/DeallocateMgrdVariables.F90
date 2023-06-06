@@ -95,10 +95,6 @@ subroutine DeallocateMgrdVariables
         end if
     end if
 
-    call DestroyReal3DArray(vxr)
-    call DestroyReal3DArray(vyr)
-    call DestroyReal3DArray(vzr)
-
     call DestroyReal3DArray(tpdv)
     call DestroyReal3DArray(tpdvr)  !CS BUG: ERROR WHILE DEALLOCATING
 

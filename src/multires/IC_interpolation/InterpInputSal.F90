@@ -2,7 +2,7 @@ subroutine InterpInputSal
     
     use param
     use input_grids
-    use mgrd_arrays
+    use afid_salinity
     use mpih
     use decomp_2d
     use AuxiliaryRoutines

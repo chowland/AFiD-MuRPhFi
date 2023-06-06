@@ -11,7 +11,7 @@
 subroutine WriteFlowField(final)
     use param
     use local_arrays, only: vz,vy,vx,temp,pr
-    use mgrd_arrays, only: sal,phi
+    use afid_salinity, only: sal
     implicit none
     logical, intent(in) :: final
     character(30) :: filnam1,dsetname,basename
