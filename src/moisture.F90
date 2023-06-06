@@ -1,4 +1,6 @@
-module moisture
+!> Module adding evolution of a specific humidity field to AFiD
+!! following Vallis et al. (2019) J. Fluid Mech.
+module afid_moisture
     use param
     use decomp_2d, only: xstart, xend, nrank, update_halo
     use AuxiliaryRoutines
@@ -405,8 +407,8 @@ subroutine CalcMoistStats
                 qrms(k) = qrms(k) + humid(k,j,i)**2
                 qrel(k) = qrel(k) + humid(k,j,i)/qsat(k,j,i)
                 vxq(k) = vxq(k) + 0.5*(vx(k,j,i) + vx(k+1,j,i))*humid(k,j,i)
-                vyq(k) = vyq(k) + 0.5*(vy(k,j,i) + vy(k,j,i))*humid(k,j,i)
-                vzq(k) = vzq(k) + 0.5*(vz(k,j,i) + vz(k,j,i))*humid(k,j,i)
+                vyq(k) = vyq(k) + 0.5*(vy(k,j,i) + vy(k, jp,i))*humid(k,j,i)
+                vzq(k) = vzq(k) + 0.5*(vz(k,j,i) + vz(k,j, ip))*humid(k,j,i)
             end do
         end do
     end do
@@ -484,4 +486,4 @@ subroutine CreateMoistH5Groups(filename)
 
 end subroutine CreateMoistH5Groups
 
-end module moisture
+end module afid_moisture

@@ -174,6 +174,8 @@ $(OBJDIR)/means.o: src/h5tools/means.F90 obj/ibm_param.o
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/IBMTools.o: src/ibm/IBMTools.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/moisture.o: src/moisture.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/flow_solver/%.F90 $(MOBJS)
@@ -189,8 +191,6 @@ $(OBJDIR)/%.o: src/multires/phase-field/%.F90 $(MOBJS)
 $(OBJDIR)/%.o: src/multires/salinity/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/ibm/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/%.o: src/moist/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 
 #============================================================================
