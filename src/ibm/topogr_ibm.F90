@@ -6,6 +6,7 @@ subroutine topogr
     use param
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use ibm_param
+    use afid_salinity, only: RayS
     use mpih
     implicit none
     integer :: i,j,k,l, nc, Npart, ncz

@@ -2,7 +2,8 @@ subroutine InterpInputPhi
 
     use param
     use input_grids
-    use mgrd_arrays
+    ! use mgrd_arrays
+    use afid_phasefield, only: phi
     use mpih
     use decomp_2d
     use AuxiliaryRoutines

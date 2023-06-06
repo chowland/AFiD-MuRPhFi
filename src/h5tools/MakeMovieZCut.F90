@@ -13,7 +13,9 @@ subroutine Mkmov_zcut
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp, pr
+    ! use mgrd_arrays, only: sal, phi, phic, tempr
     use afid_salinity, only: sal
+    use afid_phasefield, only: phi, phic, tempr
     use afid_moisture, only: humid
     use h5_tools
     implicit none

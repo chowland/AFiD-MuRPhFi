@@ -14,6 +14,7 @@ subroutine CreateInitialConditions
     use decomp_2d, only: xstart,xend
     use mpih
     use afid_salinity, only: RayS
+    use afid_phasefield, only: pf_eps, read_phase_field_params
     implicit none
     integer :: j,k,i,kmid, io
     real :: xxx,yyy,zzz,eps,varptb,amp

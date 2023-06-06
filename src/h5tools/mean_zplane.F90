@@ -6,6 +6,7 @@ subroutine mean_zplane
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal
+    use afid_phasefield, only: phi
     use h5_tools
     use means
     implicit none
@@ -120,6 +121,7 @@ subroutine mean_yplane
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal
+    use afid_phasefield, only: phi
     use h5_tools
     use means
     implicit none

@@ -13,7 +13,9 @@
 subroutine TimeMarcher
     use param
     use local_arrays
+    ! use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
     use afid_salinity
+    use afid_phasefield
     use mpih
     use decomp_2d
     use ibm_param, only: aldto
@@ -36,7 +38,7 @@ subroutine TimeMarcher
         ga = gam(ns)
         ro = rom(ns)
 
-        if (melt) call UpdateBCs
+        ! if (melt) call UpdateBCs
 
         ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-explicit'
         call ExplicitTermsVX
@@ -60,6 +62,18 @@ subroutine TimeMarcher
             end if
         end if
 
+        if (phasefield) then
+            call ExplicitPhase
+            call AddVolumePenalty
+            if (salinity) then
+                call AddSaltFluxInterface
+                call AdjustMeltPoint
+            end if
+            call ImplicitPhase
+            ! Add the latent heat and salt terms *after* computing the implicit solve for phi
+            call AddLatentHeat
+            if (salinity) call AddLatentSalt
+        end if
 
         if (moist) call ExplicitHumidity
 
@@ -71,7 +85,7 @@ subroutine TimeMarcher
         ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP pre-implicit',ns
 
         if (phasefield) call update_halo(phi,lvlhalo)
-        if (phasefield .and. IBM) call UpdateIBMLocation
+        ! if (phasefield .and. IBM) call UpdateIBMLocation
 
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
@@ -133,9 +147,9 @@ subroutine TimeMarcher
         end if
 
         if (phasefield) then
-            call InterpTempMgrd
+            call InterpTempMultigrid
             call update_halo(tempr,lvlhalo)
-            call InterpPhiMgrd
+            call InterpPhiMultigrid
             call update_halo(phic,lvlhalo)
         end if
 

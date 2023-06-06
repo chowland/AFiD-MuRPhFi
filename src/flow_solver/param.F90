@@ -18,7 +18,7 @@ module param
     integer   :: TfixS,TfixN!,SfixS,SfixN        !CJH option for fixed T/S BCs
     integer   :: gAxis      !CJH option to choose gravity axis
     real      :: xminusU,xplusU,dPdz,dPdy
-    real      :: pf_A, pf_eps, pf_D, pf_S, pf_Tm, pf_Lambda
+    ! real      :: pf_A, pf_eps, pf_D, pf_S, pf_Tm, pf_Lambda
     logical   :: IBM, moist
     ! integer   :: starea,tsta
     real      :: dtmin,dtmax,limitCFL
@@ -133,8 +133,8 @@ module mgrd_arrays
     ! real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
     real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
     ! real,allocatable,dimension(:,:,:) :: salc
-    real,allocatable,dimension(:,:,:) :: tempr,Tplaner
-    real,allocatable,dimension(:,:,:) :: phi,phic,ruphi,hphi
+    real,allocatable,dimension(:,:,:) :: Tplaner!,tempr
+    ! real,allocatable,dimension(:,:,:) :: phi,phic,ruphi,hphi
     real,allocatable,dimension(:,:) :: solid_height, height_vx, height_vy, height_vz
 end module mgrd_arrays
 !===============================================================

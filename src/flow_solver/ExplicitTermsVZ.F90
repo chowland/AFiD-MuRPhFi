@@ -11,7 +11,7 @@
 subroutine ExplicitTermsVZ
     use param
     use local_arrays, only: vx,vy,vz,dq,temp
-    use mgrd_arrays, only: salc,phic
+    ! use mgrd_arrays, only: salc,phic
     use decomp_2d, only: xstart,xend
     implicit none
     integer :: kc,kp,jpp,jmm,jc,ic,imm,ipp
@@ -21,7 +21,7 @@ subroutine ExplicitTermsVZ
     real    :: dzzvz,dyyvz,pf_eta
     real    :: tempit, salit,volpen!, Gz
 
-    pf_eta = ren*(1.51044385*pf_eps)**2
+    ! pf_eta = ren*(1.51044385*pf_eps)**2
 
     udyq=dyq/ren
     udzq=dzq/ren
@@ -120,43 +120,43 @@ subroutine ExplicitTermsVZ
         end do
 
         !CJH Add salinity component of buoyancy if used
-        if (salinity) then
-            do ic=xstart(3),xend(3)
-                imm=ic-1
-                do jc=xstart(2),xend(2)
-                    do kc=1,nxm
-                        salit =active_S*salc(kc,jc,ic)
-                        dq(kc,jc,ic) = dq(kc,jc,ic) - bycs*salit
-                    end do
-                end do
-            end do
+        ! if (salinity) then
+        !     do ic=xstart(3),xend(3)
+        !         imm=ic-1
+        !         do jc=xstart(2),xend(2)
+        !             do kc=1,nxm
+        !                 salit =active_S*salc(kc,jc,ic)
+        !                 dq(kc,jc,ic) = dq(kc,jc,ic) - bycs*salit
+        !             end do
+        !         end do
+        !     end do
 
-            if (melt) then
-                !CJH For melting boundary, remove far-field buoyancy
-                do ic=xstart(3),xend(3)
-                    do jc=xstart(2),xend(2)
-                        do kc=1,nxm
-                            dq(kc,jc,ic) = dq(kc,jc,ic) + bycs - byct
-                        end do
-                    end do
-                end do
-            end if
-        end if
+        !     if (melt) then
+        !         !CJH For melting boundary, remove far-field buoyancy
+        !         do ic=xstart(3),xend(3)
+        !             do jc=xstart(2),xend(2)
+        !                 do kc=1,nxm
+        !                     dq(kc,jc,ic) = dq(kc,jc,ic) + bycs - byct
+        !                 end do
+        !             end do
+        !         end do
+        !     end if
+        ! end if
     end if
 !$OMP END PARALLEL DO
 
-    if (phasefield .and. .not. IBM) then
-        do ic=xstart(3),xend(3)
-            imm=ic-1
-            do jc=xstart(2),xend(2)
-                do kc=1,nxm
-                volpen = 0.5d0*(phic(kc,jc,ic) + phic(kc,jc,imm))* &
-                            vz(kc,jc,ic)/pf_eta
-                dq(kc,jc,ic) = dq(kc,jc,ic) - volpen
-                end do
-            end do
-        end do
-    end if
+    ! if (phasefield .and. .not. IBM) then
+    !     do ic=xstart(3),xend(3)
+    !         imm=ic-1
+    !         do jc=xstart(2),xend(2)
+    !             do kc=1,nxm
+    !             volpen = 0.5d0*(phic(kc,jc,ic) + phic(kc,jc,imm))* &
+    !                         vz(kc,jc,ic)/pf_eta
+    !             dq(kc,jc,ic) = dq(kc,jc,ic) - volpen
+    !             end do
+    !         end do
+    !     end do
+    ! end if
 
     return
 end subroutine ExplicitTermsVZ

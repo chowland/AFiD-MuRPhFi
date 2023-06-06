@@ -2,13 +2,14 @@ program AFiD
     use mpih
     use param
     use local_arrays, only: vx,vy,vz,temp,pr
-    use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phic,tempr,phi
+    ! use mgrd_arrays, only: phic,tempr,phi!,vxr,vyr,vzr,salc,sal
     use AuxiliaryRoutines
     use hdf5
     use decomp_2d
     use decomp_2d_fft
     use afid_moisture
     use afid_salinity
+    use afid_phasefield
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
 !$    use omp_lib
@@ -162,7 +163,7 @@ program AFiD
 
         call CreateInitialConditions
         if (salinity) call CreateInitialSalinity
-        if (phasefield) call CreateICPF
+        if (phasefield) call CreateInitialPhase
         if (moist) call CreateInitialHumidity
 
     endif
@@ -175,7 +176,7 @@ program AFiD
 
     if (IBM) then
         call topogr
-        if (phasefield) call UpdateIBMLocation
+        ! if (phasefield) call UpdateIBMLocation
     end if
 
 !EP   Update all relevant halos
@@ -194,8 +195,8 @@ program AFiD
         call InterpSalMultigrid
     end if
     if (phasefield) then
-        call InterpTempMgrd
-        call InterpPhiMgrd
+        call InterpTempMultigrid
+        call InterpPhiMultigrid
     end if
 
 !EP   Update all relevant halos

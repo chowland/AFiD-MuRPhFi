@@ -4,7 +4,8 @@ subroutine ReadFlowInterp(prow,pcol)
     use local_arrays
     use param
     use input_grids
-    use mgrd_arrays
+    use afid_salinity
+    use afid_phasefield
     use AuxiliaryRoutines
     
     implicit none

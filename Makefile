@@ -116,10 +116,10 @@ OBJS += obj/CreateNewInputStencil.o obj/CreateOldGrid.o obj/CreateNewSalStencil.
 # 	obj/DeallocateSalVariables.o obj/SetSalBCs.o
 
 # Object files associated with the phase-field method
-OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
-	obj/ImplicitAndUpdatePhi.o obj/InitPFVariables.o obj/InterpPhiMgrd.o \
-	obj/InterpTempMgrd.o obj/SolveImpEqnUpdate_Phi.o obj/CreateICPF.o \
-	obj/ImmersedBoundary.o obj/UpdateIBMLocation.o
+# OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
+# 	obj/ImplicitAndUpdatePhi.o obj/InitPFVariables.o obj/InterpPhiMgrd.o \
+# 	obj/InterpTempMgrd.o obj/SolveImpEqnUpdate_Phi.o obj/CreateICPF.o \
+# 	obj/ImmersedBoundary.o obj/UpdateIBMLocation.o
 
 # # Object files associated with the immersed boundary method
 OBJS += obj/SolveImpEqnUpdate_Temp_ibm.o obj/SolveImpEqnUpdate_X_ibm.o \
@@ -176,6 +176,8 @@ $(OBJDIR)/IBMTools.o: src/ibm/IBMTools.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/salinity.o: src/salinity.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/phasefield.o: src/phasefield.F90 obj/salinity.o
+	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/moisture.o: src/moisture.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
@@ -188,8 +190,8 @@ $(OBJDIR)/%.o: src/multires/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/multires/IC_interpolation/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/%.o: src/multires/phase-field/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+# $(OBJDIR)/%.o: src/multires/phase-field/%.F90 $(MOBJS)
+# 	$(FC) -c -o $@ $< $(LDFLAGS)
 # $(OBJDIR)/%.o: src/multires/salinity/%.F90 $(MOBJS)
 # 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/ibm/%.F90 $(MOBJS)

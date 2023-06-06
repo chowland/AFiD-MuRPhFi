@@ -11,7 +11,7 @@
 subroutine ExplicitTermsVX
     use param
     use local_arrays, only: vz,vy,vx,temp,qcap
-    use mgrd_arrays, only: salc,phic
+    ! use mgrd_arrays, only: salc,phic
     use decomp_2d, only: xstart,xend
     implicit none
     integer :: jc,kc
@@ -22,7 +22,7 @@ subroutine ExplicitTermsVX
     real    :: dzzvx,dyyvx,pf_eta
     real, dimension(nxm) :: idx
     
-    pf_eta = ren*(1.51044385*pf_eps)**2
+    ! pf_eta = ren*(1.51044385*pf_eps)**2
     
     udy=dy*0.25
     udz=dz*0.25
@@ -129,43 +129,43 @@ subroutine ExplicitTermsVX
         end do
         
         !CJH Add salinity component of buoyancy if used
-        if (salinity) then
-            do ic=xstart(3),xend(3)
-                do jc=xstart(2),xend(2)
-                    do kc=2,nxm
-                        salit = active_S*salc(kc,jc,ic)
-                        qcap(kc,jc,ic) = qcap(kc,jc,ic) - bycs*salit
-                    end do
-                end do
-            end do
+        ! if (salinity) then
+        !     do ic=xstart(3),xend(3)
+        !         do jc=xstart(2),xend(2)
+        !             do kc=2,nxm
+        !                 salit = active_S*salc(kc,jc,ic)
+        !                 qcap(kc,jc,ic) = qcap(kc,jc,ic) - bycs*salit
+        !             end do
+        !         end do
+        !     end do
 
-            if (melt) then
-                !CJH For melting boundary, remove far-field buoyancy
-                do ic=xstart(3),xend(3)
-                    do jc=xstart(2),xend(2)
-                        do kc=2,nxm
-                            qcap(kc,jc,ic) = qcap(kc,jc,ic) + bycs - byct
-                        end do
-                    end do
-                end do
-            end if
-        end if
+        !     if (melt) then
+        !         !CJH For melting boundary, remove far-field buoyancy
+        !         do ic=xstart(3),xend(3)
+        !             do jc=xstart(2),xend(2)
+        !                 do kc=2,nxm
+        !                     qcap(kc,jc,ic) = qcap(kc,jc,ic) + bycs - byct
+        !                 end do
+        !             end do
+        !         end do
+        !     end if
+        ! end if
     end if
     
-    if (phasefield .and. .not. IBM) then
-        do ic=xstart(3),xend(3)
-            do jc=xstart(2),xend(2)
-                do kc=2,nxm
-                    km = kc - 1
-                    volpen = 0.5d0*(phic(kc,jc,ic) + phic(km,jc,ic))* &
-                    vx(kc,jc,ic)/pf_eta
-                    ! volpen = 0.5*(1.0+tanh((xc(kc)-0.5)/2/pf_eps))* &
-                    !           vx(kc,jc,ic)/pf_gamma
-                    qcap(kc,jc,ic) = qcap(kc,jc,ic) - volpen
-                end do
-            end do
-        end do
-    end if
+    ! if (phasefield .and. .not. IBM) then
+    !     do ic=xstart(3),xend(3)
+    !         do jc=xstart(2),xend(2)
+    !             do kc=2,nxm
+    !                 km = kc - 1
+    !                 volpen = 0.5d0*(phic(kc,jc,ic) + phic(km,jc,ic))* &
+    !                 vx(kc,jc,ic)/pf_eta
+    !                 ! volpen = 0.5*(1.0+tanh((xc(kc)-0.5)/2/pf_eps))* &
+    !                 !           vx(kc,jc,ic)/pf_gamma
+    !                 qcap(kc,jc,ic) = qcap(kc,jc,ic) - volpen
+    !             end do
+    !         end do
+    !     end do
+    ! end if
     !$OMP END PARALLEL DO
     
     return
