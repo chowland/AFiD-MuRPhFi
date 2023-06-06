@@ -30,9 +30,9 @@ ifeq ($(MACHINE),PC)
 # GNU Debug Flags
 # FC += -O0 -g -fbacktrace -Wall -Wextra
 # FC += -Wpedantic
-# FC += -Warray-temporaries
+	FC += -Warray-temporaries
 # FC += -fcheck=all -finit-real=snan -ffpe-trap=invalid #-std=f2018
-# FC += -pg -fbacktrace -fbounds-check
+# FC += -O0 -pg -fbacktrace -fbounds-check
 # Intel Debug Flags
 # FC += -O0 -g -traceback -check bounds
 	ifeq ($(FLAVOUR),GNU)
@@ -131,14 +131,14 @@ OBJS += obj/mean_zplane.o
 
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
-	obj/HermiteInterpolations.o obj/GridModule.o obj/h5_tools.o obj/means.o \
+	obj/HermiteInterpolations.o obj/grid.o obj/h5_tools.o obj/means.o \
 	obj/ibm_param.o obj/IBMTools.o obj/moisture.o obj/salinity.o obj/phasefield.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
-	HermiteInterpolations.F90 GridModule.F90 ibm_param.F90 IBMTools.F90 \
+	HermiteInterpolations.F90 grid.F90 ibm_param.F90 IBMTools.F90 \
 	moisture.F90 salinity.F90 phasefield.F90
 
 #============================================================================ 
@@ -164,7 +164,7 @@ $(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/GridModule.o: src/flow_solver/GridModule.F90
+$(OBJDIR)/grid.o: src/grid.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/HermiteInterpolations.o: src/multires/HermiteInterpolations.F90 obj/ibm_param.o
 	$(FC) -c -o $@ $< $(LDFLAGS)
