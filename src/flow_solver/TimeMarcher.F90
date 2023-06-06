@@ -17,7 +17,7 @@ subroutine TimeMarcher
     use mpih
     use decomp_2d
     use ibm_param, only: aldto
-    use moisture
+    use afid_moisture
     implicit none
     integer :: ns
     integer :: j,k,i
@@ -61,10 +61,7 @@ subroutine TimeMarcher
         end if
 
 
-        !CJH: Phi must be updated before computing S explicit terms and latent heat
-        ! varaible rhsr used to store d(phi)/dt for the following subroutines
-        if (salinity) call ExplicitTermsSal !Refined
-        if (phasefield) call AddLatentHeat
+        if (moist) call ExplicitHumidity
 
         if (moist) call AddCondensation
 

@@ -11,7 +11,7 @@
 subroutine SetTempBCs
     use param
     use decomp_2d
-    use moisture, only: beta_q
+    use afid_moisture, only: beta_q
     implicit none
     integer :: ic,jc
     

@@ -13,6 +13,7 @@
       use param
       use decomp_2d, only: nrank, decomp_2d_finalize
       use decomp_2d_fft
+      use afid_moisture, only: DeallocateMoistVariables
       use afid_salinity, only: DeallocateSalVariables
       implicit none
       logical, intent(in) :: normalexit

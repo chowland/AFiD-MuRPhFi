@@ -7,6 +7,7 @@ program AFiD
     use hdf5
     use decomp_2d
     use decomp_2d_fft
+    use afid_moisture
     use afid_salinity
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 

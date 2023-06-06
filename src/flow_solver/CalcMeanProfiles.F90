@@ -16,7 +16,7 @@ subroutine CalcMeanProfiles
     use mpih
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use ibm_param, only: solidr
-    use moisture, only: CalcMoistStats, CreateMoistH5Groups
+    use afid_moisture, only: CalcMoistStats, CreateMoistH5Groups
     
     implicit none
 
