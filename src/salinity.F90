@@ -30,6 +30,10 @@ module afid_salinity
     real, allocatable, dimension(:,:,:) :: salbp    !! Salinity boundary value (lower plate)
     real, allocatable, dimension(:,:,:) :: saltp    !! Salinity boundary value (upper plate)
 
+    real, allocatable, dimension(:) :: ap3sskr      !! Upper diagonal derivative coefficient for salinity
+    real, allocatable, dimension(:) :: ac3sskr      !! Diagonal derivative coefficient for salinity
+    real, allocatable, dimension(:) :: am3sskr      !! Lower diagonal derivative coefficient for salinity
+
 contains
 
 !> Subroutine to allocate memory for salinity-related variables
@@ -56,6 +60,11 @@ subroutine InitSalVariables
     if (melt) then
         call AllocateReal3DArray(Tplaner,1,1,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
     end if
+
+    ! Second derivative coefficients
+    call AllocateReal1DArray(ap3sskr,1,nxr)
+    call AllocateReal1DArray(ac3sskr,1,nxr)
+    call AllocateReal1DArray(am3sskr,1,nxr)
 
 end subroutine InitSalVariables
 
@@ -84,6 +93,11 @@ subroutine DeallocateSalVariables
     if (melt) then
         call DestroyReal3DArray(Tplaner)
     end if
+
+    ! Second derivative coefficients
+    call DestroyReal1DArray(ap3sskr)
+    call DestroyReal1DArray(ac3sskr)
+    call DestroyReal1DArray(am3sskr)
 
 end subroutine DeallocateSalVariables
 

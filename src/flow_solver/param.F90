@@ -54,11 +54,11 @@ module param
     !===========================================================
     !******* Metric coefficients *******************************
     real, allocatable, dimension(:) :: ap3ck,ac3ck,am3ck
-    real, allocatable, dimension(:) :: ap3ckr,ac3ckr,am3ckr      !CS mgrd
+    ! real, allocatable, dimension(:) :: ap3ckr,ac3ckr,am3ckr      !CS mgrd
     real, allocatable, dimension(:) :: ap3sk,ac3sk,am3sk
     real, allocatable, dimension(:) :: ap3ssk,ac3ssk,am3ssk
-    real, allocatable, dimension(:) :: ap3sskr,ac3sskr,am3sskr   !CS mgrd
-    real, allocatable, dimension(:) :: ap3spkr,ac3spkr,am3spkr   !CJH phase-field
+    ! real, allocatable, dimension(:) :: ap3sskr,ac3sskr,am3sskr   !CS mgrd
+    ! real, allocatable, dimension(:) :: ap3spkr,ac3spkr,am3spkr   !CJH phase-field
     !============================================================
     !******* Variables for FFTW and Poisson solver****************
     real, allocatable, dimension(:) :: ak2,ap

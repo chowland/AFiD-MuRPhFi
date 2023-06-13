@@ -37,17 +37,17 @@ subroutine InitMgrdVariables
     call AllocateReal1DArray(udx3cr,1,nxr)
     call AllocateReal1DArray(udx3mr,1,nxr)
 
-    call AllocateReal1DArray(ap3ckr,1,nxr)
-    call AllocateReal1DArray(ac3ckr,1,nxr)
-    call AllocateReal1DArray(am3ckr,1,nxr)
+    ! call AllocateReal1DArray(ap3ckr,1,nxr)
+    ! call AllocateReal1DArray(ac3ckr,1,nxr)
+    ! call AllocateReal1DArray(am3ckr,1,nxr)
 
-    call AllocateReal1DArray(ap3sskr,1,nxr)
-    call AllocateReal1DArray(ac3sskr,1,nxr)
-    call AllocateReal1DArray(am3sskr,1,nxr)
+    ! call AllocateReal1DArray(ap3sskr,1,nxr)
+    ! call AllocateReal1DArray(ac3sskr,1,nxr)
+    ! call AllocateReal1DArray(am3sskr,1,nxr)
 
-    call AllocateReal1DArray(ap3spkr,1,nxr)
-    call AllocateReal1DArray(ac3spkr,1,nxr)
-    call AllocateReal1DArray(am3spkr,1,nxr)
+    ! call AllocateReal1DArray(ap3spkr,1,nxr)
+    ! call AllocateReal1DArray(ac3spkr,1,nxr)
+    ! call AllocateReal1DArray(am3spkr,1,nxr)
 
     call AllocateInt1dArray(kmcr,1,nxr)
     call AllocateInt1dArray(kpcr,1,nxr)

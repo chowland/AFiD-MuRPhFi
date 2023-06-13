@@ -12,7 +12,8 @@ subroutine CreateMgrdGrid
     use param
     use AuxiliaryRoutines
     use GridModule
-    use afid_salinity, only: SfixS, SfixN, PraS
+    use afid_salinity, only: SfixS, SfixN, PraS, ap3sskr, ac3sskr, am3sskr
+    use afid_phasefield, only: ap3spkr, ac3spkr, am3spkr
     implicit none
 
     integer :: kc
@@ -157,9 +158,9 @@ subroutine CreateMgrdGrid
 !
 
     ! Salinity differentiation
-    call second_derivative_coeff(ap3sskr, ac3sskr, am3sskr, xmr(1:nxmr), alx3, SfixN, SfixS)
+    if (salinity) call second_derivative_coeff(ap3sskr, ac3sskr, am3sskr, xmr(1:nxmr), alx3, SfixN, SfixS)
     ! Phase-field differentiation (ensuring zero gradient at boundaries)
-    call second_derivative_coeff(ap3spkr, ac3spkr, am3spkr, xmr(1:nxmr), alx3, 0, 0)
+    if (phasefield) call second_derivative_coeff(ap3spkr, ac3spkr, am3spkr, xmr(1:nxmr), alx3, 0, 0)
 
     return
 end subroutine CreateMgrdGrid

@@ -22,6 +22,10 @@ module afid_phasefield
     real :: pf_Tm       !! Equilibrium melting temperature
     real :: pf_Lambda   !! Dimensionless liquidus slope
 
+    real, allocatable, dimension(:) :: ap3spkr      !! Upper diagonal derivative coefficient for salinity
+    real, allocatable, dimension(:) :: ac3spkr      !! Diagonal derivative coefficient for salinity
+    real, allocatable, dimension(:) :: am3spkr      !! Lower diagonal derivative coefficient for salinity
+
 contains
 
 !> Initialise and allocate memory for phase-field variables
@@ -38,6 +42,11 @@ subroutine InitPFVariables
 
     ! Coarse array for phi or d(phi)/dt
     call AllocateReal3DArray(phic,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
+
+    ! Second derivative coefficients
+    call AllocateReal1DArray(ap3spkr,1,nxr)
+    call AllocateReal1DArray(ac3spkr,1,nxr)
+    call AllocateReal1DArray(am3spkr,1,nxr)
 
 end subroutine InitPFVariables
 
@@ -56,6 +65,11 @@ subroutine DeallocatePFVariables
 
     ! Coarse array for phi or d(phi)/dt
     call DestroyReal3DArray(phic)
+
+    ! Second derivative coefficients
+    call DestroyReal1DArray(ap3spkr)
+    call DestroyReal1DArray(ac3spkr)
+    call DestroyReal1DArray(am3spkr)
 
 end subroutine DeallocatePFVariables
 
@@ -200,10 +214,10 @@ subroutine SolveImpEqnUpdate_Phi
     ! Construct tridiagonal matrix for LHS
     ! (normalised to prevent floating point errors)
     do kc=1,nxmr
-        ackl_b=1.0d0/(1.-ac3sskr(kc)*betadx)
-        if (kc > 1) amkT(kc-1) = -am3sskr(kc)*betadx*ackl_b
+        ackl_b=1.0d0/(1.-ac3spkr(kc)*betadx)
+        if (kc > 1) amkT(kc-1) = -am3spkr(kc)*betadx*ackl_b
         ackT(kc)=1.0d0
-        if (kc < nxmr) apkT(kc) = -ap3sskr(kc)*betadx*ackl_b
+        if (kc < nxmr) apkT(kc) = -ap3spkr(kc)*betadx*ackl_b
     end do
 
     ! Factor the tridiagonal matrix
@@ -214,7 +228,7 @@ subroutine SolveImpEqnUpdate_Phi
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
             do kc=1,nxmr
-                ackl_b=1.0/(1.0-ac3sskr(kc)*betadx)
+                ackl_b=1.0/(1.0-ac3spkr(kc)*betadx)
                 rhsr(kc,jc,ic)=rhsr(kc,jc,ic)*ackl_b
             end do
         end do

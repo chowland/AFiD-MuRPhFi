@@ -28,17 +28,17 @@ subroutine DeallocateMgrdVariables
     call DestroyReal1DArray(udx3cr)
     call DestroyReal1DArray(udx3mr)
 
-    call DestroyReal1DArray(ap3ckr)
-    call DestroyReal1DArray(ac3ckr)
-    call DestroyReal1DArray(am3ckr)
+    ! call DestroyReal1DArray(ap3ckr)
+    ! call DestroyReal1DArray(ac3ckr)
+    ! call DestroyReal1DArray(am3ckr)
 
-    call DestroyReal1DArray(ap3sskr)
-    call DestroyReal1DArray(ac3sskr)
-    call DestroyReal1DArray(am3sskr)
+    ! call DestroyReal1DArray(ap3sskr)
+    ! call DestroyReal1DArray(ac3sskr)
+    ! call DestroyReal1DArray(am3sskr)
 
-    call DestroyReal1DArray(ap3spkr)
-    call DestroyReal1DArray(ac3spkr)
-    call DestroyReal1DArray(am3spkr)
+    ! call DestroyReal1DArray(ap3spkr)
+    ! call DestroyReal1DArray(ac3spkr)
+    ! call DestroyReal1DArray(am3spkr)
 
     call DestroyInt1dArray(kmcr)
     call DestroyInt1dArray(kpcr)
