@@ -79,26 +79,38 @@ subroutine CreateInitialPhase
     real :: A, B, alpha, t0, x0, h0
     integer :: i, j, k
 
-    ! do i=xstartr(3),xendr(3)
-    !     do j=xstartr(2),xendr(2)
-    !         do k=1,nxmr
-    !             phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - 0.1)/2/pf_eps))
-    !             if (RAYT > 0) phi(k,j,i) = 1.0 - phi(k,j,i)
-    !         end do
-    !     end do
-    ! end do
-    call read_phase_field_params(A, B, alpha)
-    t0 = 1e-3
-    x0 = 0.8
-    h0 = x0 + 2*alpha*sqrt(t0)
-    do i=xstartr(3),xendr(3)
-        do j=xstartr(2),xendr(2)
-            do k=1,nxmr
-                sal(k,j,i) = 1.0 - B*erfc((x0 - xmr(k))/sqrt(PraT/PraS*t0)/2.0)
-                phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - h0)/2/pf_eps))
+    if (salinity) then
+        !! Ice above salty water (1D_DDMelting example)
+        call read_phase_field_params(A, B, alpha)
+        t0 = 1e-3
+        x0 = 0.8
+        h0 = x0 + 2*alpha*sqrt(t0)
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    if (salinity) sal(k,j,i) = 1.0 - B*erfc((h0 - xmr(k))/sqrt(PraT/PraS*t0)/2.0)
+                    phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - h0)/2/pf_eps))
+                end do
             end do
         end do
-    end do
+    else
+        !! 1D freezing/moving example
+        !! (RayT > 0: melting; RayT < 0: freezing)
+        if (pf_IC==1) then
+            h0 = 0.1
+            call set_flat_interface(h0, .false.)
+            call set_temperature_interface(h0, .false.)
+
+        !! Favier (2019) appendix A.3 validation case
+        elseif (pf_IC==3) then
+            call set_flat_interface(0.5, .true.)
+        
+        !! 1D supercooling example
+        elseif (pf_IC==5) then
+            call set_flat_interface(0.02, .false.)
+        end if
+    end if
+    
 end subroutine CreateInitialPhase
 
 !> Read a simple input file with three parameters definining
@@ -120,6 +132,73 @@ subroutine read_phase_field_params(A, B, alpha)
         alpha = 3.987e-2
     end if
 end subroutine read_phase_field_params
+
+!> Impose a flat interface at height x=h0
+!! with ice phase for x>h0 if ice_above=.true. and vice versa
+subroutine set_flat_interface(h0, ice_above)
+    real, intent(in) :: h0              !! height (in x) of interface
+    logical, intent(in) :: ice_above    !! flag to determine whether ice phase is above or below interface
+
+    integer :: i, j, k
+
+    do i=xstartr(3),xendr(3)
+        do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+                if (ice_above) then
+                    phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - h0)/2/pf_eps))
+                else
+                    phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - h0)/2/pf_eps))
+                end if
+            end do
+        end do
+    end do
+end subroutine set_flat_interface
+
+!> Impose a diffusive boundary layer profile for temperature
+!! on one side of the flat interface at height x=h0
+subroutine set_temperature_interface(h0, diffuse_above)
+    use local_arrays, only: temp
+    real, intent(in) :: h0                  !! Interface position (at sim time t=0)
+    logical, intent(in) :: diffuse_above    !! Flag: set diffusion above interface (or not)
+
+    real :: t0, Lambda
+    integer :: i, j, k
+
+    ! Set normalising similarity value (see docs for justification)
+    if (diffuse_above) then
+        Lambda = 0.060314
+    else
+        Lambda = 0.620063
+    end if
+
+    ! Effective time assuming that initial interface diffused from
+    ! x=0 at t=0
+    t0 = PecT*(h0/2.0/Lambda)**2
+
+    do i=xstart(3),xend(3)
+        do j=xstart(2),xend(2)
+            do k=1,nxm
+                if (diffuse_above) then
+                    !! For the 1D supercooling example
+                    if (xm(k) > h0) then
+                        temp(k,j,i) = erfc(xm(k)*sqrt(pect/t0)/2.0)/erfc(Lambda)
+                    else
+                        temp(k,j,i) = 1.0
+                    end if
+                else
+                    !! For the 1D freezing example
+                    if (xm(k) < h0) then
+                        temp(k,j,i) = erf(xm(k)*sqrt(pect/t0)/2)/erf(Lambda)
+                    else
+                        temp(k,j,i) = 1.0
+                    end if
+                    !! For the 1D melting case
+                    if (RayT > 0) temp(k,j,i) = 1.0 - temp(k,j,i)
+                end if
+            end do
+        end do
+    end do
+end subroutine set_temperature_interface
 
 !> Compute the explicit terms for the phase-field evolution
 !! and store the result in `hphi`
