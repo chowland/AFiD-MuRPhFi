@@ -135,25 +135,124 @@ subroutine SetSalBCs
 
 end subroutine SetSalBCs
 
-! !> Set initial conditions for salinity field
+!> Set initial conditions for salinity field
+!! N.B. This can get overwritten by CreateInitialPhase if also using phase-field
 subroutine CreateInitialSalinity
-    ! use afid_phasefield, only: read_phase_field_params
-    ! real :: A, B, alpha, t0, x0, h0
-    ! integer :: i, j, k
+    
+    !! Rayleigh-Taylor setup for pore-scale simulation
+    if (IBM) then
+        call SetSaltTwoLayer(h0=0.5*alx3, eps=1e-7, stable=.false.)
+        call AddSalinityNoise(amp=0.1, localised=.true., h0=0.5*alx3)
 
-    ! call read_phase_field_params(A, B, alpha)
-    ! t0 = 1e-3
-    ! x0 = 0.8
-    ! h0 = x0 + 2*alpha*sqrt(t0)
-    ! do i=xstartr(3),xendr(3)
-    !     do j=xstartr(2),xendr(2)
-    !         do k=1,nxmr
-    !             sal(k,j,i) = 1.0 - B*erfc((x0 - xmr(k))/sqrt(PraT/PraS*t0)/2.0)
-    !         end do
-    !     end do
-    ! end do
+    !! Bounded double-diffusive convection (begin with small amplitude noise)
+    else if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
+        call SetZeroSalinity
+        call AddSalinityNoise(amp=5e-3, localised=.false.)
+
+    !! Stratified shear layer setup
+    else if ((RayS < 0) .and. (RayT < 0)) then
+        call SetSaltTwoLayer(h0=0.5*alx3, eps=1.0, stable=.true.)
+        call AddSalinityNoise(amp=1e-2, localised=.true., h0=0.5*alx3)
+
+    !! Default: linear profile + small noise (e.g. RBC, VC)
+    else
+        call SetLinearSalinity
+        call AddSalinityNoise(amp=5e-3, localised=.false.)
+    end if
 
 end subroutine CreateInitialSalinity
+
+!> Set salinity variable to linear profile between boundary values
+subroutine SetLinearSalinity
+    integer :: i, j, k
+
+    do i=xstartr(3),xendr(3)
+        do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+                sal(k,j,i) = salbp(1,j,i) - (salbp(1,j,i) - saltp(1,j,i))*xmr(k)/xcr(nxr)
+            end do
+        end do
+    end do
+end subroutine SetLinearSalinity
+
+!> Set salinity variable to zero everywhere
+subroutine SetZeroSalinity
+    integer :: i, j, k
+
+    do i=xstartr(3),xendr(3)
+        do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+                sal(k,j,i) = 0.0
+            end do
+        end do
+    end do
+end subroutine SetZeroSalinity
+
+!> Set the salinity field up as a two-layer system with a tanh profile
+!! with interface thickness eps
+subroutine SetSaltTwoLayer(h0, eps, stable, mode, mode_amp)
+    real, intent(in) :: h0          !! Mean height of interface
+    real, intent(in) :: eps         !! Width of tanh interface
+    logical, intent(in) :: stable   !! Flag determining gravitational stability of profile
+    integer, intent(in), optional :: mode   !! Optional mode number to perturb interface
+    real, intent(in), optional :: mode_amp  !! Amplitude of optional modal perturbation
+
+    real :: x0
+    integer :: i, j, k
+
+    x0 = h0
+
+    do i=xstartr(3),xendr(3)
+        do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+                ! Use pf_IC input parameter as mode number for initial perturbation
+                if (present(mode)) x0 = h0 + mode_amp*sin(mode*2.0*pi*ymr(j)/ylen)
+                sal(k,j,i) = 0.5*tanh((xmr(k) - x0)/eps)
+                if (stable) sal(k,j,i) = -sal(k,j,i)
+            end do
+        end do
+    end do
+
+end subroutine SetSaltTwoLayer
+
+!> Add random noise to the salinity field, either locally at an interface
+!! or uniformly. In both cases, noise is limited such that the absolute value
+!! of salinity does not exceed 0.5
+subroutine AddSalinityNoise(amp, localised, h0)
+    real, intent(in) :: amp             !! Amplitude of random noise
+    logical, intent(in) :: localised    !! Flag determining whether to add noise around interface or everywhere
+    real, intent(in), optional :: h0    !! Height of interface if using localised noise
+
+    integer :: i, j, k
+    real :: a2, varptb
+
+    call random_seed()
+
+    do i=xstartr(3),xendr(3)
+        do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+                call random_number(varptb)
+                !! Add noise locally
+                if (localised) then
+                    sal(k,j,i) = sal(k,j,i) + amp/cosh((xmr(k) - h0)/0.01)**2*varptb
+                    ! Restrict initial salinity field to [-0.5,0.5]
+                    sal(k,j,i) = min(0.5, sal(k,j,i))
+                    sal(k,j,i) = max(-0.5, sal(k,j,i))
+                !! Add noise everywhere uniformly
+                else
+                    ! Prevent values of |S| exceeding 0.5 by restricting noise amplitude locally
+                    if (abs(sal(k,j,i)) + amp > 0.5) then
+                        a2 = 0.5 - abs(sal(k,j,i))
+                        sal(k,j,i) = sal(k,j,i) + a2*(2.d0*varptb - 1.d0)
+                    else
+                        sal(k,j,i) = sal(k,j,i) + amp*(2.d0*varptb - 1.d0)
+                    end if
+                end if
+            end do
+        end do
+    end do
+
+end subroutine AddSalinityNoise
 
 !> Compute the explicit terms for the salinity evolution
 !! and store the result in hsal
