@@ -18,13 +18,13 @@
       
       call DestroyReal1DArray(zc)
       call DestroyReal1DArray(zm)
-      call DestroyReal1DArray(ak1)
-      call DestroyReal1DArray(ao)
+      ! call DestroyReal1DArray(ak1)
+      ! call DestroyReal1DArray(ao)
 
       call DestroyReal1DArray(yc)
       call DestroyReal1DArray(ym)
-      call DestroyReal1DArray(ak2)
-      call DestroyReal1DArray(ap)
+      ! call DestroyReal1DArray(ak2)
+      ! call DestroyReal1DArray(ap)
 
       call DestroyReal1DArray(xc)
       call DestroyReal1DArray(xm)
@@ -49,9 +49,9 @@
       call DestroyReal1DArray(ac3ssk)
       call DestroyReal1DArray(am3ssk)
 
-      call DestroyReal1DArray(amphk)
-      call DestroyReal1DArray(acphk)
-      call DestroyReal1DArray(apphk)
+      ! call DestroyReal1DArray(amphk)
+      ! call DestroyReal1DArray(acphk)
+      ! call DestroyReal1DArray(apphk)
  
       call DestroyInt1dArray(kmc)
       call DestroyInt1dArray(kpc)

@@ -61,9 +61,9 @@ module param
     ! real, allocatable, dimension(:) :: ap3spkr,ac3spkr,am3spkr   !CJH phase-field
     !============================================================
     !******* Variables for FFTW and Poisson solver****************
-    real, allocatable, dimension(:) :: ak2,ap
-    real, allocatable, dimension(:) :: ak1,ao
-    real, allocatable, dimension(:) :: amphk,acphk,apphk
+    ! real, allocatable, dimension(:) :: ak2,ap
+    ! real, allocatable, dimension(:) :: ak1,ao
+    ! real, allocatable, dimension(:) :: amphk,acphk,apphk
 
     !===========================================================
     !******* Other variables ***********************************

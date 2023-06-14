@@ -2,6 +2,7 @@ subroutine CalcFourierCoef(var,fouvar)
 use, intrinsic :: iso_c_binding
 use param
 use fftw_params
+use afid_pressure
 use decomp_2d
 use decomp_2d_fft
 use mpih
@@ -19,7 +20,7 @@ type(fftw_iodim),dimension(2) :: iodim_howmany
 
 !RO   Allocate variables for FFT transform
 
-call CreateFFTTmpArrays
+! call CreateFFTTmpArrays
 
 nymh=nym/2+1
 
@@ -27,62 +28,7 @@ call transpose_x_to_y(var,ry1,ph)
 
 !RO   Plan FFT transforms if not planned previously
 
-if (.not.planned) then
-    iodim(1)%n=nzm
-    iodim(1)%is=(sp%zen(1)-sp%zst(1)+1)*(sp%zen(2)-sp%zst(2)+1)
-    iodim(1)%os=(sp%zen(1)-sp%zst(1)+1)*(sp%zen(2)-sp%zst(2)+1)
-    iodim_howmany(1)%n=(sp%zen(1)-sp%zst(1)+1)
-    iodim_howmany(1)%is=1
-    iodim_howmany(1)%os=1
-    iodim_howmany(2)%n=(sp%zen(2)-sp%zst(2)+1)
-    iodim_howmany(2)%is=(sp%zen(1)-sp%zst(1)+1)
-    iodim_howmany(2)%os=(sp%zen(1)-sp%zst(1)+1)
-    fwd_guruplan_z=fftw_plan_guru_dft(1,iodim, &
-            2,iodim_howmany,cz1,cz1, &
-            FFTW_FORWARD,FFTW_ESTIMATE)
-    iodim(1)%n=nzm
-    bwd_guruplan_z=fftw_plan_guru_dft(1,iodim, &
-            2,iodim_howmany,cz1,cz1, &
-            FFTW_BACKWARD,FFTW_ESTIMATE)
-
-    if (.not.c_associated(bwd_guruplan_z)) then
-        if (ismaster) print*,'Failed to create guru plan. You should'
-        if (ismaster) print*,'link with FFTW3 before MKL'
-        if (ismaster) print*,'Please check linking order.'
-        call MPI_Abort(MPI_COMM_WORLD,1,info)
-    endif
-
-    iodim(1)%n=nym
-    iodim(1)%is=ph%yen(1)-ph%yst(1)+1
-    iodim(1)%os=sp%yen(1)-sp%yst(1)+1
-    iodim_howmany(1)%n=(ph%yen(1)-ph%yst(1)+1)
-    iodim_howmany(1)%is=1
-    iodim_howmany(1)%os=1
-    iodim_howmany(2)%n=(ph%yen(3)-ph%yst(3)+1)
-    iodim_howmany(2)%is=(ph%yen(1)-ph%yst(1)+1) &
-            *(ph%yen(2)-ph%yst(2)+1)
-    iodim_howmany(2)%os=(sp%yen(1)-sp%yst(1)+1) &
-            *(sp%yen(2)-sp%yst(2)+1)
-    fwd_guruplan_y=fftw_plan_guru_dft_r2c(1,iodim, &
-            2,iodim_howmany,ry1,cy1, &
-            FFTW_ESTIMATE)
-
-    iodim(1)%n=nym
-    iodim(1)%is=sp%yen(1)-sp%yst(1)+1
-    iodim(1)%os=ph%yen(1)-ph%yst(1)+1
-    iodim_howmany(1)%n=(sp%yen(1)-sp%yst(1)+1)
-    iodim_howmany(1)%is=1
-    iodim_howmany(1)%os=1
-    iodim_howmany(2)%n=(sp%yen(3)-sp%yst(3)+1)
-    iodim_howmany(2)%is=(sp%yen(1)-sp%yst(1)+1) &
-            *(sp%yen(2)-sp%yst(2)+1)
-    iodim_howmany(2)%os=(ph%yen(1)-ph%yst(1)+1) &
-            *(ph%yen(2)-ph%yst(2)+1)
-    bwd_guruplan_y=fftw_plan_guru_dft_c2r(1,iodim, &
-            2,iodim_howmany,cy1,ry1, &
-            FFTW_ESTIMATE)
-    planned=.true.
-endif
+if (.not.planned) call PlanFourierTransform
 
 call dfftw_execute_dft_r2c(fwd_guruplan_y,ry1,cy1)
 
@@ -95,7 +41,7 @@ cz1 = cz1 / (nzm*nym)
 
 call transpose_z_to_x(cz1,fouvar,sp)
 
-call DestroyFFTTmpArrays
+! call DestroyFFTTmpArrays
 
 return
 end subroutine CalcFourierCoef

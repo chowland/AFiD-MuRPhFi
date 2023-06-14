@@ -7,6 +7,7 @@ program AFiD
     use hdf5
     use decomp_2d
     use decomp_2d_fft
+    use afid_pressure
     use afid_moisture
     use afid_salinity
     use afid_phasefield
@@ -93,6 +94,7 @@ program AFiD
     call InitTimeMarchScheme
 
     call InitVariables
+    call InitPressureVars
     if (multires) call InitMgrdVariables  !CS mgrd
     if (salinity) call InitSalVariables
     if (phasefield) call InitPFVariables

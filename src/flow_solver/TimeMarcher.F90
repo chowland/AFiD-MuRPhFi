@@ -14,6 +14,7 @@ subroutine TimeMarcher
     use param
     use local_arrays
     ! use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
+    use afid_pressure
     use afid_salinity
     use afid_phasefield
     use mpih

@@ -84,19 +84,19 @@ EXTRA_DIST = transpose_z_to_x.F90 transpose_x_to_z.F90 transpose_x_to_y.F90\
 	     factor.F90 halo.F90 fft_common.F90 alloc.F90 halo_common.F90
 
 # Object files associated with standard flow solver
-OBJS = obj/main.o obj/CalcLocalDivergence.o obj/CalcMaxCFL.o \
-	obj/CalcMeanProfiles.o obj/CheckDivergence.o obj/CorrectPressure.o \
+OBJS = obj/main.o obj/CalcMaxCFL.o \
+	obj/CalcMeanProfiles.o obj/CheckDivergence.o \
 	obj/CorrectVelocity.o obj/CreateGrid.o obj/CreateInitialConditions.o \
 	obj/DeallocateVariables.o obj/DebugRoutines.o obj/ExplicitTermsTemp.o \
 	obj/ExplicitTermsVX.o obj/ExplicitTermsVY.o obj/ExplicitTermsVZ.o \
 	obj/factorize.o obj/HdfReadContinua.o obj/HdfRoutines.o \
 	obj/ImplicitAndUpdateTemp.o obj/ImplicitAndUpdateVX.o obj/ImplicitAndUpdateVY.o \
-	obj/ImplicitAndUpdateVZ.o obj/InitPressureSolver.o obj/InitTimeMarchScheme.o \
+	obj/ImplicitAndUpdateVZ.o obj/InitTimeMarchScheme.o \
 	obj/InitVariables.o obj/LocateLargeDivergence.o obj/MakeMovieXCut.o \
 	obj/MakeMovieYCut.o obj/MakeMovieZCut.o obj/MpiAuxRoutines.o \
 	obj/QuitRoutine.o obj/ReadInputFile.o obj/ResetLogs.o \
 	obj/SetTempBCs.o obj/SolveImpEqnUpdate_Temp.o obj/SolveImpEqnUpdate_X.o \
-	obj/SolveImpEqnUpdate_YZ.o obj/SolvePressureCorrection.o obj/SpecRoutines.o \
+	obj/SolveImpEqnUpdate_YZ.o obj/SpecRoutines.o \
 	obj/TimeMarcher.o obj/WriteFlowField.o obj/WriteGridInfo.o \
 	obj/CalcWriteQ.o obj/GlobalQuantities.o obj/ReadFlowInterp.o
 
@@ -131,14 +131,14 @@ OBJS += obj/mean_zplane.o
 
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
-	obj/HermiteInterpolations.o obj/grid.o obj/h5_tools.o obj/means.o \
+	obj/pressure.o obj/HermiteInterpolations.o obj/grid.o obj/h5_tools.o obj/means.o \
 	obj/ibm_param.o obj/IBMTools.o obj/moisture.o obj/salinity.o obj/phasefield.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
-	HermiteInterpolations.F90 grid.F90 ibm_param.F90 IBMTools.F90 \
+	pressure.F90 HermiteInterpolations.F90 grid.F90 ibm_param.F90 IBMTools.F90 \
 	moisture.F90 salinity.F90 phasefield.F90
 
 #============================================================================ 
@@ -165,6 +165,8 @@ $(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
 $(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/grid.o: src/grid.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/pressure.o: src/pressure.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/HermiteInterpolations.o: src/multires/HermiteInterpolations.F90 obj/ibm_param.o
 	$(FC) -c -o $@ $< $(LDFLAGS)

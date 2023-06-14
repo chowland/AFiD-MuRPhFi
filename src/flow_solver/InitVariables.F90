@@ -23,13 +23,13 @@
 
       call AllocateReal1DArray(zc,1,nz)
       call AllocateReal1DArray(zm,0,nz+1)
-      call AllocateReal1DArray(ak1,1,nz)
-      call AllocateReal1DArray(ao,1,nz)
+      ! call AllocateReal1DArray(ak1,1,nz)
+      ! call AllocateReal1DArray(ao,1,nz)
 
       call AllocateReal1DArray(yc,1,ny)
       call AllocateReal1DArray(ym,0,ny+1)
-      call AllocateReal1DArray(ak2,1,ny)
-      call AllocateReal1DArray(ap,1,ny)
+      ! call AllocateReal1DArray(ak2,1,ny)
+      ! call AllocateReal1DArray(ap,1,ny)
 
       call AllocateReal1DArray(xc,1,nx)
       call AllocateReal1DArray(xm,1,nx)
@@ -55,9 +55,9 @@
       call AllocateReal1DArray(ac3ssk,1,nx)
       call AllocateReal1DArray(am3ssk,1,nx)
 
-      call AllocateReal1DArray(amphk,1,nx)
-      call AllocateReal1DArray(acphk,1,nx)
-      call AllocateReal1DArray(apphk,1,nx)
+      ! call AllocateReal1DArray(amphk,1,nx)
+      ! call AllocateReal1DArray(acphk,1,nx)
+      ! call AllocateReal1DArray(apphk,1,nx)
  
       call AllocateInt1dArray(kmc,1,nx)
       call AllocateInt1dArray(kpc,1,nx)
