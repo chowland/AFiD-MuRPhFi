@@ -81,18 +81,8 @@ subroutine CreateInitialPhase
 
     if (salinity) then
         !! Ice above salty water (1D_DDMelting example)
-        call read_phase_field_params(A, B, alpha)
-        t0 = 1e-3
-        x0 = 0.8
-        h0 = x0 + 2*alpha*sqrt(t0)
-        do i=xstartr(3),xendr(3)
-            do j=xstartr(2),xendr(2)
-                do k=1,nxmr
-                    if (salinity) sal(k,j,i) = 1.0 - B*erfc((h0 - xmr(k))/sqrt(PraT/PraS*t0)/2.0)
-                    phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - h0)/2/pf_eps))
-                end do
-            end do
-        end do
+        call set_multicomponent_interface(0.8, h0)
+        call set_flat_interface(h0, .true.)
     else
         !! 1D freezing/moving example
         !! (RayT > 0: melting; RayT < 0: freezing)
@@ -101,13 +91,20 @@ subroutine CreateInitialPhase
             call set_flat_interface(h0, .false.)
             call set_temperature_interface(h0, .false.)
 
+        !! 2D axisymmetric melting example (disc radius 0.1)
+        else if (pf_IC==2) then
+            call set_ice_disc(r0=0.1)
+
         !! Favier (2019) appendix A.3 validation case
         elseif (pf_IC==3) then
             call set_flat_interface(0.5, .true.)
+            call add_temperature_mode(amp=0.1, ymode=2, zmode=2)
         
         !! 1D supercooling example
         elseif (pf_IC==5) then
-            call set_flat_interface(0.02, .false.)
+            h0 = 0.02
+            call set_flat_interface(h0, .false.)
+            call set_temperature_interface(h0, .true.)
         end if
     end if
     
@@ -199,6 +196,105 @@ subroutine set_temperature_interface(h0, diffuse_above)
         end do
     end do
 end subroutine set_temperature_interface
+
+!> Set temperature and salinity profiles to a diffusive boundary layer below
+!! an ice interface that began as a step profile at height x0
+subroutine set_multicomponent_interface(x0, h0)
+    use local_arrays, only: temp
+    use afid_salinity, only: sal, PraS
+    real, intent(in) :: x0  !! initial interface height (at diffusion start)
+    real, intent(out) :: h0 !! interface height at simulation time 0
+    
+    real :: t0, A, B, alpha
+    integer :: i, j, k
+    
+    call read_phase_field_params(A, B, alpha)
+    t0 = 1e-3
+    h0 = x0 + 2*alpha*sqrt(t0)
+    do i=xstartr(3),xendr(3)
+        do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+                sal(k,j,i) = 1.0 - B*erfc((x0 - xmr(k))/sqrt(PraT/PraS*t0)/2.0)
+            end do
+        end do
+    end do
+    do i=xstart(3),xend(3)
+        do j=xstart(2),xend(2)
+            do k=1,nxm
+                if (xm(k) <= h0) then
+                    temp(k,j,i) = 1 - A*erfc((x0 - xm(k))/sqrt(t0)/2.0)
+                else
+                    temp(k,j,i) = 1 - A*erfc(-alpha)
+                end if
+            end do
+        end do
+    end do
+end subroutine set_multicomponent_interface
+
+!> Add a modal perturbation to the temperature field in the lower half of the domain
+!! Intended for use with phase-field validation case of 2D Melting RBC from Favier et al (2019)
+!! Vertical structure is of the form sin^2(2 pi x)
+subroutine add_temperature_mode(amp, ymode, zmode)
+    use local_arrays, only: temp
+    real, intent(in) :: amp         !! amplitude of perturbation
+    integer, intent(in) :: ymode    !! mode number in y
+    integer, intent(in) :: zmode    !! mode number in z (only used if nzm>1)
+    integer :: i, j, k, kmid
+    real :: xxx, yyy, zzz
+
+    kmid = nxm/2
+    do i=xstart(3),xend(3)
+        do j=xstart(2),xend(2)
+            if (nzm > 1) then
+                do k=1,kmid ! If domain 3D, add in z perturbation too
+                    xxx = xm(k)
+                    yyy = ym(j)/ylen
+                    zzz = zm(i)/zlen
+
+                    temp(k,j,i) = temp(k,j,i) &
+                        + amp*sin(2.0*pi*ymode*yyy)*cos(2.0*pi*zmode*zzz)*sin(2.0*pi*xxx)**2
+                end do
+            else
+                do k=1,kmid
+                    xxx = xm(k)
+                    yyy = ym(j)/ylen
+
+                    temp(k,j,i) = temp(k,j,i) &
+                        + amp*sin(2.0*pi*ymode*yyy)*sin(2.0*pi*xxx)**2
+                end do
+            end if
+        end do
+    end do
+end subroutine add_temperature_mode
+
+!> Add an ice disc at the centre of the domain of radius r0
+!! with a corresponding temperature profile
+subroutine set_ice_disc(r0)
+    use local_arrays, only: temp
+    real, intent(in) :: r0      !! Initial disc radius
+
+    real :: r
+    integer :: i, j, k
+
+    ! Temperature field (0 in disc, 1 out of disc, tanh interface width approx 1e-2)
+    do i=xstart(3),xend(3)
+        do j=xstart(2),xend(2)
+            do k=1,nxm
+                r = sqrt((xm(k) - 0.5*alx3)**2 + (ym(j) - 0.5*ylen)**2)
+                temp(k,j,i) = 0.5*(1.0 + tanh(100.0*(r - r0)))
+            end do
+        end do
+    end do
+    ! Phase-field (0 out of disc, 1 in disc)
+    do i=xstartr(3),xendr(3)
+        do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+                r = sqrt((xmr(k) - 0.5*alx3)**2 + (ymr(j) - 0.5*ylen)**2)
+                phi(k,j,i) = 0.5*(1.0 - tanh(0.5*(r - r0)/pf_eps))
+            end do
+        end do
+    end do
+end subroutine set_ice_disc
 
 !> Compute the explicit terms for the phase-field evolution
 !! and store the result in `hphi`
