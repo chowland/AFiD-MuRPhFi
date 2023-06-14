@@ -1,5 +1,5 @@
 # Choose the machine being used
-# Options: PC_GNU, PC_INTEL, (i)SNELLIUS, IRENE(_SKL/_ROME), MARENOSTRUM, SUPERMUC
+# Options: PC, SNELLIUS, IRENE, MARENOSTRUM, SUPERMUC, DISCOVERER
 MACHINE=PC
 FLAVOUR=GNU
 # Modules required for each HPC system as follows:
@@ -28,10 +28,10 @@ endif
 
 ifeq ($(MACHINE),PC)
 # GNU Debug Flags
-# FC += -O0 -g -fbacktrace -Wall -Wextra
-# FC += -Wpedantic
-	FC += -Warray-temporaries
-# FC += -fcheck=all -finit-real=snan -ffpe-trap=invalid #-std=f2018
+	# FC += -O0 -g -fbacktrace -Wall -Wextra
+	# FC += -Wpedantic
+	# FC += -Warray-temporaries
+	# FC += -fcheck=all -finit-real=snan -ffpe-trap=invalid #-std=f2018
 # FC += -O0 -pg -fbacktrace -fbounds-check
 # Intel Debug Flags
 # FC += -O0 -g -traceback -check bounds
@@ -102,7 +102,7 @@ OBJS = obj/main.o obj/CalcMaxCFL.o \
 
 # Object files associated with multiple resolution grids
 OBJS += obj/CreateMgrdGrid.o obj/InitMgrdVariables.o \
-	obj/DeallocateMgrdVariables.o obj/CreateMgrdStencil.obj
+	obj/DeallocateMgrdVariables.o obj/CreateMgrdStencil.o
 
 # Object files associated with initial condition interpolation
 OBJS += obj/CreateNewInputStencil.o obj/CreateOldGrid.o obj/CreateNewSalStencil.o \
