@@ -102,24 +102,13 @@ OBJS = obj/main.o obj/CalcMaxCFL.o \
 
 # Object files associated with multiple resolution grids
 OBJS += obj/CreateMgrdGrid.o obj/InitMgrdVariables.o \
-	obj/DeallocateMgrdVariables.o obj/CreateMgrdStencil.o# obj/CreateMgrdStencil.o
+	obj/DeallocateMgrdVariables.o obj/CreateMgrdStencil.obj
 
 # Object files associated with initial condition interpolation
 OBJS += obj/CreateNewInputStencil.o obj/CreateOldGrid.o obj/CreateNewSalStencil.o \
 	obj/InterpInputSal.o obj/InterpInputVel.o \
 	obj/InterpVelMgrd.o obj/InitInputVars.o obj/DeallocateInputVars.o \
-	obj/InterpInputPhi.o# obj/InterpSalMgrd.o obj/CreateInputStencil.o obj/CreateSalStencil.o
-
-# Object files associated with the salinity field
-# OBJS += obj/ExplicitTermsSal.o obj/ImplicitAndUpdateSal.o obj/SolveImpEqnUpdate_Sal.o \
-# 	obj/UpdateScalarBCs.o obj/CreateICSal.o obj/InitSalVariables.o \
-# 	obj/DeallocateSalVariables.o obj/SetSalBCs.o
-
-# Object files associated with the phase-field method
-# OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
-# 	obj/ImplicitAndUpdatePhi.o obj/InitPFVariables.o obj/InterpPhiMgrd.o \
-# 	obj/InterpTempMgrd.o obj/SolveImpEqnUpdate_Phi.o obj/CreateICPF.o \
-# 	obj/ImmersedBoundary.o obj/UpdateIBMLocation.o
+	obj/InterpInputPhi.o
 
 # # Object files associated with the immersed boundary method
 OBJS += obj/SolveImpEqnUpdate_Temp_ibm.o obj/SolveImpEqnUpdate_X_ibm.o \
@@ -192,10 +181,6 @@ $(OBJDIR)/%.o: src/multires/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/multires/IC_interpolation/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
-# $(OBJDIR)/%.o: src/multires/phase-field/%.F90 $(MOBJS)
-# 	$(FC) -c -o $@ $< $(LDFLAGS)
-# $(OBJDIR)/%.o: src/multires/salinity/%.F90 $(MOBJS)
-# 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/ibm/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 
