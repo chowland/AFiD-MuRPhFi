@@ -13,8 +13,7 @@ subroutine CalcMeanProfiles
     use param
     use local_arrays, only: vx,vy,vz,temp
     use mpih
-    use decomp_2d, only: xstart,xend,xstartr,xendr
-    use ibm_param, only: solidr
+    use decomp_2d, only: xstart,xend
     use afid_salinity, only: CalcSalStats, CreateSalinityH5Groups
     use afid_moisture, only: CalcMoistStats, CreateMoistH5Groups
     use afid_phasefield, only: CalcPhiStats, CreatePhaseH5Groups
@@ -22,9 +21,9 @@ subroutine CalcMeanProfiles
     implicit none
 
     integer :: i, j, k, im, ip, jm, jp, km, kp
-    real :: inym, inzm, inymr, inzmr, tdx, tdxr
+    real :: inym, inzm, tdx
     real :: tii(2)
-    real, dimension(nxm) :: Tbar, Trms, chiT, chiT2
+    real, dimension(nxm) :: Tbar, Trms, chiT!, chiT2
     real, dimension(nxm) :: vxT, vyT, vzT
     real, dimension(nxm) :: vxrms, vyrms, vzrms
     real, dimension(nxm) :: vybar, vzbar

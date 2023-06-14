@@ -203,13 +203,12 @@ end subroutine set_temperature_interface
 !> Compute the explicit terms for the phase-field evolution
 !! and store the result in `hphi`
 subroutine ExplicitPhase
-    use afid_salinity, only: sal
     integer :: ic, jc, kc
-    integer :: im, jm, km
-    integer :: ip, jp, kp
+    integer :: im, jm
+    integer :: ip, jp
 
-    real :: udyr, udzr, udyrq, udzrq
-    real :: pf_B, nlphi, bcl
+    real :: udyrq, udzrq
+    real :: pf_B, nlphi
     real :: dyyp, dzzp
 
     ! Nonlinear term prefactor
@@ -283,7 +282,6 @@ end subroutine ImplicitPhase
 !> Solve the implicit system for the phase-field
 !! and update the global variable phi
 subroutine SolveImpEqnUpdate_Phi
-    real, dimension(nxr) :: amkl,apkl,ackl
     integer :: jc,kc,info,ipkv(nxr),ic,nrhs
     real :: betadx,ackl_b
     real :: amkT(nxmr-1),ackT(nxmr),apkT(nxmr-1),appk(nxmr-2)

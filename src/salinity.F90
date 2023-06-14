@@ -163,7 +163,7 @@ subroutine ExplicitSalinity
     integer :: ip, jp, kp
 
     real :: udyr, udzr, udyrq, udzrq
-    real :: pf_delta, aldt
+    real :: aldt
     real, dimension(1:nxmr) :: sdx
     real :: hsx, hsy, hsz
     real :: dyys, dzzs
@@ -508,7 +508,6 @@ subroutine CalcDissipationSal(chiS)
     integer :: k
 
     real, dimension(1:nxmr) :: tdxr
-    real :: inyzmr
 
     do k=1,nxmr
         tdxr(k) = 0.5*dxr/g3rmr(k)

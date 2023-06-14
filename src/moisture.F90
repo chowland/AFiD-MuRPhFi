@@ -63,7 +63,7 @@ end subroutine InitMoistVariables
 !> Read parameters from the humid.in input file
 subroutine ReadMoistParameters
     logical :: exists, ifdiff
-    integer :: io, stat
+    integer :: io
     real :: Sm !! humid-to-thermal diffusivity ratio
 
     inquire(file="humid.in", exist=exists)
