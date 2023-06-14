@@ -12,7 +12,6 @@ subroutine CalcMeanProfiles
 
     use param
     use local_arrays, only: vx,vy,vz,temp
-    ! use mgrd_arrays, only: phi!,vxr,vyr,vzr,sal
     use mpih
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use ibm_param, only: solidr
@@ -331,26 +330,6 @@ subroutine HdfCreateMeansFile(filename)
     ! call h5gclose_f(group_id,hdf_error)
     call h5gcreate_f(file_id,"epsilon",group_id,hdf_error)
     call h5gclose_f(group_id,hdf_error)
-    ! if (salinity) then
-    !     call h5gcreate_f(file_id,"Sbar",group_id,hdf_error)
-    !     call h5gclose_f(group_id,hdf_error)
-    !     call h5gcreate_f(file_id,"vxS",group_id,hdf_error)
-    !     call h5gclose_f(group_id,hdf_error)
-    !     call h5gcreate_f(file_id,"vyS",group_id,hdf_error)
-    !     call h5gclose_f(group_id,hdf_error)
-    !     call h5gcreate_f(file_id,"vzS",group_id,hdf_error)
-    !     call h5gclose_f(group_id,hdf_error)
-    !     call h5gcreate_f(file_id,"Srms",group_id,hdf_error)
-    !     call h5gclose_f(group_id,hdf_error)
-    !     call h5gcreate_f(file_id,"chiS",group_id,hdf_error)
-    !     call h5gclose_f(group_id,hdf_error)
-    ! end if
-    ! if (phasefield) then
-    !     call h5gcreate_f(file_id,"phibar",group_id,hdf_error)
-    !     call h5gclose_f(group_id,hdf_error)
-    !     call h5gcreate_f(file_id,"phirms",group_id,hdf_error)
-    !     call h5gclose_f(group_id,hdf_error)
-    ! end if
-    
+
     call h5fclose_f(file_id, hdf_error)
 end subroutine HdfCreateMeansFile
