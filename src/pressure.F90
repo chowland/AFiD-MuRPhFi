@@ -12,8 +12,6 @@ module afid_pressure
 
     logical :: sidewall     !! Flag to determine whether to impose sidewalls in y (using a DCT)
 
-    ! real, allocatable, dimension(:) :: ao       !! Unscaled wavenumber in z
-    ! real, allocatable, dimension(:) :: ap       !! Unscaled wavenumber in y
     real, allocatable, dimension(:) :: ak1      !! Modified wavenumber in z
     real, allocatable, dimension(:) :: ak2      !! Modified wavenumber in y
 
