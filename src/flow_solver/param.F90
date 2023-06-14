@@ -13,12 +13,11 @@ module param
     real      :: alx3,str3
     integer   :: istr3
     real      :: ylen,zlen
-    real      :: rayt,prat,dt,resid !,rays,pras
+    real      :: rayt,prat,dt,resid
     integer   :: inslws,inslwn
-    integer   :: TfixS,TfixN!,SfixS,SfixN        !CJH option for fixed T/S BCs
+    integer   :: TfixS,TfixN    !CJH option for fixed T/S BCs
     integer   :: gAxis      !CJH option to choose gravity axis
     real      :: xminusU,xplusU,dPdz,dPdy
-    ! real      :: pf_A, pf_eps, pf_D, pf_S, pf_Tm, pf_Lambda
     logical   :: IBM, moist
     ! integer   :: starea,tsta
     real      :: dtmin,dtmax,limitCFL
@@ -54,16 +53,9 @@ module param
     !===========================================================
     !******* Metric coefficients *******************************
     real, allocatable, dimension(:) :: ap3ck,ac3ck,am3ck
-    ! real, allocatable, dimension(:) :: ap3ckr,ac3ckr,am3ckr      !CS mgrd
     real, allocatable, dimension(:) :: ap3sk,ac3sk,am3sk
     real, allocatable, dimension(:) :: ap3ssk,ac3ssk,am3ssk
-    ! real, allocatable, dimension(:) :: ap3sskr,ac3sskr,am3sskr   !CS mgrd
-    ! real, allocatable, dimension(:) :: ap3spkr,ac3spkr,am3spkr   !CJH phase-field
     !============================================================
-    !******* Variables for FFTW and Poisson solver****************
-    ! real, allocatable, dimension(:) :: ak2,ap
-    ! real, allocatable, dimension(:) :: ak1,ao
-    ! real, allocatable, dimension(:) :: amphk,acphk,apphk
 
     !===========================================================
     !******* Other variables ***********************************
@@ -82,7 +74,6 @@ module param
     real, dimension(1:ndv) :: vmax
     real, dimension(1:3) :: gam,rom,alm
     real, allocatable, dimension(:,:,:) :: tempbp,temptp !CJH make BCs 3D arrays so we can use update_halo
-    ! real, allocatable, dimension(:,:,:) :: salbp,saltp
     integer, dimension(5) :: spec_idx
 
     logical :: dumpslabs=.false.
@@ -114,7 +105,6 @@ module local_arrays
     real,allocatable,dimension(:,:,:) :: rux,ruy,ruz,rutemp
     real,allocatable,dimension(:,:,:) :: dph,qcap,dq,hro,dphhalo
     real,allocatable,dimension(:,:,:) :: qtens
-    ! real,allocatable,dimension(:,:,:) :: sal,rhsr,rusal,hsal
 end module local_arrays
 
 module mgrd_arrays
@@ -125,16 +115,13 @@ module mgrd_arrays
     integer,allocatable,dimension(:) :: irangb,jrangb,krangb
     integer,allocatable,dimension(:) :: irangr,jrangr,krangr
     integer,allocatable,dimension(:) :: yc_to_ymr, zc_to_zmr
-    real,allocatable,dimension(:,:,:) :: rhsr!,sal,rusal,hsal
+    real,allocatable,dimension(:,:,:) :: rhsr
     real,allocatable,dimension(:,:) :: cxvx, cxvy, cxvz, cxrs, cxsalc, cxphic
     real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs, cysalc, cyphic
     real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs, czsalc, czphic
     real,allocatable,dimension(:,:) :: cych, czch
-    ! real,allocatable,dimension(:,:,:) :: vxr,vyr,vzr !CS mgrd
     real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
-    ! real,allocatable,dimension(:,:,:) :: salc
-    real,allocatable,dimension(:,:,:) :: Tplaner!,tempr
-    ! real,allocatable,dimension(:,:,:) :: phi,phic,ruphi,hphi
+    real,allocatable,dimension(:,:,:) :: Tplaner
     real,allocatable,dimension(:,:) :: solid_height, height_vx, height_vy, height_vz
 end module mgrd_arrays
 !===============================================================
