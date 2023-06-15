@@ -10,17 +10,18 @@
 !                                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      subroutine ImplicitAndUpdateTemp
-      use param
-      use local_arrays, only: temp,hro,rutemp,rhs
-      use decomp_2d, only: xstart,xend
-      implicit none
-      integer :: jc,kc,ic
-      integer :: km,kp
-      real    :: alpec,dxxt
-      real    :: app,acc,amm
+subroutine ImplicitAndUpdateTemp
+    use param
+    use local_arrays, only: temp,hro,rutemp,rhs
+    use decomp_2d, only: xstart,xend
+    use ibm_param
+    implicit none
+    integer :: jc,kc,ic
+    integer :: km,kp,ke
+    real    :: alpec,dxxt
+    real    :: app,acc,amm
 
-      alpec=al/pect
+    alpec=al/pect
 
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &
@@ -31,56 +32,49 @@
 !$OMP   PRIVATE(ic,jc,kc,km,kp) &
 !$OMP   PRIVATE(amm,acc,app) &
 !$OMP   PRIVATE(dxxt)
-      do ic=xstart(3),xend(3)
-      do jc=xstart(2),xend(2)
-      do kc=1,nxm
+    do ic=xstart(3),xend(3)
+        do jc=xstart(2),xend(2)
+            do kc=1,nxm
 
 !   Calculate second derivative of temperature in the x-direction.
 !   This is the only term calculated implicitly for temperature.
-            if (kc.eq.1) then       !CJH Apply lower BC
-                  dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
-                        +temp(kc  ,jc,ic)*ac3ssk(kc) &
-                        -(ap3ssk(kc)+ac3ssk(kc))*tempbp(1,jc,ic)*TfixS
-            elseif(kc.eq.nxm) then  !CJH Apply upper BC
-                  dxxt = temp(kc  ,jc,ic)*ac3ssk(kc) &
-                        +temp(kc-1,jc,ic)*am3ssk(kc) &
-                        -(am3ssk(kc)+ac3ssk(kc))*temptp(1,jc,ic)*TfixN
-            else
-               dxxt= temp(kc+1,jc,ic)*ap3ssk(kc) &
-                    +temp(kc  ,jc,ic)*ac3ssk(kc) &
-                    +temp(kc-1,jc,ic)*am3ssk(kc)
-            end if
+                if (kc.eq.1) then       !CJH Apply lower BC
+                    dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
+                        + temp(kc,jc,ic)*ac3ssk(kc) &
+                        - (ap3ssk(kc)+ac3ssk(kc))*tempbp(1,jc,ic)*TfixS
+                elseif(kc.eq.nxm) then  !CJH Apply upper BC
+                    dxxt = temp(kc,jc,ic)*ac3ssk(kc) &
+                        + temp(kc-1,jc,ic)*am3ssk(kc) &
+                        - (am3ssk(kc)+ac3ssk(kc))*temptp(1,jc,ic)*TfixN
+                else
+                    dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
+                        + temp(kc  ,jc,ic)*ac3ssk(kc) &
+                        + temp(kc-1,jc,ic)*am3ssk(kc)
+                end if
 
 
 !    Calculate right hand side of Eq. 5 (VO96)
 
-            rhs(kc,jc,ic)=(ga*hro(kc,jc,ic)+ro*rutemp(kc,jc,ic) &
-                    +alpec*dxxt)*dt
+                rhs(kc,jc,ic)=(ga*hro(kc,jc,ic)+ro*rutemp(kc,jc,ic) &
+                        +alpec*dxxt)*dt
 
 !    Store the non-linear terms for the calculation of 
 !    the next timestep
 
-            rutemp(kc,jc,ic)=hro(kc,jc,ic)
+                rutemp(kc,jc,ic)=hro(kc,jc,ic)
 
+            enddo
         enddo
-       enddo
-      enddo
+    enddo
 !$OMP END PARALLEL DO
 
-
+    if (IBM) then
+        call SolveImpEqnUpdate_Temp_ibm
+    else
 !  Solve equation and update temperature
 
-      call SolveImpEqnUpdate_Temp
+        call SolveImpEqnUpdate_Temp
+    end if
 
-!  Set boundary conditions on the temperature field at top
-!  and bottom plates. This seems necessary.
-
-      !  temp(1,xstart(2):xend(2),xstart(3):xend(3)) &
-      !     = tempbp(1,xstart(2):xend(2),xstart(3):xend(3))
-
-      !  temp(nx,xstart(2):xend(2),xstart(3):xend(3)) &
-      !     = temptp(1,xstart(2):xend(2),xstart(3):xend(3))
-
-
-      return
-      end
+    return
+end subroutine ImplicitAndUpdateTemp

@@ -61,6 +61,12 @@ subroutine CreateMgrdGrid
     if (istr3r==1) call centre_focus_grid(xcr(1:nxr),xmr(1:nxmr),nxmr,alx3,str3)
 
 !
+!     OPTION 3: Symmetric NATURAL TURB BL CLUSTERING
+!
+
+    if (istr3r==3) call sym_natural_BL_grid(xcr(1:nxr),xmr(1:nxmr),nxmr,alx3, PraS)
+
+!
 !     OPTION 4: HYPERBOLIC TANGENT-TYPE CLUSTERING
 !
 

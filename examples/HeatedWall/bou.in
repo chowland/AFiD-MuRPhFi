@@ -52,4 +52,4 @@ xplusU  xminusU     dPdy    dPdz    MELT
 
 Phase-field parameters
 pf_D(*Pe)   pf_A    pf_S    pf_Tm   IBM     pf_IC
-0.1         10.0    10.0    0.0     1       1
+0.1         10.0    10.0    0.0     0       1

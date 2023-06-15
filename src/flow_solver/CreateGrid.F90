@@ -61,10 +61,27 @@ subroutine CreateGrid
     if (istr3==1) call centre_focus_grid(xc(1:nx),xm(1:nxm),nxm,alx3,str3)
 
 !
+!     OPTION 2: NATURAL TURB BL CLUSTERING
+!
+
+    if (istr3==2) call natural_BL_grid(xc(1:nx),xm(1:nxm),nxm,alx3)
+
+!
+!     OPTION 3: Symmetric NATURAL TURB BL CLUSTERING
+!
+
+    if (istr3==3) call sym_natural_BL_grid(xc(1:nx),xm(1:nxm),nxm,alx3, 1.0)
+
+!
 !     OPTION 4: HYPERBOLIC TANGENT-TYPE CLUSTERING
 !
 
     if (istr3==4) call tanh_grid(xc(1:nx),xm(1:nxm),nxm,alx3,str3)
+
+!
+!   OPTION 5: SCALLOP-FOCUSED LOWER WALL CLUSTERING
+!
+    if (istr3==5) call scallop_grid(xc(1:nx), xm(1:nxm), nxm, alx3, dPdy, 0.5)
 
 !
 !     OPTION 6: CLIPPED CHEBYCHEV-TYPE CLUSTERING

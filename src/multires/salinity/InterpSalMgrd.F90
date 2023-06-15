@@ -37,7 +37,7 @@ subroutine InterpSalMgrd
     end do
 
     if ((xmr(1) < xm(1)) .and. (xmr(nxmr) > xm(nxm))) then
-        call interpolate_xyz_to_coarse_fast(tpdvr, salc(1:nxm,:,:))
+        call interpolate_xyz_to_coarse_fast(tpdvr, salc(1:nxm,:,:), "sal")
     else
         call interpolate_xyz_to_coarse(tpdvr, salc(1:nxm,:,:))
     end if

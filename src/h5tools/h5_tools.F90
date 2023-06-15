@@ -1,7 +1,7 @@
 module h5_tools
     use HDF5
     use mpih, only: MPI_INFO_NULL
-    use param, only: salinity, phasefield, nx, nxm, nym, nzm, time, tframe, nxmr, nymr, nzmr
+    use param, only: salinity, phasefield, nx, nxm, nym, nzm, time, tframe, nxmr, nymr, nzmr, IBM
     use decomp_2d, only: xstart, xstartr
     implicit none
 
@@ -47,6 +47,10 @@ subroutine h5_add_slice_groups(file_id)
     if (salinity) then
         call h5gcreate_f(file_id, "sal", group_id, hdf_error)
         call h5gclose_f(group_id, hdf_error)
+        if (IBM) then
+            call h5gcreate_f(file_id, "sal2", group_id, hdf_error)
+            call h5gclose_f(group_id, hdf_error)
+        end if
     end if
 
     if (phasefield) then
@@ -85,7 +89,7 @@ subroutine write_H5_plane(file_id, varname, var, axis)
             dims(1) = nxm
         end if
     end if
-    if (index('phisal', trim(varname)) /= 0) then
+    if (index('phisal2', trim(varname)) /= 0) then
         dims = [nxmr, nzmr]
         data_offset = [0, xstartr(3) - 1]
         if (axis=='x') then

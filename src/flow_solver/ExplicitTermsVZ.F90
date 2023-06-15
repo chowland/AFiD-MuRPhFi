@@ -125,7 +125,7 @@ subroutine ExplicitTermsVZ
                 imm=ic-1
                 do jc=xstart(2),xend(2)
                     do kc=1,nxm
-                        salit =active_S*0.5d0*(salc(kc,jc,ic)+salc(kc,jc,imm))
+                        salit =active_S*salc(kc,jc,ic)
                         dq(kc,jc,ic) = dq(kc,jc,ic) - bycs*salit
                     end do
                 end do
@@ -145,7 +145,7 @@ subroutine ExplicitTermsVZ
     end if
 !$OMP END PARALLEL DO
 
-    if (phasefield .and. .not.IBM) then
+    if (phasefield) then
         do ic=xstart(3),xend(3)
             imm=ic-1
             do jc=xstart(2),xend(2)

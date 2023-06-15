@@ -10,7 +10,7 @@
 
 subroutine WriteFlowField(final)
     use param
-    use local_arrays, only: vz,vy,vx,temp
+    use local_arrays, only: vz,vy,vx,temp,pr
     use mgrd_arrays, only: sal,phi
     implicit none
     logical, intent(in) :: final
@@ -37,6 +37,10 @@ subroutine WriteFlowField(final)
     if (phasefield) then
         filnam1 = trim(basename)//'_phi.h5'
         call HdfWriteRealHalo3DR(filnam1,phi)
+    end if
+    if (final) then
+        filnam1 = trim(basename)//'_pr.h5'
+        call HdfWriteRealHalo3D(filnam1,pr)
     end if
     
     if (ismaster .and. final) then !EP only write once

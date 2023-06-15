@@ -156,12 +156,18 @@ subroutine ReadFlowInterp(prow,pcol)
             call HdfReadContinua(nzr, nyr, nxr, xstartr(2), xendr(2), &
                                 xstartr(3), xendr(3), 6, phi)
         end if
+        filnam = trim("outputdir/continua_pr.h5")
+        inquire(file=filnam, exist=fexist)
+        if (fexist) then
+            call HdfReadContinua(nz, ny, nx, xstart(2), xend(2), &
+                                    xstart(3), xend(3), 1, pr)
+        end if
     end if
 
     if (resetlogstime) time = 0.d0
     
-    ! Increase max sim time by the end time in continua files
-    tmax = tmax + time
+    ! ! Increase max sim time by the end time in continua files
+    ! tmax = tmax + time
 
     return
 

@@ -40,7 +40,7 @@ subroutine InterpPhiMgrd
     end do
 
     if ((xmr(1) < xm(1)) .and. (xmr(nxmr) > xm(nxm))) then
-        call interpolate_xyz_to_coarse_fast(tpdvr, phic(1:nxm,:,:))
+        call interpolate_xyz_to_coarse_fast(tpdvr, phic(1:nxm,:,:), "phi")
     else
         call interpolate_xyz_to_coarse(tpdvr, phic(1:nxm,:,:))
     end if

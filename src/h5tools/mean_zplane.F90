@@ -101,7 +101,7 @@ subroutine mean_zplane
             ! If file only just created, add groups for data storage
             if (.not. fexist) call h5_add_slice_groups(file_id)
 
-            varname='sal'
+            varname='phi'
             call write_H5_plane(file_id, varname, Tplane, 'z')
     
             ! Close HDF5 file
@@ -215,7 +215,7 @@ subroutine mean_yplane
             ! If file only just created, add groups for data storage
             if (.not. fexist) call h5_add_slice_groups(file_id)
 
-            varname='sal'
+            varname='phi'
             call write_H5_plane(file_id, varname, Tplane, 'y')
     
             ! Close HDF5 file

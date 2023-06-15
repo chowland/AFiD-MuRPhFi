@@ -15,6 +15,7 @@ subroutine CalcMeanProfiles
     use mgrd_arrays, only: vxr,vyr,vzr,sal,phi
     use mpih
     use decomp_2d, only: xstart,xend,xstartr,xendr
+    use ibm_param, only: solidr
     
     implicit none
 
@@ -196,10 +197,10 @@ subroutine CalcMeanProfiles
                                 & + tdx*((vy(kp,jp,i) - vy(km,jp,i))**2 + (vy(kp,j,i) - vy(km,j,i))**2)      ! (dv/dx)^2
             end do
             tdx = 0.125*(dx/g3rm(nxm))**2
-            epsilon(nxm) = epsilon(nxm) + tdx*((vz(nxm,j,ip) - vz(nxm-1,j,ip) + inslws*2.0*(0.0 - vz(nxm,j,ip)))**2 &
-                                       + (vz(nxm,j,i) - vz(nxm-1,j,i) + inslws*2.0*(0.0 - vz(nxm,j,i)))**2) &
-                                & + tdx*((vy(nxm,jp,i) - vy(nxm-1,jp,i) + inslws*2.0*(vy(nxm,jp,i) - xplusU))**2 &
-                                       + (vy(nxm,j,i) - vy(nxm-1,j,i) + inslws*2.0*(vy(nxm,j,i) - xplusU))**2)
+            epsilon(nxm) = epsilon(nxm) + tdx*((vz(nxm,j,ip) - vz(nxm-1,j,ip) + inslwn*2.0*(0.0 - vz(nxm,j,ip)))**2 &
+                                       + (vz(nxm,j,i) - vz(nxm-1,j,i) + inslwn*2.0*(0.0 - vz(nxm,j,i)))**2) &
+                                & + tdx*((vy(nxm,jp,i) - vy(nxm-1,jp,i) + inslwn*2.0*(xplusU - vy(nxm,jp,i)))**2 &
+                                       + (vy(nxm,j,i) - vy(nxm-1,j,i) + inslwn*2.0*(xplusU - vy(nxm,j,i)))**2)
         end do
     end do
 
@@ -215,19 +216,54 @@ subroutine CalcMeanProfiles
         inymr = 1.d0/nymr
         inzmr = 1.d0/nzmr
 
-        do i=xstartr(3),xendr(3)
-            do j=xstartr(2),xendr(2)
-                do k=1,nxmr
-                    Sbar(k) = Sbar(k) + sal(k,j,i)*inymr*inzmr
-
-                    vxS(k) = vxS(k) + 0.5*(vxr(k,j,i)+vxr(k+1,j,i))*sal(k,j,i)*inymr*inzmr
-                    vyS(k) = vyS(k) + 0.5*(vyr(k,j,i)+vyr(k,j+1,i))*sal(k,j,i)*inymr*inzmr
-                    vzS(k) = vzS(k) + 0.5*(vzr(k,j,i)+vzr(k,j,i+1))*sal(k,j,i)*inymr*inzmr
-
-                    Srms(k) = Srms(k) + sal(k,j,i)**2*inymr*inzmr
+        if (IBM) then
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,nxmr
+                        ! Only record data from fluid phase
+                        if (.not. solidr(k,j,i)) then
+                            Sbar(k) = Sbar(k) + sal(k,j,i)*inymr*inzmr
+                        end if
+                        ! NB This is zero in solid anyway, so no need for an if
+                        vxS(k) = vxS(k) + 0.5*(vxr(k,j,i)+vxr(k+1,j,i))*sal(k,j,i)*inymr*inzmr
+                        vyS(k) = vyS(k) + 0.5*(vyr(k,j,i)+vyr(k,j+1,i))*sal(k,j,i)*inymr*inzmr
+                        vzS(k) = vzS(k) + 0.5*(vzr(k,j,i)+vzr(k,j,i+1))*sal(k,j,i)*inymr*inzmr
+                    end do
                 end do
             end do
-        end do
+        else
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,nxmr
+                        Sbar(k) = Sbar(k) + sal(k,j,i)*inymr*inzmr
+
+                        vxS(k) = vxS(k) + 0.5*(vxr(k,j,i)+vxr(k+1,j,i))*sal(k,j,i)*inymr*inzmr
+                        vyS(k) = vyS(k) + 0.5*(vyr(k,j,i)+vyr(k,j+1,i))*sal(k,j,i)*inymr*inzmr
+                        vzS(k) = vzS(k) + 0.5*(vzr(k,j,i)+vzr(k,j,i+1))*sal(k,j,i)*inymr*inzmr
+                    end do
+                end do
+            end do
+        end if
+
+        if (IBM) then
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,nxmr
+                        if (.not. solidr(k,j,i)) then
+                            Srms(k) = Srms(k) + sal(k,j,i)**2*inymr*inzmr
+                        end if
+                    end do
+                end do
+            end do
+        else
+            do i=xstartr(3),xendr(3)
+                do j=xstartr(2),xendr(2)
+                    do k=1,nxmr
+                        Srms(k) = Srms(k) + sal(k,j,i)**2*inymr*inzmr
+                    end do
+                end do
+            end do
+        end if
 
         call MpiSumReal1D(Sbar,nxmr)
         call MpiSumReal1D(vxS,nxmr)
@@ -239,24 +275,74 @@ subroutine CalcMeanProfiles
             Srms(k) = sqrt(Srms(k))
         end do
 
-        do i=xstartr(3),xendr(3)
-            do j=xstartr(2),xendr(2)
-                do k=1,nxmr
-                    chiS(k) = chiS(k) + ((sal(k,j,i+1)-sal(k,j,i-1))*0.5*dzr)**2*inymr*inzmr
-                    chiS(k) = chiS(k) + ((sal(k,j+1,i)-sal(k,j-1,i))*0.5*dyr)**2*inymr*inzmr
+        if (IBM) then
+            do i=xstartr(3),xendr(3)
+                ip = i + 1
+                im = i - 1
+                do j=xstartr(2),xendr(2)
+                    jp = j + 1
+                    jm = j - 1
+                    do k=1,nxmr
+                        if (.not. solidr(k,j,i)) then
+                            if (solidr(k,j,ip)) then
+                                chiS(k) = chiS(k) + ((sal(k,j,i)-sal(k,j,im))*0.5*dzr)**2*inymr*inzmr
+                            elseif (solidr(k,j,im)) then
+                                chiS(k) = chiS(k) + ((sal(k,j,ip)-sal(k,j,i))*0.5*dzr)**2*inymr*inzmr
+                            else
+                                chiS(k) = chiS(k) + ((sal(k,j,ip)-sal(k,j,im))*0.5*dzr)**2*inymr*inzmr
+                            end if
+                            if (solidr(k,jp,i)) then
+                                chiS(k) = chiS(k) + ((sal(k,j,i)-sal(k,jm,i))*0.5*dyr)**2*inymr*inzmr
+                            elseif (solidr(k,jm,i)) then
+                                chiS(k) = chiS(k) + ((sal(k,jp,i)-sal(k,j,i))*0.5*dyr)**2*inymr*inzmr
+                            else
+                                chiS(k) = chiS(k) + ((sal(k,jp,i)-sal(k,jm,i))*0.5*dyr)**2*inymr*inzmr
+                            end if
+                        end if
+                    end do
+                    if (.not. solidr(1,j,i)) then
+                        tdxr = 0.5*dxr/g3rmr(1)
+                        chiS(1) = chiS(1) + ((sal(2,j,i)-sal(1,j,i)+2.0*SfixS*(sal(1,j,i)-salbp(1,j,i)))&
+                                        & *tdxr)**2*inymr*inzmr
+                    end if
+                    do k=2,nxmr-1
+                        if (.not. solidr(k,j,i)) then
+                            tdxr = 0.5*dxr/g3rmr(k)
+                            chiS(k) = chiS(k) + ((sal(k+1,j,i)-sal(k-1,j,i)) * tdxr)**2*inymr*inzmr
+                        end if
+                    end do
+                    if (.not. solidr(nxmr,j,i)) then
+                        tdxr = 0.5*dxr/g3rmr(nxmr)
+                        chiS(nxmr) = chiS(nxmr) + ((sal(nxmr,j,i)-sal(nxmr-1,j,i)+2.0*SfixN*(saltp(1,j,i)-sal(nxmr,j,i)))&
+                                        & *tdxr)**2*inymr*inzmr
+                    end if
                 end do
-                tdxr = 0.5*dxr/g3rmr(1)
-                chiS(1) = chiS(1) + ((sal(2,j,i)-sal(1,j,i)+2.0*SfixS*(sal(1,j,i)-salbp(1,j,i)))&
-                                & *tdxr)**2*inymr*inzmr
-                do k=2,nxmr-1
-                    tdxr = 0.5*dxr/g3rmr(k)
-                    chiS(k) = chiS(k) + ((sal(k+1,j,i)-sal(k-1,j,i)) * tdxr)**2*inymr*inzmr
-                end do
-                tdxr = 0.5*dxr/g3rmr(nxmr)
-                chiS(nxmr) = chiS(nxmr) + ((sal(nxmr,j,i)-sal(nxmr-1,j,i)+2.0*SfixN*(saltp(1,j,i)-sal(nxmr,j,i)))&
-                                & *tdxr)**2*inymr*inzmr
             end do
-        end do
+        else
+            do i=xstartr(3),xendr(3)
+                ip = i + 1
+                im = i - 1
+                do j=xstartr(2),xendr(2)
+                    jp = j + 1
+                    jm = j - 1
+                    do k=1,nxmr
+                        chiS(k) = chiS(k) + ((sal(k,j,ip)-sal(k,j,im))*0.5*dzr)**2*inymr*inzmr
+                        chiS(k) = chiS(k) + ((sal(k,jp,i)-sal(k,jm,i))*0.5*dyr)**2*inymr*inzmr
+                    end do
+                    tdxr = 0.5*dxr/g3rmr(1)
+                    chiS(1) = chiS(1) + ((sal(2,j,i)-sal(1,j,i)+2.0*SfixS*(sal(1,j,i)-salbp(1,j,i)))&
+                                    & *tdxr)**2*inymr*inzmr
+                    do k=2,nxmr-1
+                        tdxr = 0.5*dxr/g3rmr(k)
+                        chiS(k) = chiS(k) + ((sal(k+1,j,i)-sal(k-1,j,i)) * tdxr)**2*inymr*inzmr
+                    end do
+                    tdxr = 0.5*dxr/g3rmr(nxmr)
+                    chiS(nxmr) = chiS(nxmr) + ((sal(nxmr,j,i)-sal(nxmr-1,j,i)+2.0*SfixN*(saltp(1,j,i)-sal(nxmr,j,i)))&
+                                    & *tdxr)**2*inymr*inzmr
+                end do
+            end do
+        end if
+
 
         call MpiSumReal1D(chiS,nxmr)
 

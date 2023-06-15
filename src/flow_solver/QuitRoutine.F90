@@ -37,6 +37,7 @@
       if (multires) call DeallocateMgrdVariables
       if (salinity) call DeallocateSalVariables
       if (phasefield) call DeallocatePFVariables
+      if (IBM) call DeallocateIBMVariables
       call HdfClose
       call decomp_2d_fft_finalize
       call decomp_2d_finalize

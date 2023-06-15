@@ -92,14 +92,32 @@ subroutine CreateInitialConditions
 
     if (dPdy > 0) then
         !CJH Interpret dPdy as Re_tau
-        do i=xstart(3),xend(3)
-            do j=xstart(2),xend(2)
-                do k=1,nxm
-                    xxx = xm(k)
-                    vy(k,j,i) = vy(k,j,i) + 4.0*dPdy**2/ren*xxx*(1.0 - xxx)
+        if (inslwn==1) then
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xm(k)
+                        vy(k,j,i) = vy(k,j,i) + 4.0*dPdy**2/ren*xxx*(1.0 - xxx)
+                    end do
                 end do
             end do
-        end do
+        else
+            eps = 0.1
+            r = 2.0*pi*4/ylen
+            do i=xstart(3),xend(3)
+                do j=xstart(2),xend(2)
+                    do k=1,nxm
+                        xxx = xc(k)
+                        yyy = ym(j)
+                        vx(k,j,i) = - eps*xxx**2*(1.0 - xxx)**2*cos(r*yyy)
+
+                        xxx = xm(k)
+                        yyy = yc(j)
+                        vy(k,j,i) = 20.0*xxx*(2.0 - xxx) + 2.0*eps*xxx*(1.0 - xxx)*(1.0 - 2.0*xxx)*sin(r*yyy)/r
+                    end do
+                end do
+            end do
+        end if
     end if
 
     if (dPdz > 0) then
@@ -115,7 +133,7 @@ subroutine CreateInitialConditions
     end if
 
     ! Set velocity to zero if we are using the phase-field method
-    if (melt .or. phasefield) then
+    if (melt .or. phasefield .or. IBM) then
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                 do k=1,nxm
@@ -191,6 +209,16 @@ subroutine CreateInitialConditions
                     end do
                     amp = 1.0 + 1e-3*amp + 1e-3*sin(46.0*pi*zm(i)/zlen)
                     temp(k,j,i) = amp*erfc(xm(k)/2*sqrt(pect/t0))
+                end do
+            end do
+        end do
+    end if
+
+    if (IBM .and. dPdy/=0) then
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    temp(k,j,i) = 0.0
                 end do
             end do
         end do

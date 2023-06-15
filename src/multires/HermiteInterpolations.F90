@@ -2,9 +2,11 @@ module HermiteInterpolations
     use decomp_2d, only: xstart, xstartr, xend, xendr
     use mgrd_arrays, only: irangs, jrangs, krangs, &
                             irangr, jrangr, krangr, &
+                            irangb, jrangb, krangb, &
                             cxrs, cyrs, czrs, &
-                            cxsalc, cysalc, czsalc
-    use param, only: nxm, nxmr, lvlhalo
+                            cxsalc, cysalc, czsalc, &
+                            cxphic, cyphic, czphic
+    use param, only: nx, nxm, nxmr, lvlhalo, ny, nym, nz, nzm
     use input_grids, only: nxmo, nxmro, xstarto, xendo, &
                             irangsr, jrangsr, krangsr
     implicit none
@@ -180,13 +182,13 @@ contains
                     qv3 = rvar(kcr-1:kcr+2,jcr-1:jcr+2,icr-1:icr+2)
 
                     do ic=max(krangr(icr),xstart(3)),min(krangr(icr+1)-1,xend(3))
-                        qv2(:,:) = qv3(:,:,1)*czsalc(1,ic) + qv3(:,:,2)*czsalc(2,ic) &
-                                 + qv3(:,:,3)*czsalc(3,ic) + qv3(:,:,4)*czsalc(4,ic)
+                        qv2(:,:) = qv3(:,:,1)*czphic(1,ic) + qv3(:,:,2)*czphic(2,ic) &
+                                 + qv3(:,:,3)*czphic(3,ic) + qv3(:,:,4)*czphic(4,ic)
                         do jc=max(jrangr(jcr),xstart(2)),min(jrangr(jcr+1)-1,xend(2))
-                            qv1(:) = qv2(:,1)*cysalc(1,jc) + qv2(:,2)*cysalc(2,jc) &
-                                   + qv2(:,3)*cysalc(3,jc) + qv2(:,4)*cysalc(4,jc)
+                            qv1(:) = qv2(:,1)*cyphic(1,jc) + qv2(:,2)*cyphic(2,jc) &
+                                   + qv2(:,3)*cyphic(3,jc) + qv2(:,4)*cyphic(4,jc)
                             do kc=max(irangr(kcr),1),min(irangr(kcr+1)-1,nxm)
-                                cvar(kc,jc,ic) = sum(qv1(1:4)*cxsalc(1:4,kc))
+                                cvar(kc,jc,ic) = sum(qv1(1:4)*cxphic(1:4,kc))
                             end do
                         end do
                     end do
@@ -197,32 +199,57 @@ contains
 
     end subroutine interpolate_xyz_to_coarse
 
-    subroutine interpolate_xyz_to_coarse_fast(rvar, cvar)
+    subroutine interpolate_xyz_to_coarse_fast(rvar, cvar, vname)
         real, dimension(-1:,xstartr(2)-lvlhalo:,xstartr(3)-lvlhalo:), intent(in) :: rvar
         real, dimension(:,xstart(2)-lvlhalo:,xstart(3)-lvlhalo:), intent(out) :: cvar
+        character(len=3), intent(in) :: vname
 
         real, dimension(4,4,4) :: qv3
         real, dimension(4,4) :: qv2
         real, dimension(4) :: qv1
 
+        real, dimension(4,nxm) :: cx
+        real, dimension(4,nym) :: cy
+        real, dimension(4,nzm) :: cz
+
+        integer, dimension(0:nx) :: irang
+        integer, dimension(0:ny) :: jrang
+        integer, dimension(0:nz) :: krang
+
         integer :: ic, jc, kc, icr, jcr, kcr
 
+        if (vname=="sal") then
+            cx(:,:) = cxsalc(:,1:nxm)
+            cy(:,:) = cysalc(:,:)
+            cz(:,:) = czsalc(:,:)
+            irang(0:nx) = irangb(0:nx)
+            jrang = jrangb
+            krang = krangb
+        else
+            cx(:,:) = cxphic(:,:)
+            cy(:,:) = cyphic(:,:)
+            cz(:,:) = czphic(:,:)
+            irang(0:nx) = irangs(0:nx)
+            jrang = jrangs
+            krang = krangs
+        end if
+
         do ic=xstart(3),xend(3)
-            icr = krangs(ic)
+            icr = krang(ic)
             do jc=xstart(2),xend(2)
-                jcr = jrangs(jc)
+                jcr = jrang(jc)
                 do kc=1,nxm
-                    kcr = irangs(kc)
+                    kcr = irang(kc)
     
                     qv3 = rvar(kcr-2:kcr+1,jcr-2:jcr+1,icr-2:icr+1)
 
-                    qv2(:,:) = qv3(:,:,1)*czsalc(1,ic) + qv3(:,:,2)*czsalc(2,ic) &
-                            + qv3(:,:,3)*czsalc(3,ic) + qv3(:,:,4)*czsalc(4,ic)
+                    qv2(:,:) = qv3(:,:,1)*cz(1,ic) + qv3(:,:,2)*cz(2,ic) &
+                            + qv3(:,:,3)*cz(3,ic) + qv3(:,:,4)*cz(4,ic)
 
-                    qv1(:) = qv2(:,1)*cysalc(1,jc) + qv2(:,2)*cysalc(2,jc) &
-                            + qv2(:,3)*cysalc(3,jc) + qv2(:,4)*cysalc(4,jc)
+                    qv1(:) = qv2(:,1)*cy(1,jc) + qv2(:,2)*cy(2,jc) &
+                            + qv2(:,3)*cy(3,jc) + qv2(:,4)*cy(4,jc)
                     
-                    cvar(kc,jc,ic) = sum(qv1(1:4)*cxsalc(1:4,kc))
+                    cvar(kc,jc,ic) = sum(qv1(1:4)*cx(1:4,kc))
 
                 end do
             end do

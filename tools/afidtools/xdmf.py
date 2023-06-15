@@ -278,7 +278,7 @@ def generate_uniform_xmf(folder, var):
     else:
         nyu, nzu = nym//2, nzm//2
     dx, dy, dz = grid.xc[-1]/nxu, grid.yc[-1]/nyu, grid.zc[-1]/nzu
-    fulldims = (nzm, nym, nxu)
+    fulldims = (nzu, nyu, nxu)
     dims = fulldims
     
     # Collect indices of saved fields

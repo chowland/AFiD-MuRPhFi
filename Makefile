@@ -1,12 +1,12 @@
 # Choose the machine being used
-# Options: PC_GNU, PC_INTEL, (i)SNELLIUS, IRENE, MARENOSTRUM, SUPERMUC
+# Options: PC_GNU, PC_INTEL, (i)SNELLIUS, IRENE(_SKL/_ROME), MARENOSTRUM, SUPERMUC
 MACHINE=PC_GNU
 # Modules required for each HPC system as follows:
-# SNELLIUS: 2021 foss/2021a HDF5/1.10.7-gompi-2021a
-# iSNELLIUS: 2021 intel/2021a FFTW/3.3.9-intel-2021a HDF5/1.10.7-iimpi-2021a
+# SNELLIUS: 2022 foss/2022a HDF5/1.12.2-gompi-2022a
+# iSNELLIUS: 2022 intel/2022a FFTW/3.3.10-GCC-11.3.0 HDF5/1.12.2-iimpi-2021a
 # IRENE: flavor/hdf5/parallel hdf5 fftw3/gnu
 # MARENOSTRUM: fabric intel mkl impi hdf5 fftw szip
-# SUPERMUC: fftw hdf5 szip
+# SUPERMUC: fftw hdf5
 
 #=======================================================================
 #  Compiler options
@@ -29,20 +29,16 @@ ifeq ($(MACHINE),PC_INTEL)
 endif
 ifeq ($(MACHINE),iSNELLIUS)
 	FC = h5pfc -fpp -r8 -O3 -align array64byte -fma -ftz -fomit-frame-pointer
-	LDFLAGS = -lfftw3 -mkl=sequential
+	LDFLAGS = -lfftw3 -qmkl=sequential
 endif
 ifeq ($(MACHINE),SNELLIUS)
 	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -w -fallow-argument-mismatch
-	FC += -O3 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer
+	FC += -O2 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer
 	BLAS_LIBS = -lscalapack -lopenblas -ldl
 	LDFLAGS = -lfftw3 $(BLAS_LIBS)
 endif
 ifeq ($(MACHINE),IRENE_SKL)
 	FC = h5pfc -fpp -r8 -O3 -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW3_FFLAGS)
-	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) -ldl
-endif
-ifeq ($(MACHINE),IRENE_KNL)
-	FC = h5pfc -fpp -r8 -O3 -xMIC-AVX512 -fma -align array64byte -finline-functions $(FFTW3_FFLAGS)
 	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) -ldl
 endif
 ifeq ($(MACHINE),IRENE_ROME)
@@ -55,9 +51,8 @@ ifeq ($(MACHINE),MARENOSTRUM)
 	LDFLAGS = $(FFTW_LIBS) -mkl=sequential
 endif
 ifeq ($(MACHINE),SUPERMUC)
-	FC = h5pfc -fpp -r8 -O3
-	HDF5_LIBS = $(HDF5_F90_SHLIB) $(HDF5_SHLIB) -L$(SZIP_LIBDIR) -lz -ldl -lm
-	LDFLAGS = $(MKL_LIB) $(FFTW_LIB) $(HDF5_LIBS)
+	FC = mpif90 -fpp -r8 -O3 $(HDF5_INC)
+	LDFLAGS = $(FFTW_LIB) $(HDF5_F90_SHLIB) $(HDF5_SHLIB) -qmkl=sequential
 endif
 
 ifeq ($(MACHINE),SNELLIUS)
@@ -115,18 +110,23 @@ OBJS += obj/AddLatentHeat.o obj/DeallocatePFVariables.o obj/ExplicitTermsPhi.o \
 	obj/InterpTempMgrd.o obj/SolveImpEqnUpdate_Phi.o obj/CreateICPF.o \
 	obj/ImmersedBoundary.o
 
+# # Object files associated with the immersed boundary method
+OBJS += obj/SolveImpEqnUpdate_Temp_ibm.o obj/SolveImpEqnUpdate_X_ibm.o \
+	obj/SolveImpEqnUpdate_YZ_ibm.o obj/topogr_ibm.o obj/SolveImpEqnUpdate_Sal_ibm.o \
+	obj/DeallocateIBMVars.o
+
 # Object files for plane writing
 OBJS += obj/mean_zplane.o
 
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
-	obj/HermiteInterpolations.o obj/GridModule.o obj/h5_tools.o obj/means.o
+	obj/HermiteInterpolations.o obj/GridModule.o obj/h5_tools.o obj/means.o obj/ibm_param.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
-	HermiteInterpolations.F90 GridModule.F90
+	HermiteInterpolations.F90 GridModule.F90 ibm_param.F90
 
 #============================================================================ 
 #  make PROGRAM   
@@ -148,7 +148,17 @@ $(OBJDIR)/AuxiliaryRoutines.o: src/flow_solver/AuxiliaryRoutines.F90
 $(OBJDIR)/decomp_2d.o: src/flow_solver/2decomp/decomp_2d.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
-	$(FC) -c -o $@ $< $(LDFLAGS) 
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/GridModule.o: src/flow_solver/GridModule.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/HermiteInterpolations.o: src/multires/HermiteInterpolations.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/h5_tools.o: src/h5tools/h5_tools.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/means.o: src/h5tools/means.F90 obj/ibm_param.o
+	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/flow_solver/%.F90 $(MOBJS)
@@ -162,6 +172,8 @@ $(OBJDIR)/%.o: src/multires/IC_interpolation/%.F90 $(MOBJS)
 $(OBJDIR)/%.o: src/multires/phase-field/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/%.o: src/multires/salinity/%.F90 $(MOBJS)
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/%.o: src/ibm/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $< $(LDFLAGS)
 
 #============================================================================

@@ -27,6 +27,7 @@ program AFiD
 !*******************************************************
 !
     call ReadInputFile
+    if (nzm==1 .or. nym==1) write_mean_planes = .false.
 
     if (command_argument_count().eq.2) then
         call get_command_argument(1,arg)
@@ -155,6 +156,8 @@ program AFiD
         if (phasefield) call CreateICPF
 
     endif
+
+    if (IBM) call topogr
 
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)

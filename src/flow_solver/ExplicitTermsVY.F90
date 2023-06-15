@@ -30,7 +30,11 @@ subroutine ExplicitTermsVY
     udz=dz*0.25
 
     !CJH Treat dPdy input variable as Re_tau
-    Gy = 8.0*dPdy**2/ren**2
+    if (inslwn==0 .or. inslws==0) then
+        Gy = dPdy**2/ren**2
+    else
+        Gy = 8.0*dPdy**2/ren**2
+    end if
 
 !$OMP  PARALLEL DO &
 !$OMP  DEFAULT(none) &
@@ -125,7 +129,7 @@ subroutine ExplicitTermsVY
                 do jc=xstart(2),xend(2)
                     jmm=jc-1
                     do kc=1,nxm
-                        salit =active_S*0.5d0*(salc(kc,jc,ic)+salc(kc,jmm,ic))
+                        salit =active_S*salc(kc,jc,ic)
                         dph(kc,jc,ic) = dph(kc,jc,ic) - bycs*salit
                     end do
                 end do
@@ -144,7 +148,7 @@ subroutine ExplicitTermsVY
         end if
     end if
 
-    if (phasefield .and. .not.IBM) then
+    if (phasefield) then
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
                 jmm=jc-1

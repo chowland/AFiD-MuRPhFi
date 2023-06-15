@@ -18,6 +18,7 @@ subroutine CorrectVelocity
     integer :: jc,jm,kc,km,ic,im,kmid
     real    :: usukm,udy,udz,locdph
     real, dimension(nxm) :: vxbar, Gshape
+    real, dimension(nxmr):: GshapeR
     real :: vybulk, vzbulk, Tbulk, Sbulk, idx, vz_target, lam, lfac
 
     udy = al*dt*dy
@@ -138,6 +139,13 @@ subroutine CorrectVelocity
         do kc=kmid+1,nxm
             Gshape(kc) = (1.0 - exp(lam*(xm(kc) - 1.0)))/lfac
         end do
+        kmid = nxmr/2
+        do kc=1,kmid
+            GshapeR(kc) = (1.0 - exp(-lam*xmr(kc)))/lfac
+        end do
+        do kc=kmid+1,nxmr
+            GshapeR(kc) = (1.0 - exp(lam*(xmr(kc) - 1.0)))/lfac
+        end do
 
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
@@ -171,7 +179,7 @@ subroutine CorrectVelocity
             do ic=xstartr(3),xendr(3)
                 do jc=xstartr(2),xendr(2)
                     do kc=1,nxmr
-                        sal(kc,jc,ic) = sal(kc,jc,ic) - Sbulk*Gshape(kc)
+                        sal(kc,jc,ic) = sal(kc,jc,ic) - Sbulk*GshapeR(kc)
                     end do
                 end do
             end do

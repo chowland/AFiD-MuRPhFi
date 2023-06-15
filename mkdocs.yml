@@ -56,3 +56,4 @@ nav:
         - 'buoyancy.md'
         - 'interpolation.md'
         - 'stretched_grids.md'
+        - 'ibm.md'

@@ -21,7 +21,25 @@ subroutine CreateICSal
 
     call random_seed()
     eps=5e-3
-    if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
+    if (IBM) then
+        eps = 1e-1
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    call random_number(varptb)
+                    ! Centre random perturbations around 0
+                    varptb = 2.0*varptb - 1.0
+                    ! Use pf_IC input parameter as mode number for initial perturbation
+                    h0 = 0.5 + 0.01*sin(pf_IC*2.0*pi*ymr(j)/ylen)
+                    sal(k,j,i) = 0.5*tanh((xmr(k) - h0)/1e-7)
+                    sal(k,j,i) = sal(k,j,i) + eps/cosh((xmr(k) - h0)/0.01)**2*varptb
+                    ! Restrict initial salinity field to [-0.5,0.5]
+                    sal(k,j,i) = min(0.5, sal(k,j,i))
+                    sal(k,j,i) = max(-0.5, sal(k,j,i))
+                end do
+            end do
+        end do
+    else if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
         ! For DDC initialise with uniform salinity
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
