@@ -68,34 +68,42 @@ subroutine InitPressureSolver
     nzmh=nzm/2+1
     nzmp=nzmh+1
 
-    ! call AllocateReal1DArray(ao,1,nz)
-    ! call AllocateReal1DArray(ap,1,ny)
-    
     !! Construct modified wavenumbers
     !! z
-    do i=1,nzmh
-        ao(i)=(i-1)*2.d0*pi
-    end do
-    do i=nzmp,nzm
-        ao(i)=-(nzm-i+1)*2.d0*pi
-    end do
-    do i=1,nzm
-        ak1(i)=2.d0*(1.d0-dcos(ao(i)/nzm))*(float(nzm)/zlen)**2
-    end do
+    if (sidewall) then
+        do i=1,nzm
+            ao(i) = (i-1)*pi
+            ak1(i) = 2.d0*(1.d0 - cos(ao(i)/nzm))*(float(nzm)/zlen)**2
+        end do
+    else
+        do i=1,nzmh
+            ao(i)=(i-1)*2.d0*pi
+        end do
+        do i=nzmp,nzm
+            ao(i)=-(nzm-i+1)*2.d0*pi
+        end do
+        do i=1,nzm
+            ak1(i)=2.d0*(1.d0-cos(ao(i)/nzm))*(float(nzm)/zlen)**2
+        end do
+    end if
     
     !! y
-    do j=1,nymh
-        ap(j)=(j-1)*2.d0*pi
-    end do
-    do j=nymp,nym
-        ap(j)=-(nym-j+1)*2.d0*pi
-    end do
-    do j=1,nym
-        ak2(j)=2.d0*(1.d0-dcos(ap(j)/nym))*(float(nym)/ylen)**2
-    end do
-
-    ! call DestroyReal1DArray(ao)
-    ! call DestroyReal1DArray(ap)
+    if (sidewall) then
+        do j=1,nym
+            ap(j) = (j-1)*pi
+            ak2(j) = 2.d0*(1.d0 - cos(ap(j)/nym))*(float(nym)/ylen)**2
+        end do
+    else
+        do j=1,nymh
+            ap(j)=(j-1)*2.d0*pi
+        end do
+        do j=nymp,nym
+            ap(j)=-(nym-j+1)*2.d0*pi
+        end do
+        do j=1,nym
+            ak2(j)=2.d0*(1.d0-cos(ap(j)/nym))*(float(nym)/ylen)**2
+        end do
+    end if
 
     !! Initialise tridiagonal matrices for Poisson solver
     do kc=1,nxm
