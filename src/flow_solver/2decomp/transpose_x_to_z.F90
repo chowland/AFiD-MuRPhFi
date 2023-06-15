@@ -44,3 +44,36 @@
     return
   end subroutine transpose_x_to_z_complex
 
+
+  subroutine transpose_x_to_z_real(src, dst, opt_decomp)
+
+    implicit none
+    
+    real(mytype), dimension(:,:,:), intent(IN) :: src
+    real(mytype), dimension(:,:,:), intent(OUT) :: dst
+    TYPE(DECOMP_INFO), intent(IN), optional :: opt_decomp
+
+    TYPE(DECOMP_INFO) :: decomp
+
+    integer :: ierror
+
+    if (present(opt_decomp)) then
+       decomp = opt_decomp
+    else
+       decomp = decomp_main
+    end if
+
+#if !defined(MPI3)
+    call MPI_Alltoallw(src,decomp%xcnts_xz,decomp%xdispls_xz,decomp%xtypes_xz, &
+      dst,decomp%zcnts_xz,decomp%zdispls_xz,decomp%ztypes_xz,MPI_COMM_WORLD,ierror)
+#endif
+
+#ifdef MPI3
+    call MPI_Neighbor_alltoallw( &
+      src,decomp%xcnts_xz(decomp%xranks),decomp%xdispls_xz(decomp%xranks),decomp%xtypes_xz(decomp%xranks), &
+      dst,decomp%zcnts_xz(decomp%zranks),decomp%zdispls_xz(decomp%zranks),decomp%ztypes_xz(decomp%zranks), &
+      decomp%xtozNeighborComm,ierror)
+#endif
+
+    return
+  end subroutine transpose_x_to_z_real

@@ -212,14 +212,12 @@ module decomp_2d
   end interface transpose_y_to_x
 
   interface transpose_z_to_x
-! not available
-!     module procedure transpose_z_to_x_real
+    module procedure transpose_z_to_x_real
      module procedure transpose_z_to_x_complex
   end interface transpose_z_to_x
 
   interface transpose_x_to_z
-! not available
-!     module procedure transpose_x_to_z_real
+    module procedure transpose_x_to_z_real
      module procedure transpose_x_to_z_complex
   end interface transpose_x_to_z
 
