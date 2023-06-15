@@ -92,6 +92,8 @@ module param
 
     integer :: lvlhalo=2
 
+    logical :: sidewall = .false.     !! Flag to determine whether to impose sidewalls in y and z (using a DCT)
+
 end module param
 
 !************* End of param module******************************

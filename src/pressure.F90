@@ -10,8 +10,6 @@ module afid_pressure
     use mpih
     implicit none
 
-    logical :: sidewall     !! Flag to determine whether to impose sidewalls in y (using a DCT)
-
     real, allocatable, dimension(:) :: ak1      !! Modified wavenumber in z
     real, allocatable, dimension(:) :: ak2      !! Modified wavenumber in y
 
