@@ -1,7 +1,7 @@
 subroutine CalcFourierCoef(var,fouvar)
 use, intrinsic :: iso_c_binding
 use param
-use fftw_params
+use afid_fft
 use afid_pressure
 use decomp_2d
 use decomp_2d_fft
@@ -50,7 +50,7 @@ end subroutine CalcFourierCoef
 subroutine CalcSpec(var1,var2,specy,specz)
 use, intrinsic :: iso_c_binding
 use param
-use fftw_params
+use afid_fft
 use decomp_2d
 use decomp_2d_fft
 use mpih
@@ -158,7 +158,7 @@ end subroutine CalcSpec
 subroutine CalcPowerSpec(var, idx, specy, specz)
     use, intrinsic :: iso_c_binding
     use param
-    use fftw_params
+    use afid_fft
     use decomp_2d
     use decomp_2d_fft
     use mpih

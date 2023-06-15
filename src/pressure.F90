@@ -2,7 +2,7 @@
 !! pressure correction needed to ensure a divergence-free velocity field
 module afid_pressure
     use param
-    use fftw_params
+    use afid_fft
     use local_arrays, only: pr, dph, dphhalo
     use decomp_2d
     use decomp_2d_fft
