@@ -120,14 +120,14 @@ OBJS += obj/mean_zplane.o
 
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
-	obj/pressure.o obj/HermiteInterpolations.o obj/grid.o obj/h5_tools.o obj/means.o \
+	obj/fft.o obj/pressure.o obj/HermiteInterpolations.o obj/grid.o obj/h5_tools.o obj/means.o \
 	obj/ibm_param.o obj/IBMTools.o obj/moisture.o obj/salinity.o obj/phasefield.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
-	pressure.F90 HermiteInterpolations.F90 grid.F90 ibm_param.F90 IBMTools.F90 \
+	fft.F90 pressure.F90 HermiteInterpolations.F90 grid.F90 ibm_param.F90 IBMTools.F90 \
 	moisture.F90 salinity.F90 phasefield.F90
 
 #============================================================================ 
@@ -154,6 +154,8 @@ $(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
 $(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/grid.o: src/grid.F90
+	$(FC) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/fft.o: src/fft.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/pressure.o: src/pressure.F90
 	$(FC) -c -o $@ $< $(LDFLAGS)
