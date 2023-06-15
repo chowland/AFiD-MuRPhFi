@@ -15,6 +15,7 @@ subroutine Mkmov_xcut
     use afid_salinity, only: sal
     use afid_phasefield, only: phi
     use h5_tools
+    use param, only: nxm, nxmr, IBM
     implicit none
     character(70) :: filename
     character(4) :: varname
