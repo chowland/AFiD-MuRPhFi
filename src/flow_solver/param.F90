@@ -172,68 +172,68 @@ module mpih
     integer :: MDP = MPI_DOUBLE_PRECISION
 end module mpih
 !====================================================
-module fftw_params
-    !        use param, only: m2m,m2mh,m1m
-    use iso_c_binding
+! module fftw_params
+!     !        use param, only: m2m,m2mh,m1m
+!     use iso_c_binding
 
-    type, bind(C) :: fftw_iodim
-        integer(C_INT) n, is, os
-    end type fftw_iodim
+!     type, bind(C) :: fftw_iodim
+!         integer(C_INT) n, is, os
+!     end type fftw_iodim
 
-    interface
-        type(C_PTR) function fftw_plan_guru_dft(rank,dims, &
-        howmany_rank,howmany_dims,in,out,sign,flags) &
-        bind(C, name='fftw_plan_guru_dft')
-        import
-        integer(C_INT), value :: rank
-        type(fftw_iodim), dimension(*), intent(in) :: dims
-        integer(C_INT), value :: howmany_rank
-        type(fftw_iodim), dimension(*), intent(in) :: howmany_dims
-        complex(C_DOUBLE_COMPLEX), dimension(*), intent(out) :: in
-        complex(C_DOUBLE_COMPLEX), dimension(*), intent(out) :: out
-        integer(C_INT), value :: sign
-        integer(C_INT), value :: flags
-        end function fftw_plan_guru_dft
+!     interface
+!         type(C_PTR) function fftw_plan_guru_dft(rank,dims, &
+!         howmany_rank,howmany_dims,in,out,sign,flags) &
+!         bind(C, name='fftw_plan_guru_dft')
+!         import
+!         integer(C_INT), value :: rank
+!         type(fftw_iodim), dimension(*), intent(in) :: dims
+!         integer(C_INT), value :: howmany_rank
+!         type(fftw_iodim), dimension(*), intent(in) :: howmany_dims
+!         complex(C_DOUBLE_COMPLEX), dimension(*), intent(out) :: in
+!         complex(C_DOUBLE_COMPLEX), dimension(*), intent(out) :: out
+!         integer(C_INT), value :: sign
+!         integer(C_INT), value :: flags
+!         end function fftw_plan_guru_dft
 
-        type(C_PTR) function fftw_plan_guru_dft_r2c(rank,dims, &
-            howmany_rank,howmany_dims,in,out,flags) &
-            bind(C, name='fftw_plan_guru_dft_r2c')
-            import
-            integer(C_INT), value :: rank
-            type(fftw_iodim), dimension(*), intent(in) :: dims
-            integer(C_INT), value :: howmany_rank
-            type(fftw_iodim), dimension(*), intent(in) :: howmany_dims
-            real(C_DOUBLE), dimension(*), intent(out) :: in
-            complex(C_DOUBLE_COMPLEX), dimension(*), intent(out) :: out
-            integer(C_INT), value :: flags
-        end function fftw_plan_guru_dft_r2c
+!         type(C_PTR) function fftw_plan_guru_dft_r2c(rank,dims, &
+!             howmany_rank,howmany_dims,in,out,flags) &
+!             bind(C, name='fftw_plan_guru_dft_r2c')
+!             import
+!             integer(C_INT), value :: rank
+!             type(fftw_iodim), dimension(*), intent(in) :: dims
+!             integer(C_INT), value :: howmany_rank
+!             type(fftw_iodim), dimension(*), intent(in) :: howmany_dims
+!             real(C_DOUBLE), dimension(*), intent(out) :: in
+!             complex(C_DOUBLE_COMPLEX), dimension(*), intent(out) :: out
+!             integer(C_INT), value :: flags
+!         end function fftw_plan_guru_dft_r2c
 
-        type(C_PTR) function fftw_plan_guru_dft_c2r(rank,dims, &
-            howmany_rank,howmany_dims,in,out,flags)  &
-            bind(C, name='fftw_plan_guru_dft_c2r')
-            import
-            integer(C_INT), value :: rank
-            type(fftw_iodim), dimension(*), intent(in) :: dims
-            integer(C_INT), value :: howmany_rank
-            type(fftw_iodim), dimension(*), intent(in) :: howmany_dims
-            complex(C_DOUBLE_COMPLEX), dimension(*), intent(out) :: in
-            real(C_DOUBLE), dimension(*), intent(out) :: out
-            integer(C_INT), value :: flags
-        end function fftw_plan_guru_dft_c2r
+!         type(C_PTR) function fftw_plan_guru_dft_c2r(rank,dims, &
+!             howmany_rank,howmany_dims,in,out,flags)  &
+!             bind(C, name='fftw_plan_guru_dft_c2r')
+!             import
+!             integer(C_INT), value :: rank
+!             type(fftw_iodim), dimension(*), intent(in) :: dims
+!             integer(C_INT), value :: howmany_rank
+!             type(fftw_iodim), dimension(*), intent(in) :: howmany_dims
+!             complex(C_DOUBLE_COMPLEX), dimension(*), intent(out) :: in
+!             real(C_DOUBLE), dimension(*), intent(out) :: out
+!             integer(C_INT), value :: flags
+!         end function fftw_plan_guru_dft_c2r
 
 
-    end interface
+!     end interface
 
-    integer FFTW_PATIENT, FFTW_FORWARD, FFTW_BACKWARD,FFTW_ESTIMATE
-    parameter (FFTW_PATIENT=32)
-    parameter (FFTW_ESTIMATE=64)
-    parameter (FFTW_FORWARD=-1)
-    parameter (FFTW_BACKWARD=1)
-    type(C_PTR) :: fwd_guruplan_y,bwd_guruplan_y
-    type(C_PTR) :: fwd_guruplan_z,bwd_guruplan_z
-    logical :: planned=.false.
+!     integer FFTW_PATIENT, FFTW_FORWARD, FFTW_BACKWARD,FFTW_ESTIMATE
+!     parameter (FFTW_PATIENT=32)
+!     parameter (FFTW_ESTIMATE=64)
+!     parameter (FFTW_FORWARD=-1)
+!     parameter (FFTW_BACKWARD=1)
+!     type(C_PTR) :: fwd_guruplan_y,bwd_guruplan_y
+!     type(C_PTR) :: fwd_guruplan_z,bwd_guruplan_z
+!     logical :: planned=.false.
 
-    real,allocatable,dimension(:,:,:) :: ry1,rz1
-    complex,allocatable,dimension(:,:,:) :: cy1,cz1,dphc,fouvar1,fouvar2
+!     real,allocatable,dimension(:,:,:) :: ry1,rz1
+!     complex,allocatable,dimension(:,:,:) :: cy1,cz1,dphc,fouvar1,fouvar2
 
-end module fftw_params
+! end module fftw_params
