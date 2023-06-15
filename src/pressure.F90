@@ -46,10 +46,12 @@ subroutine DeallocatePressureVars
     call DestroyReal1DArray(apphk)
 
     !! Temporary mid-FFT arrays
-    if(allocated(dphc)) deallocate(dphc)
-    if(allocated(rz1)) deallocate(rz1)
-    if(allocated(cz1)) deallocate(cz1)
     if(allocated(ry1)) deallocate(ry1)
+    if(allocated(ry2)) deallocate(ry2)
+    if(allocated(rz2)) deallocate(rz2)
+    if(allocated(dphr)) deallocate(dphr)
+    if(allocated(dphc)) deallocate(dphc)
+    if(allocated(cz1)) deallocate(cz1)
     if(allocated(cy1)) deallocate(cy1)
     
 end subroutine DeallocatePressureVars
@@ -126,18 +128,27 @@ subroutine InitPressureSolver
     allocate(ry1(ph%yst(1):ph%yen(1), &
                  ph%yst(2):ph%yen(2), &
                  ph%yst(3):ph%yen(3)))
-    allocate(rz1(ph%zst(1):ph%zen(1), &
-                 ph%zst(2):ph%zen(2), &
-                 ph%zst(3):ph%zen(3)))
-    allocate(cy1(sp%yst(1):sp%yen(1), &
-                 sp%yst(2):sp%yen(2), &
-                 sp%yst(3):sp%yen(3)))
-    allocate(cz1(sp%zst(1):sp%zen(1), &
-                 sp%zst(2):sp%zen(2), &
-                 sp%zst(3):sp%zen(3)))
-    allocate(dphc(sp%xst(1):sp%xen(1), &
-                  sp%xst(2):sp%xen(2), &
-                  sp%xst(3):sp%xen(3)))
+    if (sidewall) then
+        allocate(ry2(ph%yst(1):ph%yen(1), &
+                     ph%yst(2):ph%yen(2), &
+                     ph%yst(3):ph%yen(3)))
+        allocate(rz2(ph%zst(1):ph%zen(1), &
+                     ph%zst(2):ph%zen(2), &
+                     ph%zst(3):ph%zen(3)))
+        allocate(dphr(ph%xst(1):ph%xen(1), &
+                      ph%xst(2):ph%xen(2), &
+                      ph%xst(3):ph%xen(3)))
+    else
+        allocate(cy1(sp%yst(1):sp%yen(1), &
+                     sp%yst(2):sp%yen(2), &
+                     sp%yst(3):sp%yen(3)))
+        allocate(cz1(sp%zst(1):sp%zen(1), &
+                     sp%zst(2):sp%zen(2), &
+                     sp%zst(3):sp%zen(3)))
+        allocate(dphc(sp%xst(1):sp%xen(1), &
+                      sp%xst(2):sp%xen(2), &
+                      sp%xst(3):sp%xen(3)))
+    end if
 
 end subroutine InitPressureSolver
 
