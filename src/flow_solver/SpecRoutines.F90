@@ -2,7 +2,6 @@ subroutine CalcFourierCoef(var,fouvar)
 use, intrinsic :: iso_c_binding
 use param
 use afid_fft
-use afid_pressure
 use decomp_2d
 use decomp_2d_fft
 use mpih
