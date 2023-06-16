@@ -2,6 +2,9 @@
 !! the fast Fourier transform
 !! N.B. The bulk of the FFT framework is actually in the modified 2decomp library 2decomp_fft
 module afid_fft
+    use param, only: sidewall, nym, nzm, ismaster
+    use mpih
+    use decomp_2d_fft
     use iso_c_binding
     implicit none
 
@@ -87,6 +90,113 @@ module afid_fft
             integer(C_INT), value :: flags
         end function fftw_plan_guru_r2r
 
-    end interface
+    end Interface
+
+contains
+
+!> Create FFTW plan using DFTs if no sidewalls
+!! and using DCTs if `sidewall` is set to true
+subroutine PlanFourierTransform
+    type(fftw_iodim),dimension(1) :: iodim
+    type(fftw_iodim),dimension(2) :: iodim_howmany
+    integer :: info
+    integer(C_FFTW_R2R_KIND), dimension(1) :: kind_forw, kind_back
+
+    kind_forw(1) = FFTW_REDFT10
+    kind_back(1) = FFTW_REDFT01
+
+    iodim(1) % n = nzm
+    iodim(1) % is = (sp%zen(1)-sp%zst(1)+1)*(sp%zen(2)-sp%zst(2)+1)
+    iodim(1) % os = (sp%zen(1)-sp%zst(1)+1)*(sp%zen(2)-sp%zst(2)+1)
+
+    iodim_howmany(1) % n = (sp%zen(1)-sp%zst(1)+1)
+    iodim_howmany(1) % is = 1
+    iodim_howmany(1) % os = 1
+    iodim_howmany(2) % n = (sp%zen(2)-sp%zst(2)+1)
+    iodim_howmany(2) % is = (sp%zen(1)-sp%zst(1)+1)
+    iodim_howmany(2) % os = (sp%zen(1)-sp%zst(1)+1)
+
+    ! Construct forward plan for z transform
+    if (sidewall) then
+        fwd_guruplan_z = fftw_plan_guru_r2r(1, iodim, &
+            2, iodim_howmany, rz2, rz2, &
+            kind_forw, FFTW_ESTIMATE)
+    else
+        fwd_guruplan_z = fftw_plan_guru_dft(1, iodim, &
+            2, iodim_howmany, cz1, cz1, &
+            FFTW_FORWARD, FFTW_ESTIMATE)
+    end if
+    
+    iodim(1) % n = nzm
+    ! Construct backward plan for z transform
+    if (sidewall) then
+        bwd_guruplan_z = fftw_plan_guru_r2r(1, iodim, &
+            2,iodim_howmany,rz2,rz2, &
+            kind_back,FFTW_ESTIMATE)
+    else
+        bwd_guruplan_z = fftw_plan_guru_dft(1, iodim, &
+            2,iodim_howmany,cz1,cz1, &
+            FFTW_BACKWARD,FFTW_ESTIMATE)
+    end if
+    
+    if (.not.c_associated(bwd_guruplan_z)) then
+        if (ismaster) print*,'Failed to create guru plan. You should'
+        if (ismaster) print*,'link with FFTW3 before MKL'
+        if (ismaster) print*,'Please check linking order.'
+        call MPI_Abort(MPI_COMM_WORLD,1,info)
+    end if
+    
+    iodim(1) % n = nym
+    iodim(1) % is = ph%yen(1)-ph%yst(1)+1
+    iodim(1) % os = sp%yen(1)-sp%yst(1)+1
+    
+    iodim_howmany(1) % n = (ph%yen(1)-ph%yst(1)+1)
+    iodim_howmany(1) % is = 1
+    iodim_howmany(1) % os = 1
+    iodim_howmany(2) % n = (ph%yen(3)-ph%yst(3)+1)
+    iodim_howmany(2) % is = (ph%yen(1)-ph%yst(1)+1) &
+                          * (ph%yen(2)-ph%yst(2)+1)
+    iodim_howmany(2) % os = (sp%yen(1)-sp%yst(1)+1) &
+                          * (sp%yen(2)-sp%yst(2)+1)
+
+    ! Construct forward plan for y transform
+    if (sidewall) then
+        fwd_guruplan_y = fftw_plan_guru_r2r(1, iodim, &
+            2, iodim_howmany, ry1, ry2, &
+            kind_forw, FFTW_ESTIMATE)
+    else
+        fwd_guruplan_y = fftw_plan_guru_dft_r2c(1, iodim, &
+            2, iodim_howmany, ry1, cy1, &
+            FFTW_ESTIMATE)
+    end if
+    
+    iodim(1) % n = nym
+    iodim(1) % is = sp%yen(1)-sp%yst(1)+1
+    iodim(1) % os = ph%yen(1)-ph%yst(1)+1
+
+    iodim_howmany(1) % n=(sp%yen(1)-sp%yst(1)+1)
+    iodim_howmany(1) % is=1
+    iodim_howmany(1) % os=1
+    iodim_howmany(2) % n=(sp%yen(3)-sp%yst(3)+1)
+    iodim_howmany(2) % is=(sp%yen(1)-sp%yst(1)+1) &
+                        * (sp%yen(2)-sp%yst(2)+1)
+    iodim_howmany(2) % os=(ph%yen(1)-ph%yst(1)+1) &
+                        * (ph%yen(2)-ph%yst(2)+1)
+    
+    ! Construct backward plan for y transform
+    if (sidewall) then
+        bwd_guruplan_y = fftw_plan_guru_r2r(1,iodim, &
+            2,iodim_howmany,ry2,ry1, &
+            kind_back, FFTW_ESTIMATE)
+    else
+        bwd_guruplan_y = fftw_plan_guru_dft_c2r(1,iodim, &
+            2,iodim_howmany,cy1,ry1, &
+            FFTW_ESTIMATE)
+    end if
+
+    ! Save that we have planned the FFT
+    planned=.true.
+
+end subroutine PlanFourierTransform
 
 end module
