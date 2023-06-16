@@ -12,7 +12,7 @@ FLAGSAL     FLAGPF
 
 Read flow / Reset logs
 NREAD       IRESET
-1           0
+0           0
 
 Time steps / time limit (wall/flow) 
 NTST        WALLTIMEMAX     TMAX
