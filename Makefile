@@ -98,7 +98,7 @@ OBJS = obj/main.o obj/CalcMaxCFL.o \
 	obj/SetTempBCs.o obj/SolveImpEqnUpdate_Temp.o obj/SolveImpEqnUpdate_X.o \
 	obj/SolveImpEqnUpdate_YZ.o obj/SpecRoutines.o \
 	obj/TimeMarcher.o obj/WriteFlowField.o obj/WriteGridInfo.o \
-	obj/CalcWriteQ.o obj/GlobalQuantities.o obj/ReadFlowInterp.o
+	obj/CalcWriteQ.o obj/GlobalQuantities.o obj/ReadFlowInterp.o obj/SetSidewallBCs.o
 
 # Object files associated with multiple resolution grids
 OBJS += obj/CreateMgrdGrid.o obj/InitMgrdVariables.o \
