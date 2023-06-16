@@ -24,6 +24,7 @@ program AFiD
     integer :: lfactor,lfactor2
     character(100) :: arg
     logical :: nanexist, write_mean_planes=.true.
+    logical, dimension(3) :: periodic_bc        !! Flags for which dimensions have periodic boundary conditions
     ! real,allocatable,dimension(:,:) :: dummy,dscan,dbot
     ! integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
@@ -45,10 +46,16 @@ program AFiD
         read(arg,'(i10)') pcol
     endif
 
+    if (sidewall) then
+        periodic_bc = [.false., .false., .false.]
+    else
+        periodic_bc = [.false., .true., .true.]
+    end if
+
     call decomp_2d_init(nxm ,nym ,nzm ,&
                         nxmr,nymr,nzmr,&
                         prow,pcol,&
-                        (/ .false.,.true.,.true. /))
+                        periodic_bc)
 
     ts=MPI_WTIME()
     tin(1) = MPI_WTIME()
