@@ -107,6 +107,8 @@ subroutine TimeMarcher
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
 
+        if (sidewall) call SetSidewallBCs
+
         call CalcLocalDivergence
         call SolvePressureCorrection
 
@@ -153,6 +155,8 @@ subroutine TimeMarcher
             call InterpPhiMultigrid
             call update_halo(phic,lvlhalo)
         end if
+
+        if (sidewall) call SetSidewallBCs
 
         if (moist) call UpdateSaturation
 
