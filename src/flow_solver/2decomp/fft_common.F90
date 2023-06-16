@@ -90,6 +90,7 @@ contains
 
   ! Initialise the FFT library to perform arbitrary size transforms
   subroutine fft_init_general(pencil, nx, ny, nz)
+   use param, only: sidewall
 
     implicit none
 
@@ -123,9 +124,17 @@ contains
 
     call decomp_info_init(nx, ny, nz, ph)
     if (format==PHYSICAL_IN_X) then
-       call decomp_info_init(nx, ny/2+1, nz, sp)
+      if (sidewall) then
+         call decomp_info_init(nx, ny, nz, sp)
+      else
+         call decomp_info_init(nx, ny/2+1, nz, sp)
+      end if
     else if (format==PHYSICAL_IN_Z) then
-       call decomp_info_init(nx, ny, nz/2+1, sp)
+      if (sidewall) then
+         call decomp_info_init(nx, ny, nz, sp)
+      else
+         call decomp_info_init(nx, ny, nz/2+1, sp)
+      end if
     end if
 
     allocate(wk2_c2c(ph%ysz(1),ph%ysz(2),ph%ysz(3)), STAT=status)
