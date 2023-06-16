@@ -188,26 +188,53 @@ subroutine SolvePressureCorrection
     call transpose_x_to_y(dph,ry1,ph)
     ! If calling for the first time, plan the Fourier transform
     if (.not. planned) call PlanFourierTransform
-    call dfftw_execute_dft_r2c(fwd_guruplan_y,ry1,cy1)
-    call transpose_y_to_z(cy1,cz1,sp)
-    call dfftw_execute_dft(fwd_guruplan_z,cz1,cz1)
+
+    if (sidewall) then
+        call dfftw_execute_r2r(fwd_guruplan_y,ry1,ry2)
+        call transpose_y_to_z(ry2,rz2,sp)
+        call dfftw_execute_r2r(fwd_guruplan_z,rz2,rz2)
+    else
+        call dfftw_execute_dft_r2c(fwd_guruplan_y,ry1,cy1)
+        call transpose_y_to_z(cy1,cz1,sp)
+        call dfftw_execute_dft(fwd_guruplan_z,cz1,cz1)
+    end if
     
     ! Normalise the transformed array. FFTW does not do this automatically
-    cz1 = cz1 / (nzm*nym)
+    if (sidewall) then
+        rz2 = 0.25*rz2/(nzm*nym)
+    else
+        cz1 = cz1 / (nzm*nym)
+    end if
     
     ! Transpose back to an x-pencil before the tridiagonal solve
-    call transpose_z_to_x(cz1,dphc,sp)
+    if (sidewall) then
+        call transpose_z_to_x(rz2,dphr,sp)
+    else
+        call transpose_z_to_x(cz1,dphc,sp)
+    end if
     
     ! Solve the tridiagonal system with complex coefficients
-    call SolveTridiagonalPressure
+    if (sidewall) then
+        call SolveTridiagonalPressure_real
+    else
+        call SolveTridiagonalPressure_complex
+    end if
 
-    call transpose_x_to_z(dphc,cz1,sp)
+    ! if (ismaster) write(*,*) 'Tridiagonal system solved'
     
-    call dfftw_execute_dft(bwd_guruplan_z,cz1,cz1)
+    if (sidewall) then
+        call transpose_x_to_z(dphr,rz2,sp)
+        call dfftw_execute_r2r(bwd_guruplan_z,rz2,rz2)
+        call transpose_z_to_y(rz2,ry2,sp)
+        call dfftw_execute_r2r(bwd_guruplan_y,ry2,ry1)
+    else
+        call transpose_x_to_z(dphc,cz1,sp)
+        call dfftw_execute_dft(bwd_guruplan_z,cz1,cz1)
+        call transpose_z_to_y(cz1,cy1,sp)
+        call dfftw_execute_dft_c2r(bwd_guruplan_y,cy1,ry1)
+    end if
     
-    call transpose_z_to_y(cz1,cy1,sp)
-    
-    call dfftw_execute_dft_c2r(bwd_guruplan_y,cy1,ry1)
+    ! if (ismaster) write(*,*) 'Back FFT performed'
     
     call transpose_y_to_x(ry1,dph,ph)
 
@@ -215,7 +242,7 @@ end subroutine SolvePressureCorrection
 
 !> Solve the tridiagonal system for the x-derivatives of the Poisson equation
 !! for the Fourier transformed pressure
-subroutine SolveTridiagonalPressure
+subroutine SolveTridiagonalPressure_complex
     integer :: i, j, k, info
     complex :: acphT_b
     complex :: appph(nxm-2)
@@ -250,7 +277,46 @@ subroutine SolveTridiagonalPressure
             
         end do
     end do
-end subroutine SolveTridiagonalPressure
+end subroutine SolveTridiagonalPressure_complex
+
+!> Solve the tridiagonal system for the x-derivatives of the Poisson equation
+!! for the cosine Fourier transformed pressure
+subroutine SolveTridiagonalPressure_real
+    integer :: i, j, k, info
+    real :: acphT_b
+    real :: appph(nxm-2)
+    real :: acphT(nxm), apph(nxm-1), amph(nxm-1)
+    integer :: phpiv(nxm)
+
+    ! Construct tridiagonal system for each Fourier mode
+    do i=sp%xst(3),sp%xen(3)
+        do j=sp%xst(2),sp%xen(2)
+            do k=1,nxm
+                ! Normalise RHS & LHS to avoid floating point errors
+                acphT_b = 1.0/(acphk(k) - ak2(j) - ak1(i))
+                dphr(k,j,i) = dphr(k,j,i)*acphT_b
+                if (k < nxm) apph(k  ) = apphk(k)*acphT_b
+                if (k > 1)   amph(k-1) = amphk(k)*acphT_b
+                ! Small perturbation needed to prevent singular matrix
+                ! when using uniform grid:
+                acphT(k) = 1.0d0 + 1.0d-15 
+            end do
+            
+            ! Factor the tridiagonal matrix
+            call dgttrf(nxm, amph, acphT, apph, appph, phpiv, info)
+            
+            if (info.gt.0) then
+                print*,'Singular value found in LAPACK routine zgttrf: info=',info
+                print*,'Please try to adjust either NX or STR3 in bou.in'
+                call MPI_Abort(MPI_COMM_WORLD,1,ierr)
+            endif
+            
+            ! Solve the tridiagonal system
+            call dgttrs('N',nxm,1,amph,acphT,apph,appph,phpiv,dphr(1:nxm,j,i),nxm,info)
+            
+        end do
+    end do
+end subroutine SolveTridiagonalPressure_real
 
 !> Remove the divergent component of velocity from the velocity field
 !! using the solved pressure correction
