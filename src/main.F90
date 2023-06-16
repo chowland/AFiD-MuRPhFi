@@ -33,6 +33,9 @@ program AFiD
 !*******************************************************
 !
 
+    ! Set `sidewall` to .true. if sidewall.in exists
+    inquire(file="sidewall.in", exist=sidewall)
+
     ! Set `moist` to .true. if humid.in exists
     inquire(file="humid.in", exist=moist)
 
