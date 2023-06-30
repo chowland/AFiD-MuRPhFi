@@ -130,7 +130,7 @@ end subroutine SetHumidityBCs
 
 subroutine CreateInitialHumidity
     integer :: ic, jc, kc
-    real :: rnum, r
+    real :: rnum, r, r2
 
     call random_seed()
 
@@ -151,12 +151,13 @@ subroutine CreateInitialHumidity
         do jc=xstart(2),xend(2)
             do kc=1,nxm
                 call random_number(rnum)
-                r = sqrt((ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2)
+                ! r = sqrt((ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2 + (zm(ic) - 0.5*zlen)**2)
+                r2 = (ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2 + (zm(ic) - 0.5*zlen)**2
                 ! humid(kc,jc,ic) = humbp(1,jc,ic) + (humtp(1,jc,ic) - humbp(1,jc,ic))*xm(kc)
                 ! humid(kc,jc,ic) = 1.1*qsat(kc,jc,ic)*0.5*(1.0 - tanh(100*(r - 0.1)))
                 ! humid(kc,jc,ic) = 0.5*(1.0 - tanh(100*(r - 0.1)))
-                humid(kc,jc,ic) = 5.0*exp(-((xm(kc)-0.1)**2 + (ym(jc) - 0.5*ylen)**2)/0.005)
-                ! humid(kc,jc,ic) = humid(kc,jc,ic) + 1e-3*rnum
+                humid(kc,jc,ic) = 5.0*exp(-r2/0.005)
+                humid(kc,jc,ic) = humid(kc,jc,ic) + 1e-3*rnum
                 ! humid(kc,jc,ic) = temp(kc,jc,ic)
             end do
         end do
