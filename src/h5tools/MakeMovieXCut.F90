@@ -14,6 +14,7 @@ subroutine Mkmov_xcut
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal
     use afid_phasefield, only: phi
+    use afid_moisture, only: humid
     use h5_tools
     use param, only: nxm, nxmr, IBM
     implicit none
@@ -33,7 +34,8 @@ subroutine Mkmov_xcut
     filename = trim("outputdir/flowmov/movie_xcut.h5")
 
     ! MPI
-    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true.,.true./), comm, ierr)
+    ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true.,.true./), comm, ierr)
+    comm = comm_yz
     info = MPI_INFO_NULL
 
     call h5_open_or_create(file_id, filename, comm, fexist)
@@ -50,6 +52,11 @@ subroutine Mkmov_xcut
 
     varname = 'temp'
     call write_H5_plane(file_id, varname, temp(ic, xstart(2):xend(2), xstart(3):xend(3)), 'x')
+
+    if (moist) then
+        varname = 'qhum'
+        call write_H5_plane(file_id, varname, humid(ic, xstart(2):xend(2), xstart(3):xend(3)), 'x')
+    end if
 
     call h5fclose_f(file_id, hdf_error)
 

@@ -34,7 +34,8 @@ subroutine Mkmov_zcut
     filename = trim("outputdir/flowmov/movie_zcut.h5")
 
     ! MPI
-    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true.,.false./), comm, ierr)
+    ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true.,.false./), comm, ierr)
+    comm = comm_xy
     info = MPI_INFO_NULL
 
     if(ic.le.xend(3) .and. ic.ge.xstart(3)) then

@@ -7,13 +7,14 @@ subroutine mean_zplane
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal
     use afid_phasefield, only: phi
+    use afid_moisture, only: humid
     use h5_tools
     use means
     implicit none
 
     character(70) :: filename
     character(4) :: varname
-    real, allocatable :: uplane(:,:), vplane(:,:), wplane(:,:), Tplane(:,:)
+    real, allocatable :: uplane(:,:), vplane(:,:), wplane(:,:), Tplane(:,:), qplane(:,:)
     integer :: comm, zrank
     integer(HID_T) :: file_id
     logical :: fexist
@@ -24,16 +25,20 @@ subroutine mean_zplane
     allocate(vplane(1:nxm,xstart(2):xend(2)))
     allocate(wplane(1:nxm,xstart(2):xend(2)))
     allocate(Tplane(1:nxm,xstart(2):xend(2)))
+    if (moist) allocate(qplane(1:nxm,xstart(2):xend(2)))
 
-    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+    ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+    comm = comm_xz
     call MPI_COMM_RANK(comm, zrank, ierr)
 
     call zmean(vx(1:nx ,xstart(2):xend(2),xstart(3):xend(3)), uplane, comm, zrank)
     call zmean(vy(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), vplane, comm, zrank)
     call zmean(vz(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), wplane, comm, zrank)
     call zmean(temp(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), Tplane, comm, zrank)
+    if (moist) call zmean(humid(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), qplane, comm, zrank)
 
-    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+    ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+    comm = comm_xy
 
     if (zrank==0) then
 
@@ -50,6 +55,10 @@ subroutine mean_zplane
         call write_H5_plane(file_id, varname, wplane, 'z')
         varname='temp'
         call write_H5_plane(file_id, varname, Tplane, 'z')
+        if (moist) then
+            varname='qhum'
+            call write_H5_plane(file_id, varname, qplane, 'z')
+        end if
 
         ! Close HDF5 file
         call h5fclose_f(file_id, hdf_error)
@@ -59,16 +68,19 @@ subroutine mean_zplane
     if (allocated(vplane)) deallocate(vplane)
     if (allocated(wplane)) deallocate(wplane)
     if (allocated(Tplane)) deallocate(Tplane)
+    if (allocated(qplane)) deallocate(qplane)
 
     if (salinity) then
         allocate(Tplane(1:nxmr,xstartr(2):xendr(2)))
 
-        call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+        ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+        comm = comm_xz
         call MPI_COMM_RANK(comm, zrank, ierr)
 
         call zmeanr(sal(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)), Tplane, comm, zrank)
 
-        call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+        ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+        comm = comm_xy
 
         if (zrank==0) then
             ! Open the movie file (create if it doesn't exist)
@@ -89,12 +101,14 @@ subroutine mean_zplane
     if (phasefield) then
         allocate(Tplane(1:nxmr,xstartr(2):xendr(2)))
 
-        call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+        ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+        comm = comm_xz
         call MPI_COMM_RANK(comm, zrank, ierr)
 
         call zmeanr(phi(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)), Tplane, comm, zrank)
 
-        call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+        ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+        comm = comm_xy
 
         if (zrank==0) then
             ! Open the movie file (create if it doesn't exist)
@@ -122,13 +136,14 @@ subroutine mean_yplane
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal
     use afid_phasefield, only: phi
+    use afid_moisture, only: humid
     use h5_tools
     use means
     implicit none
 
     character(70) :: filename
     character(4) :: varname
-    real, allocatable :: uplane(:,:), vplane(:,:), wplane(:,:), Tplane(:,:)
+    real, allocatable :: uplane(:,:), vplane(:,:), wplane(:,:), Tplane(:,:), qplane(:,:)
     integer :: comm, yrank
     integer(HID_T) :: file_id
     logical :: fexist
@@ -139,16 +154,20 @@ subroutine mean_yplane
     allocate(vplane(1:nxm,xstart(3):xend(3)))
     allocate(wplane(1:nxm,xstart(3):xend(3)))
     allocate(Tplane(1:nxm,xstart(3):xend(3)))
+    if (moist) allocate(qplane(1:nxm,xstart(3):xend(3)))
 
-    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+    ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+    comm = comm_xy
     call MPI_COMM_RANK(comm, yrank, ierr)
 
     call ymean(vx(1:nx ,xstart(2):xend(2),xstart(3):xend(3)), uplane, comm, yrank)
     call ymean(vy(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), vplane, comm, yrank)
     call ymean(vz(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), wplane, comm, yrank)
     call ymean(temp(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), Tplane, comm, yrank)
+    if (moist) call ymean(humid(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), qplane, comm, yrank)
 
-    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+    ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+    comm = comm_xz
 
     if (yrank==0) then
 
@@ -165,6 +184,10 @@ subroutine mean_yplane
         call write_H5_plane(file_id, varname, wplane, 'y')
         varname='temp'
         call write_H5_plane(file_id, varname, Tplane, 'y')
+        if (moist) then
+            varname='qhum'
+            call write_H5_plane(file_id, varname, qplane, 'y')
+        end if
 
         ! Close HDF5 file
         call h5fclose_f(file_id, hdf_error)
@@ -174,16 +197,19 @@ subroutine mean_yplane
     if (allocated(vplane)) deallocate(vplane)
     if (allocated(wplane)) deallocate(wplane)
     if (allocated(Tplane)) deallocate(Tplane)
+    if (allocated(qplane)) deallocate(qplane)
 
     if (salinity) then
         allocate(Tplane(1:nxmr,xstartr(3):xendr(3)))
 
-        call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+        ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+        comm = comm_xy
         call MPI_COMM_RANK(comm, yrank, ierr)
 
         call ymeanr(sal(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)), Tplane, comm, yrank)
 
-        call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+        ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+        comm = comm_xz
 
         if (yrank==0) then
             ! Open the movie file (create if it doesn't exist)
@@ -204,12 +230,14 @@ subroutine mean_yplane
     if (phasefield) then
         allocate(Tplane(1:nxmr,xstartr(3):xendr(3)))
 
-        call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+        ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .false./), comm, ierr)
+        comm = comm_xy
         call MPI_COMM_RANK(comm, yrank, ierr)
 
         call ymeanr(phi(1:nxmr,xstartr(2):xendr(2),xstartr(3):xendr(3)), Tplane, comm, yrank)
 
-        call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+        ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false., .true./), comm, ierr)
+        comm = comm_xz
 
         if (yrank==0) then
             ! Open the movie file (create if it doesn't exist)
