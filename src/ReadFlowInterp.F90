@@ -6,6 +6,7 @@ subroutine ReadFlowInterp(prow,pcol)
     use input_grids
     use afid_salinity
     use afid_phasefield
+    use afid_moisture, only: humid
     use AuxiliaryRoutines
     
     implicit none
@@ -159,7 +160,11 @@ subroutine ReadFlowInterp(prow,pcol)
         inquire(file=filnam, exist=fexist)
         if (fexist) then
             call HdfReadContinua(nz, ny, nx, xstart(2), xend(2), &
-                                    xstart(3), xend(3), 1, pr)
+                                    xstart(3), xend(3), 7, pr)
+        end if
+        if (moist) then
+            call HdfReadContinua(nz, ny, nx, xstart(2), xend(2), &
+                                    xstart(3), xend(3), 8, humid)
         end if
     end if
 
