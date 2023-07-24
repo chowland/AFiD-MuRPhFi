@@ -99,6 +99,12 @@ subroutine ReadMoistParameters
         if (ifdiff) tau_q = pect*tau_q
     end if
 
+    ! If the input file has a negative gamma, set the value of gamma
+    ! such that delta m is equal to 1
+    if (gamma_q < 0) then
+        gamma_q = beta_q/(1.0 - exp(-alpha_q))
+    end if
+
     if (ismaster) then
         write(*,*) 'al, be, ga, tau'
         write(*,*) alpha_q, beta_q, gamma_q, tau_q
