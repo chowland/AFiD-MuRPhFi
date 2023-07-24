@@ -29,8 +29,8 @@ contains
 
 !> Subroutine to allocate memory for all moisture-related variables
 subroutine InitMoistVariables
-    ! Allocate array for 3D specific humidity field
-    call AllocateReal3DArray(humid,1,nxm,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
+    ! Allocate array for 3D specific humidity field (needs to be nx size in x for writing out continua file)
+    call AllocateReal3DArray(humid,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
     ! Allocate array for 3D saturation values
     call AllocateReal3DArray(qsat,1,nxm,xstart(2),xend(2),xstart(3),xend(3))
 

@@ -192,6 +192,7 @@ program AFiD
     if (salinity) call update_halo(sal,lvlhalo)
     call update_halo(pr,lvlhalo)
     if (moist) call update_halo(humid,lvlhalo)
+    if (moist) call UpdateSaturation
 
 
 !CS   Interpolate initial values
