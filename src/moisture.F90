@@ -136,39 +136,57 @@ end subroutine SetHumidityBCs
 
 subroutine CreateInitialHumidity
     integer :: ic, jc, kc
-    real :: rnum, r, r2
+    real :: rnum, r, r2, amp
+    real :: bz(nxm), qz(nxm)
+    logical :: exists
 
     call random_seed()
 
-    do ic=xstart(3),xend(3)
-        do jc=xstart(2),xend(2)
-            do kc=1,nxm
-                call random_number(rnum)
-                temp(kc,jc,ic) = (1.0 - xm(kc))*xm(kc)*rnum*1e-3
+    inquire(file="drizzle.h5", exist=exists)
+    if (exists) then
+        call HdfSerialReadReal1D('b', "drizzle.h5", bz, nxm)
+        call HdfSerialReadReal1D('q', "drizzle.h5", qz, nxm)
+        
+        amp = 1e-3
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                    call random_number(rnum)
+                    temp(kc,jc,ic) = bz(kc) + amp*rnum
+                    call random_number(rnum)
+                    humid(kc,jc,ic) = qz(kc) + amp*rnum
+                end do
             end do
         end do
-    end do
+    else
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                    call random_number(rnum)
+                    temp(kc,jc,ic) = (1.0 - xm(kc))*xm(kc)*rnum*1e-3
+                end do
+            end do
+        end do
+
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                    call random_number(rnum)
+                    ! r = sqrt((ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2 + (zm(ic) - 0.5*zlen)**2)
+                    r2 = (ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2 + (zm(ic) - 0.5*zlen)**2
+                    ! humid(kc,jc,ic) = humbp(1,jc,ic) + (humtp(1,jc,ic) - humbp(1,jc,ic))*xm(kc)
+                    ! humid(kc,jc,ic) = 1.1*qsat(kc,jc,ic)*0.5*(1.0 - tanh(100*(r - 0.1)))
+                    ! humid(kc,jc,ic) = 0.5*(1.0 - tanh(100*(r - 0.1)))
+                    humid(kc,jc,ic) = 5.0*exp(-r2/0.005)
+                    humid(kc,jc,ic) = humid(kc,jc,ic) + 1e-3*rnum
+                    ! humid(kc,jc,ic) = temp(kc,jc,ic)
+                end do
+            end do
+        end do
+    end if
 
     call update_halo(temp,lvlhalo)
-
     call UpdateSaturation
-
-    do ic=xstart(3),xend(3)
-        do jc=xstart(2),xend(2)
-            do kc=1,nxm
-                call random_number(rnum)
-                ! r = sqrt((ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2 + (zm(ic) - 0.5*zlen)**2)
-                r2 = (ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2 + (zm(ic) - 0.5*zlen)**2
-                ! humid(kc,jc,ic) = humbp(1,jc,ic) + (humtp(1,jc,ic) - humbp(1,jc,ic))*xm(kc)
-                ! humid(kc,jc,ic) = 1.1*qsat(kc,jc,ic)*0.5*(1.0 - tanh(100*(r - 0.1)))
-                ! humid(kc,jc,ic) = 0.5*(1.0 - tanh(100*(r - 0.1)))
-                humid(kc,jc,ic) = 5.0*exp(-r2/0.005)
-                humid(kc,jc,ic) = humid(kc,jc,ic) + 1e-3*rnum
-                ! humid(kc,jc,ic) = temp(kc,jc,ic)
-            end do
-        end do
-    end do
-
     call update_halo(humid,lvlhalo)
 
 end subroutine CreateInitialHumidity
