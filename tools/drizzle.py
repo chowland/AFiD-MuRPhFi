@@ -28,7 +28,7 @@ m = P + Q*z
 
 # Define temperature profile
 C = P + (Q - beta)*z
-T = C - lambertw(alpha*gamma*np.exp(alpha*C))/alpha
+T = C - W(alpha*gamma*np.exp(alpha*C))/alpha
 
 # Infer buoyancy profile
 b = T + beta*z

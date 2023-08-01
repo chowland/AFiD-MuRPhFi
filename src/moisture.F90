@@ -135,17 +135,27 @@ subroutine SetHumidityBCs
 end subroutine SetHumidityBCs
 
 subroutine CreateInitialHumidity
+    use mpih
     integer :: ic, jc, kc
     real :: rnum, r, r2, amp
     real :: bz(nxm), qz(nxm)
     logical :: exists
+    character(len=30) :: dsetname, filename
 
     call random_seed()
 
-    inquire(file="drizzle.h5", exist=exists)
+    filename = trim("drizzle.h5")
+
+    inquire(file=filename, exist=exists)
     if (exists) then
-        call HdfSerialReadReal1D('b', "drizzle.h5", bz, nxm)
-        call HdfSerialReadReal1D('q', "drizzle.h5", qz, nxm)
+        if (ismaster) then
+            dsetname = trim("b")
+            call HdfSerialReadReal1D(dsetname, filename, bz, nxm)
+            dsetname = trim("q")
+            call HdfSerialReadReal1D(dsetname, filename, qz, nxm)
+        end if
+        call MPI_BCAST(bz, nxm, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)
+        call MPI_BCAST(qz, nxm, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)
         
         amp = 1e-3
         do ic=xstart(3),xend(3)
