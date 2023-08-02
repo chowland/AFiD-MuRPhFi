@@ -102,7 +102,11 @@ subroutine ReadMoistParameters
     ! If the input file has a negative gamma, set the value of gamma
     ! such that delta m is equal to 1
     if (gamma_q < 0) then
-        gamma_q = beta_q/(1.0 - exp(-alpha_q))
+        if (qfixN == 2) then    ! (unsaturated top boundary)
+            gamma_q = beta_q
+        else
+            gamma_q = beta_q/(1.0 - exp(-alpha_q))
+        end if
     end if
 
     if (ismaster) then
@@ -132,6 +136,15 @@ subroutine SetHumidityBCs
             humtp(1,jc,ic) = exp(alpha_q*(temptp(1,jc,ic) - beta_q))
         end do
     end do
+    ! Use the input qfixN==2 to set an unsaturated top boundary
+    if (qfixN == 2) then
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                humtp(1,jc,ic) = 0.0
+            end do
+        end do
+        qfixN = 1
+    end if
 end subroutine SetHumidityBCs
 
 subroutine CreateInitialHumidity
