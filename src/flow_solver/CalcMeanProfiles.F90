@@ -175,7 +175,7 @@ subroutine CalcMeanProfiles
                                 & + 0.125*dz**2*((vx(kp,j,ip) - vx(kp,j,im))**2 + (vx(k,j,ip) - vx(k,j,im))**2) & ! (du/dz)^2
                                 & + 0.125*dy**2*((vz(k,jp,ip) - vz(k,jm,ip))**2 + (vz(k,jp,i) - vz(k,jm,i))**2) & ! (dw/dy)^2
                                 & + ((vy(k,j+1,i)-vy(k,j,i))*dy)**2 &   ! (dv/dy)^2
-                                & + 0.125*dy**2*((vx(kp,jp,i) - vx(k,jm,i))**2 + (vx(k,jp,i) - vx(k,jm,i))**2) & ! (du/dy)^2
+                                & + 0.125*dy**2*((vx(kp,jp,i) - vx(kp,jm,i))**2 + (vx(k,jp,i) - vx(k,jm,i))**2) & ! (du/dy)^2
                                 & + ((vx(k+1,j,i)-vx(k,j,i))*udx3m(k))**2   ! (du/dx)^2
             end do
             tdx = 0.125*(dx/g3rm(1))**2
