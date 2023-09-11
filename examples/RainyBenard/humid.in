@@ -1,0 +1,24 @@
+An input file for parameters used in moist convection
+---
+
+alpha (Dimensionless saturation parameter)
+3.0
+
+beta (Dimensionless lapse rate)
+1.2
+
+gamma (Dimensioness latent heat parameter)
+0.19
+
+tau (Condensation time scale)
+0.375
+
+Diffusive scale for tau? (.true. / .false.)
+.false.
+
+Fixed humidity boundary conditions (1 / 0)
+top     bottom
+1       1
+
+Sm (Humid-to-thermal diffusivity ratio)
+1.0

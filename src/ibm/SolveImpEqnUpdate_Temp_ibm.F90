@@ -10,13 +10,13 @@
 
 subroutine SolveImpEqnUpdate_Temp_ibm
     use param
-    use local_arrays, only : temp,rhs,hro
+    use local_arrays, only : temp,rhs
     use decomp_2d, only: xstart,xend
     use ibm_param, only: distbt, ibmaskt
     ! use param_particle      ! SL
     implicit none
     real, dimension(nx) :: amkl,apkl,ackl,fkl
-    integer :: jc,kc,info,ipkv(nxm),ic,nrhs,km,kp,n
+    integer :: jc,kc,info,ipkv(nxm),ic,km,kp,n
     real :: betadx,ackl_b, Tb
     real :: amkT(nxm-1),ackT(nxm),apkT(nxm-1),appk(nxm-2)
     ! real :: kcpp,kcpm       ! SL

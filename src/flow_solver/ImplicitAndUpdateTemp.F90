@@ -68,7 +68,7 @@ subroutine ImplicitAndUpdateTemp
     enddo
 !$OMP END PARALLEL DO
 
-    if (IBM) then
+    if (IBM .and. .not. phasefield) then
         call SolveImpEqnUpdate_Temp_ibm
     else
 !  Solve equation and update temperature

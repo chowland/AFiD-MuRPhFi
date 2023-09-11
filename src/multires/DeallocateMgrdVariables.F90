@@ -28,17 +28,17 @@ subroutine DeallocateMgrdVariables
     call DestroyReal1DArray(udx3cr)
     call DestroyReal1DArray(udx3mr)
 
-    call DestroyReal1DArray(ap3ckr)
-    call DestroyReal1DArray(ac3ckr)
-    call DestroyReal1DArray(am3ckr)
+    ! call DestroyReal1DArray(ap3ckr)
+    ! call DestroyReal1DArray(ac3ckr)
+    ! call DestroyReal1DArray(am3ckr)
 
-    call DestroyReal1DArray(ap3sskr)
-    call DestroyReal1DArray(ac3sskr)
-    call DestroyReal1DArray(am3sskr)
+    ! call DestroyReal1DArray(ap3sskr)
+    ! call DestroyReal1DArray(ac3sskr)
+    ! call DestroyReal1DArray(am3sskr)
 
-    call DestroyReal1DArray(ap3spkr)
-    call DestroyReal1DArray(ac3spkr)
-    call DestroyReal1DArray(am3spkr)
+    ! call DestroyReal1DArray(ap3spkr)
+    ! call DestroyReal1DArray(ac3spkr)
+    ! call DestroyReal1DArray(am3spkr)
 
     call DestroyInt1dArray(kmcr)
     call DestroyInt1dArray(kpcr)
@@ -60,6 +60,9 @@ subroutine DeallocateMgrdVariables
     call DestroyInt1dArray(irangb)   !CS mgrd
     call DestroyInt1dArray(jrangb)   !CS mgrd
     call DestroyInt1dArray(krangb)   !CS mgrd
+
+    call DestroyInt1dArray(yc_to_ymr)
+    call DestroyInt1dArray(zc_to_zmr)
 
     call DestroyReal2DArray(cxvx) !CS mgrd
     call DestroyReal2DArray(cxvy) !CS mgrd
@@ -85,9 +88,12 @@ subroutine DeallocateMgrdVariables
     call DestroyReal2DArray(cyphic)
     call DestroyReal2DArray(czphic)
 
-    call DestroyReal3DArray(vxr)
-    call DestroyReal3DArray(vyr)
-    call DestroyReal3DArray(vzr)
+    if (IBM) then
+        if (phasefield) then
+            call DestroyReal2DArray(cych)
+            call DestroyReal2DArray(czch)
+        end if
+    end if
 
     call DestroyReal3DArray(tpdv)
     call DestroyReal3DArray(tpdvr)  !CS BUG: ERROR WHILE DEALLOCATING

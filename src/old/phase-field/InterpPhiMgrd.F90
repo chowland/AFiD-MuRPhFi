@@ -11,18 +11,14 @@
 subroutine InterpPhiMgrd
 
     use param
-    use mgrd_arrays, only: phi,phic,cxsalc,cysalc,czsalc,irangr,jrangr,krangr,tpdvr
+    use mgrd_arrays, only: phi,phic,tpdvr
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
     use HermiteInterpolations, only: interpolate_xyz_to_coarse, interpolate_xyz_to_coarse_fast
     implicit none
 
-    integer  :: ic,jc,kc, icr,jcr,kcr
-
-    real,dimension(4,4,4) :: qv3 
-    real,dimension(4,4) :: qv2
-    real,dimension(4) :: qv1
+    integer  :: ic,jc,kc
 
     ! Interpolate to coarse grid here. A better option is to apply
     ! a box filter.

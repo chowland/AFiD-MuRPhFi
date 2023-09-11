@@ -2,18 +2,15 @@ subroutine InterpInputPhi
 
     use param
     use input_grids
-    use mgrd_arrays
+    ! use mgrd_arrays
+    use afid_phasefield, only: phi
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
     use HermiteInterpolations, only: interpolate_xyz_old_to_new_ref
     implicit none
 
-    integer  :: ic,jc,kc, ip,jp,kp, icr,jcr,kcr
-
-    real,dimension(4,4,4) :: qv3 
-    real,dimension(4,4) :: qv2
-    real,dimension(4) :: qv1
+    integer  :: ic,jc
 
     real, allocatable, dimension(:,:,:) :: phio
 

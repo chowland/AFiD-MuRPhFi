@@ -112,16 +112,21 @@ contains
                 dlp = xo(io+2) - xo(io+1)
                 do in=max(idx(io),1),min(idx(io+1)-1,n_new)
                     t = (xn(in) - xo(io))/dlc
-                    h00 = (1.0 + 2.0*t)*(1.0 - t)**2
-                    h10 = t*(1.0 - t)**2
-                    h01 = (1.0 + 2.0*(1.0 - t))*t**2
-                    h11 = -(1.0 - t)*t**2
-                    cx(1,in) = -h10*dlc**2/dlm/(dlc + dlm)
-                    cx(2,in) = h00 - h11*dlp/(dlp + dlc) &
-                                    + h10*(dlc - dlm)/dlm
-                    cx(3,in) = h01 + h10*dlm/(dlm + dlc) &
-                                    + h11*(dlp - dlc)/dlp
-                    cx(4,in) = h11*dlc**2/dlp/(dlp + dlc)
+                    if (t<1e-12) then
+                        cx(:,in) = 0.0
+                        cx(2,in) = 1.0
+                    else
+                        h00 = (1.0 + 2.0*t)*(1.0 - t)**2
+                        h10 = t*(1.0 - t)**2
+                        h01 = (1.0 + 2.0*(1.0 - t))*t**2
+                        h11 = -(1.0 - t)*t**2
+                        cx(1,in) = -h10*dlc**2/dlm/(dlc + dlm)
+                        cx(2,in) = h00 - h11*dlp/(dlp + dlc) &
+                                        + h10*(dlc - dlm)/dlm
+                        cx(3,in) = h01 + h10*dlm/(dlm + dlc) &
+                                        + h11*(dlp - dlc)/dlp
+                        cx(4,in) = h11*dlc**2/dlp/(dlp + dlc)
+                    end if
                 end do
             end if
         end do

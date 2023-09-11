@@ -15,13 +15,6 @@ subroutine CreateOldGrid
     use GridModule
     implicit none
 
-    real :: x1, x2, x3
-    real :: delet, etain, tstr3, z2dp
-
-    real, allocatable, dimension(:) :: etaz, etazm
-
-    integer :: i, j, k, nxp, nclip
-
     nxmo = nxo - 1
     nymo = nyo - 1
     nzmo = nzo - 1
@@ -65,12 +58,36 @@ subroutine CreateOldGrid
         if (istr3ro==1) call centre_focus_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3,str3o)
     end if
 
+    ! Option 2: Natural turb BL clustering
+
+    if (istr3o==2) call natural_BL_grid(xco(1:nxo),xmo(1:nxmo),nxmo,alx3)
+
+    if (multires) then
+        if (istr3ro==2) call natural_BL_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3)
+    end if
+
+    ! Option 3: Symmetric natural turb BL clustering
+
+    if (istr3o==3) call sym_natural_BL_grid(xco(1:nxo),xmo(1:nxmo),nxmo,alx3, 1.0)
+
+    if (multires) then
+        if (istr3ro==3) call sym_natural_BL_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3, 1.0)
+    end if
+
     ! Option 4: Hyperbolic tangent-type clustering
 
     if (istr3o==4) call tanh_grid(xco(1:nxo),xmo(1:nxmo),nxmo,alx3,str3o)
 
     if (multires) then
         if (istr3ro==4) call tanh_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3,str3o)
+    end if
+
+    ! Option 5: Scallop-focused wall clustering
+
+    if (istr3==5) call scallop_grid(xco(1:nxo), xmo(1:nxmo), nxmo, alx3, dPdy, 0.5)
+
+    if (multires) then
+        if (istr3ro==5) call scallop_grid(xcro(1:nxro),xmro(1:nxmro),nxmro,alx3,dPdy, 0.5)
     end if
 
     ! Option 6: Clipped Chebychev-type clustering

@@ -12,12 +12,11 @@ subroutine CreateMgrdGrid
     use param
     use AuxiliaryRoutines
     use GridModule
+    use afid_salinity, only: SfixS, SfixN, PraS, ap3sskr, ac3sskr, am3sskr
+    use afid_phasefield, only: ap3spkr, ac3spkr, am3spkr
     implicit none
 
-    real :: x1,x2,x3
-
-    integer :: i, j, kc, km, kp
-    logical :: fexist
+    integer :: kc
 
     do kc=1,nxmr
         kmvr(kc)=kc-1
@@ -71,6 +70,11 @@ subroutine CreateMgrdGrid
 !
 
     if (istr3r==4) call tanh_grid(xcr(1:nxr),xmr(1:nxmr),nxmr,alx3,str3)
+
+!
+!   OPTION 5: SCALLOP-FOCUSED LOWER WALL CLUSTERING
+!
+    if (istr3==5) call scallop_grid(xcr(1:nxr), xmr(1:nxmr), nxmr, alx3, dPdy, 0.5)
 
 !
 !     OPTION 6: CLIPPED CHEBYCHEV-TYPE CLUSTERING
@@ -154,9 +158,9 @@ subroutine CreateMgrdGrid
 !
 
     ! Salinity differentiation
-    call second_derivative_coeff(ap3sskr, ac3sskr, am3sskr, xmr(1:nxmr), alx3, SfixN, SfixS)
+    if (salinity) call second_derivative_coeff(ap3sskr, ac3sskr, am3sskr, xmr(1:nxmr), alx3, SfixN, SfixS)
     ! Phase-field differentiation (ensuring zero gradient at boundaries)
-    call second_derivative_coeff(ap3spkr, ac3spkr, am3spkr, xmr(1:nxmr), alx3, 0, 0)
+    if (phasefield) call second_derivative_coeff(ap3spkr, ac3spkr, am3spkr, xmr(1:nxmr), alx3, 0, 0)
 
     return
 end subroutine CreateMgrdGrid

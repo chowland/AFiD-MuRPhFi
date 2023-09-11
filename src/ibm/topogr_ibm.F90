@@ -6,26 +6,23 @@ subroutine topogr
     use param
     use decomp_2d, only: xstart,xend,xstartr,xendr
     use ibm_param
-    use mgrd_arrays, only: sal
+    use afid_salinity, only: RayS
     use mpih
     implicit none
-    integer :: i,j,k,l,kstartp, nc, Npart, ncz
-    integer :: km,kp,jm,jp,im,ip,mm!,kup,klo
+    integer :: i,j,k,l, nc, Npart, ncz
+    integer :: km,kp
     
-    real    :: xe, xem, xep!, xlo, xup
-    real    :: ye, yem, yep
-    real    :: ze, zem, zep
+    real    :: xe, xem, xep
+    real    :: ye, yem
+    real    :: ze, zem
     real    :: delta1x, delta2x, r2, Lhex, radius, porosity
     real    :: solid_temp, rp, tp, amp, rx, ry, rz
-    integer,allocatable :: ind1(:), ind2(:)
     real,allocatable :: xpart(:), ypart(:), zpart(:)
     integer :: ibmask(1:nx,xstart(2):xend(2),xstart(3):xend(3))
 
     !! Variables for writing details of solid centres to file
     character(len=30) :: dsetname, filename
 
-    ! Flag for boundary interpolation for velocity
-    logical, parameter :: velBCinterp = .true.
     logical :: fexist
 
 
@@ -628,6 +625,7 @@ subroutine topogr
         !
         n = 0
         ibmaskr(:,:,:) = 2
+        solidr(:,:,:) = .false.
 
         do i=xstartr(3)-1,xendr(3)+1
             ze = zmr(i)

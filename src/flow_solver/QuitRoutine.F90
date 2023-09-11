@@ -13,6 +13,10 @@
       use param
       use decomp_2d, only: nrank, decomp_2d_finalize
       use decomp_2d_fft
+      use afid_pressure, only: DeallocatePressureVars
+      use afid_moisture, only: DeallocateMoistVariables
+      use afid_phasefield, only: DeallocatePFVariables
+      use afid_salinity, only: DeallocateSalVariables
       implicit none
       logical, intent(in) :: normalexit
       integer :: errorcode
@@ -34,10 +38,12 @@
       endif
 
       call DeallocateVariables
+      call DeallocatePressureVars
       if (multires) call DeallocateMgrdVariables
       if (salinity) call DeallocateSalVariables
       if (phasefield) call DeallocatePFVariables
       if (IBM) call DeallocateIBMVariables
+      if (moist) call DeallocateMoistVariables
       call HdfClose
       call decomp_2d_fft_finalize
       call decomp_2d_finalize

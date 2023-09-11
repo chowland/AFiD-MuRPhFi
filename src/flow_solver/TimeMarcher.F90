@@ -13,10 +13,14 @@
 subroutine TimeMarcher
     use param
     use local_arrays
-    use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
+    ! use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
+    use afid_pressure
+    use afid_salinity
+    use afid_phasefield
     use mpih
     use decomp_2d
     use ibm_param, only: aldto
+    use afid_moisture
     implicit none
     integer :: ns
     integer :: j,k,i
@@ -35,7 +39,7 @@ subroutine TimeMarcher
         ga = gam(ns)
         ro = rom(ns)
 
-        if (melt) call UpdateBCs
+        ! if (melt) call UpdateBCs
 
         ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-explicit'
         call ExplicitTermsVX
@@ -43,26 +47,55 @@ subroutine TimeMarcher
         call ExplicitTermsVZ
         call ExplicitTermsTemp
 
-        if (phasefield) call ExplicitTermsPhi
-        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-implicit'
-        if (phasefield) call ImplicitAndUpdatePhi
-        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI post-implicit'
+        if (salinity) then
+            call ExplicitSalinity
+            
+            ! If using salinity as an active scalar, add its buoyancy contribution
+            ! to the relevant component of the momentum equation
+            if (active_S==1) then
+                if (gAxis==1) then
+                    call AddSalBuoyancy(qcap)
+                elseif (gAxis==2) then
+                    call AddSalBuoyancy(dph)
+                elseif (gAxis==3) then
+                    call AddSalBuoyancy(dq)
+                end if
+            end if
+        end if
 
-        !CJH: Phi must be updated before computing S explicit terms and latent heat
-        ! varaible rhsr used to store d(phi)/dt for the following subroutines
-        if (salinity) call ExplicitTermsSal !Refined
-        if (phasefield) call AddLatentHeat
+        if (phasefield) then
+            call ExplicitPhase
+            call AddVolumePenalty
+            if (salinity) then
+                call AddSaltFluxInterface
+                call AdjustMeltPoint
+            end if
+            call ImplicitPhase
+            ! Add the latent heat and salt terms *after* computing the implicit solve for phi
+            call AddLatentHeat
+            if (salinity) call AddLatentSalt
+        end if
+
+        if (moist) call ExplicitHumidity
+
+        if (moist) call AddCondensation
 
         ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX pre-implicit',ns
         ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY pre-implicit',ns
         ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ pre-implicit',ns
         ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP pre-implicit',ns
 
+        if (phasefield) call update_halo(phi,lvlhalo)
+        ! if (phasefield .and. IBM) call UpdateIBMLocation
+
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ
         call ImplicitAndUpdateTemp
-        if (salinity) call ImplicitAndUpdateSal !Refined
+
+        if (salinity) call ImplicitSalinity
+
+        if (moist) call ImplicitHumidity
 
         ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX post-implicit',ns
         ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY post-implicit',ns
@@ -70,6 +103,7 @@ subroutine TimeMarcher
         ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP post-implicit',ns
 
         ! if (phasefield .and. IBM) call ImmersedBoundary
+        if (phasefield .and. (pf_direct_force > 0)) call ForceIceVelZero
 
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
@@ -103,22 +137,25 @@ subroutine TimeMarcher
         call update_halo(temp,lvlhalo)
         if (salinity) call update_halo(sal,lvlhalo)
         if (phasefield) call update_halo(phi,lvlhalo)
+        if (moist) call update_halo(humid,lvlhalo)
 
         if (salinity) then
             call InterpVelMgrd !Vel from base mesh to refined mesh
             call update_halo(vxr,lvlhalo)
             call update_halo(vyr,lvlhalo)
             call update_halo(vzr,lvlhalo)
-            call InterpSalMgrd !Sal from refined mesh to base mesh
+            call InterpSalMultigrid !Sal from refined mesh to base mesh
             call update_halo(salc,lvlhalo)
         end if
 
         if (phasefield) then
-            call InterpTempMgrd
+            call InterpTempMultigrid
             call update_halo(tempr,lvlhalo)
-            call InterpPhiMgrd
+            call InterpPhiMultigrid
             call update_halo(phic,lvlhalo)
         end if
+
+        if (moist) call UpdateSaturation
 
         ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX',ns
         ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY',ns

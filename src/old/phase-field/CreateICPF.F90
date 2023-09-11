@@ -18,7 +18,7 @@ subroutine CreateICPF
     implicit none
 
     integer :: i,j,k,kmid
-    real :: r, x0, lambda, h0, t0, A, B, alpha
+    real :: r, x0, h0, t0, A, B, alpha
     real, dimension(11) :: yh, zh
 
     if (pf_IC == 1) then ! 1D freezing validation
@@ -128,6 +128,17 @@ subroutine CreateICPF
             end do
         end if
     end if
+
+    ! if (IBM) then
+    !     do i=xstartr(3),xendr(3)
+    !         do j=xstartr(2),xendr(2)
+    !             h0 = 0.25 + (ymr(j) - 0.5)**2
+    !             do k=1,nxmr
+    !                 phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - h0)/2/pf_eps))
+    !             end do
+    !         end do
+    !     end do
+    ! end if
 
     return
 

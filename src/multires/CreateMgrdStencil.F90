@@ -79,3 +79,28 @@ subroutine CreateMgrdStencil
 
     return
 end subroutine CreateMgrdStencil
+
+
+subroutine CreatePFStencil
+    use param
+    use mgrd_arrays
+    use HermiteInterpolations
+
+    implicit none
+
+    integer, dimension(0:nyr) :: jrange !< temporary index counter in y
+    integer, dimension(0:nzr) :: krange !< temporary index counter in z
+
+    ! Save indices for fast interpolation
+    call interpolation_indices(yc_to_ymr, yc(1:nym), ymr(1:nymr), ylen)
+    call interpolation_indices(zc_to_zmr, zc(1:nzm), zmr(1:nzmr), zlen)
+
+    ! Create temporary index counters for stencil creation
+    call interpolation_indices(jrange, ymr(1:nymr), yc(1:nym), ylen)
+    call interpolation_indices(krange, zmr(1:nzmr), zc(1:nzm), zlen)
+
+    ! Create stencils
+    call construct_stencil(cych, ymr(1:nymr), yc(1:nym), ylen, jrange, "y")
+    call construct_stencil(czch, zmr(1:nzmr), zc(1:nzm), zlen, krange, "z")
+
+end subroutine CreatePFStencil

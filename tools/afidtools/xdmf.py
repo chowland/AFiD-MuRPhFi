@@ -219,33 +219,33 @@ def generate_field_xmf(folder, var):
     with open(folder+"/outputdir/"+var+"_fields.xmf","w") as f:
         f.write(formatted_xmf.toprettyxml(indent="  "))
 
-def interpolate_field_to_uniform(folder, var):
+def interpolate_field_to_uniform(folder, var, scale=2):
     # Create directory to store uniform-gridded snapshots
     os.makedirs(folder+"/outputdir/viz", exist_ok=True)
     # Create uniform x-grid to interpolate to
     grid = Grid(folder)
     inputs = InputParams(folder)
     nxm = grid.xm.size
-    nxu = nxm//2
+    nxu = nxm//scale
     xu = linspace(0, inputs.alx3, nxu+1)
     xu = 0.5*(xu[:-1] + xu[1:])
     # Pick corresponding grid for flow variable
     if var=="vx":
         xs = grid.xc
-        nyu, nzu = grid.ym.size//2, grid.zm.size//2
+        nyu, nzu = grid.ym.size//scale, grid.zm.size//scale
     elif var=="sal" or var=="phi":
         xs = grid.xmr
-        nyu, nzu = grid.ymr.size//2, grid.zmr.size//2
+        nyu, nzu = grid.ymr.size//scale, grid.zmr.size//scale
     else:
         xs = grid.xm
-        nyu, nzu = grid.ym.size//2, grid.zm.size//2
+        nyu, nzu = grid.ym.size//scale, grid.zm.size//scale
     filelist = sorted(os.listdir(folder+"/outputdir/fields"))
     fvlist = list(filter(lambda fname: var in fname, filelist))
     Funi = zeros((nzu, nyu, nxu), dtype=float32)
     for fname in fvlist:
         for k in range(nzu):
             with h5py.File(folder+"/outputdir/fields/"+fname, 'r') as f:
-                F = f['var'][2*k,::2,:]
+                F = f['var'][scale*k,::scale,:]
             if var=="vx":
                 itp = interp1d(xs, F, kind='cubic', axis=-1)
             else:
@@ -254,7 +254,7 @@ def interpolate_field_to_uniform(folder, var):
         with h5py.File(folder+"/outputdir/viz/"+fname, 'a') as f:
             f['var'] = Funi
 
-def generate_uniform_xmf(folder, var):
+def generate_uniform_xmf(folder, var, scale=2):
     """
     Generates an xmf file in the Xdmf format to allow reading of
     the 3D fields in ParaView. This function produces a 3D array 
@@ -271,12 +271,12 @@ def generate_uniform_xmf(folder, var):
     nxmr, nymr, nzmr = grid.xmr.size, grid.ymr.size, grid.zmr.size
 
     # Store the appropriate grid sizes and names based on the variable
-    nxu = nxm//2
+    nxu = nxm//scale
     fulldims = (nzm, nym, nxu)
     if var in "phisal":
-        nyu, nzu = nymr//2, nzmr//2
+        nyu, nzu = nymr//scale, nzmr//scale
     else:
-        nyu, nzu = nym//2, nzm//2
+        nyu, nzu = nym//scale, nzm//scale
     dx, dy, dz = grid.xc[-1]/nxu, grid.yc[-1]/nyu, grid.zc[-1]/nzu
     fulldims = (nzu, nyu, nxu)
     dims = fulldims

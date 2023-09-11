@@ -13,7 +13,10 @@ subroutine Mkmov_zcut
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp, pr
-    use mgrd_arrays, only: sal, phi, phic, tempr
+    ! use mgrd_arrays, only: sal, phi, phic, tempr
+    use afid_salinity, only: sal
+    use afid_phasefield, only: phi, phic, tempr
+    use afid_moisture, only: humid
     use h5_tools
     implicit none
     character(70) :: filename
@@ -31,7 +34,8 @@ subroutine Mkmov_zcut
     filename = trim("outputdir/flowmov/movie_zcut.h5")
 
     ! MPI
-    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true.,.false./), comm, ierr)
+    ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true.,.false./), comm, ierr)
+    comm = comm_xy
     info = MPI_INFO_NULL
 
     if(ic.le.xend(3) .and. ic.ge.xstart(3)) then
@@ -51,6 +55,11 @@ subroutine Mkmov_zcut
         varname = 'temp'
         call write_H5_plane(file_id, varname, temp(1:nxm, xstart(2):xend(2), ic), 'z')
         
+        if (moist) then
+            varname = 'qhum'
+            call write_H5_plane(file_id, varname, humid(1:nxm, xstart(2):xend(2), ic), 'z')
+        end if
+
         call h5fclose_f(file_id, hdf_error)
 
     end if

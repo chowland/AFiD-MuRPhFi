@@ -11,6 +11,7 @@
 subroutine SetTempBCs
     use param
     use decomp_2d
+    use afid_moisture, only: beta_q
     implicit none
     integer :: ic,jc
     
@@ -55,6 +56,15 @@ subroutine SetTempBCs
                 end do
             end do
         end if
+    end if
+
+    if (moist) then
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                tempbp(1,jc,ic) = 0.0
+                temptp(1,jc,ic) = beta_q - 1.0
+            end do
+        end do
     end if
     
     call update_halo(temptp,lvlhalo)

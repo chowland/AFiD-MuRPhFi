@@ -3,6 +3,7 @@ subroutine InterpVelMgrd
     use param
     use local_arrays, only: vx,vy,vz
     use mgrd_arrays
+    use afid_salinity, only: vxr, vyr, vzr
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
@@ -10,11 +11,9 @@ subroutine InterpVelMgrd
     implicit none
     
     integer  :: ic,jc,kc, ip,jp,kp, icr,jcr,kcr
-    integer  :: icc,jcc,kcc
     integer  :: jc0,jcr0, ic0,icr0
-    integer  :: comm_col,comm_row,comm,ierror,chk
+    integer  :: comm_col,comm_row,ierror
 
-    real,dimension(4,4,4) :: qv3 
     real,dimension(4,4) :: qv2
     real,dimension(4) :: qv1
 

@@ -37,17 +37,17 @@ subroutine InitMgrdVariables
     call AllocateReal1DArray(udx3cr,1,nxr)
     call AllocateReal1DArray(udx3mr,1,nxr)
 
-    call AllocateReal1DArray(ap3ckr,1,nxr)
-    call AllocateReal1DArray(ac3ckr,1,nxr)
-    call AllocateReal1DArray(am3ckr,1,nxr)
+    ! call AllocateReal1DArray(ap3ckr,1,nxr)
+    ! call AllocateReal1DArray(ac3ckr,1,nxr)
+    ! call AllocateReal1DArray(am3ckr,1,nxr)
 
-    call AllocateReal1DArray(ap3sskr,1,nxr)
-    call AllocateReal1DArray(ac3sskr,1,nxr)
-    call AllocateReal1DArray(am3sskr,1,nxr)
+    ! call AllocateReal1DArray(ap3sskr,1,nxr)
+    ! call AllocateReal1DArray(ac3sskr,1,nxr)
+    ! call AllocateReal1DArray(am3sskr,1,nxr)
 
-    call AllocateReal1DArray(ap3spkr,1,nxr)
-    call AllocateReal1DArray(ac3spkr,1,nxr)
-    call AllocateReal1DArray(am3spkr,1,nxr)
+    ! call AllocateReal1DArray(ap3spkr,1,nxr)
+    ! call AllocateReal1DArray(ac3spkr,1,nxr)
+    ! call AllocateReal1DArray(am3spkr,1,nxr)
 
     call AllocateInt1dArray(kmcr,1,nxr)
     call AllocateInt1dArray(kpcr,1,nxr)
@@ -69,6 +69,9 @@ subroutine InitMgrdVariables
     call AllocateInt1dArray(irangr,0,nxr)
     call AllocateInt1dArray(jrangr,0,nyr)
     call AllocateInt1dArray(krangr,0,nzr)
+
+    call AllocateInt1dArray(yc_to_ymr,0,ny)
+    call AllocateInt1dArray(zc_to_zmr,0,nz)
 
     call AllocateReal2DArray(cxvx,1,4,1,nxr)
     call AllocateReal2DArray(cxvy,1,4,1,nxmr)
@@ -94,6 +97,13 @@ subroutine InitMgrdVariables
     call AllocateReal2DArray(cysalc,1,4,1,nym)
     call AllocateReal2DArray(czsalc,1,4,1,nzm)
 
+    if (IBM) then
+        if (phasefield) then
+            call AllocateReal2DArray(cych,1,4,1,nym)
+            call AllocateReal2DArray(czch,1,4,1,nzm)
+        end if
+    end if
+
 !-------------------------------------------------
 ! Arrays with ghost cells
 !-------------------------------------------------
@@ -103,6 +113,6 @@ subroutine InitMgrdVariables
     call AllocateReal3DArray(tpdvr,-1,nxr+1,xstartr(2)-2,xendr(2)+2,xstartr(3)-2,xendr(3)+2)
 
     ! RHS array without ghost cells
-    call AllocateReal3DArray(rhsr,1,nxr,xstartr(2),xendr(2),xstartr(3),xendr(3))
+    call AllocateReal3DArray(rhsr,1,nxmr,xstartr(2),xendr(2),xstartr(3),xendr(3))
     return
 end subroutine InitMgrdVariables

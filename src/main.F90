@@ -2,30 +2,40 @@ program AFiD
     use mpih
     use param
     use local_arrays, only: vx,vy,vz,temp,pr
-    use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phic,tempr,phi
+    ! use mgrd_arrays, only: phic,tempr,phi!,vxr,vyr,vzr,salc,sal
     use AuxiliaryRoutines
     use hdf5
     use decomp_2d
     use decomp_2d_fft
+    use afid_pressure
+    use afid_moisture
+    use afid_salinity
+    use afid_phasefield
+    use h5_tools, only: InitSliceCommunicators
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
 !$    use omp_lib
     implicit none
-    integer :: errorcode, nthreads, i, j, k
+    integer :: errorcode!, nthreads, i, j, k
     real    :: instCFL,CFLmr,dmax,dmaxr
     real    :: ti(2), tin(3), minwtdt
-    real :: ts, varptb,chksum
+    real :: ts!, varptb,chksum
+    real :: td(2)   !< debugging time measure
     integer :: prow=0,pcol=0
     integer :: lfactor,lfactor2
     character(100) :: arg
     logical :: nanexist, write_mean_planes=.true.
-    real,allocatable,dimension(:,:) :: dummy,dscan,dbot
-    integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
+    ! real,allocatable,dimension(:,:) :: dummy,dscan,dbot
+    ! integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
 !*******************************************************
 !******* Read input file bou.in by all processes********
 !*******************************************************
 !
+
+    ! Set `moist` to .true. if humid.in exists
+    inquire(file="humid.in", exist=moist)
+
     call ReadInputFile
     if (nzm==1 .or. nym==1) write_mean_planes = .false.
 
@@ -85,9 +95,13 @@ program AFiD
     call InitTimeMarchScheme
 
     call InitVariables
+    call InitPressureVars
     if (multires) call InitMgrdVariables  !CS mgrd
     if (salinity) call InitSalVariables
     if (phasefield) call InitPFVariables
+    if (moist) call InitMoistVariables
+
+    call InitSliceCommunicators
 
     call CreateGrid
     if (multires) call CreateMgrdGrid     !CS mgrd
@@ -136,6 +150,7 @@ program AFiD
     call InitPressureSolver
     call SetTempBCs
     if (salinity) call SetSalBCs
+    if (moist) call SetHumidityBCs
 
     if(readflow) then
 
@@ -152,12 +167,22 @@ program AFiD
         instCFL=0.d0
 
         call CreateInitialConditions
-        if (salinity) call CreateICSal
-        if (phasefield) call CreateICPF
+        if (salinity) call CreateInitialSalinity
+        if (phasefield) call CreateInitialPhase
+        if (moist) call CreateInitialHumidity
 
     endif
 
-    if (IBM) call topogr
+!CS   Create multigrid stencil for interpolation
+    if (multires) call CreateMgrdStencil
+    if (phasefield .and. IBM) call CreatePFStencil
+
+    if (phasefield) call update_halo(phi,lvlhalo)
+
+    if (IBM) then
+        call topogr
+        ! if (phasefield) call UpdateIBMLocation
+    end if
 
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)
@@ -165,20 +190,19 @@ program AFiD
     call update_halo(vz,lvlhalo)
     call update_halo(temp,lvlhalo)
     if (salinity) call update_halo(sal,lvlhalo)
-    if (phasefield) call update_halo(phi,lvlhalo)
     call update_halo(pr,lvlhalo)
+    if (moist) call update_halo(humid,lvlhalo)
+    if (moist) call UpdateSaturation
 
-!CS   Create multigrid stencil for interpolation
-    if (multires) call CreateMgrdStencil
 
 !CS   Interpolate initial values
     if (salinity) then
         call InterpVelMgrd
-        call InterpSalMgrd
+        call InterpSalMultigrid
     end if
     if (phasefield) then
-        call InterpTempMgrd
-        call InterpPhiMgrd
+        call InterpTempMultigrid
+        call InterpPhiMultigrid
     end if
 
 !EP   Update all relevant halos
@@ -205,7 +229,12 @@ program AFiD
     end if
     
     if (ismaster) write(*,*) "Writing 3D fields"
+    call MpiBarrier
+    td(1) = MPI_WTIME()
     call WriteFlowField(.false.)
+    call MpiBarrier
+    td(2) = MPI_WTIME()
+    if (ismaster) write(*,*) "Flow field writing took: ",td(2)-td(1)
 
 !EP   Check divergence. Should be reduced to machine precision after the first
 !phcalc. Here it can still be high.

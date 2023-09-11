@@ -13,6 +13,8 @@ subroutine CreateInitialConditions
     use local_arrays, only: vy,vx,temp,vz
     use decomp_2d, only: xstart,xend
     use mpih
+    use afid_salinity, only: RayS
+    use afid_phasefield, only: pf_eps, read_phase_field_params
     implicit none
     integer :: j,k,i,kmid, io
     real :: xxx,yyy,zzz,eps,varptb,amp
@@ -133,7 +135,7 @@ subroutine CreateInitialConditions
     end if
 
     ! Set velocity to zero if we are using the phase-field method
-    if (melt .or. phasefield .or. IBM) then
+    if (melt .or. phasefield .or. IBM .or. moist) then
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                 do k=1,nxm
@@ -215,6 +217,16 @@ subroutine CreateInitialConditions
     end if
 
     if (IBM .and. dPdy/=0) then
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    temp(k,j,i) = 0.0
+                end do
+            end do
+        end do
+    end if
+
+    if (moist) then
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                 do k=1,nxm
@@ -390,6 +402,21 @@ subroutine CreateInitialConditions
                 end do
             end if
         end if
+
+        ! if (IBM) then
+        !     do i=xstart(3),xend(3)
+        !         do j=xstart(2),xend(2)
+        !             h0 = 0.25 + (ym(j) - 0.5)**2
+        !             do k=1,nxm
+        !                 if (xm(k) < h0) then
+        !                     temp(k,j,i) = 0.0
+        !                 else
+        !                     temp(k,j,i) = 1.0
+        !                 end if
+        !             end do
+        !         end do
+        !     end do
+        ! end if
 
     end if
 
