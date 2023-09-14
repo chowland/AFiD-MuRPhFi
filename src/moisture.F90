@@ -29,8 +29,8 @@ contains
 
 !> Subroutine to allocate memory for all moisture-related variables
 subroutine InitMoistVariables
-    ! Allocate array for 3D specific humidity field
-    call AllocateReal3DArray(humid,1,nxm,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
+    ! Allocate array for 3D specific humidity field (needs to be nx size in x for writing out continua file)
+    call AllocateReal3DArray(humid,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
     ! Allocate array for 3D saturation values
     call AllocateReal3DArray(qsat,1,nxm,xstart(2),xend(2),xstart(3),xend(3))
 
@@ -99,6 +99,16 @@ subroutine ReadMoistParameters
         if (ifdiff) tau_q = pect*tau_q
     end if
 
+    ! If the input file has a negative gamma, set the value of gamma
+    ! such that delta m is equal to 1
+    if (gamma_q < 0) then
+        if (qfixN == 2) then    ! (unsaturated top boundary)
+            gamma_q = beta_q
+        else
+            gamma_q = beta_q/(1.0 - exp(-alpha_q))
+        end if
+    end if
+
     if (ismaster) then
         write(*,*) 'al, be, ga, tau'
         write(*,*) alpha_q, beta_q, gamma_q, tau_q
@@ -126,42 +136,80 @@ subroutine SetHumidityBCs
             humtp(1,jc,ic) = exp(alpha_q*(temptp(1,jc,ic) - beta_q))
         end do
     end do
+    ! Use the input qfixN==2 to set an unsaturated top boundary
+    if (qfixN == 2) then
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                humtp(1,jc,ic) = 0.0
+            end do
+        end do
+        qfixN = 1
+    end if
 end subroutine SetHumidityBCs
 
 subroutine CreateInitialHumidity
+    use mpih
     integer :: ic, jc, kc
-    real :: rnum, r
+    real :: rnum, r, r2, amp
+    real :: bz(nxm), qz(nxm)
+    logical :: exists
+    character(len=30) :: dsetname, filename
 
     call random_seed()
 
-    do ic=xstart(3),xend(3)
-        do jc=xstart(2),xend(2)
-            do kc=1,nxm
-                call random_number(rnum)
-                temp(kc,jc,ic) = (1.0 - xm(kc))*xm(kc)*rnum*1e-3
+    filename = trim("drizzle.h5")
+
+    inquire(file=filename, exist=exists)
+    if (exists) then
+        if (ismaster) then
+            dsetname = trim("b")
+            call HdfSerialReadReal1D(dsetname, filename, bz, nxm)
+            dsetname = trim("q")
+            call HdfSerialReadReal1D(dsetname, filename, qz, nxm)
+        end if
+        call MPI_BCAST(bz, nxm, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)
+        call MPI_BCAST(qz, nxm, MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)
+        
+        amp = 1e-3
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                    call random_number(rnum)
+                    temp(kc,jc,ic) = bz(kc) + amp*rnum
+                    call random_number(rnum)
+                    humid(kc,jc,ic) = qz(kc) + amp*rnum
+                end do
             end do
         end do
-    end do
+    else
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                    call random_number(rnum)
+                    temp(kc,jc,ic) = (1.0 - xm(kc))*xm(kc)*rnum*1e-3
+                end do
+            end do
+        end do
+
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                do kc=1,nxm
+                    call random_number(rnum)
+                    ! r = sqrt((ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2 + (zm(ic) - 0.5*zlen)**2)
+                    r2 = (ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2 + (zm(ic) - 0.5*zlen)**2
+                    ! humid(kc,jc,ic) = humbp(1,jc,ic) + (humtp(1,jc,ic) - humbp(1,jc,ic))*xm(kc)
+                    ! humid(kc,jc,ic) = 1.1*qsat(kc,jc,ic)*0.5*(1.0 - tanh(100*(r - 0.1)))
+                    ! humid(kc,jc,ic) = 0.5*(1.0 - tanh(100*(r - 0.1)))
+                    humid(kc,jc,ic) = 5.0*exp(-r2/0.005)
+                    humid(kc,jc,ic) = humid(kc,jc,ic) + 1e-3*rnum
+                    ! humid(kc,jc,ic) = temp(kc,jc,ic)
+                end do
+            end do
+        end do
+    end if
 
     call update_halo(temp,lvlhalo)
-
     call UpdateSaturation
-
-    do ic=xstart(3),xend(3)
-        do jc=xstart(2),xend(2)
-            do kc=1,nxm
-                call random_number(rnum)
-                r = sqrt((ym(jc) - 0.5*ylen)**2 + (xm(kc) - 0.1)**2)
-                ! humid(kc,jc,ic) = humbp(1,jc,ic) + (humtp(1,jc,ic) - humbp(1,jc,ic))*xm(kc)
-                ! humid(kc,jc,ic) = 1.1*qsat(kc,jc,ic)*0.5*(1.0 - tanh(100*(r - 0.1)))
-                ! humid(kc,jc,ic) = 0.5*(1.0 - tanh(100*(r - 0.1)))
-                humid(kc,jc,ic) = 5.0*exp(-((xm(kc)-0.1)**2 + (ym(jc) - 0.5*ylen)**2)/0.005)
-                ! humid(kc,jc,ic) = humid(kc,jc,ic) + 1e-3*rnum
-                ! humid(kc,jc,ic) = temp(kc,jc,ic)
-            end do
-        end do
-    end do
-
     call update_halo(humid,lvlhalo)
 
 end subroutine CreateInitialHumidity

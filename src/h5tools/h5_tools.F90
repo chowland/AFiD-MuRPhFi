@@ -135,4 +135,19 @@ subroutine write_H5_plane(file_id, varname, var, axis)
 
 end subroutine
 
+!> Initialise the MPI communicators used for writing 2D slices
+subroutine InitSliceCommunicators
+    use mpih, only: comm_xy, comm_xz, comm_yz
+    use decomp_2d, only: DECOMP_2D_COMM_CART_X
+    integer :: ierr
+
+    !! yz-plane (cut of constant x)
+    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true., .true./), comm_yz, ierr)
+    !! xy-plane (cut of constant z)
+    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.true.,.false./), comm_xy, ierr)
+    !! xz-plane (cut of constant y)
+    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false.,.true./), comm_xz, ierr)
+
+end subroutine InitSliceCommunicators
+
 end module h5_tools

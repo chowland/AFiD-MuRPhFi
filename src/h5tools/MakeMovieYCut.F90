@@ -15,6 +15,7 @@ subroutine Mkmov_ycut
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal
     use afid_phasefield, only: phi
+    use afid_moisture, only: humid
     use h5_tools
     implicit none
     character(70) :: filename
@@ -32,7 +33,8 @@ subroutine Mkmov_ycut
     filename = trim("outputdir/flowmov/movie_ycut.h5")
 
     ! MPI
-    call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false.,.true./), comm, ierr)
+    ! call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false.,.true./), comm, ierr)
+    comm = comm_xz
     info = MPI_INFO_NULL
 
     if (ic.le.xend(2) .and. ic.ge.xstart(2)) then
@@ -51,6 +53,11 @@ subroutine Mkmov_ycut
 
         varname = 'temp'
         call write_H5_plane(file_id, varname, temp(1:nxm, ic, xstart(3):xend(3)), 'y')
+
+        if (moist) then
+            varname = 'qhum'
+            call write_H5_plane(file_id, varname, humid(1:nxm, ic, xstart(3):xend(3)), 'y')
+        end if
 
         call h5fclose_f(file_id, hdf_error)
 

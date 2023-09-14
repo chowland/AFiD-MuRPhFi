@@ -11,6 +11,7 @@ program AFiD
     use afid_moisture
     use afid_salinity
     use afid_phasefield
+    use h5_tools, only: InitSliceCommunicators
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
 !$    use omp_lib
@@ -110,6 +111,8 @@ program AFiD
     if (phasefield) call InitPFVariables
     if (moist) call InitMoistVariables
 
+    call InitSliceCommunicators
+
     call CreateGrid
     if (multires) call CreateMgrdGrid     !CS mgrd
 
@@ -199,6 +202,7 @@ program AFiD
     if (salinity) call update_halo(sal,lvlhalo)
     call update_halo(pr,lvlhalo)
     if (moist) call update_halo(humid,lvlhalo)
+    if (moist) call UpdateSaturation
 
 
 !CS   Interpolate initial values

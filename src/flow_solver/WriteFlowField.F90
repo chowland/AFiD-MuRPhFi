@@ -13,6 +13,7 @@ subroutine WriteFlowField(final)
     use local_arrays, only: vz,vy,vx,temp,pr
     use afid_salinity, only: sal
     use afid_phasefield, only: phi
+    use afid_moisture, only: humid
     implicit none
     logical, intent(in) :: final
     character(30) :: filnam1,dsetname,basename
@@ -31,6 +32,10 @@ subroutine WriteFlowField(final)
     call HdfWriteRealHalo3D(filnam1,vy)
     filnam1 = trim(basename)//'_vz.h5'
     call HdfWriteRealHalo3D(filnam1,vz)
+    if (moist) then
+        filnam1 = trim(basename)//'_humid.h5'
+        call HdfWriteRealHalo3D(filnam1,humid)
+    end if
     if (salinity) then
         filnam1 = trim(basename)//'_sal.h5'
         call HdfWriteRealHalo3DR(filnam1,sal)

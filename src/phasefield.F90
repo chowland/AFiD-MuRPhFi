@@ -26,6 +26,8 @@ module afid_phasefield
     real, allocatable, dimension(:) :: ac3spkr      !! Diagonal derivative coefficient for salinity
     real, allocatable, dimension(:) :: am3spkr      !! Lower diagonal derivative coefficient for salinity
 
+    real :: pf_direct_force = 0.9      !! phi contour above which velocity is forced exactly to zero pre-pressure solve
+
 contains
 
 !> Initialise and allocate memory for phase-field variables
@@ -335,6 +337,34 @@ subroutine ExplicitPhase
     end do
 
 end subroutine ExplicitPhase
+
+!> Force the velocity field to be zero in the ice phase
+!! Apply this only above the phase-field level pf_direct_force
+subroutine ForceIceVelZero
+    use local_arrays, only: vx, vy, vz
+    integer :: i, j, k, im, jm
+
+    do i=xstart(3),xend(3)
+        im = i - 1
+        do j=xstart(2),xend(2)
+            jm = j - 1
+            do k=2,nxm
+                if (0.5*(phic(k,j,i) + phic(k-1,j,i)) > pf_direct_force) then
+                    vx(k,j,i) = 0.0
+                end if
+            end do
+            do k=1,nxm
+                if (0.5*(phic(k,j,i) + phic(k,jm,i)) > pf_direct_force) then
+                    vy(k,j,i) = 0.0
+                end if
+                if (0.5*(phic(k,j,i) + phic(k,j,im)) > pf_direct_force) then
+                    vz(k,j,i) = 0.0
+                end if
+            end do
+        end do
+    end do
+
+end subroutine ForceIceVelZero
 
 !> Compute the implicit terms for the phase-field evolution
 subroutine ImplicitPhase

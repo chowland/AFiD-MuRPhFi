@@ -233,5 +233,8 @@ module mpih
     integer :: ierr
     integer, parameter :: master=0
     integer :: MDP = MPI_DOUBLE_PRECISION
+    integer :: comm_yz  !> MPI communicator across y and z (2D decomposition)
+    integer :: comm_xy  !> MPI communicator across x and y (1D decomposition)
+    integer :: comm_xz  !> MPI communicator across x and z (1D decomposition)
 end module mpih
 !====================================================
