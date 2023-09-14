@@ -8,16 +8,16 @@
 
 AFiD has the following prerequisites that must be installed to compile and run the program:
 - A parallel HDF5 library wrapping an MPI implementation and a Fortran 90 compiler
-- The numerical BLAS and LAPACK libraries (or Intel MKL)
+- The numerical LAPACK library (or Intel MKL)
 - FFTW3 (*not* the MKL implementation)
 
 On Ubuntu, these prerequisites can be installed using the single line command
 ```
-sudo apt install build-essential gfortran libblas-dev liblapack-dev libhdf5-mpich-dev libfftw3-dev
+sudo apt install build-essential gfortran liblapack-dev libhdf5-mpich-dev libfftw3-dev
 ```
 AFiD can then be compiled simply by running `make`.
-The [Makefile](./Makefile) contains a `MACHINE` variable that the user can modify to reflect the libraries installed (e.g. setting it to `PC_INTEL` to ensure the MKL libraries and Intel compiler options are used).
-Presets are also available for a collection of European HPC systems.
+The [Makefile](./Makefile) contains a `MACHINE` variable and a `FLAVOUR` variable that the user can modify to reflect the libraries installed (e.g. setting `FLAVOUR=Intel` ensures the MKL libraries and Intel compiler options are used).
+Presets are also available for a collection of European HPC systems using the `MACHINE` variable.
 
 ## Code description
 
@@ -25,8 +25,10 @@ Presets are also available for a collection of European HPC systems.
 - Third-order Runge-Kutta time stepping
 - Finite-differences calculate spatial derivatives on staggered velocity grid
 - Pencil MPI decomposition based on the 2DECOMP&FFT library
-- Hermite interpolation between two decoupled grids for multiple resolution
-- Optional phase-field model to simulate the flow around melting objects
+- Cubic Hermite interpolation between two decoupled grids for multiple resolution
+- Phase-field model to simulate the flow around melting objects following [Hester et al. (2020)](https://doi.org/10.1098/rspa.2020.0508)
+- Immersed boundary method for fixed objects following [Fadlun et al. (2000)](https://doi.org/10.1006/jcph.2000.6484)
+- A simple moisture model for a rapidly condensing vapour field following [Vallis et al. (2019)](https://doi.org/10.1017/jfm.2018.954)
 
 AFiD is a highly parallel application for simulating canonical flows in a channel domain.
 More technical details can be found in [van der Poel et al (2015)](https://doi.org/10.1016/j.compfluid.2015.04.007).
@@ -41,7 +43,6 @@ One key difference from the original version of AFiD is that the scalar fields a
 This staggered grid provides more flexibility for applications with different gravitational axes.
 
 The refined grid can also be used to evolve a phase-field variable to model the melting and dissolving of immersed solid objects.
-This implementation is currently under development.
 
 ## Contributing
 If you would like to contribute to bug fixing/feature development/documentation, please create a new branch, commit your changes and then submit a pull request.
