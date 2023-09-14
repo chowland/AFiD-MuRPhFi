@@ -38,10 +38,23 @@ These subroutines are also used for the interpolation of the initial condition, 
 
 ## Boundary points
 When the point we are interpolating to is between one of the solid boundaries and the adjacent point, we do not have sufficient information to perform such a detailed interpolation.
-In this case, we use a simple linear interpolation.
+In this case, we use a simple linear interpolation between the boundary and the first grid point.
 This will not significantly impact the accuracy of the simulation if the fields are adequately resolved.
 
 ## Minimising the velocity divergence
 
 In order to preserve the divergence-free nature of the velocity field when interpolating it to the refined grid, we actually interpolate the velocity gradients to the refined grid, and integrate over space to reconstruct the velocity components on the refined grid.
-**To be expanded...**
+
+For example, for the wall normal velocity `vx`, we compute
+$$
+v_x(x,y,z) = \int_0^x \frac{\partial v_x}{\partial x}(x',y,z) \ \mathrm{d}x' ,
+$$
+on the refined grid, having interpolated $\partial_x v_x$ to higher resolution.
+
+For the components of velocity in the other (homogeneous) directions, we have to first interpolate a single plane of the velocity field and then integrate over the desired direction to recover, for example
+$$
+v_y(x,y,z) = v_y(x,0,z) + \int_0^y \frac{\partial v_y}{\partial y} (x,y',z) \ \mathrm{d}y' .
+$$
+We choose to use the interpolated plane from $y=0$ here since there is no interpolation in $y$ necessary: the first index of both grids (`yc` and `ycr`) for $v_y$ corresponds to this plane.
+
+The velocity interpolation is performed in the subroutine [`InterpVelMgrd`](https://github.com/chowland/AFiD-MuRPhFi/blob/main/src/multires/InterpVelMgrd.F90).
