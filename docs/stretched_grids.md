@@ -1,8 +1,24 @@
 # Spatial derivatives
 
 ## Staggered grid layout
+![staggered grid](assets/afid_grid.svg)
 
-**To be added...**
+To avoid the development of spurious modes in the pressure solve, the velocity field is housed on a staggered grid, as shown in the above schematic.
+The pressure field `pr` is stored at the cell midpoints, on the grid defined by the coordinates (`xm(k)`, `ym(j)`, `zm(i)`).
+We also store the temperature field `temp` (and if used the humidity field `qhum`) at the cell midpoints.
+The velocity components are then discretised on their corresponding cell edges.
+
+The boundaries of the domain are specified to lie on the grid of the cell edges, so for example (if the x-domain size is set as `alx3=1`)
+$$
+x_c[1] = 0, \qquad x_c[n_x] = 1 .
+$$
+The cell mid-points are always defined as
+$$
+x_m[k] = \frac{x_c[k] + x_c[k+1]}{2} ,
+$$
+whether the grid is stretched or uniform.
+The grids in $y$ and $z$ must always be uniformly spaced so that Fourier transforms can be performed in the pressure solver, but the grids in $x$ can be non-uniform.
+Their stretching is defined by the input parameters `str3` and `istr3`.
 
 ## Finite difference method on non-uniform grids
 
