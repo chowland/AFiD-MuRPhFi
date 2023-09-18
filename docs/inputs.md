@@ -87,7 +87,7 @@ These are detailed below.
 - `MELT` is a logical that implements a dynamic boundary condition for temperature and salinity according to the three-equation model for a melting boundary. With `MELT = 1`, the boundary at $x=0$ is treated as a stationary, planar wall of ice. **This feature is highly experimental and is not recommended for current use.**
 
 #### Phase-field parameters
-As described in the documentation page on the [governing equations](../equations), the evolution for the phase-field equation is
+As described in the documentation page on the [governing equations](equations.md#double-diffusive-melting), the evolution for the phase-field equation is
 
 $$
 \partial_t \phi = A\nabla^2 \phi - (A/\varepsilon^2) \phi (1-\phi)(1-2\phi+C(T-T_m + \Lambda S))
@@ -103,6 +103,6 @@ The diffuse interface thickness $\varepsilon$ is always set equal to the mean wa
     - `IBM = 0` uses the volume penalty method, adding a forcing term of $-{Pe}^{-1} \phi \boldsymbol{u}/(1.5\varepsilon)^2$ to the momentum equation;
     - `IBM = 1` imposes an immersed boundary in the solid phase by simply setting $\boldsymbol{u} = 0$ wherever $\phi>0.5$ at each time step;
 - `pf_IC` determines the initial condition when the phase-field method is used:
-    - `pf_IC = 1` provides the initial condition for the 1-D melting/freezing example described [here](../examples/stefan#1-d-solidification-from-a-cooled-boundary);
-    - `pf_IC = 2` produces an initial condition with a solid disc at the centre of the domain, following the example described [here](../examples/stefan/#axisymmetric-melting-of-a-solid-disc-in-2-d);
-    - `pf_IC = 3` provides an initial condition to match the validation example of Rayleigh-Bénard convection from Favier et al. (2019) as described [here](../examples/coupled_flows/#2-d-rayleigh-benard-with-a-melting-boundary). The velocity is zero everywhere, the phase boundary is at $x=0.5$, and the temperature profile is linear plus a wave-like perturbation in the liquid phase.
+    - `pf_IC = 1` provides the initial condition for the 1-D melting/freezing example described [here](examples/stefan.md#1-d-solidification-from-a-cooled-boundary);
+    - `pf_IC = 2` produces an initial condition with a solid disc at the centre of the domain, following the example described [here](examples/stefan.md#axisymmetric-melting-of-a-solid-disc-in-2-d);
+    - `pf_IC = 3` provides an initial condition to match the validation example of Rayleigh-Bénard convection from Favier et al. (2019) as described [here](examples/coupled_flows.md#2-d-rayleigh-benard-with-a-melting-boundary). The velocity is zero everywhere, the phase boundary is at $x=0.5$, and the temperature profile is linear plus a wave-like perturbation in the liquid phase.
