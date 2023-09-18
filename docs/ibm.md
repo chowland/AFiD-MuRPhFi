@@ -12,7 +12,7 @@ $$
 a_{ij} (\Delta u)_j = RHS^*_{i} ,
 $$
 
-where in the standard fluid domain $a_{ij}$ defines the wall-normal diffusion operator (see [the time stepper documentation](../numerics/#crank-nicolson-semi-implicit-diffusion) for more details).
+where in the standard fluid domain $a_{ij}$ defines the wall-normal diffusion operator (see [the time stepper documentation](numerics.md#crank-nicolson-semi-implicit-diffusion) for more details).
 Recall that $\Delta u = u^{l+1} - u^l$ is the velocity increment over the RK substep.
 For all points away from the solid immersed boundaries, $RHS^*$ is simply the sum of the explicit terms and the explicit portion of the Crank-Nicolson term.
 

@@ -68,7 +68,7 @@ for var in vars:
 For each variable, this creates a `var_fields.xmf` file which is what should be opened in ParaView.
 
 ### 2D slices from `flowmov`
-Although viewing the 2D slices can be easily done in [Jupyter notebooks](../jupyter), it is also possible to load the planes in ParaView.
+Although viewing the 2D slices can be easily done in [Jupyter notebooks](jupyter.md), it is also possible to load the planes in ParaView.
 This also has the benefit of plotting the various slices in 3-D space.
 The Python function `afid.generate_cut_xmf(folder, plane)` produces an XML file for all the simulation variables in each plane slice.
 These are stored in `outputdir/flowmov` and can be opened in ParaView using the XDMF Reader.
