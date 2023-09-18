@@ -6,7 +6,7 @@ A more detailed overview of the setups considered here, including the initial co
 
 ## 1-D melting from a hot boundary: phase-field parameters
 
-We begin by investigating the model parameter $a$ introduced by the phase-field method.
+We begin by investigating the model parameter $A$ introduced by the phase-field method.
 As a reminder, the governing equation for the phase field $\phi$ takes the form
 
 $$
