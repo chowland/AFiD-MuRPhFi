@@ -50,10 +50,8 @@ ifeq ($(MACHINE),DISCOVERER)
 endif
 ifeq ($(MACHINE),SNELLIUS)
 	ifeq ($(FLAVOUR),GNU)
-		FC += -O2 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer
 		LDFLAGS = -lfftw3 -lopenblas -ldl
 	else
-		FC += -align array64byte -fma -ftz -fomit-frame-pointer
 		LDFLAGS = -lfftw3 -qmkl=sequential
 	endif
 endif
