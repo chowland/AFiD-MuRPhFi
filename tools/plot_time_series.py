@@ -36,14 +36,14 @@ Nu_eps = 1.0 + afid.xmean(epsilon, grid.xc)*Pec
 wS = afid.read_mean(simdir, 'vxS')
 Nu_vol = 1.0 - afid.xmean(wS, grid.xcr)*Pec
 
-fig, ax = plt.subplots(layout='constrained')
+fig, ax = plt.subplots(figsize=(6.0,2.0), layout='constrained')
 ax.plot(t, Nu_pl, label="$Nu_\mathrm{pl}$")
 ax.plot(t, Nu_pu, label="$Nu_\mathrm{pu}$")
 ax.plot(t, Nu_chi, label="$Nu_\chi$")
 ax.plot(t, Nu_eps, label="$Nu_\\varepsilon$")
 ax.plot(t, Nu_vol, label="$Nu_\mathrm{vol}$")
 ax.grid()
-ax.legend()
+ax.legend(ncols=2)
 ax.set(
     xlim=[0,t[-1]],
     ylim=[0,100],
@@ -67,7 +67,7 @@ urms = afid.read_mean(simdir, 'vyrms')
 Re_h = afid.xmean(urms**2 + vrms**2, grid.xc)**0.5*inu
 
 # Make the time series plot
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(6.0,2.0), layout='constrained')
 ax.plot(t, Re_v, label='vertical')
 ax.plot(t, Re_h, label='horizontal')
 Re_t = (Re_h**2 + Re_v**2)**0.5
@@ -78,6 +78,6 @@ ax.set(
     xlim=[0,t[-1]],
     ylim=[0,800],
     xlabel='$t/(H/U_f)$',
-    ylabel=r'$Re = \sqrt{\mathcal{K}} H / \nu$'
+    ylabel=r'$Re = \sqrt{2\mathcal{K}} H / \nu$'
 )
 fig.savefig('Reynolds.svg')

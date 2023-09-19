@@ -35,13 +35,13 @@ pc = ax.pcolormesh(
 )
 
 # Add a colorbar
-cb = fig.colorbar(pc, ax=[ax], label="$\\theta$")
+cb = fig.colorbar(pc, ax=[ax], label="$\\theta/\Delta$")
 
 # Add axis labels and fix aspect ratio
 ax.set(
     aspect='equal',
-    xlabel='$x$',
-    ylabel='$z$'
+    xlabel='$x/H$',
+    ylabel='$z/H$'
 )
 
 # Rescale the output image so that the resolution of the image matches the simulation
@@ -64,10 +64,11 @@ def update_and_save_plot(idx):
 with h5py.File(simdir+'/outputdir/flowmov/movie_zcut.h5', 'r') as f:
     nmov = len(list(f[var].keys()))
 
+fig.canvas.draw()
 fig.set_layout_engine('none')
 
-# Create a multiprocessing pool to split up the work
-pool = mp.Pool()
+# Create a multiprocessing pool to split up the work on 4 processors
+pool = mp.Pool(4)
 # Save plots for all of the 
 pool.map(update_and_save_plot, range(nmov))
 
