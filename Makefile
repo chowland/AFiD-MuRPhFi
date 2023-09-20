@@ -10,7 +10,7 @@ FLAVOUR=GNU
 # MARENOSTRUM (Intel): fabric intel mkl impi hdf5 fftw szip
 # SUPERMUC (Intel): fftw hdf5
 # DISCOVERER:
-#	GNU: hdf5/1/1.14/latest-gcc-openmpi fftw/3/latest-gcc-openmpi lapack
+#	GNU: hdf5/1/1.14/1.14.0-gcc-openmpi fftw/3/latest-gcc-openmpi lapack
 #	Intel: hdf5/1/1.14/latest-intel-openmpi fftw/3/latest-gcc-openmpi mkl
 
 #=======================================================================
