@@ -29,9 +29,10 @@ fig, ax = plt.subplots(layout='constrained')
 
 # Make a pcolor plot of the 2D field
 pc = ax.pcolormesh(
-    grid.ymr, grid.zmr, T.T,
+    grid.ymr, grid.xmr, T.T,
     shading='nearest', rasterized=True,
-    cmap='inferno', vmin=-0.5, vmax=0.5
+    cmap='inferno',
+    vmin=-0.5, vmax=0.5
 )
 
 # Add a colorbar
