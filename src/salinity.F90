@@ -138,15 +138,23 @@ end subroutine SetSalBCs
 !> Set initial conditions for salinity field
 !! N.B. This can get overwritten by CreateInitialPhase if also using phase-field
 subroutine CreateInitialSalinity
+    integer :: i, j, k
     
     !! Rayleigh-Taylor setup for pore-scale simulation
     if (IBM) then
         call SetSaltTwoLayer(h0=0.5*alx3, eps=1e-7, stable=.false.)
         call AddSalinityNoise(amp=0.1, localised=.true., h0=0.5*alx3)
 
-    !! Bounded double-diffusive convection (begin with small amplitude noise)
+    !! Bounded double-diffusive convection (begin with small amplitude noise + BLs)
     else if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
-        call SetZeroSalinity
+        ! call SetZeroSalinity
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    sal(k,j,i) = 0.5*(2*(xmr(k) - 0.5))**7
+                end do
+            end do
+        end do
         call AddSalinityNoise(amp=5e-3, localised=.false.)
 
     !! Stratified shear layer setup
