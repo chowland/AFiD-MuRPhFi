@@ -11,6 +11,7 @@ We set `activeT=0` to remove the effect of `temp` on the buoyancy and run the si
 ## 2D Visualization
 
 Here, we show the results for $Ra=10^8$, $Pr=10$.
+The simulation was run with a resolution of $128^3$ on the coarse grid for velocity, and a resolution of $384^3$ on the refined grid for "temperature".
 First, we use the script `parallel_movie.py` to produce a visualisation of a vertical slice of the "temperature" field `sal`:
 
 <video width="100%" controls>
