@@ -52,7 +52,7 @@ nav:
     - 'Technical Details':
         - 'equations.md'
         - 'numerics.md'
-        - 'buoyancy.md'
+        # - 'buoyancy.md'
         - 'interpolation.md'
         - 'stretched_grids.md'
         - 'ibm.md'
