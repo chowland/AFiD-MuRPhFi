@@ -35,7 +35,7 @@ where $T$ is the simulation output, $T_a$ is the analytic solution, and $t_f=10$
   </figcaption>
 </figure> -->
 
-## 2-D Taylor-Green vortex
+<!-- ## 2-D Taylor-Green vortex
 **To be completed**
 
 To test the convergence of the combined advection and diffusion, we consider the velocity field associated with a decaying, advected Taylor-Green vortex.
@@ -46,13 +46,13 @@ $$
 v = -\sin(z-Wt)\cos(y) e^{-2\nu t}, \qquad w = W + \cos(z - Wt)\sin(y) e^{-2\nu t} ,
 $$
 
-where $W$ is a uniform constant advection, and $\nu=(Pr/Ra)^{1/2}$ is the dimensionless viscosity (or inverse Reynolds number) determined by the input parameters $Ra$ and $Pr$.
+where $W$ is a uniform constant advection, and $\nu=(Pr/Ra)^{1/2}$ is the dimensionless viscosity (or inverse Reynolds number) determined by the input parameters $Ra$ and $Pr$. -->
 
 ## Phase-field model: 1-D Stefan problem
 
 Now we perform a convergence test for the phase-field model used to simulate liquid-solid phase transitions.
 We consider the problem of a liquid phase freezes from a cold boundary and a solidification front moves across the domain.
-As for the melting problem on the validation page LINK THIS, the analytic solution for the phase boundary height is
+As for the melting problem on the [validation page](phasefield_validation.md), the analytic solution for the phase boundary height is
 
 $$
 h(t) = 2\Lambda \sqrt{(t+t_0)/Pe_T} ,

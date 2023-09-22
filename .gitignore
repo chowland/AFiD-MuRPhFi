@@ -12,3 +12,6 @@ examples/*/*.svg
 examples/*/*.ipynb
 *.ipynb_checkpoints
 *.out
+tools/*.svg
+tools/*.png
+tools/*.mp4

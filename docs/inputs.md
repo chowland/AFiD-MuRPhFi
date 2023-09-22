@@ -84,25 +84,35 @@ These are detailed below.
 - `dPdy` and `dPdz` set mean pressure gradients in the $y$ and $z$ directions respectively.
     - `dPdy` is interpreted as a target shear Reynolds number $Re_\tau = v_\tau H/2\nu$ where $v_\tau$ is the friction velocity in the $y$-direction. The pressure gradient is kept to a constant value such that in a statistically steady state $Re_\tau$ measured at the wall will match the target, i.e. that the dimensionless pressure gradient in the equations satsifies $G=8 Re_\tau^2/Gr$. This constant pressure gradient is simply added to the $y$-momentum equation in `ExplicitTermsVY`.
     - `dPdz` is interpreted as a target bulk Reynolds number $Re_b=\langle w \rangle H/\nu$ where $\langle w\rangle$ is the volume-averaged $z$-component of velocity. The pressure gradient is adjusted at each time step to maintain this constant volume flux. We follow [Quadrio et al. (2016)](https://doi.org/10.1016/j.euromechflu.2015.09.005) in setting the wall-normal profile of the pressure gradient such that it remains consistent with the boundary conditions. This adjustment is performed in the subroutine `CorrectVelocity`.
-- `MELT` is a logical that implements a dynamic boundary condition for temperature and salinity according to the three-equation model for a melting boundary. With `MELT = 1`, the boundary at $x=0$ is treated as a stationary, planar wall of ice. **This feature is highly experimental and is not recommended for current use.**
+- `MELT` is a logical that implements a dynamic boundary condition for temperature and salinity according to the three-equation model for a melting boundary. With `MELT = 1`, the boundary at $x=0$ is treated as a stationary, planar wall of ice. **This is not meant to be used with the phase-field. When doing phase-field simulations, set `MELT = 0`.**
 
 #### Phase-field parameters
-As described in the documentation page on the [governing equations](../equations), the evolution for the phase-field equation is
+As described in the documentation page on the [governing equations](equations.md#double-diffusive-melting), the evolution for the phase-field equation is
 
 $$
-\partial_t \phi = A\nabla^2 \phi - (A/\varepsilon^2) \phi (1-\phi)(1-2\phi+C(T-T_m + \Lambda S))
+\partial_t \phi = D\nabla^2 \phi - (D/\varepsilon^2) \phi (1-\phi)(1-2\phi+A(T-T_m + \Lambda S))
 $$
 
 The diffuse interface thickness $\varepsilon$ is always set equal to the mean wall-normal grid spacing for the refined grid $\varepsilon = 1/n_x^r$.
 
-- `pf_A`$=A Pe$ is value of the diffusivity coefficient in the phase-field equation as a multiple of the Peclet number $Pe=(RaPr)^{-1/2}$;
-- `pf_C`$=C$ is the value of the thermal coupling parameter;
+- `pf_D` is no longer used as an input by the code - please ignore it. The diffusivity of the phase-field is always set such that $D=6/5 Pe \mathcal{S} A$;
+- `pf_A`$=A$ is the value of the thermal coupling parameter;
 - `pf_S`$=\mathcal{S}=L/c_p\Delta T$ is the Stefan number;
 - `pf_Tm`$=T_m$ is the dimensionless melting temperature;
-- `IBM` is a logical that determines which method is used to constrain the velocity field in the solid:
-    - `IBM = 0` uses the volume penalty method, adding a forcing term of $-{Pe}^{-1} \phi \boldsymbol{u}/(1.5\varepsilon)^2$ to the momentum equation;
-    - `IBM = 1` imposes an immersed boundary in the solid phase by simply setting $\boldsymbol{u} = 0$ wherever $\phi>0.5$ at each time step;
+- `IBM` should be set to `0` for phase-field simulations. See below for the options for fixed-object immersed boundaries;
 - `pf_IC` determines the initial condition when the phase-field method is used:
-    - `pf_IC = 1` provides the initial condition for the 1-D melting/freezing example described [here](../examples/stefan#1-d-solidification-from-a-cooled-boundary);
-    - `pf_IC = 2` produces an initial condition with a solid disc at the centre of the domain, following the example described [here](../examples/stefan/#axisymmetric-melting-of-a-solid-disc-in-2-d);
-    - `pf_IC = 3` provides an initial condition to match the validation example of Rayleigh-Bénard convection from Favier et al. (2019) as described [here](../examples/coupled_flows/#2-d-rayleigh-benard-with-a-melting-boundary). The velocity is zero everywhere, the phase boundary is at $x=0.5$, and the temperature profile is linear plus a wave-like perturbation in the liquid phase.
+    - `pf_IC = 1` provides the initial condition for the 1-D melting/freezing example described [here](examples/stefan.md#1-d-solidification-from-a-cooled-boundary);
+    - `pf_IC = 2` produces an initial condition with a solid disc at the centre of the domain, following the example described [here](examples/stefan.md#axisymmetric-melting-of-a-solid-disc-in-2-d);
+    - `pf_IC = 3` provides an initial condition to match the validation example of Rayleigh-Bénard convection from Favier et al. (2019) as described [here](examples/coupled_flows.md#2-d-rayleigh-benard-with-a-melting-boundary). The velocity is zero everywhere, the phase boundary is at $x=0.5$, and the temperature profile is linear plus a wave-like perturbation in the liquid phase.
+    - *Feel free to use other values of `pf_IC` yourself to define your own initial conditions in the subroutines `CreateInitialConditions` and `CreateICPF`*
+
+#### Immersed boundary objects
+The input parameter `ibm` can be used to specify different shapes of solid objects to model as immersed boundaries. The input parameter is reused as the variable `solidtype` in the code, and the shapes are defined in the subroutine `topogr`.
+
+- `ibm = 1` produces a hexagonal lattice array of cylinders
+- `ibm = 2` produces a "scallop-like" surface of parabolic curves
+- `ibm = 3` produces streamwise riblets at the bottom plate
+- `ibm = 4` produces a hexagonal lattice of spheres
+
+Of these options, only 1 and 4 have been reliably tested.
+Perform your own validation casses before using.
