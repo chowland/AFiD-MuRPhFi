@@ -11,6 +11,8 @@ program AFiD
     use afid_moisture
     use afid_salinity
     use afid_phasefield
+    use afid_averaging
+    use afid_spectra
     use h5_tools, only: InitSliceCommunicators
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
@@ -184,6 +186,9 @@ program AFiD
         ! if (phasefield) call UpdateIBMLocation
     end if
 
+    call InitAveragingVariables
+    call InitSpectra
+
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)
     call update_halo(vy,lvlhalo)
@@ -297,6 +302,9 @@ program AFiD
         endif
 
         call TimeMarcher
+
+        call UpdateTemporalAverages
+        call UpdateSpectra
 
         time=time+dt
 
