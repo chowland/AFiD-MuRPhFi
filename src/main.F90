@@ -108,8 +108,8 @@ program AFiD
 
     call WriteGridInfo
 
-    inquire(file=trim("spectra.in"),exist=specwrite)
-    if (specwrite) call InitPowerSpec
+    ! inquire(file=trim("spectra.in"),exist=specwrite)
+    ! if (specwrite) call InitPowerSpec
 
 !m===================================
 !m===================================
@@ -218,7 +218,7 @@ program AFiD
     end if
 
     call CalcMeanProfiles
-    if (specwrite) call WritePowerSpec
+    ! if (specwrite) call WritePowerSpec
     if(ismaster)  write(6,*) 'Write plane slices'
     call Mkmov_xcut
     call Mkmov_ycut
@@ -306,11 +306,11 @@ program AFiD
                 write(6,'(a,ES11.4,a,i9,a,ES11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
             endif
             call CalcMeanProfiles
-            if (specwrite) then
-                if (ismaster) write(*,*) "Writing power spectra"
-                call WritePowerSpec
-                if (ismaster) write(*,*) "Done writing power spectra"
-            end if
+            ! if (specwrite) then
+            !     if (ismaster) write(*,*) "Writing power spectra"
+            !     call WritePowerSpec
+            !     if (ismaster) write(*,*) "Done writing power spectra"
+            ! end if
             if(ismaster) then
                 open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
                 write(96,769) ntime,time,dt,instCFL*dt!,vx_global,vy_global,vz_global
