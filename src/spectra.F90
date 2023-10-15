@@ -10,6 +10,9 @@ module afid_spectra
     real, allocatable, dimension(:,:,:) :: vz_spec !! Power spectrum of vz
     real, allocatable, dimension(:,:,:) :: te_spec !! Power spectrum of temp
 
+    real, allocatable, dimension(:,:,:) :: wSr_spec !! Cospectrum of wall-normal S-flux (real part)
+    real, allocatable, dimension(:,:,:) :: wSi_spec !! Cospectrum of wall-normal S-flux (imaginary part)
+
 contains
 
 !> Allocate memory for 3D arrays of energy spectra
@@ -26,11 +29,19 @@ subroutine InitSpectra
     call AllocateReal3DArray(vz_spec,1,nxm,sp%xst(2),sp%xen(2),sp%xst(3),sp%xen(3))
     call AllocateReal3DArray(te_spec,1,nxm,sp%xst(2),sp%xen(2),sp%xst(3),sp%xen(3))
 
+    if (salinity) then
+        call AllocateReal3DArray(wSr_spec,1,nxm,sp%xst(2),sp%xen(2),sp%xst(3),sp%xen(3))
+        call AllocateReal3DArray(wSi_spec,1,nxm,sp%xst(2),sp%xen(2),sp%xst(3),sp%xen(3))
+
+        wSr_spec = 0.0
+        wSi_spec = 0.0
+    end if
+
     vx_spec = 0.0
     vy_spec = 0.0
     vz_spec = 0.0
     te_spec = 0.0
-
+    
 end subroutine InitSpectra
 
 !> Free memory from arrays used to store energy spectra
@@ -42,6 +53,8 @@ subroutine DeallocateSpectra
     call DestroyReal3DArray(vy_spec)
     call DestroyReal3DArray(vz_spec)
     call DestroyReal3DArray(te_spec)
+    call DestroyReal3DArray(wSr_spec)
+    call DestroyReal3DArray(wSi_spec)
 
     deallocate(fouvar1, fouvar2)
 
@@ -98,14 +111,47 @@ subroutine AddRealSpectrum(var, spectrum)
 
 end subroutine AddRealSpectrum
 
+!> Calculate the cospectrum of the variables `var1` and `var2` as a function of
+!! height and horizontal wavenumbers and add the real part to `rspec` and the
+!! imaginary part to ispec (scaled by dt)
+subroutine AddCospectrum(var1, var2, rspec, ispec)
+    use param, only: dt
+    real, dimension(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), intent(in) :: var1, var2
+    real, dimension(1:nxm,sp%xst(2):sp%xen(2),sp%xst(3):sp%xen(3)), intent(inout) :: rspec, ispec
+    complex :: cspec
+    integer :: i, j, k
+
+    ! Compute FFT on the variable
+    call CalcFourierCoef(var1, fouvar1)
+    call CalcFourierCoef(var2, fouvar2)
+
+    do i=sp%xst(3),sp%xen(3)
+        do j=sp%xst(2),sp%xen(2)
+            do k=1,nxm
+                cspec = fouvar1(k,j,i)*conjg(fouvar2(k,j,i))
+                rspec(k,j,i) = rspec(k,j,i) + dt*real(cspec)
+                ispec(k,j,i) = ispec(k,j,i) + dt*aimag(cspec)
+            end do
+        end do
+    end do
+
+end subroutine AddCospectrum
+
 !> Update the spectra
 subroutine UpdateSpectra
     use local_arrays, only: vx, vy, vz, temp
+    use afid_salinity, only: salc
 
     call AddRealSpectrum(vx(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), vx_spec)
     call AddRealSpectrum(vy(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), vy_spec)
     call AddRealSpectrum(vz(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), vz_spec)
     call AddRealSpectrum(temp(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), te_spec)
+
+    if (salinity) then
+        call AddCospectrum(salc(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), &
+                    vx(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), &
+                    wSr_spec, wSi_spec)
+    end if
 
 end subroutine UpdateSpectra
 
@@ -124,6 +170,10 @@ subroutine WriteSpectra
     vy_spec = vy_spec*i_tav
     vz_spec = vz_spec*i_tav
     te_spec = te_spec*i_tav
+    if (salinity) then
+        wSr_spec = wSr_spec*i_tav
+        wSi_spec = wSi_spec*i_tav
+    end if
 
     ! Save the arrays
     filename = 'outputdir/vx_spectrum.h5'
@@ -134,6 +184,13 @@ subroutine WriteSpectra
     call write_3D_spectrum(filename, vz_spec)
     filename = 'outputdir/te_spectrum.h5'
     call write_3D_spectrum(filename, te_spec)
+
+    if (salinity) then
+        filename = 'outputdir/wSr_spectrum.h5'
+        call write_3D_spectrum(filename, wSr_spec)
+        filename = 'outputdir/wSi_spectrum.h5'
+        call write_3D_spectrum(filename, wSi_spec)
+    end if
 
 end subroutine WriteSpectra
     
