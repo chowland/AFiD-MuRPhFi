@@ -17,6 +17,8 @@ contains
 !> Allocate the memory for the arrays storing temporal averages
 subroutine InitAveragingVariables
     use AuxiliaryRoutines, only: AllocateReal3DArray
+    logical :: exists
+    integer :: io
 
     ! Note we don't need ghost cells for these array
     call AllocateReal3DArray(vx_tav,1,nx,xstart(2),xend(2),xstart(3),xend(3))
@@ -29,7 +31,19 @@ subroutine InitAveragingVariables
     vz_tav = 0.0
     te_tav = 0.0
 
-    tav_start = time
+    ! Read in time at which to start averaging
+    inquire(file="spectra.in", exist=exists)
+    if (exists) then
+        open(file="spectra.in", newunit=io, status="old", action="read")
+        read(io,*)
+        read(io,*) tav_start
+    end if
+    
+    ! If starting a simulation already past the specified averaging
+    ! time, set tav_start as current time
+    if (time > tav_start) then
+        tav_start = time
+    end if
 
 end subroutine InitAveragingVariables
 
@@ -73,21 +87,24 @@ subroutine WriteTemporalAverages
     tav_length = time - tav_start
     i_tav = 1.0/tav_length
 
-    ! Normalize the arrays
-    vx_tav = vx_tav*i_tav
-    vy_tav = vy_tav*i_tav
-    vz_tav = vz_tav*i_tav
-    te_tav = te_tav*i_tav
+    ! Only write out the array if we've started averaging
+    if (tav_length > 0) then
+        ! Normalize the arrays
+        vx_tav = vx_tav*i_tav
+        vy_tav = vy_tav*i_tav
+        vz_tav = vz_tav*i_tav
+        te_tav = te_tav*i_tav
 
-    ! Save the arrays
-    filename = 'outputdir/fields/vx_mean.h5'
-    call write_3D_array(filename, vx_tav)
-    filename = 'outputdir/fields/vy_mean.h5'
-    call write_3D_array(filename, vy_tav)
-    filename = 'outputdir/fields/vz_mean.h5'
-    call write_3D_array(filename, vz_tav)
-    filename = 'outputdir/fields/te_mean.h5'
-    call write_3D_array(filename, te_tav)
+        ! Save the arrays
+        filename = 'outputdir/fields/vx_mean.h5'
+        call write_3D_array(filename, vx_tav)
+        filename = 'outputdir/fields/vy_mean.h5'
+        call write_3D_array(filename, vy_tav)
+        filename = 'outputdir/fields/vz_mean.h5'
+        call write_3D_array(filename, vz_tav)
+        filename = 'outputdir/fields/te_mean.h5'
+        call write_3D_array(filename, te_tav)
+    end if
     
 end subroutine WriteTemporalAverages
 

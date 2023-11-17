@@ -110,7 +110,7 @@ program AFiD
 
     call WriteGridInfo
 
-    ! inquire(file=trim("spectra.in"),exist=specwrite)
+    inquire(file=trim("spectra.in"),exist=specwrite)
     ! if (specwrite) call InitPowerSpec
 
 !m===================================
@@ -186,8 +186,10 @@ program AFiD
         ! if (phasefield) call UpdateIBMLocation
     end if
 
+    if (specwrite) then
     call InitAveragingVariables
     call InitSpectra
+    end if
 
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)
@@ -303,8 +305,10 @@ program AFiD
 
         call TimeMarcher
 
+        if (specwrite .and. time > tav_start) then
         call UpdateTemporalAverages
         call UpdateSpectra
+        end if
 
         time=time+dt
 
