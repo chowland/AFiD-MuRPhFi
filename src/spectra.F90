@@ -139,7 +139,7 @@ end subroutine AddCospectrum
 
 !> Update the spectra
 subroutine UpdateSpectra
-    use local_arrays, only: vx, vy, vz, temp
+    use local_arrays, only: vx, vy, vz, temp, dph, dq
     use afid_salinity, only: salc
 
     call AddRealSpectrum(vx(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), vx_spec)
@@ -147,9 +147,19 @@ subroutine UpdateSpectra
     call AddRealSpectrum(vz(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), vz_spec)
     call AddRealSpectrum(temp(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), te_spec)
 
+    ! Interpolate vx and salc to the cell centre, temporarily storing in dph
+    do i=xstart(3),xend(3)
+        do j=xstart(2),xend(2)
+            do k=1,nxm
+                dph(k,j,i) = 0.5*(vx(k,j,i) + vx(k+1,j,i))
+                dq(k,j,i) = 0.5*(salc(k,j,i) + salc(k,j+1,i))
+            end do
+        end do
+    end do
+
     if (salinity) then
-        call AddCospectrum(salc(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), &
-                    vx(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), &
+        call AddCospectrum(dq(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), &
+                    dph(1:nxm,xstart(2):xend(2),xstart(3):xend(3)), &
                     wSr_spec, wSi_spec)
     end if
 
