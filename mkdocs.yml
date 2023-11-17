@@ -46,7 +46,7 @@ nav:
         - 'examples/stefan.md'
         - 'examples/coupled_flows.md'
     - 'Benchmarking and validation':
-        - 'compilers.md'
+        - 'scaling.md'
         - 'convergence.md'
         - 'phasefield_validation.md'
     - 'Technical Details':
