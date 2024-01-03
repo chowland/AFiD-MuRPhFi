@@ -79,9 +79,9 @@ subroutine InterpVelMgrd
             do kc=1,nxm
                 tpdv(kc,jc,ic) = (vy(kc,jp,ic) - vy(kc,jc,ic))*dy
             end do
-            !-- Boundary points, enforce zero velocity
-            tpdv( 0,jc,ic) = -tpdv(1,jc,ic)
-            tpdv(nx,jc,ic) = -tpdv(nxm,jc,ic)
+            !-- Boundary points, enforce zero velocity / gradient
+            tpdv( 0,jc,ic) = (1-2*inslwS)*tpdv(1,jc,ic)
+            tpdv(nx,jc,ic) = (1-2*inslwN)*tpdv(nxm,jc,ic)
         end do
     end do
 
@@ -101,8 +101,8 @@ subroutine InterpVelMgrd
                 vyxzc(kc,ic) = vy(kc,jc0,ic)
             end do
             ! x boundaries
-            vyxzc(0,ic) = -vyxzc(1,ic)
-            vyxzc(nx,ic) = -vyxzc(nxm,ic)
+            vyxzc(0,ic) = (1-2*inslwS)*vyxzc(1,ic)
+            vyxzc(nx,ic) = (1-2*inslwN)*vyxzc(nxm,ic)
         end do
 
         do ic=xstart(3)-1,xend(3)
@@ -165,9 +165,9 @@ subroutine InterpVelMgrd
             do kc=1,nxm
                 tpdv(kc,jc,ic) = (vz(kc,jc,ip) - vz(kc,jc,ic))*dz
             enddo
-            !-- Boundary points, enforce zero velocity
-            tpdv( 0,jc,ic) = -tpdv(1,jc,ic)
-            tpdv(nx,jc,ic) = -tpdv(nxm,jc,ic)
+            !-- Boundary points, enforce zero velocity / gradient
+            tpdv( 0,jc,ic) = (1-2*inslwS)*tpdv(1,jc,ic)
+            tpdv(nx,jc,ic) = (1-2*inslwN)*tpdv(nxm,jc,ic)
         end do
     end do
 
@@ -187,8 +187,8 @@ subroutine InterpVelMgrd
                 vzxyc(kc,jc) = vz(kc,jc,ic0)
             end do
             ! Boundary points
-            vzxyc( 0,jc) = -vzxyc(1,jc)
-            vzxyc(nx,jc) = -vzxyc(nxm,jc)
+            vzxyc( 0,jc) = (1-2*inslwS)*vzxyc(1,jc)
+            vzxyc(nx,jc) = (1-2*inslwN)*vzxyc(nxm,jc)
         end do
 
         do jc=xstart(2)-1,xend(2)
