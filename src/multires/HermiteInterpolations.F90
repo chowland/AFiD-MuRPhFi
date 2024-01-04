@@ -57,90 +57,125 @@ subroutine interpolation_indices(idx, x_old, x_new, x_len)
 
 end subroutine interpolation_indices
 
-    subroutine construct_stencil(cx, x_old, x_new, x_len, idx, axis)
-        real, intent(out) :: cx(:,:)
-        real, intent(in) :: x_old(:), x_new(:), x_len
-        integer, intent(in) :: idx(0:)
-        character, intent(in) :: axis
+!> Subroutine for extending the grid `x_og` at the lower (x=0) and
+!! upper (x=`x_len`) boundaries by `n_ext` points in each direction
+subroutine extend_grid(x_ext, x_og, x_len, n_ext)
+    real, allocatable, intent(out) :: x_ext(:) !! Extended grid
+    real, intent(in) :: x_og(:)    !! Original grid
+    real, intent(in) :: x_len   !! Upper boundary position
+    integer, intent(in) :: n_ext   !! Number of points to extend by
 
-        integer :: n_old, n_new, io, in
-        real, allocatable :: xo(:), xn(:)
-        real :: t, dlc, dlm, dlp, h00, h01, h10, h11
+    integer :: n_og, i
 
-        if (scan("xyz",axis)==0) then
-            write(*,*) 'WARNING: invalid value for axis used in construct_stencil!'
-            write(*,*) '         Please set axis as one of "x", "y", or "z".'
-        end if
+    n_og = size(x_og)
+    allocate(x_ext(1-n_ext:n_og+n_ext))
 
-        n_old = size(x_old)
-        n_new = size(x_new)
+    x_ext(1:n_og) = x_og(1:n_og)
 
-        if (axis=="x") then
-            allocate(xo(0:n_old+1))
-            allocate(xn(0:n_new+1))
-        else
-            allocate(xo(-1:n_old+2))
-            allocate(xn(-1:n_new+2))
-        end if
-        xo(1:n_old) = x_old(1:n_old)
-        xn(1:n_new) = x_new(1:n_new)
-        if (axis=="x") then
-            xo(0) = -xo(2)
-            xo(n_old+1) = 2.0*x_len - xo(n_old-1)
-            xn(0) = -xn(2)
-            xn(n_new+1) = 2.0*x_len - xn(n_new-1)
-        else
-            xo(0) = -xo(1)
-            xo(-1) = -xo(2)
-            xo(n_old+1) = 2.0*x_len - xo(n_old)
-            xo(n_old+2) = 2.0*x_len - xo(n_old-1)
-            xn(0) = -xn(1)
-            xn(-1) = -xn(2)
-            xn(n_new+1) = 2.0*x_len - xn(n_new)
-            xn(n_new+2) = 2.0*x_len - xn(n_new-1)
-        end if
-        
-        do io=0,n_old
-            ! Use linear interpolation if by solid boundary
-            if (axis=="x" .and. (io==0 .or. io==n_old)) then
-                dlc = xo(io+1) - xo(io)
-                do in=max(idx(io),1),min(idx(io+1)-1,n_new)
-                    t = (xn(in) - xo(io))/dlc
-                    cx(1,in) = 0.0
-                    cx(2,in) = 1 - t
-                    cx(3,in) = t
-                    cx(4,in) = 0.0
-                end do
-            ! Otherwise, use second order Hermite interpolation
-            else
-                dlm = xo(io) - xo(io-1)
-                dlc = xo(io+1) - xo(io)
-                dlp = xo(io+2) - xo(io+1)
-                do in=max(idx(io),1),min(idx(io+1)-1,n_new)
-                    t = (xn(in) - xo(io))/dlc
-                    if (t<1e-12) then
-                        cx(:,in) = 0.0
-                        cx(2,in) = 1.0
-                    else
-                        h00 = (1.0 + 2.0*t)*(1.0 - t)**2
-                        h10 = t*(1.0 - t)**2
-                        h01 = (1.0 + 2.0*(1.0 - t))*t**2
-                        h11 = -(1.0 - t)*t**2
-                        cx(1,in) = -h10*dlc**2/dlm/(dlc + dlm)
-                        cx(2,in) = h00 - h11*dlp/(dlp + dlc) &
-                                        + h10*(dlc - dlm)/dlm
-                        cx(3,in) = h01 + h10*dlm/(dlm + dlc) &
-                                        + h11*(dlp - dlc)/dlp
-                        cx(4,in) = h11*dlc**2/dlp/(dlp + dlc)
-                    end if
-                end do
-            end if
+    ! Check if first grid point is on the boundary
+    if (abs(x_og(1)) < 1e-10) then
+        ! index location and boundary:
+        !   -1  0  |1|  2  3
+        do i=1,n_ext
+            x_ext(1-i) = -x_og(1+i)
         end do
+    else
+        ! index location and boundary:
+        !   -1  0  ||  1  2
+        do i=1,n_ext
+            x_ext(1-i) = -x_og(i)
+        end do
+    end if
 
-        deallocate(xo)
-        deallocate(xn)
+    ! Check if last grid point is on the boundary
+    if (abs(x_og(n_og) - x_len) < 1e-10) then
+        ! index location and boundary:
+        !   n-2  n-1  |n|  n+1  n+2
+        do i=1,n_ext
+            x_ext(n_og+i) = 2*x_len - x_og(n_og-i)
+        end do
+    else
+        do i=1,n_ext
+            x_ext(n_og+i) = 2*x_len - x_og(n_og+1-i)
+        end do
+    end if
 
-    end subroutine construct_stencil
+end subroutine extend_grid
+
+!> Compute stencil coefficients for the interpolation between `x_old`
+!! and `x_new` along a given axis. 
+subroutine construct_stencil(cx, x_old, x_new, x_len, idx, axis)
+    real, intent(out) :: cx(:,:)    !! Stencil coefficient array
+    real, intent(in) :: x_old(:)    !! Starting grid
+    real, intent(in) :: x_new(:)    !! Grid interpolated to
+    real, intent(in) :: x_len       !! Upper boundary position
+    integer, intent(in) :: idx(0:)  !! Index array from `interpolation_indices`
+    character, intent(in) :: axis   !! Axis of grid ('x', 'y', or 'z')
+
+    integer :: n_old, n_new, io, in, n_ext
+    real, allocatable :: xo(:), xn(:)
+    real :: t, dlc, dlm, dlp, h00, h01, h10, h11
+
+    if (scan("xyz",axis)==0) then
+        write(*,*) 'WARNING: invalid value for axis used in construct_stencil!'
+        write(*,*) '         Please set axis as one of "x", "y", or "z".'
+    end if
+
+    n_old = size(x_old)
+    n_new = size(x_new)
+
+    cx(:,:) = 0.0
+
+    ! Extend grid by 1 point over boundary if x, 2 points if not
+    if (axis=="x") then
+        n_ext = 1
+    else
+        n_ext = 2
+    end if
+    call extend_grid(xo, x_old, x_len, n_ext)
+    call extend_grid(xn, x_new, x_len, n_ext)
+    
+    do io=0,n_old
+        ! Use linear interpolation if by solid boundary
+        if (axis=="x" .and. (io==0 .or. io==n_old)) then
+            dlc = xo(io+1) - xo(io)
+            do in=max(idx(io),1),min(idx(io+1)-1,n_new)
+                t = (xn(in) - xo(io))/dlc
+                cx(1,in) = 0.0
+                cx(2,in) = 1 - t
+                cx(3,in) = t
+                cx(4,in) = 0.0
+            end do
+        ! Otherwise, use second order Hermite interpolation
+        else
+            dlm = xo(io) - xo(io-1)
+            dlc = xo(io+1) - xo(io)
+            dlp = xo(io+2) - xo(io+1)
+            do in=max(idx(io),1),min(idx(io+1)-1,n_new)
+                t = (xn(in) - xo(io))/dlc
+                if (t<1e-12) then
+                    cx(:,in) = 0.0
+                    cx(2,in) = 1.0
+                else
+                    h00 = (1.0 + 2.0*t)*(1.0 - t)**2
+                    h10 = t*(1.0 - t)**2
+                    h01 = (1.0 + 2.0*(1.0 - t))*t**2
+                    h11 = -(1.0 - t)*t**2
+                    cx(1,in) = -h10*dlc**2/dlm/(dlc + dlm)
+                    cx(2,in) = h00 - h11*dlp/(dlp + dlc) &
+                                    + h10*(dlc - dlm)/dlm
+                    cx(3,in) = h01 + h10*dlm/(dlm + dlc) &
+                                    + h11*(dlp - dlc)/dlp
+                    cx(4,in) = h11*dlc**2/dlp/(dlp + dlc)
+                end if
+            end do
+        end if
+    end do
+
+    deallocate(xo)
+    deallocate(xn)
+
+end subroutine construct_stencil
 
 !> Interpolate the 3D array `cvar` from the coarse grid to the refined
 !! grid and store the result in `rvar`
