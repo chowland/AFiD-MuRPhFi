@@ -45,8 +45,8 @@ subroutine InterpVelMgrd
             end do
         !-- Boundary points, enforce continuity
         !CJH Note indices 0 & nx are now beyond boundaries in CreateMgrdStencil
-        tpdv( 0,jc,ic) = -tpdv(1,jc,ic)
-        tpdv(nx,jc,ic) = -tpdv(nxm,jc,ic)
+        tpdv( 0,jc,ic) = (1-2*inslwS)*tpdv(1,jc,ic)
+        tpdv(nx,jc,ic) = (1-2*inslwN)*tpdv(nxm,jc,ic)
         end do
     end do
 
