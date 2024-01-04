@@ -61,10 +61,10 @@ subroutine InterpInputVel
                 kp=kc+1
                 tpdvo(kc,jc,ic)=(vxo(kp,jc,ic)-vxo(kc,jc,ic))/(xco(kp)-xco(kc))
             enddo
-            ! CJH du/dx=0 on boundaries
+            ! CJH du/dx=0 on boundaries or d2u/dx2=0 when free-slip
             !-- Boundary points, enforce continuity
-            tpdvo(0  ,jc,ic) = -tpdvo(1,jc,ic)
-            tpdvo(nxo,jc,ic) = -tpdvo(nxmo,jc,ic)
+            tpdvo(0  ,jc,ic) = (1-2*inslwS)*tpdvo(1,jc,ic)
+            tpdvo(nxo,jc,ic) = (1-2*inslwN)*tpdvo(nxmo,jc,ic)
     
         enddo
     enddo
