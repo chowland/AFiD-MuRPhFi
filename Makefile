@@ -28,7 +28,7 @@ endif
 
 ifeq ($(MACHINE),PC)
 # GNU Debug Flags
-	FC += -O0 -g -fbacktrace -Wall -Wextra
+	# FC += -O0 -g -fbacktrace -Wall -Wextra
 	# FC += -Wpedantic
 	# FC += -Warray-temporaries
 	# FC += -fcheck=all -finit-real=snan -ffpe-trap=invalid #-std=f2018
@@ -36,7 +36,7 @@ ifeq ($(MACHINE),PC)
 # Intel Debug Flags
 # FC += -O0 -g -traceback -check bounds
 	ifeq ($(FLAVOUR),GNU)
-		LDFLAGS = -L$(HOME)/fftw-install/lib -lfftw3 -llapack -ldl
+		LDFLAGS = -lfftw3 -llapack -ldl
 	else
 		LDFLAGS = -lfftw3 -qmkl=sequential
 	endif
