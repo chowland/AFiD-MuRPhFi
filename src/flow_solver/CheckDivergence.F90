@@ -13,7 +13,7 @@ subroutine CheckDivergence(qmax,qmaxr)
     use local_arrays, only: vy,vx,vz
     use afid_salinity, only: vyr,vxr,vzr
     use mpih
-    use decomp_2d, only: xstart,xend,xstartr,xendr,nrank
+    use decomp_2d, only: xstart,xend,xstartr,xendr!,nrank
     implicit none
     real,intent(out) :: qmax,qmaxr
     integer :: jc,kc,kp,jp,ic,ip

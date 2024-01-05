@@ -13,10 +13,9 @@ subroutine ReadInputFile
     use afid_phasefield, only: pf_A, pf_D, pf_eps, pf_Lambda, pf_S, pf_Tm
     implicit none
     character(len=4) :: dummy
-    integer flagstat,flagbal,flagmelt
+    integer :: flagmelt
     integer :: flagMR, flagsal, flagPF
-    integer :: FFscaleS!, pf_IBM
-    logical fexist
+    integer :: FFscaleS
 
     open(unit=15,file='bou.in',status='old')
         read(15,301) dummy
