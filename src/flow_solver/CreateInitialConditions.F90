@@ -178,8 +178,8 @@ subroutine CreateInitialConditions
                 do k=1,nxm
                     call random_number(varptb)
                     if (abs(xm(k)-0.5) + eps > 0.5) then
-                    amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
-                    temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
+                        amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
+                        temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
                     else
                     temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
                     end if
