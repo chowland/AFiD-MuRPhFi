@@ -14,7 +14,7 @@ subroutine ExplicitTermsTemp
     use decomp_2d, only: xstart,xend
     implicit none
     integer :: jc,kc,ic
-    integer :: km,kp,jm,jp,im,ip
+    integer :: jm,jp,im,ip
     real    :: htx,hty,htz,udy,udz
     real    :: udzq,udyq
     real    :: dyyt,dzzt

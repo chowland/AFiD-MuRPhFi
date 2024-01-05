@@ -26,7 +26,7 @@ program AFiD
     integer :: prow=0,pcol=0
     integer :: lfactor,lfactor2
     character(100) :: arg
-    logical :: nanexist, write_mean_planes=.true.
+    logical :: write_mean_planes=.true.!, nanexist
     ! real,allocatable,dimension(:,:) :: dummy,dscan,dbot
     ! integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
@@ -110,7 +110,7 @@ program AFiD
 
     call WriteGridInfo
 
-    ! inquire(file=trim("spectra.in"),exist=specwrite)
+    inquire(file=trim("spectra.in"),exist=specwrite)
     ! if (specwrite) call InitPowerSpec
 
 !m===================================
@@ -186,8 +186,10 @@ program AFiD
         ! if (phasefield) call UpdateIBMLocation
     end if
 
-    call InitAveragingVariables
-    call InitSpectra
+    if (specwrite) then
+        call InitAveragingVariables
+        call InitSpectra
+    end if
 
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)
@@ -303,8 +305,10 @@ program AFiD
 
         call TimeMarcher
 
-        call UpdateTemporalAverages
-        call UpdateSpectra
+        if (specwrite .and. time > tav_start) then
+            call UpdateTemporalAverages
+            call UpdateSpectra
+        end if
 
         time=time+dt
 

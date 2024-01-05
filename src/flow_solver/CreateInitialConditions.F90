@@ -16,11 +16,10 @@ subroutine CreateInitialConditions
     use afid_salinity, only: RayS
     use afid_phasefield, only: pf_eps, read_phase_field_params
     implicit none
-    integer :: j,k,i,kmid, io
+    integer :: j,k,i,kmid
     real :: xxx,yyy,zzz,eps,varptb,amp
     real :: h0,t0,Lambda,r, x0, A, B, alpha
     real, dimension(11) :: yh, zh
-    logical :: exists
 
     call random_seed()
 
