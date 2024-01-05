@@ -37,15 +37,28 @@ subroutine CreateInitialConditions
     end if
 
     if (gAxis == 1) then
-        if ((RayT < 0) .and. (RayS <0)) then
-            !CJH: Stratified shear layer initial condition
-            do i=xstart(3),xend(3)
-                do j=xstart(2),xend(2)
-                    do k=1,nxm
-                        vy(k,j,i) = tanh(xm(k) - alx3/2.0)
+        if (RayT < 0) then
+            if (RayS <0) then
+                !CJH: Stratified shear layer initial condition
+                do i=xstart(3),xend(3)
+                    do j=xstart(2),xend(2)
+                        do k=1,nxm
+                            vy(k,j,i) = tanh(xm(k) - alx3/2.0)
+                        end do
                     end do
                 end do
-            end do
+            else
+                !CJH: Salt-fingering initial condition
+                do i=xstart(3),xend(3)
+                    do j=xstart(2),xend(2)
+                        do k=1,nxm
+                            vx(k,j,i) = 0.0
+                            vy(k,j,i) = 0.0
+                            vz(k,j,i) = 0.0
+                        end do
+                    end do
+                end do
+            end if
         else
             !CJH: RBC initial condition as used in AFiD 1.0
             eps = 0.01
