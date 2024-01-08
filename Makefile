@@ -43,6 +43,7 @@ ifeq ($(MACHINE),PC)
 endif
 ifeq ($(MACHINE),DISCOVERER)
 	ifeq ($(FLAVOUR),GNU)
+		FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8
 		LDFLAGS += -lfftw3 -llapack -ldl
 	else
 		LDFLAGS += -lfftw3 -qmkl=sequential
