@@ -10,10 +10,10 @@
 subroutine Mkmov_xcut
     use mpih
     use hdf5
-    use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
+    use decomp_2d, only: xstart,xend,xstartr,xendr!,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal, RayS
-    use afid_phasefield, only: phi
+    ! use afid_phasefield, only: phi
     use afid_moisture, only: humid
     use h5_tools
     use param, only: nxm, nxmr, IBM, RayT

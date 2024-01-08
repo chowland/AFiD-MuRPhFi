@@ -18,7 +18,7 @@ subroutine ImplicitAndUpdateVY
     use ibm_param
     implicit none
     integer :: kc,jmm,jc,ic
-    integer :: kpp,kmm,ke
+    integer :: kpp,kmm
     real    :: alre,udy
     real    :: amm,acc,app
     real    :: dyp,dxxvy

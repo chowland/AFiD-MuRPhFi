@@ -16,11 +16,10 @@ subroutine CreateInitialConditions
     use afid_salinity, only: RayS
     use afid_phasefield, only: pf_eps, read_phase_field_params
     implicit none
-    integer :: j,k,i,kmid, io
+    integer :: j,k,i,kmid
     real :: xxx,yyy,zzz,eps,varptb,amp
     real :: h0,t0,Lambda,r, x0, A, B, alpha
     real, dimension(11) :: yh, zh
-    logical :: exists
 
     call random_seed()
 
@@ -37,16 +36,29 @@ subroutine CreateInitialConditions
     end if
 
     if (gAxis == 1) then
-        if ((RayT < 0) .and. (RayS <0)) then
-            !CJH: Stratified shear layer initial condition
-            do i=xstart(3),xend(3)
-                do j=xstart(2),xend(2)
-                    do k=1,nxm
-                        vy(k,j,i) = tanh(xm(k) - alx3/2.0)
-                        ! vz(k,j,i) = 1.0/cosh(xm(k) - alx3/2.0)
+        if (RayT < 0) then
+            if (RayS <0) then
+                !CJH: Stratified shear layer initial condition
+                do i=xstart(3),xend(3)
+                    do j=xstart(2),xend(2)
+                        do k=1,nxm
+                            vy(k,j,i) = tanh(xm(k) - alx3/2.0)
+                            ! vz(k,j,i) = 1.0/cosh(xm(k) - alx3/2.0)
+                        end do
                     end do
                 end do
-            end do
+            else
+                !CJH: Salt-fingering initial condition
+                do i=xstart(3),xend(3)
+                    do j=xstart(2),xend(2)
+                        do k=1,nxm
+                            vx(k,j,i) = 0.0
+                            vy(k,j,i) = 0.0
+                            vz(k,j,i) = 0.0
+                        end do
+                    end do
+                end do
+            end if
         else
             !CJH: RBC initial condition as used in AFiD 1.0
             eps = 0.01
@@ -179,8 +191,8 @@ subroutine CreateInitialConditions
                 do k=1,nxm
                     call random_number(varptb)
                     if (abs(xm(k)-0.5) + eps > 0.5) then
-                    amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
-                    temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
+                        amp = 0.5 - abs(xm(k)-0.5) ! CJH Prevent values of |T| exceeding 0.5
+                        temp(k,j,i) = temp(k,j,i) + amp*(2.d0*varptb - 1.d0)
                     else
                     temp(k,j,i) = temp(k,j,i) + eps*(2.d0*varptb - 1.d0)
                     end if

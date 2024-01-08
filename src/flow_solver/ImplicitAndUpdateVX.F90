@@ -18,7 +18,7 @@ subroutine ImplicitAndUpdateVX
     use ibm_param
     implicit none
     integer :: jc,kc
-    integer :: km,kp,ic,ke
+    integer :: km,kp,ic
     real    :: alre,udx3
     real    :: amm,acc,app,dxp,dxxvx
 

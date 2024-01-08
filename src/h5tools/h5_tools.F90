@@ -71,7 +71,7 @@ subroutine write_H5_plane(file_id, varname, var, axis)
     character, intent(in) :: axis
 
     integer, parameter :: ndims = 2
-    integer(HID_T) :: filespace, slabspace, memspace, dset
+    integer(HID_T) :: filespace, memspace, dset
     integer(HSIZE_T), dimension(2) :: dims, data_count, data_offset
     character(len=5) :: frame
     character(len=10) :: dsetname

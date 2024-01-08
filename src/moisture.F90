@@ -150,7 +150,7 @@ end subroutine SetHumidityBCs
 subroutine CreateInitialHumidity
     use mpih
     integer :: ic, jc, kc
-    real :: rnum, r, r2, amp
+    real :: rnum, r2, amp
     real :: bz(nxm), qz(nxm)
     logical :: exists
     character(len=30) :: dsetname, filename
