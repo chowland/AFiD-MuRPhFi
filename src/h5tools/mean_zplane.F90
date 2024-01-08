@@ -3,7 +3,7 @@ subroutine mean_zplane
     use param, only: nx
     use mpih
     use hdf5
-    use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
+    use decomp_2d, only: xstart,xend,xstartr,xendr!,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal
     use afid_phasefield, only: phi
@@ -132,7 +132,7 @@ subroutine mean_yplane
     use param, only: nx
     use mpih
     use hdf5
-    use decomp_2d, only: xstart,xend,xstartr,xendr,DECOMP_2D_COMM_CART_X
+    use decomp_2d, only: xstart,xend,xstartr,xendr!,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal
     use afid_phasefield, only: phi

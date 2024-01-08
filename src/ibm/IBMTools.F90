@@ -12,7 +12,7 @@ subroutine calc_interface_height(ph, h)
     !< input variable 
     real, intent(out) :: h(xstartr(2)-lvlhalo:,xstartr(3)-lvlhalo:)
     real :: dxx(nxmr)
-    integer :: i,j,k,kp
+    integer :: i,j,k
 
     h(:,:) = 0.0
 

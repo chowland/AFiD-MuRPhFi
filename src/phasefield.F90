@@ -77,9 +77,8 @@ end subroutine DeallocatePFVariables
 
 !> Set the initial state of the phase field
 subroutine CreateInitialPhase
-    use afid_salinity, only: sal, PraS
-    real :: A, B, alpha, t0, x0, h0
-    integer :: i, j, k
+    ! use afid_salinity, only: sal, PraS
+    real :: h0
 
     if (salinity) then
         !! Ice above salty water (1D_DDMelting example)

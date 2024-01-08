@@ -18,7 +18,7 @@ subroutine ImplicitAndUpdateVZ
     use ibm_param
     implicit none
     integer :: kc,jc,ic,imm
-    integer :: kmm,kpp,ke
+    integer :: kmm,kpp
     real    :: alre,amm,acc,app,udz
     real    :: dxxvz,dzp
 

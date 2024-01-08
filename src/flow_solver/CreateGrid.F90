@@ -14,10 +14,7 @@ subroutine CreateGrid
     use GridModule
     implicit none
 
-    real :: x1,x2,x3
-
-    integer :: i, j, kc, km, kp
-    logical :: fexist
+    integer :: kc
 
     do kc=1,nxm
         kmv(kc)=kc-1

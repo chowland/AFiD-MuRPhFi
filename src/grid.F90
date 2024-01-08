@@ -227,7 +227,7 @@ contains
         real, intent(in) :: grd_len, Retau, dw
 
         integer :: k, ks
-        real :: alpha, kb, dyw, sig, dxlo, dxup, dxsmooth
+        real :: alpha, kb, sig, dxlo, dxup, dxsmooth
 
         ! Index of roughness height
         kb = 0.2*Retau/dw
