@@ -155,7 +155,7 @@ subroutine CreateInitialSalinity
                 end do
             end do
         end do
-        call AddSalinityNoise(amp=5e-3, localised=.false.)
+        ! call AddSalinityNoise(amp=5e-3, localised=.false.)
 
     !! Stratified shear layer setup
     else if ((RayS < 0) .and. (RayT < 0)) then
