@@ -67,7 +67,7 @@ subroutine ImplicitAndUpdateVX
     end do
 !$OMP END PARALLEL DO
 
-    iF(ANY(IsNaN(rhs))) write(*,*) 'NaN in rhs'
+    ! iF(ANY(IsNaN(rhs))) write(*,*) 'NaN in rhs'
 
 !  Solve equation and update velocity
 

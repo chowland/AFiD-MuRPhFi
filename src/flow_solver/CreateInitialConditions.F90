@@ -43,6 +43,7 @@ subroutine CreateInitialConditions
                     do j=xstart(2),xend(2)
                         do k=1,nxm
                             vy(k,j,i) = tanh(xm(k) - alx3/2.0)
+                            ! vz(k,j,i) = 1.0/cosh(xm(k) - alx3/2.0)
                         end do
                     end do
                 end do

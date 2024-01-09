@@ -421,7 +421,7 @@ subroutine topogr
                 end do
             end do
         end do
-        iF(ANY(IsNaN(distb))) write(*,*) 'NaN in distb'
+        ! iF(ANY(IsNaN(distb))) write(*,*) 'NaN in distb'
         
         if(l.eq.1) then
             if(n.gt.mpun)  &

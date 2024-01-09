@@ -12,11 +12,11 @@ subroutine Mkmov_xcut
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr!,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
-    use afid_salinity, only: sal
+    use afid_salinity, only: sal, RayS
     ! use afid_phasefield, only: phi
     use afid_moisture, only: humid
     use h5_tools
-    use param, only: nxm, nxmr, IBM
+    use param, only: nxm, nxmr, IBM, RayT
     implicit none
     character(70) :: filename
     character(4) :: varname
@@ -28,6 +28,7 @@ subroutine Mkmov_xcut
 
     ! Select plane - plane next to lower wall
     ic = 1
+    if (RayS < 0 .and. RayT < 0) ic = nxm/2
     if (IBM) ic = nxm/2
 
     ! Record filename as string
@@ -64,6 +65,7 @@ subroutine Mkmov_xcut
         !! Repeat on refined grid to save salinity
         ! Select wall plane index for refined grid
         ic = 1
+        if (RayS < 0 .and. RayT < 0) ic = nxmr/2
         if (IBM) ic = nxmr/2
 
         call h5_open_or_create(file_id, filename, comm, fexist)

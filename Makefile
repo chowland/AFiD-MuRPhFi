@@ -10,7 +10,7 @@ FLAVOUR=GNU
 # MARENOSTRUM (Intel): fabric intel mkl impi hdf5 fftw szip
 # SUPERMUC (Intel): fftw hdf5
 # DISCOVERER:
-#	GNU: hdf5/1/1.14/1.14.0-gcc-openmpi fftw/3/latest-gcc-openmpi lapack
+#	GNU: hdf5/1/1.14/latest-gcc-openmpi fftw/3/latest-gcc-openmpi lapack
 #	Intel: hdf5/1/1.14/latest-intel-openmpi fftw/3/latest-gcc-openmpi mkl
 
 #=======================================================================
@@ -43,6 +43,7 @@ ifeq ($(MACHINE),PC)
 endif
 ifeq ($(MACHINE),DISCOVERER)
 	ifeq ($(FLAVOUR),GNU)
+		FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8
 		LDFLAGS += -lfftw3 -llapack -ldl
 	else
 		LDFLAGS += -lfftw3 -qmkl=sequential
