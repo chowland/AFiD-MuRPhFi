@@ -16,6 +16,7 @@ subroutine ImplicitAndUpdateVX
     use local_arrays, only: vx,rhs,rux,qcap,pr
     use decomp_2d, only: xstart,xend
     use ibm_param
+    use afid_phasefield, only: SolveImpEqnUpdate_X_pf
     implicit none
     integer :: jc,kc
     integer :: km,kp,ic
@@ -73,6 +74,8 @@ subroutine ImplicitAndUpdateVX
 
     if (IBM) then
         call SolveImpEqnUpdate_X_ibm
+    elseif (phasefield) then
+        call SolveImpEqnUpdate_X_pf
     else
         call SolveImpEqnUpdate_X
     end if
