@@ -921,9 +921,9 @@ subroutine SolveImpEqnUpdate_VY_pf
             do kc=1,nxm
                 philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc+1,ic))
                 if (philoc > pf_direct_force) then ! Solid phase
-                    amkl(kc-1) = 0.d0
+                    if (kc > 1) amkl(kc-1) = 0.d0
                     ackl(kc) = 1.d0
-                    apkl(kc) = 0.d0
+                    if (kc < nxm) apkl(kc) = 0.d0
                     fkl(kc) = -vy(kc,jc,ic)
                 else ! Liquid phase
                     ackl_b=1.0d0/(1.0d0-ac3sk(kc)*betadx)
@@ -971,9 +971,9 @@ subroutine SolveImpEqnUpdate_VZ_pf
             do kc=1,nxm
                 philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc,ic+1))
                 if (philoc > pf_direct_force) then ! Solid phase
-                    amkl(kc-1) = 0.d0
+                    if (kc > 1) amkl(kc-1) = 0.d0
                     ackl(kc) = 1.d0
-                    apkl(kc) = 0.d0
+                    if (kc < nxm) apkl(kc) = 0.d0
                     fkl(kc) = -vz(kc,jc,ic)
                 else ! Liquid phase
                     ackl_b=1.0d0/(1.0d0-ac3sk(kc)*betadx)
@@ -1009,7 +1009,7 @@ end subroutine SolveImpEqnUpdate_VZ_pf
 !     real :: apkl(nxm-1)   ! Upper diagonal of LHS matrix
 !     integer :: ipkv(1:nxm), info
 !     real :: ackl_b, betadx
-!     real :: appl(nx-3)
+!     real :: appk(nxm-2)
 
 !     betadx = beta*al
 
@@ -1029,9 +1029,9 @@ end subroutine SolveImpEqnUpdate_VZ_pf
 !                     philoc = phic(kc,jc,ic)
 !                 end if
 !                 if (philoc > pf_direct_force) then ! Solid phase
-!                     amkl(kc-1) = 0.d0
+!                     if (kc > 1) amkl(kc-1) = 0.d0
 !                     ackl(kc) = 1.d0
-!                     apkl(kc) = 0.d0
+!                     if (kc < nxm) apkl(kc) = 0.d0
 !                     fkl(kc) = -q(kc,jc,ic)
 !                 else ! Liquid phase
 !                     ackl_b=1.0d0/(1.0d0-ac3sk(kc)*betadx)
@@ -1042,8 +1042,8 @@ end subroutine SolveImpEqnUpdate_VZ_pf
 !                 end if
 !             end do
 
-!             call dgttrf(nxm, amkl, ackl, apkl, appl, ipkv, info)
-!             call dgttrs('N',nxm,1,amkl,ackl,apkl,appl,ipkv,fkl,nxm,info)
+!             call dgttrf(nxm, amkl, ackl, apkl, appk, ipkv, info)
+!             call dgttrs('N',nxm,1,amkl,ackl,apkl,appk,ipkv,fkl,nxm,info)
 
 !             do kc=1,nxm
 !                 q(kc,jc,ic) = q(kc,jc,ic) + fkl(kc)
