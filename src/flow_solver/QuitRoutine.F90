@@ -17,6 +17,8 @@
       use afid_moisture, only: DeallocateMoistVariables
       use afid_phasefield, only: DeallocatePFVariables
       use afid_salinity, only: DeallocateSalVariables
+      use afid_averaging
+      use afid_spectra
       implicit none
       logical, intent(in) :: normalexit
       integer :: errorcode
@@ -33,6 +35,10 @@
         if(nrank.eq.0) write(6,'(a,f10.2,a)') '  Total Iteration Time = ',(tin(3) -tin(2))/3600.0,' h.'
         ! if (statcal) call WriteStats
         call WriteFlowField(.true.)
+        if (specwrite) then
+          call WriteTemporalAverages
+          call WriteSpectra
+        end if
       else
         call MPI_Abort(MPI_COMM_WORLD, 1, ierr)
       endif
@@ -44,6 +50,10 @@
       if (phasefield) call DeallocatePFVariables
       if (IBM) call DeallocateIBMVariables
       if (moist) call DeallocateMoistVariables
+      if (specwrite) then
+        call DeallocateAveragingVariables
+        call DeallocateSpectra
+      end if
       call HdfClose
       call decomp_2d_fft_finalize
       call decomp_2d_finalize

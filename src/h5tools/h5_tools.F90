@@ -1,8 +1,8 @@
 module h5_tools
     use HDF5
-    use mpih, only: MPI_INFO_NULL
+    use mpih, only: MPI_INFO_NULL, MPI_COMM_WORLD
     use param, only: salinity, phasefield, nx, nxm, nym, nzm, time, tframe, nxmr, nymr, nzmr, IBM, moist
-    use decomp_2d, only: xstart, xstartr
+    use decomp_2d, only: xstart, xstartr, xend
     implicit none
 
     integer(HID_T) :: group_id, plist_id
@@ -71,7 +71,7 @@ subroutine write_H5_plane(file_id, varname, var, axis)
     character, intent(in) :: axis
 
     integer, parameter :: ndims = 2
-    integer(HID_T) :: filespace, slabspace, memspace, dset
+    integer(HID_T) :: filespace, memspace, dset
     integer(HSIZE_T), dimension(2) :: dims, data_count, data_offset
     character(len=5) :: frame
     character(len=10) :: dsetname
@@ -149,5 +149,156 @@ subroutine InitSliceCommunicators
     call MPI_CART_SUB(DECOMP_2D_COMM_CART_X, (/.false.,.true./), comm_xz, ierr)
 
 end subroutine InitSliceCommunicators
+
+!> Write out a 3D array that does not have a halo
+subroutine write_3D_array(filename, arr)
+    character(len=30), intent(in) :: filename
+    real, dimension(1:nx,xstart(2):xend(2),xstart(3):xend(3)), intent(in) :: arr
+
+    integer(hid_t) :: file_id, filespace, slabspace, memspace, dset
+    integer(hsize_t), dimension(3) :: dims, data_count, data_offset
+    integer :: comm, ndims
+
+    comm = MPI_COMM_WORLD
+    info = MPI_INFO_NULL
+
+    ndims = 3
+
+    ! Set the size of the global array
+    dims(1)=nx
+    dims(2)=nym
+    dims(3)=nzm
+
+    ! Create a dataspace for the (global) array in the file
+    call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+
+    ! Set the size of the data local to this process
+    data_count(1) = nx
+    data_count(2) = xend(2)-xstart(2)+1
+    data_count(3) = xend(3)-xstart(3)+1
+
+    ! Set the offset position of the local data in the global array
+    data_offset(1) = 0
+    data_offset(2) = xstart(2)-1
+    data_offset(3) = xstart(3)-1
+
+    ! Create a property list and set it up with the MPI comm
+    call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, hdf_error)
+    call h5pset_fapl_mpio_f(plist_id, comm, info, hdf_error)
+
+    ! Create the HDF5 file
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, file_id, &
+            hdf_error, access_prp=plist_id)
+    ! Close the property list used to set the file access property
+    call h5pclose_f(plist_id, hdf_error)
+
+    ! Create a dataset with name 'var'
+    call h5dcreate_f(file_id, 'var', H5T_NATIVE_DOUBLE, &
+            filespace, dset, hdf_error)
+
+    ! Create a dataspace for the array in the (local) memory
+    call h5screate_simple_f(ndims, data_count, memspace, hdf_error) 
+
+    ! Get dataspace of file and select slab (subsection) from offsets
+    call h5dget_space_f(dset, slabspace, hdf_error)
+    call h5sselect_hyperslab_f(slabspace, H5S_SELECT_SET_F, &
+            data_offset, data_count, hdf_error)
+
+    ! Create the property defining the collective write
+    call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+    call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, &
+            hdf_error)
+    
+    ! Write the dataset
+    call h5dwrite_f(dset, H5T_NATIVE_DOUBLE, &
+        arr, dims, &
+        hdf_error, file_space_id = slabspace, mem_space_id = memspace, &
+        xfer_prp = plist_id)
+    
+    ! Close the property list, dataset, dataspace, and file
+    call h5pclose_f(plist_id, hdf_error)
+    call h5dclose_f(dset, hdf_error)
+    call h5sclose_f(filespace, hdf_error)
+    call h5sclose_f(memspace, hdf_error)
+    call h5sclose_f(slabspace, hdf_error)
+    call h5fclose_f(file_id, hdf_error)
+
+end subroutine write_3D_array
+
+!> Write out a 3D spectrum decomposed using spectral space
+subroutine write_3D_spectrum(filename, arr)
+    use decomp_2d_fft
+    character(len=30), intent(in) :: filename
+    real, dimension(1:nxm,sp%xst(2):sp%xen(2),sp%xst(3):sp%xen(3)), intent(in) :: arr
+
+    integer(hid_t) :: file_id, filespace, slabspace, memspace, dset
+    integer(hsize_t), dimension(3) :: dims, data_count, data_offset
+    integer :: comm, ndims
+
+    comm = MPI_COMM_WORLD
+    info = MPI_INFO_NULL
+
+    ndims = 3
+
+    ! Set the size of the global array
+    dims(1)=nxm
+    dims(2)=nym
+    dims(3)=nzm
+
+    ! Create a dataspace for the (global) array in the file
+    call h5screate_simple_f(ndims, dims, filespace, hdf_error)
+
+    ! Set the size of the data local to this process
+    data_count(1) = nxm
+    data_count(2) = sp%xen(2)-sp%xst(2)+1
+    data_count(3) = sp%xen(3)-sp%xst(3)+1
+
+    ! Set the offset position of the local data in the global array
+    data_offset(1) = 0
+    data_offset(2) = sp%xst(2)-1
+    data_offset(3) = sp%xst(3)-1
+
+    ! Create a property list and set it up with the MPI comm
+    call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, hdf_error)
+    call h5pset_fapl_mpio_f(plist_id, comm, info, hdf_error)
+
+    ! Create the HDF5 file
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, file_id, &
+            hdf_error, access_prp=plist_id)
+    ! Close the property list used to set the file access property
+    call h5pclose_f(plist_id, hdf_error)
+
+    ! Create a dataset with name 'var'
+    call h5dcreate_f(file_id, 'var', H5T_NATIVE_DOUBLE, &
+            filespace, dset, hdf_error)
+
+    ! Create a dataspace for the array in the (local) memory
+    call h5screate_simple_f(ndims, data_count, memspace, hdf_error) 
+
+    ! Get dataspace of file and select slab (subsection) from offsets
+    call h5dget_space_f(dset, slabspace, hdf_error)
+    call h5sselect_hyperslab_f(slabspace, H5S_SELECT_SET_F, &
+            data_offset, data_count, hdf_error)
+
+    ! Create the property defining the collective write
+    call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
+    call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, &
+            hdf_error)
+    
+    ! Write the dataset
+    call h5dwrite_f(dset, H5T_NATIVE_DOUBLE, &
+        arr, dims, &
+        hdf_error, file_space_id = slabspace, mem_space_id = memspace, &
+        xfer_prp = plist_id)
+    
+    ! Close the property list, dataset, dataspace, and file
+    call h5pclose_f(plist_id, hdf_error)
+    call h5dclose_f(dset, hdf_error)
+    call h5sclose_f(filespace, hdf_error)
+    call h5sclose_f(memspace, hdf_error)
+    call h5sclose_f(slabspace, hdf_error)
+    call h5fclose_f(file_id, hdf_error)
+
+end subroutine write_3D_spectrum
 
 end module h5_tools

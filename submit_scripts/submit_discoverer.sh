@@ -10,7 +10,7 @@
 #SBATCH --exclusive
 
 module purge
-module load hdf5/1/1.14/1.14.0-gcc-openmpi
+module load hdf5/1/1.14/latest-gcc-openmpi
 module load lapack/latest-gcc
 module load fftw/3/latest-gcc-openmpi
 

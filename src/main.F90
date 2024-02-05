@@ -11,6 +11,8 @@ program AFiD
     use afid_moisture
     use afid_salinity
     use afid_phasefield
+    use afid_averaging
+    use afid_spectra
     use h5_tools, only: InitSliceCommunicators
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
@@ -24,7 +26,7 @@ program AFiD
     integer :: prow=0,pcol=0
     integer :: lfactor,lfactor2
     character(100) :: arg
-    logical :: nanexist, write_mean_planes=.true.
+    logical :: write_mean_planes=.true.!, nanexist
     ! real,allocatable,dimension(:,:) :: dummy,dscan,dbot
     ! integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
@@ -109,7 +111,7 @@ program AFiD
     call WriteGridInfo
 
     inquire(file=trim("spectra.in"),exist=specwrite)
-    if (specwrite) call InitPowerSpec
+    ! if (specwrite) call InitPowerSpec
 
 !m===================================
 !m===================================
@@ -184,6 +186,11 @@ program AFiD
         ! if (phasefield) call UpdateIBMLocation
     end if
 
+    if (specwrite) then
+        call InitAveragingVariables
+        call InitSpectra
+    end if
+
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)
     call update_halo(vy,lvlhalo)
@@ -218,7 +225,7 @@ program AFiD
     end if
 
     call CalcMeanProfiles
-    if (specwrite) call WritePowerSpec
+    ! if (specwrite) call WritePowerSpec
     if(ismaster)  write(6,*) 'Write plane slices'
     call Mkmov_xcut
     call Mkmov_ycut
@@ -298,6 +305,11 @@ program AFiD
 
         call TimeMarcher
 
+        if (specwrite .and. time > tav_start) then
+            call UpdateTemporalAverages
+            call UpdateSpectra
+        end if
+
         time=time+dt
 
         if(mod(time,tout).lt.dt) then
@@ -306,11 +318,11 @@ program AFiD
                 write(6,'(a,ES11.4,a,i9,a,ES11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
             endif
             call CalcMeanProfiles
-            if (specwrite) then
-                if (ismaster) write(*,*) "Writing power spectra"
-                call WritePowerSpec
-                if (ismaster) write(*,*) "Done writing power spectra"
-            end if
+            ! if (specwrite) then
+            !     if (ismaster) write(*,*) "Writing power spectra"
+            !     call WritePowerSpec
+            !     if (ismaster) write(*,*) "Done writing power spectra"
+            ! end if
             if(ismaster) then
                 open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
                 write(96,769) ntime,time,dt,instCFL*dt!,vx_global,vy_global,vz_global

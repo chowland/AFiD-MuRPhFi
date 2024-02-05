@@ -77,9 +77,8 @@ end subroutine DeallocatePFVariables
 
 !> Set the initial state of the phase field
 subroutine CreateInitialPhase
-    use afid_salinity, only: sal, PraS
-    real :: A, B, alpha, t0, x0, h0
-    integer :: i, j, k
+    ! use afid_salinity, only: sal, PraS
+    real :: h0
 
     if (salinity) then
         !! Ice above salty water (1D_DDMelting example)
@@ -101,6 +100,9 @@ subroutine CreateInitialPhase
         elseif (pf_IC==3) then
             call set_flat_interface(0.5, .true.)
             call add_temperature_mode(amp=0.1, ymode=2, zmode=2)
+
+        else if (pf_IC==4) then
+            call set_ice_sphere(r0=0.1)
         
         !! 1D supercooling example
         elseif (pf_IC==5) then
@@ -297,6 +299,40 @@ subroutine set_ice_disc(r0)
         end do
     end do
 end subroutine set_ice_disc
+
+!> Add an ice sphere at the centre of the domain of radius r0
+!! with a corresponding temperature profile
+subroutine set_ice_sphere(r0)
+    use local_arrays, only: temp
+    real, intent(in) :: r0      !! Initial disc radius
+
+    real :: r
+    integer :: i, j, k
+
+    ! Temperature field (0 in disc, 1 out of disc, tanh interface width approx 1e-2)
+    do i=xstart(3),xend(3)
+        do j=xstart(2),xend(2)
+            do k=1,nxm
+                r = sqrt((xm(k) - 0.5*alx3)**2 + (ym(j) - 0.5*ylen)**2 + (zm(i) - 0.5*zlen)**2)
+                ! temp(k,j,i) = 0.5*(1.0 + tanh(100.0*(r - r0)))
+                if (r > r0) then
+                    temp(k,j,i) = 1.0
+                else
+                    temp(k,j,i) = 0.0
+                end if
+            end do
+        end do
+    end do
+    ! Phase-field (0 out of disc, 1 in disc)
+    do i=xstartr(3),xendr(3)
+        do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+                r = sqrt((xmr(k) - 0.5*alx3)**2 + (ymr(j) - 0.5*ylen)**2 + (zmr(i) - 0.5*zlen)**2)
+                phi(k,j,i) = 0.5*(1.0 - tanh(0.5*(r - r0)/pf_eps))
+            end do
+        end do
+    end do
+end subroutine set_ice_sphere
 
 !> Compute the explicit terms for the phase-field evolution
 !! and store the result in `hphi`

@@ -17,9 +17,7 @@ subroutine ImplicitAndUpdateTemp
     use ibm_param
     implicit none
     integer :: jc,kc,ic
-    integer :: km,kp,ke
     real    :: alpec,dxxt
-    real    :: app,acc,amm
 
     alpec=al/pect
 
