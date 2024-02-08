@@ -161,6 +161,7 @@ subroutine CreateInitialSalinity
     else if ((RayS < 0) .and. (RayT < 0)) then
         call SetSaltTwoLayer(h0=0.5*alx3, eps=1.0, stable=.true.)
         call AddSalinityNoise(amp=1e-2, localised=.true., h0=0.5*alx3, extent=1.0)
+        sal = 2*sal
 
     !! Default: linear profile + small noise (e.g. RBC, VC)
     else
