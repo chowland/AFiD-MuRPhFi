@@ -144,49 +144,49 @@ $(PROGRAM): $(MOBJS) $(OBJS)
 #  Dependencies 
 #============================================================================
 $(OBJDIR)/param.o: src/flow_solver/param.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/AuxiliaryRoutines.o: src/flow_solver/AuxiliaryRoutines.F90 
-	$(FC) -c -o $@ $< $(LDFLAGS) 
+	$(FC) -c -o $@ $<
 $(OBJDIR)/decomp_2d.o: src/flow_solver/2decomp/decomp_2d.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/grid.o: src/grid.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/pressure.o: src/pressure.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/HermiteInterpolations.o: src/multires/HermiteInterpolations.F90 obj/ibm_param.o
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/h5_tools.o: src/h5tools/h5_tools.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/means.o: src/h5tools/means.F90 obj/ibm_param.o
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/IBMTools.o: src/ibm/IBMTools.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/salinity.o: src/salinity.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/phasefield.o: src/phasefield.F90 obj/salinity.o
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/moisture.o: src/moisture.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/time_averaging.o: src/time_averaging.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/spectra.o: src/spectra.F90 obj/time_averaging.o obj/pressure.o
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/flow_solver/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/h5tools/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/multires/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/multires/IC_interpolation/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/ibm/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 
 #============================================================================
 #  Clean up 
