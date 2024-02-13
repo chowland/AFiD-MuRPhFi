@@ -8,7 +8,7 @@ FLAVOUR=GNU
 # 	Intel: 2022 intel/2022a FFTW/3.3.10-GCC-11.3.0 HDF5/1.12.2-iimpi-2021a
 # IRENE (Intel): flavor/hdf5/parallel hdf5 fftw3/gnu
 # MARENOSTRUM (Intel): fabric intel mkl impi hdf5 fftw szip
-# SUPERMUC (Intel): fftw hdf5
+# SUPERMUC (Intel): spack/23.1.0 intel-toolkit/2023.1.0 fftw hdf5
 # DISCOVERER:
 #	GNU: hdf5/1/1.14/latest-gcc-openmpi fftw/3/latest-gcc-openmpi lapack
 #	Intel: hdf5/1/1.14/latest-intel-openmpi fftw/3/latest-gcc-openmpi mkl
@@ -65,7 +65,7 @@ ifeq ($(MACHINE),MARENOSTRUM)
 	LDFLAGS = $(FFTW_LIBS) -mkl=sequential
 endif
 ifeq ($(MACHINE),SUPERMUC)
-	FC = mpif90 -fpp -r8 -O3 $(HDF5_INC)
+	FC = mpiifort -r8 -O3 $(HDF5_INC)
 	LDFLAGS = $(FFTW_LIB) $(HDF5_F90_SHLIB) $(HDF5_SHLIB) -qmkl=sequential
 endif
 
