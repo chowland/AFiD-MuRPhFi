@@ -13,6 +13,7 @@ program AFiD
     use afid_phasefield
     use afid_averaging
     use afid_spectra
+    use afid_APE
     use h5_tools, only: InitSliceCommunicators
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
@@ -153,6 +154,7 @@ program AFiD
     call SetTempBCs
     if (salinity) call SetSalBCs
     if (moist) call SetHumidityBCs
+    if (salinity) call init_bin_edges
 
     if(readflow) then
 
@@ -225,6 +227,7 @@ program AFiD
     end if
 
     call CalcMeanProfiles
+    ! call compute_potential_energy
     ! if (specwrite) call WritePowerSpec
     if(ismaster)  write(6,*) 'Write plane slices'
     call Mkmov_xcut
@@ -318,6 +321,7 @@ program AFiD
                 write(6,'(a,ES11.4,a,i9,a,ES11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
             endif
             call CalcMeanProfiles
+            ! call compute_potential_energy
             ! if (specwrite) then
             !     if (ismaster) write(*,*) "Writing power spectra"
             !     call WritePowerSpec
