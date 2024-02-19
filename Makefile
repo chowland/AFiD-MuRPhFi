@@ -121,14 +121,15 @@ OBJS += obj/mean_zplane.o
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
 	obj/pressure.o obj/HermiteInterpolations.o obj/grid.o obj/h5_tools.o obj/means.o \
 	obj/ibm_param.o obj/IBMTools.o obj/moisture.o obj/salinity.o obj/phasefield.o \
-	obj/time_averaging.o obj/spectra.o
+	obj/time_averaging.o obj/spectra.o obj/potential_energy.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
 	pressure.F90 HermiteInterpolations.F90 grid.F90 ibm_param.F90 IBMTools.F90 \
-	moisture.F90 salinity.F90 phasefield.F90 time_averaging.F90 spectra.F90
+	moisture.F90 salinity.F90 phasefield.F90 time_averaging.F90 spectra.F90 \
+	potential_energy.F90
 
 #============================================================================ 
 #  make PROGRAM   
