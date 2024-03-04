@@ -154,7 +154,7 @@ program AFiD
     call SetTempBCs
     if (salinity) call SetSalBCs
     if (moist) call SetHumidityBCs
-    if (salinity) call init_bin_edges
+    if (salinity .and. RayS < 0) call init_bin_edges
 
     if(readflow) then
 
