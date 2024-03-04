@@ -12,17 +12,28 @@ module afid_APE
     real :: bmin = -1.d0      !< Minimum density
     real :: bmax = 1.d0       !< Maximum density
     real :: bw          !< Bin width
+    integer :: kmin     !< Minimum x-index to measure PE from
+    integer :: kmax     !< Maximum x-index to measure PE from
     
 contains
 
 !> Define the bin edges
 subroutine init_bin_edges
     integer :: n
+    logical :: exists
+    integer :: io, stat
 
     nb = nxmr
     allocate(zref(nb+1))
     allocate(edges(nb+1))
     allocate(bmids(nb))
+
+    kmin = nxmr/6 + 1
+    kmax = 5*nxmr/6
+
+    if (ismaster) write(*,*) 'kmin, kmax: ', kmin, kmax
+    if (ismaster) write(*,*) 'zmin: ', xcr(kmin)
+    if (ismaster) write(*,*) 'zmax: ', xcr(kmax+1)
 
     ! Set the bin edges, spanning the range [-1,1]
     bw = (bmax - bmin)/nb
@@ -31,6 +42,17 @@ subroutine init_bin_edges
         edges(n+1) = bmin + n*bw
         bmids(n) = 0.5*(edges(n) + edges(n+1))
     end do
+
+    if (ismaster) then
+        inquire(file="outputdir/edges.txt", exist=exists)
+        if (.not. exists) then
+            open(file="outputdir/edges.txt", newunit=io, iostat=stat, &
+            status="new", action="write")
+            write(io, *) edges
+            close(io)
+        end if
+    end if
+
 end subroutine init_bin_edges
 
 !> Compute a PDF of the salinity field to reconstruct a sorted profile
@@ -38,9 +60,10 @@ subroutine sort_salinity
     real :: bpdf(nb)    !< PDF for density
     real :: dxc(nxmr)   !< Vertical grid spacing of refined grid
     integer :: i, j, k, n
-    real :: zscale
+    real :: zscale, zmin, zmax
     logical :: exists
-    integer :: io, stat
+    character(30) :: nstat
+    character(30) :: fname
 
     ! Compute grid spacing for volume weighting
     do k=1,nxmr
@@ -52,7 +75,7 @@ subroutine sort_salinity
     ! Compute the volume-weighted histogram
     do i=xstartr(3),xendr(3)
         do j=xstartr(2),xendr(2)
-            do k=1,nxmr
+            do k=kmin,kmax
                 do n=1,nb
                     if (sal(k,j,i) < edges(n+1) .and. sal(k,j,i) > edges(n)) then
                         bpdf(n) = bpdf(n) + dxc(k)
@@ -68,60 +91,43 @@ subroutine sort_salinity
     bpdf = bpdf/sum(bpdf)*nb/(bmax - bmin)
 
     ! Construct a reference vertical coordinate
-    zscale = bw*alx3
-    zref(1) = alx3
+    zmax = xcr(kmax+1)
+    zmin = xcr(kmin)
+    zscale = bw*(zmax - zmin)
+    zref(1) = zmax
     do n=1,nb
         zref(n+1) = zref(n) - bpdf(n)*zscale
     end do
 
     if (ismaster) then
-        ! call HdfSerialWriteReal1D()
-        inquire(file="Zr.txt", exist=exists)
-        if (.not. exists) then
-            open(file="Zr.txt", newunit=io, iostat=stat, &
-            status="new", action="write")
-            write(io, *) zref
-            close(io)
-        end if
-        inquire(file="pdf.txt", exist=exists)
-        if (.not. exists) then
-            open(file="pdf.txt", newunit=io, iostat=stat, &
-            status="new", action="write")
-            write(io, *) bpdf
-            close(io)
+        write(nstat,"(i5.5)") nint(time/tout)
+        fname = "outputdir/Zr.h5"
+        inquire(file=trim(fname), exist=exists)
+        if (exists) then
+            call HdfSerialWriteReal1D(trim(nstat), trim(fname), zref, nb+1)
+        else
+            call HdfCreateBlankFile(trim(fname))
+            call HdfSerialWriteReal1D(trim(nstat), trim(fname), zref, nb+1)
         end if
     end if
 
 end subroutine sort_salinity
 
-!> Interpolate the profile Z(rho) stored in `zref`
-!! to the value given by vsal
-function Zstar(vsal) result(zz)
-    real, intent(in) :: vsal !< Salinity value input
-    real :: zz
-    integer :: n
+!> Numerically integrate the function f over the grid x
+!! using the trapezoidal rule and return the result as I
+function trapz(f, x) result(I)
+    real, intent(in) :: f(:)    !< function to integrate
+    real, intent(in) :: x(:)    !< x-coordinate vector
+    real :: I       !< Integral result
+    integer :: n, k
 
-    do n=1,nb
-        if (vsal < edges(n+1) .and. vsal > edges(n)) then
-            zz = zref(n) + (vsal - edges(n))*(zref(n+1) - zref(n))/bw
-        end if
+    n = size(x)
+    I = 0.0
+    do k=1,n-1
+        I = I + 0.5*(f(k) + f(k+1))*(x(k+1) - x(k))
     end do
 
-end function Zstar
-
-!> Interpolate the profile C(xx) stored implicitly by `zref`
-!! to the height given by xx
-function Cstar(xx) result(C)
-    real, intent(in) :: xx !< Vertical position
-    real :: C
-    integer :: n
-
-    do n=1,nb
-        if (xx > zref(n+1) .and. xx < zref(n)) then
-            C = edges(n) + (xx - zref(n))*bw/(zref(n+1) - zref(n))
-        end if
-    end do
-end function Cstar
+end function trapz
 
 
 !> Compute the potential energy of the salinity field, along with the
@@ -130,85 +136,49 @@ subroutine compute_potential_energy
     real :: rho         !< dimensionless density perturbation
     real :: E_P = 0.0       !< potential energy <rho*g*z>
     real :: E_B = 0.0       !< background potential energy <rho*g*Z(rho)>
-    real :: E_B2       !< background potential energy <rho_b*g*z>
+    real :: E_B2(nb+1)       !< background potential energy <rho_b*g*z>
     real :: E_A         !< available potential energy E_A = E_P - E_B
-    real :: E_A2         !< available potential energy E_A = E_P - E_B2
     real :: dxc         !< vertical grid spacing (for integration in x)
     real :: inv         !< 1/Lx/ny/nz for normalisation of integration
-    real :: Cs(nxmr), Zs(nxmr)
     logical :: exists
     integer :: i, j, k, io, stat
-    character(5) :: nstat
 
     call sort_salinity
 
+    E_P = 0.0
+
     do i=xstartr(3),xendr(3)
         do j=xstartr(2),xendr(2)
-            do k=1,nxmr
+            do k=kmin,kmax
                 dxc = xcr(k+1) - xcr(k)
                 rho = sal(k,j,i)
                 E_P = E_P + rho*xmr(k)*dxc
-                E_B = E_B + rho*Zstar(rho)*dxc
             end do
         end do
     end do
 
-    Cs(:) = 0.0
-
-    E_B2 = 0.0
-    do k=1,nxmr
-        Cs(k) = Cstar(xmr(k))
-        Zs(k) = Zstar(-tanh(xmr(k) - 0.5*alx3))
-        E_B2 = E_B2 + xmr(k)*(xcr(k+1) - xcr(k))*Cs(k)
+    do k=1,nb+1
+        E_B2(k) = edges(k)*zref(k)
     end do
-    E_B2 = E_B2/alx3
-    if (ismaster) then
-        write(nstat,"(i5.5)") nint(time/tout)
-        inquire(file="Cs.h5", exist=exists)
-        if (exists) then
-            call HdfSerialWriteReal1D(nstat, "Cs.h5", Cs, nxmr)
-        else
-            call HdfCreateBlankFile("Cs.h5")
-            call HdfSerialWriteReal1D(nstat, "Cs.h5", Cs, nxmr)
-        end if
 
-        inquire(file="Cs.txt", exist=exists)
-        if (.not. exists) then
-            open(file="Cs.txt", newunit=io, iostat=stat, &
-            status="new", action="write")
-            write(io, *) Cs(:)
-            close(io)
-        end if
-
-        inquire(file="Zs.txt", exist=exists)
-        if (.not. exists) then
-            open(file="Zs.txt", newunit=io, iostat=stat, &
-            status="new", action="write")
-            write(io, *) Zs
-            close(io)
-        end if
-    end if
+    E_B = -trapz(E_B2, zref)
 
     call MpiSumRealScalar(E_P)
-    call MpiSumRealScalar(E_B)
 
-    inv = 1.d0/alx3/nymr/nzmr
+    inv = 1.d0/nymr/nzmr
     E_P = E_P*inv
-    E_B = E_B*inv
-    ! E_B2 = E_B2*inv
     E_A = E_P - E_B
-    E_A2 = E_P - E_B2
 
     if (ismaster) then
-        inquire(file="PE.txt", exist=exists)
+        inquire(file="outputdir/PE.txt", exist=exists)
         if (exists) then
-            open(file="PE.txt", newunit=io, iostat=stat, &
+            open(file="outputdir/PE.txt", newunit=io, iostat=stat, &
                 status="old", action="write", position="append")    
         else
-            open(file="PE.txt", newunit=io, iostat=stat, &
+            open(file="outputdir/PE.txt", newunit=io, iostat=stat, &
             status="new", action="write")
         end if
-        write(io, *) E_P, E_B, E_B2, E_A, E_A2
+        write(io, *) E_P, E_B, E_A
         close(io)
     end if
 
