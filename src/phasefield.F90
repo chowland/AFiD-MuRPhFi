@@ -895,9 +895,12 @@ subroutine SolveImpEqnUpdate_X_pf
 
 end subroutine SolveImpEqnUpdate_X_pf
 
-!> Implicit solve for vy, setting zero in solid
-subroutine SolveImpEqnUpdate_VY_pf
-    use local_arrays, only: vy, rhs
+!> Implicit solve for vy, vz, setting zero in solid
+subroutine SolveImpEqnUpdate_YZ_pf(q, rhs, axis)
+    real, intent(inout) :: q(1:nx,xstart(2)-lvlhalo:xend(2)+lvlhalo, &
+                            & xstart(3)-lvlhalo:xend(3)+lvlhalo)    !> variable to update
+    real, intent(inout) :: rhs(1:nx,xstart(2):xend(2),xstart(3):xend(3))    !> rhs to update with
+    character, intent(in) :: axis   !> component axis of velocity (to identify grid stagger)
     integer :: ic, jc, kc
     real :: fkl(nxm)       ! RHS vector for implicit solve
     real :: philoc          ! local value of phi on vx-grid
@@ -906,10 +909,9 @@ subroutine SolveImpEqnUpdate_VY_pf
     real :: apkl(nxm-1)   ! Upper diagonal of LHS matrix
     integer :: ipkv(1:nxm), info
     real :: ackl_b, betadx
-    real :: appk(nx)
+    real :: appk(nxm-2)
 
     betadx = beta*al
-    appk(:) = 0.0
 
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
@@ -919,12 +921,18 @@ subroutine SolveImpEqnUpdate_VY_pf
             apkl(:) = 0.0
 
             do kc=1,nxm
-                philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc+1,ic))
+                if (axis=="y") then
+                    philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc+1,ic))
+                elseif (axis=="z") then
+                    philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc,ic+1))
+                else
+                    philoc = phic(kc,jc,ic)
+                end if
                 if (philoc > pf_direct_force) then ! Solid phase
                     if (kc > 1) amkl(kc-1) = 0.d0
                     ackl(kc) = 1.d0
                     if (kc < nxm) apkl(kc) = 0.d0
-                    fkl(kc) = -vy(kc,jc,ic)
+                    fkl(kc) = -q(kc,jc,ic)
                 else ! Liquid phase
                     ackl_b=1.0d0/(1.0d0-ac3sk(kc)*betadx)
                     if (kc > 1) amkl(kc-1)=-am3sk(kc)*betadx*ackl_b
@@ -938,119 +946,11 @@ subroutine SolveImpEqnUpdate_VY_pf
             call dgttrs('N',nxm,1,amkl,ackl,apkl,appk,ipkv,fkl,nxm,info)
 
             do kc=1,nxm
-                vy(kc,jc,ic) = vy(kc,jc,ic) + fkl(kc)
+                q(kc,jc,ic) = q(kc,jc,ic) + fkl(kc)
             end do
         end do
     end do
 
-end subroutine SolveImpEqnUpdate_VY_pf
-
-
-!> Implicit solve for vz, setting zero in solid
-subroutine SolveImpEqnUpdate_VZ_pf
-    use local_arrays, only: vz, rhs
-    integer :: ic, jc, kc
-    real :: fkl(nxm)       ! RHS vector for implicit solve
-    real :: philoc          ! local value of phi on vx-grid
-    real :: amkl(nxm-1)   ! Lower diagonal of LHS matrix
-    real :: ackl(nxm)     ! Diagonal of LHS matrix
-    real :: apkl(nxm-1)   ! Upper diagonal of LHS matrix
-    integer :: ipkv(1:nxm), info
-    real :: ackl_b, betadx
-    real :: appk(nx-3)
-
-    betadx = beta*al
-
-    do ic=xstart(3),xend(3)
-        do jc=xstart(2),xend(2)
-            
-            amkl(:) = 0.0
-            ackl(:) = 1.0
-            apkl(:) = 0.0
-
-            do kc=1,nxm
-                philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc,ic+1))
-                if (philoc > pf_direct_force) then ! Solid phase
-                    if (kc > 1) amkl(kc-1) = 0.d0
-                    ackl(kc) = 1.d0
-                    if (kc < nxm) apkl(kc) = 0.d0
-                    fkl(kc) = -vz(kc,jc,ic)
-                else ! Liquid phase
-                    ackl_b=1.0d0/(1.0d0-ac3sk(kc)*betadx)
-                    if (kc > 1) amkl(kc-1)=-am3sk(kc)*betadx*ackl_b
-                    ackl(kc)=1.d0
-                    if (kc < nxm) apkl(kc)=-ap3sk(kc)*betadx*ackl_b
-                    fkl(kc) = rhs(kc,jc,ic)*ackl_b
-                end if
-            end do
-
-            call dgttrf(nxm, amkl, ackl, apkl, appk, ipkv, info)
-            call dgttrs('N',nxm,1,amkl,ackl,apkl,appk,ipkv,fkl,nxm,info)
-
-            do kc=1,nxm
-                vz(kc,jc,ic) = vz(kc,jc,ic) + fkl(kc)
-            end do
-        end do
-    end do
-
-end subroutine SolveImpEqnUpdate_VZ_pf
-
-! !> Implicit solve for vy, vz, setting zero in solid
-! subroutine SolveImpEqnUpdate_YZ_pf(q, rhs, axis)
-!     real, intent(inout) :: q(1:nx,xstart(2)-lvlhalo:xend(2)+lvlhalo, &
-!                             & xstart(3)-lvlhalo:xend(3)+lvlhalo)    !> variable to update
-!     real, intent(inout) :: rhs(1:nx,xstart(2):xend(2),xstart(3):xend(3))    !> rhs to update with
-!     character, intent(in) :: axis   !> component axis of velocity (to identify grid stagger)
-!     integer :: ic, jc, kc
-!     real :: fkl(nxm)       ! RHS vector for implicit solve
-!     real :: philoc          ! local value of phi on vx-grid
-!     real :: amkl(nxm-1)   ! Lower diagonal of LHS matrix
-!     real :: ackl(nxm)     ! Diagonal of LHS matrix
-!     real :: apkl(nxm-1)   ! Upper diagonal of LHS matrix
-!     integer :: ipkv(1:nxm), info
-!     real :: ackl_b, betadx
-!     real :: appk(nxm-2)
-
-!     betadx = beta*al
-
-!     do ic=xstart(3),xend(3)
-!         do jc=xstart(2),xend(2)
-            
-!             amkl(:) = 0.0
-!             ackl(:) = 1.0
-!             apkl(:) = 0.0
-
-!             do kc=1,nxm
-!                 if (axis=="y") then
-!                     philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc+1,ic))
-!                 elseif (axis=="z") then
-!                     philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc,ic+1))
-!                 else
-!                     philoc = phic(kc,jc,ic)
-!                 end if
-!                 if (philoc > pf_direct_force) then ! Solid phase
-!                     if (kc > 1) amkl(kc-1) = 0.d0
-!                     ackl(kc) = 1.d0
-!                     if (kc < nxm) apkl(kc) = 0.d0
-!                     fkl(kc) = -q(kc,jc,ic)
-!                 else ! Liquid phase
-!                     ackl_b=1.0d0/(1.0d0-ac3sk(kc)*betadx)
-!                     if (kc > 1) amkl(kc-1)=-am3sk(kc)*betadx*ackl_b
-!                     ackl(kc)=1.d0
-!                     if (kc < nxm) apkl(kc)=-ap3sk(kc)*betadx*ackl_b
-!                     fkl(kc) = rhs(kc,jc,ic)*ackl_b
-!                 end if
-!             end do
-
-!             call dgttrf(nxm, amkl, ackl, apkl, appk, ipkv, info)
-!             call dgttrs('N',nxm,1,amkl,ackl,apkl,appk,ipkv,fkl,nxm,info)
-
-!             do kc=1,nxm
-!                 q(kc,jc,ic) = q(kc,jc,ic) + fkl(kc)
-!             end do
-!         end do
-!     end do
-
-! end subroutine SolveImpEqnUpdate_YZ_pf
+end subroutine SolveImpEqnUpdate_YZ_pf
 
 end module afid_phasefield
