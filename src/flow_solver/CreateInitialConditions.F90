@@ -14,7 +14,7 @@ subroutine CreateInitialConditions
     use decomp_2d, only: xstart,xend
     use mpih
     use afid_salinity, only: RayS
-    use afid_phasefield, only: pf_eps, read_phase_field_params
+    use afid_phasefield, only: pf_eps, read_phase_field_params, pf_Tm
     implicit none
     integer :: j,k,i,kmid
     real :: xxx,yyy,zzz,eps,varptb,amp
@@ -250,86 +250,20 @@ subroutine CreateInitialConditions
     end if
 
     if (phasefield) then
+        ! Most of this is now in `afid_phasefield` in the routine `CreateInitialPhase`
 
-        if (pf_IC == 1) then        ! 1D moving interface example
-            h0 = 0.1                ! Freezing if RAYT < 0
-            Lambda = 0.620063       ! Melting if RAYT > 0
-            t0 = pect * (h0/2/Lambda)**2
+        if (pf_IC==3) then
+            h0 = 0.4
             do i=xstart(3),xend(3)
                 do j=xstart(2),xend(2)
                     do k=1,nxm
                         xxx = xm(k)
+                        ! Piecewise linear base profile for Purseed et al
                         if (xxx < h0) then
-                            temp(k,j,i) = erf(xxx*sqrt(pect/t0)/2)/erf(Lambda)
+                            temp(k,j,i) = 1.0 - (1.0 - pf_Tm)*xxx/h0
                         else
-                            temp(k,j,i) = 1.0
+                            temp(k,j,i) = pf_Tm*(1.0 - xxx)/(1.0 - h0)
                         end if
-                        if (RAYT > 0) temp(k,j,i) = 1.0 - temp(k,j,i)
-                    end do
-                end do
-            end do
-
-        else if (pf_IC == 2) then
-            do i=xstart(3),xend(3)
-                do j=xstart(2),xend(2)
-                    do k=1,nxm
-                        r = sqrt((xm(k) - 0.5)**2 + (ym(j) - ylen/2)**2)
-                        temp(k,j,i) = 0.5*(1.0 + tanh(100.0*(r - 0.1)))
-                    end do
-                end do
-            end do
-
-        else if (pf_IC == 3) then ! Favier et al (2019) Appendix A3 Validation Case
-            eps = 0.1
-            kmid = nxm/2
-            do i=xstart(3),xend(3)
-                do j=xstart(2),xend(2)
-                    if (nzm > 1) then
-                        do k=1,kmid ! If domain 3D, add in z perturbation too
-                            xxx = xm(k)
-                            yyy = ym(j)
-                            zzz = zm(i)
-
-                            temp(k,j,i) = temp(k,j,i) &
-                                + eps*sin(4.0*pi*yyy)*cos(4.0*pi*zzz)*sin(2.0*pi*xxx)**2
-                        end do
-                    else
-                        do k=1,kmid
-                            xxx = xm(k)
-                            yyy = ym(j)
-
-                            temp(k,j,i) = temp(k,j,i) &
-                                + eps*sin(4.0*pi*yyy)*sin(2.0*pi*xxx)**2
-                        end do
-                    end if
-                end do
-            end do
-
-        elseif (pf_IC == 4) then ! Ice block to compare with Neufeld et al (2010)
-            do i=xstart(3),xend(3)      ! Ice at bottom of domain if RayT<0, at the top if RayT>0
-                do j=xstart(2),xend(2)
-                    r = sqrt((ym(j) - ylen/2.0)**2 + (zm(i) - zlen/2.0)**2)
-                    do k=1,nxm
-                        temp(k,j,i) = 1.0 - 0.25*(1.0 + sign(1.0,RayT)*tanh((xm(k) - alx3/2.0)/2.0/pf_eps)) &
-                                    *(1.0 - tanh((r - alx3/2.0)/2.0/pf_eps))
-                    end do
-                end do
-            end do
-
-        else if (pf_IC == 5) then        ! 1D supercooling example
-            h0 = 0.02
-            Lambda = 0.060314
-            t0 = pect * (h0/2/Lambda)**2
-            do i=xstart(3),xend(3)
-                do j=xstart(2),xend(2)
-                    do k=1,nxm
-                        xxx = xm(k)
-                        if (xxx > h0) then
-                            temp(k,j,i) = erfc(xxx*sqrt(pect/t0)/2.0)/erfc(Lambda)
-                        else
-                            temp(k,j,i) = 1.0
-                        end if
-                        ! if (RAYT > 0) temp(k,j,i) = 1.0 - temp(k,j,i)
                     end do
                 end do
             end do
@@ -416,21 +350,6 @@ subroutine CreateInitialConditions
             end if
         end if
 
-        ! if (IBM) then
-        !     do i=xstart(3),xend(3)
-        !         do j=xstart(2),xend(2)
-        !             h0 = 0.25 + (ym(j) - 0.5)**2
-        !             do k=1,nxm
-        !                 if (xm(k) < h0) then
-        !                     temp(k,j,i) = 0.0
-        !                 else
-        !                     temp(k,j,i) = 1.0
-        !                 end if
-        !             end do
-        !         end do
-        !     end do
-        ! end if
-
     end if
 
     if (melt) then
@@ -445,25 +364,6 @@ subroutine CreateInitialConditions
             end do
         end do
     end if
-
-    ! FAVIER ET AL. (2019) APPENDIX A1 VALIDATION CASE
-    ! if (phasefield) then
-    !   ! kmid = nxm/2
-    !   eps = 8.041
-    !   do i=xstart(3),xend(3)
-    !     do j=xstart(2),xend(2)
-    !       do k=1,nxm
-    !         temp(k,j,i) = (exp(-eps*(xm(k) - 1.0)) - 1.0)/(exp(eps) - 1.0)
-    !       end do
-    !       ! do k=1,kmid
-    !       !   temp(k,j,i) = 1.0 - 2.0*xm(k)
-    !       ! end do
-    !       ! do k=kmid+1,nxm
-    !       !   temp(k,j,i) = 0.1 - 0.2*xm(k)
-    !       ! end do
-    !     end do
-    !   end do
-    ! end if
 
     return
 end subroutine CreateInitialConditions

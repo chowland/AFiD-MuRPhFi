@@ -8,7 +8,7 @@ FLAVOUR=GNU
 # 	Intel: 2022 intel/2022a FFTW/3.3.10-GCC-11.3.0 HDF5/1.12.2-iimpi-2021a
 # IRENE (Intel): flavor/hdf5/parallel hdf5 fftw3/gnu
 # MARENOSTRUM (Intel): fabric intel mkl impi hdf5 fftw szip
-# SUPERMUC (Intel): fftw hdf5
+# SUPERMUC (Intel): spack/23.1.0 intel-toolkit/2023.1.0 fftw hdf5
 # DISCOVERER:
 #	GNU: hdf5/1/1.14/latest-gcc-openmpi fftw/3/latest-gcc-openmpi lapack
 #	Intel: hdf5/1/1.14/latest-intel-openmpi fftw/3/latest-gcc-openmpi mkl
@@ -65,7 +65,7 @@ ifeq ($(MACHINE),MARENOSTRUM)
 	LDFLAGS = $(FFTW_LIBS) -mkl=sequential
 endif
 ifeq ($(MACHINE),SUPERMUC)
-	FC = mpif90 -fpp -r8 -O3 $(HDF5_INC)
+	FC = mpiifort -r8 -O3 $(HDF5_INC)
 	LDFLAGS = $(FFTW_LIB) $(HDF5_F90_SHLIB) $(HDF5_SHLIB) -qmkl=sequential
 endif
 
@@ -144,49 +144,49 @@ $(PROGRAM): $(MOBJS) $(OBJS)
 #  Dependencies 
 #============================================================================
 $(OBJDIR)/param.o: src/flow_solver/param.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/AuxiliaryRoutines.o: src/flow_solver/AuxiliaryRoutines.F90 
-	$(FC) -c -o $@ $< $(LDFLAGS) 
+	$(FC) -c -o $@ $<
 $(OBJDIR)/decomp_2d.o: src/flow_solver/2decomp/decomp_2d.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/decomp_2d_fft.o: src/flow_solver/2decomp/decomp_2d_fft.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/ibm_param.o: src/ibm/ibm_param.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/grid.o: src/grid.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/pressure.o: src/pressure.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/HermiteInterpolations.o: src/multires/HermiteInterpolations.F90 obj/ibm_param.o
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/h5_tools.o: src/h5tools/h5_tools.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/means.o: src/h5tools/means.F90 obj/ibm_param.o
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/IBMTools.o: src/ibm/IBMTools.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/salinity.o: src/salinity.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/phasefield.o: src/phasefield.F90 obj/salinity.o
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/moisture.o: src/moisture.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/time_averaging.o: src/time_averaging.F90
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/spectra.o: src/spectra.F90 obj/time_averaging.o obj/pressure.o
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/flow_solver/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/h5tools/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/multires/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/multires/IC_interpolation/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/ibm/%.F90 $(MOBJS)
-	$(FC) -c -o $@ $< $(LDFLAGS)
+	$(FC) -c -o $@ $<
 
 #============================================================================
 #  Clean up 
