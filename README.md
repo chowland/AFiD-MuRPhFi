@@ -13,7 +13,7 @@ AFiD has the following prerequisites that must be installed to compile and run t
 
 On Ubuntu, these prerequisites can be installed using the single line command
 ```
-sudo apt install build-essential gfortran liblapack-dev libhdf5-mpich-dev libfftw3-dev
+sudo apt install build-essential gfortran liblapack-dev libhdf5-openmpi-dev libfftw3-dev
 ```
 AFiD can then be compiled simply by running `make`.
 The [Makefile](./Makefile) contains a `MACHINE` variable and a `FLAVOUR` variable that the user can modify to reflect the libraries installed (e.g. setting `FLAVOUR=Intel` ensures the MKL libraries and Intel compiler options are used).
