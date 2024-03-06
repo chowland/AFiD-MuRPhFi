@@ -21,7 +21,7 @@ Differences with [van der Poel et al (2015)](https://doi.org/10.1016/j.compfluid
 Differences with [Ostilla-Monico et al (2015)](https://doi.org/10.1016/j.jcp.2015.08.031):
 
 - Since the current code is modified from AFiD, it is pencil-parallelized in the periodic directions. This contrasts with the previous multi-resolution code, which was slab-parallelized in the wall-normal direction.
-- For reasons linked to this change in parallelization, the only terms calculated implicitly are the diffusive terms with derivatives in the wall-normal direction (e.g. $`\nu \partial_{xx}u`$). All other terms are computed explicitly.
+- For reasons linked to this change in parallelization, the only terms calculated implicitly are the diffusive terms with derivatives in the wall-normal direction (e.g. $\nu \partial_{xx}u$). All other terms are computed explicitly.
 - The multiple resolution strategy in time from [Ostilla-Monico et al (2015)](https://doi.org/10.1016/j.jcp.2015.08.031) is not yet implemented in the code. For now, we only rely on a CFL condition.
 
 ## Prerequisites

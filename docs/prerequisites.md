@@ -17,7 +17,7 @@ These instructions also work for machines running Ubuntu in the Windows Subsyste
 
 ## Single-line prerequisite installation
 ```
-sudo apt install build-essential gfortran libblas-dev liblapack-dev libhdf5-mpich-dev libfftw3-dev
+sudo apt install build-essential gfortran libblas-dev liblapack-dev libhdf5-openmpi-dev libfftw3-dev
 ```
 
 ## Using a new HPC?

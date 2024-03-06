@@ -86,7 +86,6 @@ subroutine TimeMarcher
         ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP pre-implicit',ns
 
         if (phasefield) call update_halo(phi,lvlhalo)
-        ! if (phasefield .and. IBM) call UpdateIBMLocation
 
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
@@ -101,9 +100,6 @@ subroutine TimeMarcher
         ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY post-implicit',ns
         ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ post-implicit',ns
         ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP post-implicit',ns
-
-        ! if (phasefield .and. IBM) call ImmersedBoundary
-        if (phasefield .and. (pf_direct_force > 0)) call ForceIceVelZero
 
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)

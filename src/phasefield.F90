@@ -89,7 +89,11 @@ subroutine CreateInitialPhase
         !! (RayT > 0: melting; RayT < 0: freezing)
         if (pf_IC==1) then
             h0 = 0.1
-            call set_flat_interface(h0, .false.)
+            if (RayT > 0) then
+                call set_flat_interface(h0, .true.)
+            else
+                call set_flat_interface(h0, .false.)
+            end if
             call set_temperature_interface(h0, .false.)
 
         !! 2D axisymmetric melting example (disc radius 0.1)
@@ -98,8 +102,9 @@ subroutine CreateInitialPhase
 
         !! Favier (2019) appendix A.3 validation case
         elseif (pf_IC==3) then
-            call set_flat_interface(0.5, .true.)
-            call add_temperature_mode(amp=0.1, ymode=2, zmode=2)
+            h0 = 0.4
+            call set_flat_interface(h0, .true.)
+            call add_temperature_mode(amp=1e-2, ymode=10, zmode=2, h0=h0)
 
         else if (pf_IC==4) then
             call set_ice_sphere(r0=0.1)
@@ -237,34 +242,35 @@ end subroutine set_multicomponent_interface
 
 !> Add a modal perturbation to the temperature field in the lower half of the domain
 !! Intended for use with phase-field validation case of 2D Melting RBC from Favier et al (2019)
-!! Vertical structure is of the form sin^2(2 pi x)
-subroutine add_temperature_mode(amp, ymode, zmode)
+!! Vertical structure is of the form sin^2(pi x/h0)
+subroutine add_temperature_mode(amp, ymode, zmode, h0)
     use local_arrays, only: temp
     real, intent(in) :: amp         !! amplitude of perturbation
     integer, intent(in) :: ymode    !! mode number in y
     integer, intent(in) :: zmode    !! mode number in z (only used if nzm>1)
-    integer :: i, j, k, kmid
+    real, intent(in) :: h0          !! initial interface height
+    integer :: i, j, k
     real :: xxx, yyy, zzz
 
-    kmid = nxm/2
     do i=xstart(3),xend(3)
+        zzz = zm(i)/zlen
         do j=xstart(2),xend(2)
+            yyy = ym(j)/ylen
             if (nzm > 1) then
-                do k=1,kmid ! If domain 3D, add in z perturbation too
+                do k=1,nxm ! If domain 3D, add in z perturbation too
                     xxx = xm(k)
-                    yyy = ym(j)/ylen
-                    zzz = zm(i)/zlen
-
-                    temp(k,j,i) = temp(k,j,i) &
-                        + amp*sin(2.0*pi*ymode*yyy)*cos(2.0*pi*zmode*zzz)*sin(2.0*pi*xxx)**2
+                    if (xxx < h0) then
+                        temp(k,j,i) = temp(k,j,i) &
+                            + amp*sin(2.0*pi*ymode*yyy)*cos(2.0*pi*zmode*zzz)*sin(pi*xxx/h0)**2
+                    end if
                 end do
             else
-                do k=1,kmid
+                do k=1,nxm
                     xxx = xm(k)
-                    yyy = ym(j)/ylen
-
-                    temp(k,j,i) = temp(k,j,i) &
-                        + amp*sin(2.0*pi*ymode*yyy)*sin(2.0*pi*xxx)**2
+                    if (xxx < h0) then
+                        temp(k,j,i) = temp(k,j,i) &
+                            + amp*sin(2.0*pi*ymode*yyy)*sin(pi*xxx/h0)**2
+                    end if
                 end do
             end if
         end do
@@ -373,34 +379,6 @@ subroutine ExplicitPhase
     end do
 
 end subroutine ExplicitPhase
-
-!> Force the velocity field to be zero in the ice phase
-!! Apply this only above the phase-field level pf_direct_force
-subroutine ForceIceVelZero
-    use local_arrays, only: vx, vy, vz
-    integer :: i, j, k, im, jm
-
-    do i=xstart(3),xend(3)
-        im = i - 1
-        do j=xstart(2),xend(2)
-            jm = j - 1
-            do k=2,nxm
-                if (0.5*(phic(k,j,i) + phic(k-1,j,i)) > pf_direct_force) then
-                    vx(k,j,i) = 0.0
-                end if
-            end do
-            do k=1,nxm
-                if (0.5*(phic(k,j,i) + phic(k,jm,i)) > pf_direct_force) then
-                    vy(k,j,i) = 0.0
-                end if
-                if (0.5*(phic(k,j,i) + phic(k,j,im)) > pf_direct_force) then
-                    vz(k,j,i) = 0.0
-                end if
-            end do
-        end do
-    end do
-
-end subroutine ForceIceVelZero
 
 !> Compute the implicit terms for the phase-field evolution
 subroutine ImplicitPhase
@@ -838,5 +816,117 @@ subroutine CreatePhaseH5Groups(filename)
     call h5fclose_f(file_id, hdf_error)
 
 end subroutine CreatePhaseH5Groups
+
+!> Implicit solve for vx when using direct forcing constraint
+subroutine SolveImpEqnUpdate_X_pf
+    use local_arrays, only: vx, rhs
+    integer :: ic, jc, kc
+    real :: fkl(1:nx)       ! RHS vector for implicit solve
+    real :: philoc          ! local value of phi on vx-grid
+    real :: amkl(1:nxm)     ! Lower diagonal of LHS matrix
+    real :: ackl(1:nx)      ! Diagonal of LHS matrix
+    real :: apkl(1:nxm)     ! Upper diagonal of LHS matrix
+    real :: appk(1:nxm-1)
+    integer :: ipkv(1:nx), info
+    real :: ackl_b, betadx
+
+    betadx = beta*al
+
+    do ic=xstart(3),xend(3)
+        do jc=xstart(2),xend(2)
+            
+            amkl(:) = 0.0
+            ackl(:) = 1.0
+            apkl(:) = 0.0
+
+            fkl(1) = -vx(1,jc,ic)
+            
+            do kc=2,nxm
+                philoc = 0.5*(phic(kc,jc,ic) + phic(kc+1,jc,ic))
+                if (philoc > pf_direct_force) then ! Solid phase
+                    amkl(kc-1) = 0.d0
+                    ackl(kc) = 1.d0
+                    apkl(kc) = 0.d0
+                    fkl(kc) = -vx(kc,jc,ic)
+                else ! Liquid phase
+                    ackl_b=1.0d0/(1.0d0-ac3ck(kc)*betadx)
+                    amkl(kc-1)=-am3ck(kc)*betadx*ackl_b
+                    ackl(kc)=1.d0
+                    apkl(kc)=-ap3ck(kc)*betadx*ackl_b
+                    fkl(kc) = rhs(kc,jc,ic)*ackl_b
+                end if
+            end do
+
+            fkl(nx) = -vx(nx,jc,ic)
+
+            call dgttrf(nx, amkl, ackl, apkl, appk, ipkv, info)
+            call dgttrs('N',nx,1,amkl,ackl,apkl,appk,ipkv,fkl,nx,info)
+
+            do kc=2,nxm
+                vx(kc,jc,ic) = vx(kc,jc,ic) + fkl(kc)
+            end do
+
+        end do
+    end do
+
+end subroutine SolveImpEqnUpdate_X_pf
+
+!> Implicit solve for vy, vz, setting zero in solid
+subroutine SolveImpEqnUpdate_YZ_pf(q, rhs, axis)
+    real, intent(inout) :: q(1:nx,xstart(2)-lvlhalo:xend(2)+lvlhalo, &
+                            & xstart(3)-lvlhalo:xend(3)+lvlhalo)    !> variable to update
+    real, intent(inout) :: rhs(1:nx,xstart(2):xend(2),xstart(3):xend(3))    !> rhs to update with
+    character, intent(in) :: axis   !> component axis of velocity (to identify grid stagger)
+    integer :: ic, jc, kc
+    real :: fkl(nxm)       ! RHS vector for implicit solve
+    real :: philoc          ! local value of phi on vx-grid
+    real :: amkl(nxm-1)   ! Lower diagonal of LHS matrix
+    real :: ackl(nxm)     ! Diagonal of LHS matrix
+    real :: apkl(nxm-1)   ! Upper diagonal of LHS matrix
+    integer :: ipkv(1:nxm), info
+    real :: ackl_b, betadx
+    real :: appk(nxm-2)
+
+    betadx = beta*al
+
+    do ic=xstart(3),xend(3)
+        do jc=xstart(2),xend(2)
+            
+            amkl(:) = 0.0
+            ackl(:) = 1.0
+            apkl(:) = 0.0
+
+            do kc=1,nxm
+                if (axis=="y") then
+                    philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc+1,ic))
+                elseif (axis=="z") then
+                    philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc,ic+1))
+                else
+                    philoc = phic(kc,jc,ic)
+                end if
+                if (philoc > pf_direct_force) then ! Solid phase
+                    if (kc > 1) amkl(kc-1) = 0.d0
+                    ackl(kc) = 1.d0
+                    if (kc < nxm) apkl(kc) = 0.d0
+                    fkl(kc) = -q(kc,jc,ic)
+                else ! Liquid phase
+                    ackl_b=1.0d0/(1.0d0-ac3sk(kc)*betadx)
+                    if (kc > 1) amkl(kc-1)=-am3sk(kc)*betadx*ackl_b
+                    ackl(kc)=1.d0
+                    if (kc < nxm) apkl(kc)=-ap3sk(kc)*betadx*ackl_b
+                    fkl(kc) = rhs(kc,jc,ic)*ackl_b
+                end if
+            end do
+
+            call dgttrf(nxm, amkl, ackl, apkl, appk, ipkv, info)
+            call dgttrs('N',nxm,1,amkl,ackl,apkl,appk,ipkv,fkl,nxm,info)
+
+            do kc=1,nxm
+                q(kc,jc,ic) = q(kc,jc,ic) + fkl(kc)
+            end do
+        end do
+    end do
+
+end subroutine SolveImpEqnUpdate_YZ_pf
 
 end module afid_phasefield
