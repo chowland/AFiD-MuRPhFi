@@ -89,7 +89,11 @@ subroutine CreateInitialPhase
         !! (RayT > 0: melting; RayT < 0: freezing)
         if (pf_IC==1) then
             h0 = 0.1
-            call set_flat_interface(h0, .false.)
+            if (RayT > 0) then
+                call set_flat_interface(h0, .true.)
+            else
+                call set_flat_interface(h0, .false.)
+            end if
             call set_temperature_interface(h0, .false.)
 
         !! 2D axisymmetric melting example (disc radius 0.1)
