@@ -1,7 +1,7 @@
 # Moist convection module - Rainy-Bénard
 
 The `afid_moisture` module provides additional features needed to simulate a simple model of moist convection.
-This follows the setup of Vallis et al (2019) which is outlined below.
+This follows the setup of [Vallis et al. (2019)](https://doi.org/10.1017/jfm.2018.954) which is outlined below.
 
 ## Quick start: `humid.in` input file
 
