@@ -1,0 +1,5 @@
+{
+  "source_dirs": ["src/**"],
+  "excl_paths": ["src/old/**", "tools/**"],
+  "include_dirs": ["obj/**"]
+}

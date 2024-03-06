@@ -16,11 +16,11 @@ NREAD       IRESET
 
 Time steps / time limit (wall/flow) 
 NTST        WALLTIMEMAX     TMAX
-1000000     120             100.0
+1000000     3500            100.0
 
 Time interval for saving stats/movie frames
 TOUT    TFRAME  SAVE_3D
-0.01    0.01     10.0
+0.1     1.0     10.0
 
 Domain size (keep ALX3 = 1.0)
 ALX3   YLEN   ZLEN
@@ -36,7 +36,7 @@ RAYT    PRAT    RAYS    PRAS    FFscaleS
 
 Time stepping parameters
 IDTV    DT      RESID   CFLMAX  DTMIN   DTMAX
-1       1e-3    1.e-3   1.0     1e-8    5e-3
+1       1e-3    1.e-3   1.0     1e-8    1e-3
 
 Dirichlet/Neumann BC flag on upper(N) and lower(S) walls
 inslwS  inslwN  TfixS   TfixN   SfixS   SfixN

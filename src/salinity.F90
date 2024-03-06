@@ -138,21 +138,29 @@ end subroutine SetSalBCs
 !> Set initial conditions for salinity field
 !! N.B. This can get overwritten by CreateInitialPhase if also using phase-field
 subroutine CreateInitialSalinity
+    integer :: i, j, k
     
     !! Rayleigh-Taylor setup for pore-scale simulation
     if (IBM) then
         call SetSaltTwoLayer(h0=0.5*alx3, eps=1e-7, stable=.false.)
-        call AddSalinityNoise(amp=0.1, localised=.true., h0=0.5*alx3)
+        call AddSalinityNoise(amp=0.1, localised=.true., h0=0.5*alx3, extent=0.01)
 
-    !! Bounded double-diffusive convection (begin with small amplitude noise)
+    !! Bounded double-diffusive convection (begin with small amplitude noise + BLs)
     else if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
-        call SetZeroSalinity
-        call AddSalinityNoise(amp=5e-3, localised=.false.)
+        ! call SetZeroSalinity
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                do k=1,nxmr
+                    sal(k,j,i) = 0.5*(2*(xmr(k) - 0.5))**7
+                end do
+            end do
+        end do
+        ! call AddSalinityNoise(amp=5e-3, localised=.false.)
 
     !! Stratified shear layer setup
     else if ((RayS < 0) .and. (RayT < 0)) then
         call SetSaltTwoLayer(h0=0.5*alx3, eps=1.0, stable=.true.)
-        call AddSalinityNoise(amp=1e-2, localised=.true., h0=0.5*alx3)
+        call AddSalinityNoise(amp=1e-2, localised=.true., h0=0.5*alx3, extent=1.0)
 
     !! Default: linear profile + small noise (e.g. RBC, VC)
     else
@@ -218,10 +226,11 @@ end subroutine SetSaltTwoLayer
 !> Add random noise to the salinity field, either locally at an interface
 !! or uniformly. In both cases, noise is limited such that the absolute value
 !! of salinity does not exceed 0.5
-subroutine AddSalinityNoise(amp, localised, h0)
+subroutine AddSalinityNoise(amp, localised, h0, extent)
     real, intent(in) :: amp             !! Amplitude of random noise
     logical, intent(in) :: localised    !! Flag determining whether to add noise around interface or everywhere
     real, intent(in), optional :: h0    !! Height of interface if using localised noise
+    real, intent(in), optional :: extent    !! Width of localised noise region
 
     integer :: i, j, k
     real :: a2, varptb
@@ -234,7 +243,7 @@ subroutine AddSalinityNoise(amp, localised, h0)
                 call random_number(varptb)
                 !! Add noise locally
                 if (localised) then
-                    sal(k,j,i) = sal(k,j,i) + amp/cosh((xmr(k) - h0)/0.01)**2*varptb
+                    sal(k,j,i) = sal(k,j,i) + amp/cosh((xmr(k) - h0)/extent)**2*varptb
                     ! Restrict initial salinity field to [-0.5,0.5]
                     sal(k,j,i) = min(0.5, sal(k,j,i))
                     sal(k,j,i) = max(-0.5, sal(k,j,i))

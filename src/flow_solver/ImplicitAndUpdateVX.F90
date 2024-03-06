@@ -16,9 +16,10 @@ subroutine ImplicitAndUpdateVX
     use local_arrays, only: vx,rhs,rux,qcap,pr
     use decomp_2d, only: xstart,xend
     use ibm_param
+    use afid_phasefield, only: SolveImpEqnUpdate_X_pf
     implicit none
     integer :: jc,kc
-    integer :: km,kp,ic,ke
+    integer :: km,kp,ic
     real    :: alre,udx3
     real    :: amm,acc,app,dxp,dxxvx
 
@@ -67,12 +68,14 @@ subroutine ImplicitAndUpdateVX
     end do
 !$OMP END PARALLEL DO
 
-    iF(ANY(IsNaN(rhs))) write(*,*) 'NaN in rhs'
+    ! iF(ANY(IsNaN(rhs))) write(*,*) 'NaN in rhs'
 
 !  Solve equation and update velocity
 
     if (IBM) then
         call SolveImpEqnUpdate_X_ibm
+    elseif (phasefield) then
+        call SolveImpEqnUpdate_X_pf
     else
         call SolveImpEqnUpdate_X
     end if

@@ -16,9 +16,10 @@ subroutine ImplicitAndUpdateVY
     use local_arrays, only: vy,ruy,pr,rhs,dph
     use decomp_2d, only: xstart,xend
     use ibm_param
+    use afid_phasefield, only: SolveImpEqnUpdate_YZ_pf
     implicit none
     integer :: kc,jmm,jc,ic
-    integer :: kpp,kmm,ke
+    integer :: kpp,kmm
     real    :: alre,udy
     real    :: amm,acc,app
     real    :: dyp,dxxvy
@@ -85,6 +86,8 @@ subroutine ImplicitAndUpdateVY
 
     if (IBM) then
         call SolveImpEqnUpdate_YZ_ibm(vy,rhs,ibmasky,disty)
+    elseif (phasefield) then
+        call SolveImpEqnUpdate_YZ_pf(vy,rhs,'y')
     else
         call SolveImpEqnUpdate_YZ(vy,rhs)
     end if

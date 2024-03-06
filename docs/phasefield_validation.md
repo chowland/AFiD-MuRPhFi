@@ -1,12 +1,12 @@
 # Phase-field model validation
 
 On this page, we focus on a number of validation cases of the phase-field model used to simulate liquid-solid phase transitions.
-For information on the convergence of the model with grid spacing, please refer to the [convergence page](convergence).
-A more detailed overview of the setups considered here, including the initial conditions and any analytic solutions are provided in the examples pages on [Stefan problems](examples/stefan) and [flows coupled to phase change](examples/coupled_flows).
+For information on the convergence of the model with grid spacing, please refer to the [convergence page](convergence.md).
+A more detailed overview of the setups considered here, including the initial conditions and any analytic solutions are provided in the examples pages on [Stefan problems](examples/stefan.md) and [flows coupled to phase change](examples/coupled_flows.md).
 
 ## 1-D melting from a hot boundary: phase-field parameters
 
-We begin by investigating the model parameter $a$ introduced by the phase-field method.
+We begin by investigating the model parameter $A$ introduced by the phase-field method.
 As a reminder, the governing equation for the phase field $\phi$ takes the form
 
 $$
@@ -157,7 +157,7 @@ Nevertheless, the gradients close to the phase boundary remain consistent with t
 
 ## 1-D multicomponent diffusive melting
 
-This validation case considers the diffusive example from [Martin and Kauffman (1977)](https://doi.org/10.1175/1520-0485(1977)007%3C0272:AEATSO%3E2.0.CO;2) described [here](stefan\1-d-multicomponent-melting-martin-and-kauffman-1977).
+This validation case considers the diffusive example from [Martin and Kauffman (1977)](https://doi.org/10.1175/1520-0485(1977)007%3C0272:AEATSO%3E2.0.CO;2) described [here](examples/stefan.md#1-d-multicomponent-melting-martin-and-kauffman-1977).
 Below, we present the results obtained from a run of the phase-field model with $Pe_T=10^3$, $Pe_S=10^4$, $\mathcal{S}=2.5$, $A=1$, and $\Lambda=0.4$.
 No-flux boundary conditions are applied to $T$ and $C$ at $x=0$ and $x=1$, and a resolution of $512$ points is used for $T$, whereas $C$ and $\phi$ are resolved on a grid of $1024$ points.
 As a reminder, the governing equations for the multicomponent phase-field model are

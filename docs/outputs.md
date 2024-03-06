@@ -31,7 +31,7 @@ cordin_info.h5:
 ```
 `xc` contains the wall-normal coordinates of the grid cell faces and is of length `nxm+1`.
 `xm`, `ym`, and `zm` are the coordinates of the grid cell centres, and are arrays of length `nxm`, `nym`, and `nzm`.
-The post-processing module AFiDTools reads this file in the function `read_grid()`.
+The post-processing module `afidtools` reads this file by calling the class `afid.Grid(fld)`.
 
 ## `means.h5`
 ```
@@ -45,7 +45,7 @@ means.h5:
 - /chi
 ```
 Profiles as a function of $x$ and time, output at the regular interval defined by `t_out` in `bou.in`.
-The helper function `read_mean()` is provided in the AFiDTools module to read this data.
+The helper function `read_mean()` is provided in the `afidtools` module to read this data.
 
 ## `flowmov`
 ```
@@ -75,3 +75,5 @@ The three plane slices produced are at $x\approx 0$ (taken at the first grid poi
 The slices are output at the regular time interval defined by `t_frame` in `bou.in`.
 
 ## `fields`
+
+Each file in `fields` contains one 3D array from a single time snapshot, under the group name `/var`.

@@ -19,13 +19,14 @@ for wavelengths $\lambda_n = 2\pi n$ and arbitrary constants $T_n$.
 Since the governing equation is linear we can add such solutions together, and also simply add them to a linear conductive profile if we want to satisfy non-zero boundary conditions.
 
 As a convergence test, we consider the case of $T_1=1$ and $T_3=1$ added to a linear profile satisfying the boundary conditions $T=\pm 0.5$, and set the diffusivity to $\kappa=0.01$.
-Varying the number of grid points from 8 to 512, we find second order convergence in both the $L^2$ and $L^\infty$ norms of the temperature error, defined as
+The time step is fixed at $\Delta t = 10^{-5}$.
+Varying the number of grid points from 8 to 1024, we find second order convergence in both the $L^2$ and $L^\infty$ norms of the temperature error, defined as
 
 $$
 L^2 = \sqrt{\frac{1}{t_f}\int_0^{t_f} \int_0^1 (T - T_a)^2 \, \mathrm{d}x \, \mathrm{d}t}, \qquad L^\infty = \max_{x,t} |T - T_a|
 $$
 
-where $T$ is the simulation output, $T_a$ is the analytic solution, and $t_f=10$ is the end time of the simulation.
+where $T$ is the simulation output, $T_a$ is the analytic solution, and $t_f=1$ is the end time of the simulation.
 
 ![Convergence plot](figures/spatial_convergence.svg){ width="100%" }
 
@@ -35,7 +36,7 @@ where $T$ is the simulation output, $T_a$ is the analytic solution, and $t_f=10$
   </figcaption>
 </figure> -->
 
-## 2-D Taylor-Green vortex
+<!-- ## 2-D Taylor-Green vortex
 **To be completed**
 
 To test the convergence of the combined advection and diffusion, we consider the velocity field associated with a decaying, advected Taylor-Green vortex.
@@ -46,13 +47,13 @@ $$
 v = -\sin(z-Wt)\cos(y) e^{-2\nu t}, \qquad w = W + \cos(z - Wt)\sin(y) e^{-2\nu t} ,
 $$
 
-where $W$ is a uniform constant advection, and $\nu=(Pr/Ra)^{1/2}$ is the dimensionless viscosity (or inverse Reynolds number) determined by the input parameters $Ra$ and $Pr$.
+where $W$ is a uniform constant advection, and $\nu=(Pr/Ra)^{1/2}$ is the dimensionless viscosity (or inverse Reynolds number) determined by the input parameters $Ra$ and $Pr$. -->
 
 ## Phase-field model: 1-D Stefan problem
 
 Now we perform a convergence test for the phase-field model used to simulate liquid-solid phase transitions.
 We consider the problem of a liquid phase freezes from a cold boundary and a solidification front moves across the domain.
-As for the melting problem on the validation page LINK THIS, the analytic solution for the phase boundary height is
+As for the melting problem on the [validation page](phasefield_validation.md), the analytic solution for the phase boundary height is
 
 $$
 h(t) = 2\Lambda \sqrt{(t+t_0)/Pe_T} ,

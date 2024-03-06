@@ -13,12 +13,16 @@ markdown_extensions:
         generic: true
     - attr_list
     - md_in_html
-extra_css:
-    - https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css
 extra_javascript:
-    - javascripts/config.js
-    - https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js
-    - https://cdn.plot.ly/plotly-2.9.0.min.js
+  - javascripts/katex.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+  - https://cdn.plot.ly/plotly-2.27.0.min.js
+
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
+
+    
 plugins:
     - macros:
         include_dir: docs/figures
@@ -38,7 +42,6 @@ nav:
         - 'inputs.md'
         - 'outputs.md'
         - 'mean_outs.md'
-        - 'pluto.md'
         - 'jupyter.md'
         - 'paraview.md'
     - Examples:
@@ -47,13 +50,15 @@ nav:
         - 'examples/stefan.md'
         - 'examples/coupled_flows.md'
     - 'Benchmarking and validation':
-        - 'compilers.md'
+        - 'scaling.md'
         - 'convergence.md'
         - 'phasefield_validation.md'
     - 'Technical Details':
         - 'equations.md'
         - 'numerics.md'
-        - 'buoyancy.md'
+        # - 'buoyancy.md'
         - 'interpolation.md'
         - 'stretched_grids.md'
         - 'ibm.md'
+        - 'spectra.md'
+        - 'rainy.md'
