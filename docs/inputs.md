@@ -115,4 +115,4 @@ The input parameter `ibm` can be used to specify different shapes of solid objec
 - `ibm = 4` produces a hexagonal lattice of spheres
 
 Of these options, only 1 and 4 have been reliably tested.
-Perform your own validation casses before using.
+Perform your own validation cases before using.
