@@ -133,6 +133,35 @@ subroutine SetSalBCs
     call update_halo(saltp,lvlhalo)
     call update_halo(salbp,lvlhalo)
 
+    ! Extend to sidewall halos (could be modified for other BCs...)
+    if (sidewall) then
+        if (xstartr(2)==1) then
+            do j=1,lvlhalo
+                saltp(1,1-j,:) = saltp(1,j,:)
+                salbp(1,1-j,:) = salbp(1,j,:)
+            end do
+        end if
+        if (xendr(2)==nymr) then
+            do j=1,lvlhalo
+                saltp(1,nymr+j,:) = saltp(1,nymr+1-j,:)
+                salbp(1,nymr+j,:) = salbp(1,nymr+1-j,:)
+            end do
+        end if
+
+        if (xstartr(3)==1) then
+            do i=1,lvlhalo
+                saltp(1,:,1-i) = saltp(1,:,i)
+                salbp(1,:,1-i) = salbp(1,:,i)
+            end do
+        end if
+        if (xendr(3)==nzmr) then
+            do i=1,lvlhalo
+                saltp(1,:,nzmr+i) = saltp(1,:,nzmr+1-i)
+                salbp(1,:,nzmr+i) = salbp(1,:,nzmr+1-i)
+            end do
+        end if
+    end if
+
 end subroutine SetSalBCs
 
 !> Set initial conditions for salinity field
