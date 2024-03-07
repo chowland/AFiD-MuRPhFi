@@ -120,7 +120,7 @@ OBJS += obj/mean_zplane.o
 # Module object files
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
 	obj/fft.o obj/pressure.o obj/HermiteInterpolations.o obj/grid.o obj/h5_tools.o obj/means.o \
-	obj/ibm_param.o obj/IBMTools.o obj/moisture.o obj/salinity.o obj/phasefield.o
+	obj/ibm_param.o obj/IBMTools.o obj/moisture.o obj/salinity.o obj/phasefield.o \
 	obj/time_averaging.o obj/spectra.o
 
 #=======================================================================
