@@ -137,6 +137,8 @@ subroutine TimeMarcher
         if (phasefield) call update_halo(phi,lvlhalo)
         if (moist) call update_halo(humid,lvlhalo)
 
+        if (sidewall) call SetSidewallBCs
+
         if (salinity) then
             call InterpVelMgrd !Vel from base mesh to refined mesh
             call update_halo(vxr,lvlhalo)
@@ -152,8 +154,6 @@ subroutine TimeMarcher
             call InterpPhiMultigrid
             call update_halo(phic,lvlhalo)
         end if
-
-        if (sidewall) call SetSidewallBCs
 
         if (moist) call UpdateSaturation
 
