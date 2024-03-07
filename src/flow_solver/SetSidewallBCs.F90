@@ -15,6 +15,7 @@ subroutine SetSidewallBCs
     implicit none
     real :: dyy, dzz    !! Grid spacing
     real :: dyyr, dzzr    !! Refined grid spacing
+    integer :: n
 
     dyy = yc(2)
     dzz = zc(2)
@@ -27,81 +28,131 @@ subroutine SetSidewallBCs
     !! Left wall
     if (xstart(2)==1) then
         if (bc_vx_y_fix_lo) then
-            vx(:,0,:) = 2.0*bc_vx_y_val_lo - vx(:,1,:)
+            do n=1,lvlhalo
+                vx(:,1-n,:) = 2.0*bc_vx_y_val_lo - vx(:,n,:)
+            end do
         else
-            vx(:,0,:) = vx(:,1,:) - dyy*bc_vx_y_val_lo
+            do n=1,lvlhalo
+                vx(:,1-n,:) = vx(:,n,:) - dyy*bc_vx_y_val_lo
+            end do
         end if
         !! Always impose zero normal velocity at walls
         vy(:,1,:) = 0.d0
+        vy(:,0,:) = vy(:,2,:)
         if (bc_vz_y_fix_lo) then
-            vz(:,0,:) = 2.0*bc_vz_y_val_lo - vz(:,1,:)
+            do n=1,lvlhalo
+                vz(:,1-n,:) = 2.0*bc_vz_y_val_lo - vz(:,n,:)
+            end do
         else
-            vz(:,0,:) = vz(:,1,:) - dyy*bc_vz_y_val_lo
+            do n=1,lvlhalo
+                vz(:,1-n,:) = vz(:,n,:) - dyy*bc_vz_y_val_lo
+            end do
         end if
         if (bc_temp_y_fix_lo) then
-            temp(:,0,:) = 2.0*bc_temp_y_val_lo - temp(:,1,:)
+            do n=1,lvlhalo
+                temp(:,1-n,:) = 2.0*bc_temp_y_val_lo - temp(:,n,:)
+            end do
         else
-            temp(:,0,:) = temp(:,1,:) - dyy*bc_temp_y_val_lo
+            do n=1,lvlhalo
+                temp(:,1-n,:) = temp(:,n,:) - dyy*bc_temp_y_val_lo
+            end do
         end if
         if (salinity) then
             if (bc_sal_y_fix_lo) then
-                sal(:,0,:) = 2.0*bc_sal_y_val_lo - sal(:,1,:)
+                do n=1,lvlhalo
+                    sal(:,1-n,:) = 2.0*bc_sal_y_val_lo - sal(:,n,:)
+                end do
             else
-                sal(:,0,:) = sal(:,1,:) - dyyr*bc_sal_y_val_lo
+                do n=1,lvlhalo
+                    sal(:,1-n,:) = sal(:,n,:) - dyyr*bc_sal_y_val_lo
+                end do
             end if
         end if
         if (phasefield) then
             if (bc_phi_y_fix_lo) then
-                phi(:,0,:) = 2.0*bc_phi_y_val_lo - phi(:,1,:)
+                do n=1,lvlhalo
+                    phi(:,1-n,:) = 2.0*bc_phi_y_val_lo - phi(:,n,:)
+                end do
             else
-                phi(:,0,:) = phi(:,1,:) - dyyr*bc_phi_y_val_lo
+                do n=1,lvlhalo
+                    phi(:,1-n,:) = phi(:,n,:) - dyyr*bc_phi_y_val_lo
+                end do
             end if
         end if
         if (moist) then
             if (bc_humid_y_fix_lo) then
-                humid(:,0,:) = 2.0*bc_humid_y_val_lo - humid(:,1,:)
+                do n=1,lvlhalo
+                    humid(:,1-n,:) = 2.0*bc_humid_y_val_lo - humid(:,n,:)
+                end do
             else
-                humid(:,0,:) = humid(:,1,:) - dyy*bc_humid_y_val_lo
+                do n=1,lvlhalo
+                    humid(:,1-n,:) = humid(:,n,:) - dyy*bc_humid_y_val_lo
+                end do
             end if
         end if
     end if
     if (xstart(3)==1) then
         if (bc_vx_z_fix_lo) then
-            vx(:,:,0) = 2.0*bc_vx_z_val_lo - vx(:,:,1)
+            do n=1,lvlhalo
+                vx(:,:,1-n) = 2.0*bc_vx_z_val_lo - vx(:,:,n)
+            end do
         else
-            vx(:,:,0) = vx(:,:,1) - dzz*bc_vx_z_val_lo
+            do n=1,lvlhalo
+                vx(:,:,1-n) = vx(:,:,n) - dzz*bc_vx_z_val_lo
+            end do
         end if
         if (bc_vy_z_fix_lo) then
-            vy(:,:,0) = 2.0*bc_vy_z_val_lo - vy(:,:,1)
+            do n=1,lvlhalo
+                vy(:,:,1-n) = 2.0*bc_vy_z_val_lo - vy(:,:,n)
+            end do
         else
-            vy(:,:,0) = vy(:,:,1) - dzz*bc_vy_z_val_lo
+            do n=1,lvlhalo
+                vy(:,:,1-n) = vy(:,:,n) - dzz*bc_vy_z_val_lo
+            end do
         end if
         !! Always impose zero normal velocity at walls
         vz(:,:,1) = 0.d0
+        vz(:,:,0) = vz(:,:,2)
         if (bc_temp_z_fix_lo) then
-            temp(:,:,0) = 2.0*bc_temp_z_val_lo - temp(:,:,1)
+            do n=1,lvlhalo
+                temp(:,:,1-n) = 2.0*bc_temp_z_val_lo - temp(:,:,n)
+            end do
         else
-            temp(:,:,0) = temp(:,:,1) - dzz*bc_temp_z_val_lo
+            do n=1,lvlhalo
+                temp(:,:,1-n) = temp(:,:,n) - dzz*bc_temp_z_val_lo
+            end do
         end if
         if (salinity) then
             if (bc_sal_z_fix_lo) then
-                sal(:,:,0) = 2.0*bc_sal_z_val_lo - sal(:,:,1)
+                do n=1,lvlhalo
+                    sal(:,:,1-n) = 2.0*bc_sal_z_val_lo - sal(:,:,n)
+                end do
             else
-                sal(:,:,0) = sal(:,:,1) - dzzr*bc_sal_z_val_lo
+                do n=1,lvlhalo
+                    sal(:,:,1-n) = sal(:,:,n) - dzzr*bc_sal_z_val_lo
+                end do
             end if
         end if
         if (phasefield) then
             if (bc_phi_z_fix_lo) then
-                phi(:,:,0) = 2.0*bc_phi_z_val_lo - phi(:,:,1)
+                do n=1,lvlhalo
+                    phi(:,:,1-n) = 2.0*bc_phi_z_val_lo - phi(:,:,n)
+                end do
             else
-                phi(:,:,0) = phi(:,:,1) - dzzr*bc_phi_z_val_lo
+                do n=1,lvlhalo
+                    phi(:,:,1-n) = phi(:,:,n) - dzzr*bc_phi_z_val_lo
+                end do
             end if
         end if
         if (moist) then
             if (bc_humid_z_fix_lo) then
-                humid(:,:,0) = 2.0*bc_humid_z_val_lo - humid(:,:,1)
+                do n=1,lvlhalo
+                    humid(:,:,1-n) = 2.0*bc_humid_z_val_lo - humid(:,:,n)
+                end do
             else
-                humid(:,:,0) = humid(:,:,1) - dzz*bc_humid_z_val_lo
+                do n=1,lvlhalo
+                    humid(:,:,1-n) = humid(:,:,n) - dzz*bc_humid_z_val_lo
+                end do
             end if
         end if
     end if
@@ -109,81 +160,129 @@ subroutine SetSidewallBCs
     !! Right wall
     if (xend(2)==nym) then
         if (bc_vx_y_fix_up) then
-            vx(:,ny,:) = 2.0*bc_vx_y_val_up - vx(:,nym,:)
+            do n=1,lvlhalo
+                vx(:,nym+n,:) = 2.0*bc_vx_y_val_up - vx(:,nym+1-n,:)
+            end do
         else
-            vx(:,ny,:) = vx(:,nym,:) - dyy*bc_vx_y_val_up
+            do n=1,lvlhalo
+                vx(:,nym+n,:) = vx(:,nym+1-n,:) - dyy*bc_vx_y_val_up
+            end do
         end if
         !! Always impose zero normal velocity at walls
         vy(:,ny,:) = 0.d0
         if (bc_vz_y_fix_up) then
-            vz(:,ny,:) = 2.0*bc_vz_y_val_up - vz(:,nym,:)
+            do n=1,lvlhalo
+                vz(:,nym+n,:) = 2.0*bc_vz_y_val_up - vz(:,nym+1-n,:)
+            end do
         else
-            vz(:,ny,:) = vz(:,nym,:) - dyy*bc_vz_y_val_up
+            do n=1,lvlhalo
+                vz(:,nym+n,:) = vz(:,nym+1-n,:) - dyy*bc_vz_y_val_up
+            end do
         end if
         if (bc_temp_y_fix_up) then
-            temp(:,ny,:) = 2.0*bc_temp_y_val_up - temp(:,nym,:)
+            do n=1,lvlhalo
+                temp(:,nym+n,:) = 2.0*bc_temp_y_val_up - temp(:,nym+1-n,:)
+            end do
         else
-            temp(:,ny,:) = temp(:,nym,:) - dyy*bc_temp_y_val_up
+            do n=1,lvlhalo
+                temp(:,nym+n,:) = temp(:,nym+1-n,:) - dyy*bc_temp_y_val_up
+            end do
         end if
         if (salinity) then
             if (bc_sal_y_fix_up) then
-                sal(:,nyr,:) = 2.0*bc_sal_y_val_up - sal(:,nymr,:)
+                do n=1,lvlhalo
+                    sal(:,nymr+n,:) = 2.0*bc_sal_y_val_up - sal(:,nymr+1-n,:)
+                end do
             else
-                sal(:,nyr,:) = sal(:,nymr,:) - dyyr*bc_sal_y_val_up
+                do n=1,lvlhalo
+                    sal(:,nymr+n,:) = sal(:,nymr+1-n,:) - dyyr*bc_sal_y_val_up
+                end do
             end if
         end if
         if (phasefield) then
             if (bc_phi_y_fix_up) then
-                phi(:,nyr,:) = 2.0*bc_phi_y_val_up - phi(:,nymr,:)
+                do n=1,lvlhalo
+                    phi(:,nymr+n,:) = 2.0*bc_phi_y_val_up - phi(:,nymr+1-n,:)
+                end do
             else
-                phi(:,nyr,:) = phi(:,nymr,:) - dyyr*bc_phi_y_val_up
+                do n=1,lvlhalo
+                    phi(:,nymr+n,:) = phi(:,nymr+1-n,:) - dyyr*bc_phi_y_val_up
+                end do
             end if
         end if
         if (moist) then
             if (bc_humid_y_fix_up) then
-                humid(:,ny,:) = 2.0*bc_humid_y_val_up - humid(:,nym,:)
+                do n=1,lvlhalo
+                    humid(:,nym+n,:) = 2.0*bc_humid_y_val_up - humid(:,nym+1-n,:)
+                end do
             else
-                humid(:,ny,:) = humid(:,nym,:) - dyy*bc_humid_y_val_up
+                do n=1,lvlhalo
+                    humid(:,nym+n,:) = humid(:,nym+1-n,:) - dyy*bc_humid_y_val_up
+                end do
             end if
         end if
     end if
     if (xend(3)==nzm) then
         if (bc_vx_z_fix_up) then
-            vx(:,:,nz) = 2.0*bc_vx_z_val_up - vx(:,:,nzm)
+            do n=1,lvlhalo
+                vx(:,:,nzm+n) = 2.0*bc_vx_z_val_up - vx(:,:,nzm+1-n)
+            end do
         else
-            vx(:,:,nz) = vx(:,:,nzm) - dzz*bc_vx_z_val_up
+            do n=1,lvlhalo
+                vx(:,:,nzm+n) = vx(:,:,nzm+1-n) - dzz*bc_vx_z_val_up
+            end do
         end if
         if (bc_vy_z_fix_up) then
-            vy(:,:,nz) = 2.0*bc_vy_z_val_up - vy(:,:,nzm)
+            do n=1,lvlhalo
+                vy(:,:,nzm+n) = 2.0*bc_vy_z_val_up - vy(:,:,nzm+1-n)
+            end do
         else
-            vy(:,:,nz) = vy(:,:,nzm) - dzz*bc_vy_z_val_up
+            do n=1,lvlhalo
+                vy(:,:,nzm+n) = vy(:,:,nzm+1-n) - dzz*bc_vy_z_val_up
+            end do
         end if
         !! Always impose zero normal velocity at walls
         vz(:,:,nz) = 0.d0
         if (bc_temp_z_fix_up) then
-            temp(:,:,nz) = 2.0*bc_temp_z_val_up - temp(:,:,nzm)
+            do n=1,lvlhalo
+                temp(:,:,nzm+n) = 2.0*bc_temp_z_val_up - temp(:,:,nzm+1-n)
+            end do
         else
-            temp(:,:,nz) = temp(:,:,nzm) - dzz*bc_temp_z_val_up
+            do n=1,lvlhalo
+                temp(:,:,nzm+n) = temp(:,:,nzm+1-n) - dzz*bc_temp_z_val_up
+            end do
         end if
         if (salinity) then
             if (bc_sal_z_fix_up) then
-                sal(:,:,nzr) = 2.0*bc_sal_z_val_up - sal(:,:,nzmr)
+                do n=1,lvlhalo
+                    sal(:,:,nzmr+n) = 2.0*bc_sal_z_val_up - sal(:,:,nzmr+1-n)
+                end do
             else
-                sal(:,:,nzr) = sal(:,:,nzmr) - dzzr*bc_sal_z_val_up
+                do n=1,lvlhalo
+                    sal(:,:,nzmr+n) = sal(:,:,nzmr+1-n) - dzzr*bc_sal_z_val_up
+                end do
             end if
         end if
         if (phasefield) then
             if (bc_phi_z_fix_up) then
-                phi(:,:,nzr) = 2.0*bc_phi_z_val_up - phi(:,:,nzmr)
+                do n=1,lvlhalo
+                    phi(:,:,nzmr+n) = 2.0*bc_phi_z_val_up - phi(:,:,nzmr+1-n)
+                end do
             else
-                phi(:,:,nzr) = phi(:,:,nzmr) - dzzr*bc_phi_z_val_up
+                do n=1,lvlhalo
+                    phi(:,:,nzmr+n) = phi(:,:,nzmr+1-n) - dzzr*bc_phi_z_val_up
+                end do
             end if
         end if
         if (moist) then
             if (bc_humid_z_fix_up) then
-                humid(:,:,nz) = 2.0*bc_humid_z_val_up - humid(:,:,nzm)
+                do n=1,lvlhalo
+                    humid(:,:,nzm+n) = 2.0*bc_humid_z_val_up - humid(:,:,nzm+1-n)
+                end do
             else
-                humid(:,:,nz) = humid(:,:,nzm) - dzz*bc_humid_z_val_up
+                do n=1,lvlhalo
+                    humid(:,:,nzm+n) = humid(:,:,nzm+1-n) - dzz*bc_humid_z_val_up
+                end do
             end if
         end if
     end if
