@@ -101,8 +101,8 @@ subroutine InterpVelMgrd
                 vyxzc(kc,ic) = vy(kc,jc0,ic)
             end do
             ! x boundaries
-            vyxzc(0,ic) = (1-2*inslwS)*vyxzc(1,ic)
-            vyxzc(nx,ic) = (1-2*inslwN)*vyxzc(nxm,ic)
+            vyxzc(0,ic) = (1-2*inslwS)*vyxzc(1,ic) + 2*xminusU*inslwS
+            vyxzc(nx,ic) = (1-2*inslwN)*vyxzc(nxm,ic) + 2*xplusU*inslwN
         end do
 
         do ic=xstart(3)-1,xend(3)
