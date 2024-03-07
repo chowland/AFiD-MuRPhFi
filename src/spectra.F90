@@ -1,7 +1,7 @@
 !> Module for calculating energy/power spectra of various quantities
 !! Spectra are stored as time averages and written out at the end of a simulation
 module afid_spectra
-    use fftw_params
+    use afid_fft
     use afid_pressure
     use decomp_2d_fft
 
