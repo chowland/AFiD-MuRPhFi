@@ -14,9 +14,15 @@ subroutine SetSidewallBCs
     use afid_moisture, only: humid
     implicit none
     real :: dyy, dzz    !! Grid spacing
+    real :: dyyr, dzzr    !! Refined grid spacing
 
     dyy = yc(2)
     dzz = zc(2)
+
+    if (multires) then
+        dyyr = ycr(2)
+        dzzr = zcr(2)
+    end if
 
     !! Left wall
     if (xstart(2)==1) then
@@ -41,14 +47,14 @@ subroutine SetSidewallBCs
             if (bc_sal_y_fix_lo) then
                 sal(:,0,:) = 2.0*bc_sal_y_val_lo - sal(:,1,:)
             else
-                sal(:,0,:) = sal(:,1,:) - dyy*bc_sal_y_val_lo
+                sal(:,0,:) = sal(:,1,:) - dyyr*bc_sal_y_val_lo
             end if
         end if
         if (phasefield) then
             if (bc_phi_y_fix_lo) then
                 phi(:,0,:) = 2.0*bc_phi_y_val_lo - phi(:,1,:)
             else
-                phi(:,0,:) = phi(:,1,:) - dyy*bc_phi_y_val_lo
+                phi(:,0,:) = phi(:,1,:) - dyyr*bc_phi_y_val_lo
             end if
         end if
         if (moist) then
@@ -81,14 +87,14 @@ subroutine SetSidewallBCs
             if (bc_sal_z_fix_lo) then
                 sal(:,:,0) = 2.0*bc_sal_z_val_lo - sal(:,:,1)
             else
-                sal(:,:,0) = sal(:,:,1) - dzz*bc_sal_z_val_lo
+                sal(:,:,0) = sal(:,:,1) - dzzr*bc_sal_z_val_lo
             end if
         end if
         if (phasefield) then
             if (bc_phi_z_fix_lo) then
                 phi(:,:,0) = 2.0*bc_phi_z_val_lo - phi(:,:,1)
             else
-                phi(:,:,0) = phi(:,:,1) - dzz*bc_phi_z_val_lo
+                phi(:,:,0) = phi(:,:,1) - dzzr*bc_phi_z_val_lo
             end if
         end if
         if (moist) then
@@ -123,14 +129,14 @@ subroutine SetSidewallBCs
             if (bc_sal_y_fix_up) then
                 sal(:,nyr,:) = 2.0*bc_sal_y_val_up - sal(:,nymr,:)
             else
-                sal(:,nyr,:) = sal(:,nymr,:) - dyy*bc_sal_y_val_up
+                sal(:,nyr,:) = sal(:,nymr,:) - dyyr*bc_sal_y_val_up
             end if
         end if
         if (phasefield) then
             if (bc_phi_y_fix_up) then
                 phi(:,nyr,:) = 2.0*bc_phi_y_val_up - phi(:,nymr,:)
             else
-                phi(:,nyr,:) = phi(:,nymr,:) - dyy*bc_phi_y_val_up
+                phi(:,nyr,:) = phi(:,nymr,:) - dyyr*bc_phi_y_val_up
             end if
         end if
         if (moist) then
@@ -163,14 +169,14 @@ subroutine SetSidewallBCs
             if (bc_sal_z_fix_up) then
                 sal(:,:,nzr) = 2.0*bc_sal_z_val_up - sal(:,:,nzmr)
             else
-                sal(:,:,nzr) = sal(:,:,nzmr) - dzz*bc_sal_z_val_up
+                sal(:,:,nzr) = sal(:,:,nzmr) - dzzr*bc_sal_z_val_up
             end if
         end if
         if (phasefield) then
             if (bc_phi_z_fix_up) then
                 phi(:,:,nzr) = 2.0*bc_phi_z_val_up - phi(:,:,nzmr)
             else
-                phi(:,:,nzr) = phi(:,:,nzmr) - dzz*bc_phi_z_val_up
+                phi(:,:,nzr) = phi(:,:,nzmr) - dzzr*bc_phi_z_val_up
             end if
         end if
         if (moist) then
