@@ -210,6 +210,7 @@ program AFiD
     call update_halo(pr,lvlhalo)
     if (moist) call update_halo(humid,lvlhalo)
     if (moist) call UpdateSaturation
+    if (sidewall) call SetSidewallBCs
 
 
 !CS   Interpolate initial values
