@@ -1,0 +1,42 @@
+An input file to specify the sidewall boundary conditions in y and z (DO NOT CHANGE FORMAT)
+logical :: fix_lo, fix_up   !! determine whether (lower/upper) BC is Dirichlet (.true.) or Neumann (.false.)
+real :: val_lo, val_up      !! set value of variable or flux at the wall (depending on fix_lo/fix_up)
+---
+
+vx (fix_lo / val_lo / fix_up / val_up)
+y
+.true.      0.0     .true.      0.0
+z
+.false.     0.0     .false.     0.0
+
+vy (fix_lo / val_lo / fix_up / val_up)
+z
+.false.     0.0     .false.     0.0
+
+vz (fix_lo / val_lo / fix_up / val_up)
+y
+.true.      0.0     .true.      0.0
+
+temp (fix_lo / val_lo / fix_up / val_up)
+y
+.false.     0.0     .false.     0.0
+z
+.false.     0.0     .false.     0.0
+
+sal
+y
+.false.     0.0     .false.     0.0
+z
+.false.     0.0     .false.     0.0
+
+phi
+y
+.false.     0.0     .false.     0.0
+z
+.false.     0.0     .false.     0.0
+
+humid
+y
+.false.     0.0     .false.     0.0
+z
+.false.     0.0     .false.     0.0
