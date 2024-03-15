@@ -12,8 +12,13 @@ subroutine SetTempBCs
     use param
     use decomp_2d
     use afid_moisture, only: beta_q
+    use afid_salinity, only: RayS     !2DHorizontalConvection 
+
     implicit none
-    integer :: ic,jc
+    integer :: ic,jc, ii
+    real, dimension(nym)::  values
+    real :: ProfileTemp
+
     
     if (rayt>=0) then ! unstable T gradient
         if (inslwN==0) then !Single heated wall case
@@ -66,7 +71,28 @@ subroutine SetTempBCs
             end do
         end do
     end if
-    
+
+   
+    !2DHorizontalConvection 
+    do ii = 1, nym
+        ProfileTemp = -1.0 + real(ii - 1) * 2.0/real(nym - 1) 
+        values(ii) = (1.0 + tanh(5*ProfileTemp)) / 2.0  ! JFM Limiting regimes of turbulent horizontal convection. Part I: Intermediate and low Prandtl numbers
+        
+        !values(ii) = yc(ii)/YLEN !Linear
+    end do
+    if (RayS<0) then 
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                temptp(1,jc,ic)= values(jc)
+               ! if (jc<nym/2) then
+                !temptp(1,jc,ic)=0.0d0
+                !else 
+                !temptp(1,jc,ic)=abs(1)
+                !end if 
+                tempbp(1,jc,ic)=0.0
+            end do
+        end do
+    end if
     call update_halo(temptp,lvlhalo)
     call update_halo(tempbp,lvlhalo)
     
