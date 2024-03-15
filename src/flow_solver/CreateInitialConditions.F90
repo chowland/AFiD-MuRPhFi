@@ -22,6 +22,11 @@ subroutine CreateInitialConditions
     real, dimension(11) :: yh, zh
 
     call random_seed()
+    
+
+
+
+
 
     if ((xminusU /= 0) .or. (xplusU /= 0)) then
         !CJH: Base velocity profile if walls in motion
@@ -364,6 +369,36 @@ subroutine CreateInitialConditions
             end do
         end do
     end if
+
+
+
+  ! 2DHorizontalConvection
+    if (RayS <0) then
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    vx(k,j,i) = 0.0
+                    vy(k,j,i) = 0.0
+                    vz(k,j,i) = 0.0
+                    temp(k,j,i) = 0.0
+                end do
+            end do
+        end do
+      
+   
+    
+    do k=1,nxm  ! linear profile
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+               
+                !temp(k,j,i) = yc(j)/YLEN
+            end do 
+        end do
+     end do
+
+    end if
+
+
 
     return
 end subroutine CreateInitialConditions
