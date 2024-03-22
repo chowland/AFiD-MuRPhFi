@@ -5,7 +5,7 @@ real :: val_lo, val_up      !! set value of variable or flux at the wall (depend
 
 vx (fix_lo / val_lo / fix_up / val_up)
 y
-.true.      0.0     .true.      0.0
+.false.      0.0     .false.      0.0
 z
 .false.     0.0     .false.     0.0
 
@@ -15,7 +15,7 @@ z
 
 vz (fix_lo / val_lo / fix_up / val_up)
 y
-.true.      0.0     .true.      0.0
+.false.      0.0     .false.      0.0
 
 temp (fix_lo / val_lo / fix_up / val_up)
 y
