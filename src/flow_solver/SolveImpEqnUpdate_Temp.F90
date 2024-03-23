@@ -14,7 +14,7 @@ subroutine SolveImpEqnUpdate_Temp
     use decomp_2d, only: xstart,xend
     implicit none
     real, dimension(nx) :: amkl,apkl,ackl
-    integer :: jc,kc,info,ipkv(nxm),ic,nrhs
+    integer :: jc,kc,info,ipkv(nxm),ic,nrhs,ii
     real :: betadx,ackl_b
     real :: amkT(nxm-1),ackT(nxm),apkT(nxm-1),appk(nxm-2)
 
@@ -23,14 +23,19 @@ subroutine SolveImpEqnUpdate_Temp
 !     point errors.
 
     betadx=0.5d0*al*dt/pect
-
+    do jc=xstart(2),xend(2)
+    if (yc(jc)<0.1*YLEN .or.yc(jc)>0.9*YLEN ) then
+            ii = 1
+    else 
+        ii=2
+    end if
     do kc=1,nxm
-        ackl_b=1.0d0/(1.0d0-ac3ssk(kc)*betadx)
-        amkl(kc)=-am3ssk(kc)*betadx*ackl_b
+        ackl_b=1.0d0/(1.0d0-ac3ssk(kc,ii)*betadx)
+        amkl(kc)=-am3ssk(kc,ii)*betadx*ackl_b
         ackl(kc)=1.0d0
-        apkl(kc)=-ap3ssk(kc)*betadx*ackl_b
+        apkl(kc)=-ap3ssk(kc,ii)*betadx*ackl_b
     end do
-
+    end do
     amkT=amkl(2:nxm)
     apkT=apkl(1:(nxm-1))
     ackT=ackl(1:nxm)
@@ -39,12 +44,16 @@ subroutine SolveImpEqnUpdate_Temp
 !     No solving is done in this call.
 
     call dgttrf(nxm,amkT,ackT,apkT,appk,ipkv,info)
-    
     nrhs=(xend(3)-xstart(3)+1)*(xend(2)-xstart(2)+1)
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
+            if (yc(jc)<0.3 .or.yc(jc)>0.7 ) then
+                ii = 1
+                else 
+                    ii=2
+                end if
             do kc=1,nxm
-                ackl_b=1.0/(1.0-ac3ssk(kc)*betadx)
+                ackl_b=1.0/(1.0-ac3ssk(kc,ii)*betadx)
                 rhs(kc,jc,ic)=rhs(kc,jc,ic)*ackl_b
             end do
         end do
