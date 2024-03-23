@@ -16,7 +16,7 @@ subroutine SolveImpEqnUpdate_Temp_ibm
     ! use param_particle      ! SL
     implicit none
     real, dimension(nx) :: amkl,apkl,ackl,fkl
-    integer :: jc,kc,info,ipkv(nxm),ic,km,kp,n
+    integer :: jc,kc,info,ipkv(nxm),ic,km,kp,n,ii
     real :: betadx,ackl_b, Tb
     real :: amkT(nxm-1),ackT(nxm),apkT(nxm-1),appk(nxm-2)
     ! real :: kcpp,kcpm       ! SL
@@ -36,19 +36,18 @@ subroutine SolveImpEqnUpdate_Temp_ibm
 
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
-
+           ii =1 
 !   Normalize RHS of equation
-
             do kc=1,nxm
 ! SL ==================================================   
                 ! if(ifparticle.eq.0) then
                 km = max(1,kc - 1)
                 kp = min(kc + 1,nxm)
                 if (ibmaskt(kc,jc,ic) == 2) then ! Liquid phase
-                    ackl_b=1.0d0/(1.0d0-ac3ssk(kc)*betadx)
-                    amkl(kc)=-am3ssk(kc)*betadx*ackl_b
+                    ackl_b=1.0d0/(1.0d0-ac3ssk(kc,ii)*betadx)
+                    amkl(kc)=-am3ssk(kc,ii)*betadx*ackl_b
                     ackl(kc)=1.d0
-                    apkl(kc)=-ap3ssk(kc)*betadx*ackl_b
+                    apkl(kc)=-ap3ssk(kc,ii)*betadx*ackl_b
                     fkl(kc) = rhs(kc,jc,ic)*ackl_b
                 elseif (ibmaskt(kc,jc,ic) == 0) then ! Solid phase
                     amkl(kc) = 0.d0
