@@ -380,7 +380,7 @@ subroutine CreateInitialConditions
                     vx(k,j,i) = 0.0
                     vy(k,j,i) = 0.0
                     vz(k,j,i) = 0.0
-                    temp(k,j,i) = 0.0
+                    temp(k,j,i) = 0.5
                 end do
             end do
         end do

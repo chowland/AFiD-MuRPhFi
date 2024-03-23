@@ -140,7 +140,7 @@ program AFiD
         757 format(/,2x,' dxr=',es10.3,' dyr=',es10.3,' dzr=',es10.3,/)
         end if
     endif
-
+   
 !m===================================
 !m===================================
     if (ismaster .and. multires) then
@@ -222,7 +222,6 @@ program AFiD
         call InterpTempMultigrid
         call InterpPhiMultigrid
     end if
-
 !EP   Update all relevant halos
     if (salinity) then
         call update_halo(vxr,lvlhalo)
