@@ -1,6 +1,7 @@
 !> Module adding evolution of a specific humidity field to AFiD
 !! following Vallis et al. (2019) J. Fluid Mech.
 module afid_moisture
+   
     use param
     use decomp_2d, only: xstart, xend, nrank, update_halo
     use AuxiliaryRoutines
@@ -344,25 +345,25 @@ subroutine ImplicitHumidity
             do kc=1,nxm
                 ! Second xx derivative
                 ! Apply lower BC
-                if (kc==1) then
-                    dxxq = humid(kc+1,jc,ic)*ap3ssk(kc) &
-                         + humid(kc  ,jc,ic)*ac3ssk(kc) &
-                         - (ap3ssk(kc) + ac3ssk(kc))*humbp(1,jc,ic)*qfixS
+                !if (kc==1) then
+                 !   dxxq = humid(kc+1,jc,ic)*ap3ssk(kc) &
+                  !       + humid(kc  ,jc,ic)*ac3ssk(kc) &
+                   !      - (ap3ssk(kc) + ac3ssk(kc))*humbp(1,jc,ic)*qfixS
                 ! Apply upper BC
-                elseif (kc==nxm) then
-                    dxxq = -(am3ssk(kc) + ac3ssk(kc))*humtp(1,jc,ic)*qfixN &
-                         + humid(kc  ,jc,ic)*ac3ssk(kc) &
-                         + humid(kc-1,jc,ic)*am3ssk(kc)
+                !elseif (kc==nxm) then
+                 !   dxxq = -(am3ssk(kc) + ac3ssk(kc))*humtp(1,jc,ic)*qfixN &
+                  !       + humid(kc  ,jc,ic)*ac3ssk(kc) &
+                   !      + humid(kc-1,jc,ic)*am3ssk(kc)
                 ! Compute dxxq in the interior
-                else
-                    dxxq = humid(kc+1,jc,ic)*ap3ssk(kc) &
-                         + humid(kc  ,jc,ic)*ac3ssk(kc) &
-                         + humid(kc-1,jc,ic)*am3ssk(kc)
-                end if
+               ! else
+                !    dxxq = humid(kc+1,jc,ic)*ap3ssk(kc) &
+                 !        + humid(kc  ,jc,ic)*ac3ssk(kc) &
+                  !       + humid(kc-1,jc,ic)*am3ssk(kc)
+               ! end if
 
-                rhs(kc,jc,ic) = (ga*rkhumid(kc,jc,ic) + ro*hkhumid(kc,jc,ic) + alpec*dxxq)*dt
+                !rhs(kc,jc,ic) = (ga*rkhumid(kc,jc,ic) + ro*hkhumid(kc,jc,ic) + alpec*dxxq)*dt
                 
-                hkhumid(kc,jc,ic) = rkhumid(kc,jc,ic)
+                !hkhumid(kc,jc,ic) = rkhumid(kc,jc,ic)
 
             end do
         end do
@@ -382,38 +383,38 @@ subroutine SolveImpEqnUpdate_Humidity
     betadx = 0.5d0*al*dt/pecq
 
     ! Construct tridiagonal matrix for LHS
-    do kc=1,nxm
-        ackl_b = 1.d0/(1.d0 - ac3ssk(kc)*betadx)
-        amkl(kc) = -am3ssk(kc)*betadx*ackl_b
-        ackl(kc) = 1.d0
-        apkl(kc) = -ap3ssk(kc)*betadx*ackl_b
-    end do
+    !do kc=1,nxm
+     !   ackl_b = 1.d0/(1.d0 - ac3ssk(kc)*betadx)
+      !  amkl(kc) = -am3ssk(kc)*betadx*ackl_b
+       ! ackl(kc) = 1.d0
+       ! apkl(kc) = -ap3ssk(kc)*betadx*ackl_b
+   ! end do
     
-    amkq = amkl(2:nxm)
-    ackq = ackl(1:nxm)
-    apkq = apkl(1:(nxm-1))
+    !amkq = amkl(2:nxm)
+    !ackq = ackl(1:nxm)
+    !apkq = apkl(1:(nxm-1))
 
-    call dgttrf(nxm, amkq, ackq, apkq, appk, ipkv, info)
+    !call dgttrf(nxm, amkq, ackq, apkq, appk, ipkv, info)
 
-    nrhs = (xend(3)-xstart(3)+1)*(xend(2)-xstart(2)+1)
-    do ic=xstart(3),xend(3)
-        do jc=xstart(2),xend(2)
-            do kc=1,nxm
-                ackl_b = 1.0/(1.0 - ac3ssk(kc)*betadx)
-                rhs(kc,jc,ic) = rhs(kc,jc,ic)*ackl_b
-            end do
-        end do
-    end do
+   ! nrhs = (xend(3)-xstart(3)+1)*(xend(2)-xstart(2)+1)
+    !do ic=xstart(3),xend(3)
+     !   do jc=xstart(2),xend(2)
+      !      do kc=1,nxm
+       !         ackl_b = 1.0/(1.0 - ac3ssk(kc)*betadx)
+        !        rhs(kc,jc,ic) = rhs(kc,jc,ic)*ackl_b
+         !   end do
+      !  end do
+    !end do
 
-    call dgttrs('N', nxm, nrhs, amkq, ackq, apkq, appk, ipkv, rhs(1:nxm,:,:), nxm, info)
+    !call dgttrs('N', nxm, nrhs, amkq, ackq, apkq, appk, ipkv, rhs(1:nxm,:,:), nxm, info)
 
-    do ic=xstart(3),xend(3)
-        do jc=xstart(2),xend(2)
-            do kc=1,nxm
-                humid(kc,jc,ic) = humid(kc,jc,ic) + rhs(kc,jc,ic)
-            end do
-        end do
-    end do
+    !do ic=xstart(3),xend(3)
+     !   do jc=xstart(2),xend(2)
+      !      do kc=1,nxm
+       !         humid(kc,jc,ic) = humid(kc,jc,ic) + rhs(kc,jc,ic)
+        !    end do
+       ! end do
+    !end do
     
 end subroutine SolveImpEqnUpdate_Humidity
 
@@ -533,5 +534,6 @@ subroutine CreateMoistH5Groups(filename)
     call h5fclose_f(file_id, hdf_error)
 
 end subroutine CreateMoistH5Groups
+
 
 end module afid_moisture
