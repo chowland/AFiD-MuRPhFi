@@ -13,8 +13,8 @@ subroutine CreateGrid
     use AuxiliaryRoutines
     use GridModule
     implicit none
-
-    integer :: kc
+    real, dimension(nx) :: ap3ssk_D, ac3ssk_D, am3ssk_D, ap3ssk_N, ac3ssk_N, am3ssk_N
+    integer :: kc, i
 
     do kc=1,nxm
         kmv(kc)=kc-1
@@ -174,7 +174,20 @@ subroutine CreateGrid
 !    TEMPERATURE DIFFERENTIATION
 !
 
-    call second_derivative_coeff(ap3ssk, ac3ssk, am3ssk, xm(1:nxm), alx3, TfixN, TfixS)
+    call second_derivative_coeff(ap3ssk_D, ac3ssk_D, am3ssk_D, xm(1:nxm), alx3, TfixN, TfixS)
+    call second_derivative_coeff(ap3ssk_N, ac3ssk_N, am3ssk_N, xm(1:nxm), alx3, TfixN, 0)
+    
+    do i = 1, nx
+        ap3ssk(i,1) = ap3ssk_D(i)
+        ap3ssk(i,2) = ap3ssk_N(i)
+        
+        ac3ssk(i,1) = ac3ssk_D(i)
+        ac3ssk(i,2) = ac3ssk_N(i)
+        
+        am3ssk(i,1) = am3ssk_D(i)
+        am3ssk(i,2) = am3ssk_N(i)
+        
+   end do
 
     return
 end subroutine CreateGrid
