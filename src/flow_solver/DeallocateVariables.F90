@@ -41,9 +41,13 @@ subroutine DeallocateVariables
     call DestroyReal1DArray(ac3sk)
     call DestroyReal1DArray(am3sk)
 
-    call DestroyReal1DArray(ap3ssk)
-    call DestroyReal1DArray(ac3ssk)
-    call DestroyReal1DArray(am3ssk)
+    !call DestroyReal1DArray(ap3ssk)
+    !call DestroyReal1DArray(ac3ssk)
+    !call DestroyReal1DArray(am3ssk)
+
+    call DestroyReal2DArray(ap3ssk)
+    call DestroyReal2DArray(ac3ssk)
+    call DestroyReal2DArray(am3ssk)
 
     call DestroyInt1dArray(kmc)
     call DestroyInt1dArray(kpc)

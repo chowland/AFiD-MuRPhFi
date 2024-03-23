@@ -54,7 +54,11 @@ module param
     !******* Metric coefficients *******************************
     real, allocatable, dimension(:) :: ap3ck,ac3ck,am3ck
     real, allocatable, dimension(:) :: ap3sk,ac3sk,am3sk
-    real, allocatable, dimension(:) :: ap3ssk,ac3ssk,am3ssk
+    !real, allocatable, dimension(:) :: ap3ssk,ac3ssk,am3ssk
+    !real, allocatable, dimension(:) :: ac3ssk,am3ssk
+    real, allocatable, dimension(:,:) ::ap3ssk,ac3ssk,am3ssk
+
+
     !============================================================
 
     !===========================================================

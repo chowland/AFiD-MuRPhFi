@@ -46,9 +46,14 @@ subroutine InitVariables
     call AllocateReal1DArray(ac3sk,1,nx)
     call AllocateReal1DArray(am3sk,1,nx)
 
-    call AllocateReal1DArray(ap3ssk,1,nx)
-    call AllocateReal1DArray(ac3ssk,1,nx)
-    call AllocateReal1DArray(am3ssk,1,nx)
+    !call AllocateReal1DArray(ap3ssk,1,nx)
+    !call AllocateReal1DArray(ac3ssk,1,nx)
+    !call AllocateReal1DArray(am3ssk,1,nx)
+
+    call AllocateReal2DArray(ap3ssk,1,nx,1,2)
+    call AllocateReal2DArray(ac3ssk,1,nx,1,2)
+    call AllocateReal2DArray(am3ssk,1,nx,1,2)
+
 
     call AllocateInt1dArray(kmc,1,nx)
     call AllocateInt1dArray(kpc,1,nx)
