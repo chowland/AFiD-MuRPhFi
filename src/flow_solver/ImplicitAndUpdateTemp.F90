@@ -17,7 +17,7 @@ subroutine ImplicitAndUpdateTemp
     use ibm_param
     implicit none
     integer :: jc,kc,ic,ii
-    real    :: alpec,dxxt
+    real    :: alpec,dxxt, FlagBC
 
     alpec=al/pect
 
@@ -35,15 +35,17 @@ subroutine ImplicitAndUpdateTemp
             do kc=1,nxm
                 if (yc(jc)<0.1*YLEN .or.yc(jc)>0.9*YLEN ) then
                     ii = 1
+                    FlagBC = 1
                     else 
                         ii=2
+                        FlagBC=0
                     end if
 !   Calculate second derivative of temperature in the x-direction.
 !   This is the only term calculated implicitly for temperature.
                 if (kc.eq.1) then       !CJH Apply lower BC
                     dxxt = temp(kc+1,jc,ic)*ap3ssk(kc,ii) &
                         + temp(kc,jc,ic)*ac3ssk(kc,ii) &
-                        - (ap3ssk(kc,ii)+ac3ssk(kc,ii))*tempbp(1,jc,ic)*TfixS
+                        - (ap3ssk(kc,ii)+ac3ssk(kc,ii))*tempbp(1,jc,ic)*FlagBC
                 elseif(kc.eq.nxm) then  !CJH Apply upper BC
                     dxxt = temp(kc,jc,ic)*ac3ssk(kc,ii) &
                         + temp(kc-1,jc,ic)*am3ssk(kc,ii) &

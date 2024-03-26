@@ -1,6 +1,6 @@
 Base grid resolution / number of substeps
 NXM     NYM     NZM     NSST(>1=RK,else AB)
-256      48     1       3
+48      48     1       3
 
 Refined grid: on/off and grid size
 MULTIRES    NXMR    NYMR    NZMR
@@ -16,11 +16,11 @@ NREAD       IRESET
 
 Time steps / time limit (wall/flow) 
 NTST        WALLTIMEMAX     TMAX
-100000000     70000000      50000000.0
+10000000     35000            1000.0
 
 Time interval for saving stats/movie frames
 TOUT    TFRAME  SAVE_3D
-0.2      10.0     50.0
+0.2      1.0     50.0
 
 Domain size (keep ALX3 = 1.0)
 ALX3   YLEN   ZLEN
