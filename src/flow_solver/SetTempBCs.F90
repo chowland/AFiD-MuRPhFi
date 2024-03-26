@@ -78,7 +78,7 @@ subroutine SetTempBCs
         ProfileTemp = -1.0 + real(ii - 1) * 2.0/real(nym - 1) 
         values(ii) = (1.0 + tanh(5*ProfileTemp)) / 2.0  ! JFM Limiting regimes of turbulent horizontal convection. Part I: Intermediate and low Prandtl numbers
         
-        values(ii) = yc(ii)/YLEN !Linear
+        values(ii) = xm(ii)/YLEN !Linear
     end do
     if (RayS<0) then 
         do ic=xstart(3),xend(3)
