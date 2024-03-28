@@ -37,7 +37,7 @@
         call WriteFlowField(.true.)
         if (specwrite) then
           call WriteTemporalAverages
-          call WriteSpectra
+          !call WriteSpectra
         end if
       else
         call MPI_Abort(MPI_COMM_WORLD, 1, ierr)
@@ -52,7 +52,7 @@
       if (moist) call DeallocateMoistVariables
       if (specwrite) then
         call DeallocateAveragingVariables
-        call DeallocateSpectra
+        !call DeallocateSpectra
       end if
       call HdfClose
       call decomp_2d_fft_finalize

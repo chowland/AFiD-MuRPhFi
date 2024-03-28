@@ -198,7 +198,7 @@ program AFiD
 
     if (specwrite) then
         call InitAveragingVariables
-        call InitSpectra
+        !call InitSpectra
     end if
 
 !EP   Update all relevant halos
@@ -317,7 +317,7 @@ program AFiD
 
         if (specwrite .and. time > tav_start) then
             call UpdateTemporalAverages
-            call UpdateSpectra
+            !call UpdateSpectra
         end if
 
         time=time+dt
