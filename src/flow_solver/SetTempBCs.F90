@@ -85,9 +85,9 @@ subroutine SetTempBCs
             do jc=xstart(2),xend(2)
                 !tempbp(1,jc,ic)= values(jc) 
                 if (jc<nym/2) then
-                    tempbp(1,jc,ic)=abs(1)
+                    tempbp(1,jc,ic)=0.5d0!abs(1)
                 else 
-                    tempbp(1,jc,ic)=0.0d0
+                    tempbp(1,jc,ic)=-0.5d0!0
                 end if 
                 temptp(1,jc,ic)=0.0
             end do
