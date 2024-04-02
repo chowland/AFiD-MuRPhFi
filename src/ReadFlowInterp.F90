@@ -6,7 +6,7 @@ subroutine ReadFlowInterp(prow,pcol)
     use input_grids
     use afid_salinity
     use afid_phasefield
-    use afid_moisture, only: humid
+    use afid_moisture, only: humid, InterpInputHum
     use AuxiliaryRoutines
     
     implicit none
@@ -120,6 +120,8 @@ subroutine ReadFlowInterp(prow,pcol)
                     xstarto, xendo, xsizeo)
 
         call InterpInputVel
+
+        if (moist) call InterpInputHum
 
         if (ismaster) write(*,*) "Velocity and T interpolated"
 
