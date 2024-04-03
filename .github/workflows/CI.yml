@@ -16,20 +16,22 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # - name: Install GFortran # NB gfortran and build-essential already on VM
       #   run: |
-      #     sudo apt install build-essential gfortran
+      #     sudo apt-get install build-essential gfortran
 
       - name: Install BLAS and LAPACK
-        run: sudo apt install libblas-dev liblapack-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install libblas-dev liblapack-dev
 
       - name: Install Parallel HDF5
-        run: sudo apt install libhdf5-mpich-dev
+        run: sudo apt-get install libhdf5-openmpi-dev
 
       - name: Install FFTW library
-        run: sudo apt install libfftw3-dev
+        run: sudo apt-get install libfftw3-dev
 
       - name: Build AFiD
         run: make
