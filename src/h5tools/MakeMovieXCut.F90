@@ -30,6 +30,7 @@ subroutine Mkmov_xcut
     ic = 1
     if (RayS < 0 .and. RayT < 0) ic = nxm/2
     if (IBM) ic = nxm/2
+    if (moist) ic = nxm/2
 
     ! Record filename as string
     filename = trim("outputdir/flowmov/movie_xcut.h5")
