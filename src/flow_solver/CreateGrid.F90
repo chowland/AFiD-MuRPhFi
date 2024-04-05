@@ -173,9 +173,14 @@ subroutine CreateGrid
 !
 !    TEMPERATURE DIFFERENTIATION
 !
-
-    call second_derivative_coeff(ap3ssk_D, ac3ssk_D, am3ssk_D, xm(1:nxm), alx3, TfixN, TfixS)
-    call second_derivative_coeff(ap3ssk_N, ac3ssk_N, am3ssk_N, xm(1:nxm), alx3, TfixN, 0)
+    if (TfixS ==  1) then
+        call second_derivative_coeff(ap3ssk_D, ac3ssk_D, am3ssk_D, xm(1:nxm), alx3, TfixN, TfixS)
+    else if (TfixS ==  0) then
+        call second_derivative_coeff(ap3ssk_N, ac3ssk_N, am3ssk_N, xm(1:nxm), alx3, TfixN, 0)
+    else 
+        call second_derivative_coeff(ap3ssk_D, ac3ssk_D, am3ssk_D, xm(1:nxm), alx3, TfixN, TfixS)
+        call second_derivative_coeff(ap3ssk_N, ac3ssk_N, am3ssk_N, xm(1:nxm), alx3, TfixN, 0)
+    end if
     
     do i = 1, nx
         ap3ssk(i,1) = ap3ssk_D(i)

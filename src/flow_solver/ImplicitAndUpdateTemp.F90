@@ -17,8 +17,7 @@ subroutine ImplicitAndUpdateTemp
     use ibm_param
     implicit none
     integer :: jc,kc,ic,ii
-    real    :: alpec,dxxt, FlagBC
-
+    real    :: alpec,dxxt, FlagBC,FixTempRegion
     alpec=al/pect
 
 !$OMP  PARALLEL DO &
@@ -30,16 +29,27 @@ subroutine ImplicitAndUpdateTemp
 !$OMP   PRIVATE(ic,jc,kc,km,kp) &
 !$OMP   PRIVATE(amm,acc,app) &
 !$OMP   PRIVATE(dxxt)
+    FixTempRegion =  abs(TfixS) - (abs(TfixS)/10)*10
+    FixTempRegion = 0.1*FixTempRegion
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
+
             do kc=1,nxm
-                if (yc(jc)<0.1*YLEN .or.yc(jc)>0.9*YLEN ) then
-                    ii = 1
-                    FlagBC = 1
-                    else 
+                    if (TfixS == 1) then
+                        ii = 1
+                        FlagBC = 1
+                    else  if (TfixS == 0) then
                         ii=2
                         FlagBC=0
-                    end if
+                    else
+                        if (yc(jc) < FixTempRegion * YLEN  .or. yc(jc) > YLEN - FixTempRegion * YLEN ) then                       
+                            ii = 1
+                            FlagBC = 1
+                        else 
+                            ii=2
+                            FlagBC=0
+                        end if
+                    end if 
 !   Calculate second derivative of temperature in the x-direction.
 !   This is the only term calculated implicitly for temperature.
                 if (kc.eq.1) then       !CJH Apply lower BC

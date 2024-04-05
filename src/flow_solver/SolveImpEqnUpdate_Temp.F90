@@ -15,20 +15,27 @@ subroutine SolveImpEqnUpdate_Temp
     implicit none
     real, dimension(nx) :: amkl,apkl,ackl
     integer :: jc,kc,info,ipkv(nxm),ic,nrhs,ii
-    real :: betadx,ackl_b
+    real :: betadx,ackl_b,FixTempRegion
     real :: amkT(nxm-1),ackT(nxm),apkT(nxm-1),appk(nxm-2)
 
 !     Calculate the coefficients of the tridiagonal matrix
 !     The coefficients are normalized to prevent floating
 !     point errors.
-
+    FixTempRegion =  abs(TfixS) - (abs(TfixS)/10)*10
+    FixTempRegion = 0.1*FixTempRegion
     betadx=0.5d0*al*dt/pect
     do jc=xstart(2),xend(2)
-    if (yc(jc)<0.1*YLEN .or.yc(jc)>0.9*YLEN ) then
-            ii = 1
-    else 
+    if (TfixS == 1) then
+        ii = 1
+    else  if (TfixS == 0) then
         ii=2
-    end if
+    else
+        if (yc(jc) < FixTempRegion * YLEN  .or. yc(jc) >  YLEN -FixTempRegion * YLEN ) then                       
+            ii = 1
+        else 
+            ii=2
+        end if
+    end if 
     do kc=1,nxm
         ackl_b=1.0d0/(1.0d0-ac3ssk(kc,ii)*betadx)
         amkl(kc)=-am3ssk(kc,ii)*betadx*ackl_b
