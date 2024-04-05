@@ -13,6 +13,7 @@ program AFiD
     use afid_phasefield
     use afid_averaging
     use afid_spectra
+    use afid_sides, only: SetSidewallBCs
     use h5_tools, only: InitSliceCommunicators
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 

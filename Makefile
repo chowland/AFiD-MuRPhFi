@@ -97,7 +97,7 @@ OBJS = obj/main.o obj/CalcMaxCFL.o \
 	obj/SetTempBCs.o obj/SolveImpEqnUpdate_Temp.o obj/SolveImpEqnUpdate_X.o \
 	obj/SolveImpEqnUpdate_YZ.o \
 	obj/TimeMarcher.o obj/WriteFlowField.o obj/WriteGridInfo.o \
-	obj/CalcWriteQ.o obj/GlobalQuantities.o obj/ReadFlowInterp.o obj/SetSidewallBCs.o
+	obj/CalcWriteQ.o obj/GlobalQuantities.o obj/ReadFlowInterp.o
 
 # Object files associated with multiple resolution grids
 OBJS += obj/CreateMgrdGrid.o obj/InitMgrdVariables.o \
@@ -121,7 +121,7 @@ OBJS += obj/mean_zplane.o
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
 	obj/fft.o obj/pressure.o obj/HermiteInterpolations.o obj/grid.o obj/h5_tools.o obj/means.o \
 	obj/ibm_param.o obj/IBMTools.o obj/moisture.o obj/salinity.o obj/phasefield.o \
-	obj/time_averaging.o obj/spectra.o
+	obj/time_averaging.o obj/spectra.o obj/sidewalls.o
 
 #=======================================================================
 #  Files that create modules:
@@ -176,6 +176,8 @@ $(OBJDIR)/moisture.o: src/moisture.F90
 $(OBJDIR)/time_averaging.o: src/time_averaging.F90
 	$(FC) -c -o $@ $<
 $(OBJDIR)/spectra.o: src/spectra.F90 obj/time_averaging.o obj/pressure.o
+	$(FC) -c -o $@ $<
+$(OBJDIR)/sidewalls.o: src/sidewalls.F90
 	$(FC) -c -o $@ $<
 $(OBJDIR)/%.o: src/%.F90 $(MOBJS)
 	$(FC) -c -o $@ $<

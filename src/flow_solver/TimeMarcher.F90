@@ -21,6 +21,7 @@ subroutine TimeMarcher
     use decomp_2d
     use ibm_param, only: aldto
     use afid_moisture
+    use afid_sides, only: SetSidewallBCs
     implicit none
     integer :: ns
     integer :: j,k,i

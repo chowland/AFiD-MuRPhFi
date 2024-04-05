@@ -94,69 +94,6 @@ module param
 
     logical :: sidewall = .false.     !! Flag to determine whether to impose sidewalls in y and z (using a DCT)
 
-    !! Sidewall boundary conditions
-    logical :: bc_vx_y_fix_lo = .true.      !! Dirichlet/Neumann flag for lower y BC for vx
-    logical :: bc_vx_y_fix_up = .true.      !! Dirichlet/Neumann flag for upper y BC for vx
-    logical :: bc_vx_z_fix_lo = .false.     !! Dirichlet/Neumann flag for lower z BC for vx
-    logical :: bc_vx_z_fix_up = .false.     !! Dirichlet/Neumann flag for upper z BC for vx
-
-    logical :: bc_vy_z_fix_lo = .false.     !! Dirichlet/Neumann flag for lower z BC for vy
-    logical :: bc_vy_z_fix_up = .false.     !! Dirichlet/Neumann flag for upper z BC for vy
-
-    logical :: bc_vz_y_fix_lo = .true.      !! Dirichlet/Neumann flag for lower y BC for vz
-    logical :: bc_vz_y_fix_up = .true.      !! Dirichlet/Neumann flag for upper y BC for vz
-
-    logical :: bc_temp_y_fix_lo = .false.   !! Dirichlet/Neumann flag for lower y BC for temperature
-    logical :: bc_temp_y_fix_up = .false.   !! Dirichlet/Neumann flag for upper y BC for temperature
-    logical :: bc_temp_z_fix_lo = .false.   !! Dirichlet/Neumann flag for lower z BC for temperature
-    logical :: bc_temp_z_fix_up = .false.   !! Dirichlet/Neumann flag for upper z BC for temperature
-
-    logical :: bc_sal_y_fix_lo = .false.    !! Dirichlet/Neumann flag for lower y BC for salinity
-    logical :: bc_sal_y_fix_up = .false.    !! Dirichlet/Neumann flag for upper y BC for salinity
-    logical :: bc_sal_z_fix_lo = .false.    !! Dirichlet/Neumann flag for lower z BC for salinity
-    logical :: bc_sal_z_fix_up = .false.    !! Dirichlet/Neumann flag for upper z BC for salinity
-
-    logical :: bc_phi_y_fix_lo = .false.    !! Dirichlet/Neumann flag for lower y BC for phase-field
-    logical :: bc_phi_y_fix_up = .false.    !! Dirichlet/Neumann flag for upper y BC for phase-field
-    logical :: bc_phi_z_fix_lo = .false.    !! Dirichlet/Neumann flag for lower z BC for phase-field
-    logical :: bc_phi_z_fix_up = .false.    !! Dirichlet/Neumann flag for upper z BC for phase-field
-
-    logical :: bc_humid_y_fix_lo = .false.  !! Dirichlet/Neumann flag for lower y BC for humidity
-    logical :: bc_humid_y_fix_up = .false.  !! Dirichlet/Neumann flag for upper y BC for humidity
-    logical :: bc_humid_z_fix_lo = .false.  !! Dirichlet/Neumann flag for lower z BC for humidity
-    logical :: bc_humid_z_fix_up = .false.  !! Dirichlet/Neumann flag for upper z BC for humidity
-
-    real :: bc_vx_y_val_lo = 0.0        !! Boundary (flux?) value for lower y BC for vx
-    real :: bc_vx_y_val_up = 0.0        !! Boundary (flux?) value for upper y BC for vx
-    real :: bc_vx_z_val_lo = 0.0        !! Boundary (flux?) value for lower z BC for vx
-    real :: bc_vx_z_val_up = 0.0        !! Boundary (flux?) value for upper z BC for vx
-
-    real :: bc_vy_z_val_lo = 0.0        !! Boundary (flux?) value for lower z BC for vy
-    real :: bc_vy_z_val_up = 0.0        !! Boundary (flux?) value for upper z BC for vy
-
-    real :: bc_vz_y_val_lo = 0.0        !! Boundary (flux?) value for lower y BC for vz
-    real :: bc_vz_y_val_up = 0.0        !! Boundary (flux?) value for upper y BC for vz
-
-    real :: bc_temp_y_val_lo = 0.0      !! Boundary (flux?) value for lower y BC for temperature
-    real :: bc_temp_y_val_up = 0.0      !! Boundary (flux?) value for upper y BC for temperature
-    real :: bc_temp_z_val_lo = 0.0      !! Boundary (flux?) value for lower z BC for temperature
-    real :: bc_temp_z_val_up = 0.0      !! Boundary (flux?) value for upper z BC for temperature
-
-    real :: bc_sal_y_val_lo = 0.0       !! Boundary (flux?) value for lower y BC for salinity
-    real :: bc_sal_y_val_up = 0.0       !! Boundary (flux?) value for upper y BC for salinity
-    real :: bc_sal_z_val_lo = 0.0       !! Boundary (flux?) value for lower z BC for salinity
-    real :: bc_sal_z_val_up = 0.0       !! Boundary (flux?) value for upper z BC for salinity
-
-    real :: bc_phi_y_val_lo = 0.0       !! Boundary (flux?) value for lower y BC for phase-field
-    real :: bc_phi_y_val_up = 0.0       !! Boundary (flux?) value for upper y BC for phase-field
-    real :: bc_phi_z_val_lo = 0.0       !! Boundary (flux?) value for lower z BC for phase-field
-    real :: bc_phi_z_val_up = 0.0       !! Boundary (flux?) value for upper z BC for phase-field
-
-    real :: bc_humid_y_val_lo = 0.0     !! Boundary (flux?) value for lower y BC for humidity
-    real :: bc_humid_y_val_up = 0.0     !! Boundary (flux?) value for upper y BC for humidity
-    real :: bc_humid_z_val_lo = 0.0     !! Boundary (flux?) value for lower z BC for humidity
-    real :: bc_humid_z_val_up = 0.0     !! Boundary (flux?) value for upper z BC for humidity
-
 end module param
 
 !************* End of param module******************************

@@ -11,6 +11,7 @@ subroutine ReadInputFile
     use ibm_param, only: solidtype
     use afid_salinity, only: RayS, PraS, bycs, PecS, SfixN, SfixS
     use afid_phasefield, only: pf_A, pf_D, pf_eps, pf_Lambda, pf_S, pf_Tm
+    use afid_sides, only: ReadSidewallInput
     implicit none
     character(len=4) :: dummy
     integer :: flagmelt
@@ -136,53 +137,3 @@ subroutine ReadInputFile
 
     return
 end subroutine ReadInputFile
-
-!> Read the sidewall.in input file to specify the boundary conditions in y and z
-subroutine ReadSidewallInput
-    use param
-    implicit none
-    integer :: i
-    character(len=4) :: dummy
-
-    open(unit=15,file='sidewall.in',status='old')
-        do i=1,7
-            read(15,301) dummy
-        end do
-        read(15,*) bc_vx_y_fix_lo, bc_vx_y_val_lo, bc_vx_y_fix_up,  bc_vx_y_val_up
-        read(15,301) dummy
-        read(15,*) bc_vx_z_fix_lo, bc_vx_z_val_lo, bc_vx_z_fix_up,  bc_vx_z_val_up
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,*) bc_vy_z_fix_lo, bc_vy_z_val_lo, bc_vy_z_fix_up,  bc_vy_z_val_up
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,*) bc_vz_y_fix_lo, bc_vz_y_val_lo, bc_vz_y_fix_up,  bc_vz_y_val_up
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,*) bc_temp_y_fix_lo, bc_temp_y_val_lo, bc_temp_y_fix_up,  bc_temp_y_val_up
-        read(15,301) dummy
-        read(15,*) bc_temp_z_fix_lo, bc_temp_z_val_lo, bc_temp_z_fix_up,  bc_temp_z_val_up
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,*) bc_sal_y_fix_lo, bc_sal_y_val_lo, bc_sal_y_fix_up,  bc_sal_y_val_up
-        read(15,301) dummy
-        read(15,*) bc_sal_z_fix_lo, bc_sal_z_val_lo, bc_sal_z_fix_up,  bc_sal_z_val_up
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,*) bc_phi_y_fix_lo, bc_phi_y_val_lo, bc_phi_y_fix_up,  bc_phi_y_val_up
-        read(15,301) dummy
-        read(15,*) bc_phi_z_fix_lo, bc_phi_z_val_lo, bc_phi_z_fix_up,  bc_phi_z_val_up
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,301) dummy
-        read(15,*) bc_humid_y_fix_lo, bc_humid_y_val_lo, bc_humid_y_fix_up,  bc_humid_y_val_up
-        read(15,301) dummy
-        read(15,*) bc_humid_z_fix_lo, bc_humid_z_val_lo, bc_humid_z_fix_up,  bc_humid_z_val_up
-    301     format(a4)
-    close(15)
-end subroutine ReadSidewallInput
