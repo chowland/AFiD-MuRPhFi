@@ -92,6 +92,7 @@ subroutine SetSidewallBCs
         end if
     end if
     if (xstart(3)==1) then
+        if (  .not. periodic_bc(3)) then
         if (bc_vx_z_fix_lo) then
             do n=1,lvlhalo
                 vx(:,:,1-n) = 2.0*bc_vx_z_val_lo - vx(:,:,n)
@@ -156,7 +157,7 @@ subroutine SetSidewallBCs
             end if
         end if
     end if
-
+    end if
     !! Right wall
     if (xend(2)==nym) then
         if (bc_vx_y_fix_up) then
@@ -223,6 +224,7 @@ subroutine SetSidewallBCs
         end if
     end if
     if (xend(3)==nzm) then
+        if ( .not. periodic_bc(3)) then
         if (bc_vx_z_fix_up) then
             do n=1,lvlhalo
                 vx(:,:,nzm+n) = 2.0*bc_vx_z_val_up - vx(:,:,nzm+1-n)
@@ -286,4 +288,5 @@ subroutine SetSidewallBCs
             end if
         end if
     end if
+end if
 end subroutine SetSidewallBCs

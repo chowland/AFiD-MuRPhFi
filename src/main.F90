@@ -26,11 +26,13 @@ program AFiD
     integer :: prow=0,pcol=0
     integer :: lfactor,lfactor2
     character(100) :: arg
-    logical, dimension(3) :: periodic_bc        !! Flags for which dimensions have periodic boundary conditions
     logical :: write_mean_planes=.true.!, nanexist
     ! real,allocatable,dimension(:,:) :: dummy,dscan,dbot
     ! integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
+    !integer :: common_variable
+   ! logical :: is_common_initialized = .false.
+ 
 !*******************************************************
 !******* Read input file bou.in by all processes********
 !*******************************************************
@@ -51,13 +53,16 @@ program AFiD
         call get_command_argument(2,arg)
         read(arg,'(i10)') pcol
     endif
+    !periodic_bc = [.false., .false., .true.]
 
     if (sidewall) then
-        periodic_bc = [.false., .false., .false.]
+        if ((active_S==0) .and. (active_T==1) .and. (gAxis==1)) then
+         else
+           ! periodic_bc = [.false., .false., .false.]
+        end if
     else
-        periodic_bc = [.false., .true., .true.]
+       ! periodic_bc = [.false., .true., .true.]
     end if
-
     call decomp_2d_init(nxm ,nym ,nzm ,&
                         nxmr,nymr,nzmr,&
                         prow,pcol,&
@@ -200,6 +205,9 @@ program AFiD
         call InitAveragingVariables
         call InitSpectra
     end if
+              
+ 
+    
 
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)
@@ -212,6 +220,7 @@ program AFiD
     if (moist) call UpdateSaturation
     if (sidewall) call SetSidewallBCs
 
+            
 
 !CS   Interpolate initial values
     if (salinity) then
@@ -267,7 +276,7 @@ program AFiD
 !      else
 !       if(ismaster) write(6,*)ntime,time,dt,dmax,tempm,tempmax,tempmin !RO Fix??
 !      end if
-!
+!   
 
     if(ismaster) then
        tin(2) = MPI_WTIME()
@@ -288,7 +297,7 @@ program AFiD
     lfactor=max(lfactor,lfactor2)
     ! if largest factor larger than 7 quit the simulation
     ! if (lfactor>7) errorcode=444
-
+     
     do ntime=0,ntst
         ti(1) = MPI_WTIME()
 
@@ -313,6 +322,7 @@ program AFiD
             if(CFLmr.gt.limitCFL) errorcode = 165
             ! if (ismaster) write(*,*) "CFL value  ",CFLmr
         endif
+
 
         call TimeMarcher
 

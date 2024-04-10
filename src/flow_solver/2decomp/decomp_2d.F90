@@ -749,7 +749,7 @@ contains
   ! Prepare the send / receive buffers for MPI_ALLTOALLV communications
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine prepare_buffer(decomp)
-   use param, only: sidewall
+   use param, only: sidewall,periodic_bc
     
     implicit none
     
@@ -845,7 +845,7 @@ contains
              zranks(index_src)=rank_z
              zweights(index_src)=decomp%zsz(1)*subsize_y*decomp%z2dist(i)
 #endif
-            if (sidewall) then
+            if (sidewall .and. .not. periodic_bc(3)) then
                call MPI_Type_create_subarray(3,decomp%zsz, &
                   (/decomp%zsz(1),subsize_y,decomp%z2dist(i)/), &
                   (/0,offset_y,decomp%z2st(i)-decomp%zst(3)/), &
@@ -876,8 +876,10 @@ contains
              xranks(index_dest)=rank_x
              xweights(index_dest)=decomp%x1dist(k)*subsize_y*decomp%xsz(3)
 #endif
-            if (sidewall) then
-               call MPI_Type_create_subarray(3,decomp%xsz, &
+
+
+            if (sidewall .and. .not. periodic_bc(3)) then
+              call MPI_Type_create_subarray(3,decomp%xsz, &
                   (/decomp%x1dist(k),subsize_y,decomp%xsz(3)/), &
                   (/decomp%x1st(k)-decomp%xst(1),offset_y,0/), &
                   MPI_ORDER_FORTRAN,real_type,decomp%xtypes_xz(rank_x+1),ierror)

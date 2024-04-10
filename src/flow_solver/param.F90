@@ -24,6 +24,7 @@ module param
     integer   :: nson,idtv
     real      :: tframe, save_3D
     integer   :: active_T, active_S, pf_IC !CJH Option for passive scalars
+  
     !=================================================
     !       end of input file
     !=================================================
@@ -91,9 +92,9 @@ module param
     logical :: specwrite=.false.
 
     integer :: lvlhalo=2
-
+    logical, dimension(3) :: periodic_bc = [.false.  , .false.  , .false. ]
     logical :: sidewall = .false.     !! Flag to determine whether to impose sidewalls in y and z (using a DCT)
-
+    
     !! Sidewall boundary conditions
     logical :: bc_vx_y_fix_lo = .true.      !! Dirichlet/Neumann flag for lower y BC for vx
     logical :: bc_vx_y_fix_up = .true.      !! Dirichlet/Neumann flag for upper y BC for vx

@@ -2,7 +2,7 @@
 !! the fast Fourier transform
 !! N.B. The bulk of the FFT framework is actually in the modified 2decomp library 2decomp_fft
 module afid_fft
-    use param, only: sidewall, nym, nzm, ismaster
+    use param, only: sidewall, nym, nzm, ismaster,periodic_bc
     use mpih
     use decomp_2d_fft
     use iso_c_binding
@@ -117,28 +117,37 @@ subroutine PlanFourierTransform
     iodim_howmany(2) % os = (sp%zen(1)-sp%zst(1)+1)
 
     ! Construct forward plan for z transform
-    if (sidewall) then
-        fwd_guruplan_z = fftw_plan_guru_r2r(1, iodim, &
+    if (sidewall .and. .not. periodic_bc(3)) then
+       fwd_guruplan_z = fftw_plan_guru_r2r(1, iodim, &
             2, iodim_howmany, rz2, rz2, &
             kind_forw, FFTW_ESTIMATE)
-    else
+    else if(sidewall .and.  periodic_bc(3))  then
+        fwd_guruplan_z = fftw_plan_guru_dft_r2c(1, iodim, &
+            2, iodim_howmany, rz2,cz1, &
+             FFTW_ESTIMATE)
+    else 
         fwd_guruplan_z = fftw_plan_guru_dft(1, iodim, &
-            2, iodim_howmany, cz1, cz1, &
-            FFTW_FORWARD, FFTW_ESTIMATE)
-    end if
+        2, iodim_howmany, cz1, cz1, &
+        FFTW_FORWARD, FFTW_ESTIMATE)
+    end if 
+
     
     iodim(1) % n = nzm
     ! Construct backward plan for z transform
-    if (sidewall) then
+    if (sidewall .and. .not. periodic_bc(3)) then
         bwd_guruplan_z = fftw_plan_guru_r2r(1, iodim, &
             2,iodim_howmany,rz2,rz2, &
             kind_back,FFTW_ESTIMATE)
+    else if(sidewall .and.  periodic_bc(3))  then
+        bwd_guruplan_z = fftw_plan_guru_dft_c2r(1, iodim, &
+            2,iodim_howmany,cz1,rz2, &
+            FFTW_ESTIMATE)
     else
         bwd_guruplan_z = fftw_plan_guru_dft(1, iodim, &
-            2,iodim_howmany,cz1,cz1, &
-            FFTW_BACKWARD,FFTW_ESTIMATE)
+        2,iodim_howmany,cz1,cz1, &
+        FFTW_BACKWARD,FFTW_ESTIMATE)
     end if
-    
+        
     if (.not.c_associated(bwd_guruplan_z)) then
         if (ismaster) print*,'Failed to create guru plan. You should'
         if (ismaster) print*,'link with FFTW3 before MKL'

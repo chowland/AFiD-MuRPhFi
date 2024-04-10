@@ -145,9 +145,12 @@ subroutine ReadSidewallInput
     character(len=4) :: dummy
 
     open(unit=15,file='sidewall.in',status='old')
-        do i=1,7
+        do i=1,4
             read(15,301) dummy
         end do
+        read(15,*) periodic_bc(3)
+        read(15,301) dummy
+        read(15,301) dummy
         read(15,*) bc_vx_y_fix_lo, bc_vx_y_val_lo, bc_vx_y_fix_up,  bc_vx_y_val_up
         read(15,301) dummy
         read(15,*) bc_vx_z_fix_lo, bc_vx_z_val_lo, bc_vx_z_fix_up,  bc_vx_z_val_up
