@@ -8,6 +8,23 @@
 !                                                         !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
+function smoothstep(edge0, edge1, x)
+    real :: edge0, edge1, x
+    real :: smoothstep
+
+    x = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0)
+
+    smoothstep = x * x * (3.0 - 2.0 * x)
+end function smoothstep
+
+function clamp(x, lowerlimit, upperlimit)
+    real :: x, lowerlimit, upperlimit
+    real :: clamp
+
+    clamp = min(max(x, lowerlimit), upperlimit)
+end function clamp
+
 subroutine SetTempBCs
     use param
     use decomp_2d
@@ -17,7 +34,7 @@ subroutine SetTempBCs
     implicit none
     integer :: ic,jc, ii
     real, dimension(nym)::  values
-    real :: ProfileTemp
+    real :: ProfileTemp,smoothstep
 
     
     if (rayt>=0) then ! unstable T gradient
@@ -93,6 +110,16 @@ subroutine SetTempBCs
             end do
         end do
     end if
+
+
+    if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
+        do ic=xstart(3),xend(3)
+            do jc=xstart(2),xend(2)
+                tempbp(1,jc,ic)= 0
+                temptp(1,jc,ic) = smoothstep(YLEN/8, YLEN -YLEN/8, yc(jc))
+            end do
+        end do
+    end if 
     call update_halo(temptp,lvlhalo)
     call update_halo(tempbp,lvlhalo)
     

@@ -104,6 +104,7 @@ end subroutine DeallocateSalVariables
 !> Set the values for the boundary planes of salinity
 subroutine SetSalBCs
     integer :: i, j
+    real :: smoothstep
 
     if (rays>=0) then ! unstable S gradient
         do i=xstartr(3),xendr(3)
@@ -129,6 +130,16 @@ subroutine SetSalBCs
         end do
     end if
     
+    if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                salbp(1,j,i) = 0.d0
+                saltp(1,j,i) =  smoothstep(YLEN/8, YLEN -YLEN/8, ycr(j))
+            end do
+        end do
+   
+
+    end if 
     ! Update halo for interpolation routine
     call update_halo(saltp,lvlhalo)
     call update_halo(salbp,lvlhalo)
@@ -147,7 +158,8 @@ subroutine SetSalBCs
                 salbp(1,nymr+j,:) = salbp(1,nymr+1-j,:)
             end do
         end if
-
+        if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
+        else
         if (xstartr(3)==1) then
             do i=1,lvlhalo
                 saltp(1,:,1-i) = saltp(1,:,i)
@@ -161,6 +173,7 @@ subroutine SetSalBCs
             end do
         end if
     end if
+    end if
 
 end subroutine SetSalBCs
 
@@ -173,14 +186,15 @@ subroutine CreateInitialSalinity
     if (IBM) then
         call SetSaltTwoLayer(h0=0.5*alx3, eps=1e-7, stable=.false.)
         call AddSalinityNoise(amp=0.1, localised=.true., h0=0.5*alx3, extent=0.01)
-
+       
     !! Bounded double-diffusive convection (begin with small amplitude noise + BLs)
     else if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
         ! call SetZeroSalinity
+        
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
                 do k=1,nxmr
-                    sal(k,j,i) = 0.5*(2*(xmr(k) - 0.5))**7
+                    sal(k,j,i) = 0.5!0.5*(2*(xmr(k) - 0.5))**7
                 end do
             end do
         end do
@@ -746,5 +760,21 @@ subroutine CreateSalinityH5Groups(filename)
     call h5fclose_f(file_id, hdf_error)
 
 end subroutine CreateSalinityH5Groups
+
+function smoothstep(edge0, edge1, x)
+    real :: edge0, edge1, x
+    real :: smoothstep
+
+    x = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0)
+
+    smoothstep = x * x * (3.0 - 2.0 * x)
+end function smoothstep
+
+function clamp(x, lowerlimit, upperlimit)
+    real :: x, lowerlimit, upperlimit
+    real :: clamp
+
+    clamp = min(max(x, lowerlimit), upperlimit)
+end function clamp
 
 end module afid_salinity

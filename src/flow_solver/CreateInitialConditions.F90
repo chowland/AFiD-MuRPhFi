@@ -397,7 +397,18 @@ subroutine CreateInitialConditions
      end do
 
     end if
-
+    if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    vx(k,j,i) = 0.0
+                    vy(k,j,i) = 0.0
+                    vz(k,j,i) = 0.0
+                    temp(k,j,i) = 0.0
+                end do
+            end do
+        end do
+    end if
 
 
     return

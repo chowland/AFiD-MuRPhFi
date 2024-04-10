@@ -1,0 +1,538 @@
+ In auto-tuning mode......
+ factors:            1
+ processor grid           1  by            1  time=   5.7389550000000004E-003
+ the best processor grid is probably            1  by            1
+ MPI tasks=           1
+mkdir: cannot create directory ‘outputdir’: File exists
+mkdir: cannot create directory ‘outputdir/flowmov’: File exists
+mkdir: cannot create directory ‘outputdir/fields’: File exists
+
+
+                    Double Diffusive Convection 
+
+          3D Cell with aspect-ratio:  D1/H =  1.00 D2/H =  1.00
+
+
+        Periodic lateral wall boundary condition
+
+     Parameters:  RaT= 1.000E+05 PrT=  1.000E+01 RaS= 1.000E+05 PrS=  1.000E+01
+
+     Fixed dt=  5.0000E-03 and maximum cfl= 1.0000E+00
+
+
+     The time scheme is a III order Runge-Kutta    gam=    0.533   0.417   0.750    ro=    0.000  -0.283  -0.417
+
+     grid resolution:  nx =    65 ny =    33 nz =    33
+     grid resolution:  nxr=   129 nyr=    33 nzr=    65
+
+   dx= 1.562E-02 dy= 3.125E-02 dz= 3.125E-02 dt= 5.000E-03 ntst=*******
+
+  
+ ***** Using the FFTW (version 3.x) engine *****
+  
+ Creating initial condition
+Profile save duration:    0.031s
+ Write plane slices
+ Writing 3D fields
+ Flow field writing took:    1.1552573999999996E-002
+  Initial maximum divergence:    0.0000000000000000        0.0000000000000000     
+Initialization Time =   0.12 sec.
+  -------------------------------------------------- 
+  T =  2.0000E-01 NTIME =        39 DT =  5.0000E-03
+Profile save duration:    0.015s
+  Maximum divergence =    1.9012569296705806E-014   1.9012569296705806E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  4.0000E-01 NTIME =        79 DT =  5.0000E-03
+Profile save duration:    0.014s
+  Maximum divergence =    1.7208456881689926E-014   1.7208456881689926E-014
+  Minimum Iteration Time =    0.116 sec.
+  -------------------------------------------------- 
+  T =  6.0000E-01 NTIME =       119 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.7430501486614958E-014   1.7430501486614958E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  8.0000E-01 NTIME =       159 DT =  5.0000E-03
+Profile save duration:    0.016s
+  Maximum divergence =    1.8651746813702630E-014   1.8651746813702630E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  1.0000E+00 NTIME =       199 DT =  5.0000E-03
+Profile save duration:    0.013s
+ Write slice ycut and zcut
+  Maximum divergence =    1.8207657603852567E-014   1.8207657603852567E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  1.2050E+00 NTIME =       240 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.8207657603852567E-014   1.8207657603852567E-014
+  Minimum Iteration Time =    0.114 sec.
+  -------------------------------------------------- 
+  T =  1.4050E+00 NTIME =       280 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.118 sec.
+  -------------------------------------------------- 
+  T =  1.6050E+00 NTIME =       320 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9428902930940239E-014   1.9428902930940239E-014
+  Minimum Iteration Time =    0.118 sec.
+  -------------------------------------------------- 
+  T =  1.8050E+00 NTIME =       360 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.8873791418627661E-014   1.8873791418627661E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  2.0050E+00 NTIME =       400 DT =  5.0000E-03
+Profile save duration:    0.014s
+ Write slice ycut and zcut
+  Maximum divergence =    1.7985612998927536E-014   1.7985612998927536E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  2.2050E+00 NTIME =       440 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9984014443252818E-014   1.9984014443252818E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  2.4050E+00 NTIME =       480 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.8651746813702630E-014   1.8651746813702630E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  2.6050E+00 NTIME =       520 DT =  5.0000E-03
+Profile save duration:    0.015s
+  Maximum divergence =    1.9775847626135601E-014   1.9775847626135601E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  2.8050E+00 NTIME =       560 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.7763568394002505E-014   1.7763568394002505E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  3.0050E+00 NTIME =       600 DT =  5.0000E-03
+Profile save duration:    0.013s
+ Write slice ycut and zcut
+  Maximum divergence =    1.9817480989559044E-014   1.9817480989559044E-014
+  Minimum Iteration Time =    0.117 sec.
+  -------------------------------------------------- 
+  T =  3.2050E+00 NTIME =       640 DT =  5.0000E-03
+Profile save duration:    0.014s
+  Maximum divergence =    1.8429702208777599E-014   1.8429702208777599E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  3.4050E+00 NTIME =       680 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9761969838327786E-014   1.9761969838327786E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  3.6050E+00 NTIME =       720 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9872992140790302E-014   1.9872992140790302E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  3.8050E+00 NTIME =       760 DT =  5.0000E-03
+Profile save duration:    0.014s
+  Maximum divergence =    1.8651746813702630E-014   1.8651746813702630E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  4.0050E+00 NTIME =       800 DT =  5.0000E-03
+Profile save duration:    0.014s
+ Write slice ycut and zcut
+  Maximum divergence =    1.8207657603852567E-014   1.8207657603852567E-014
+  Minimum Iteration Time =    0.110 sec.
+  -------------------------------------------------- 
+  T =  4.2050E+00 NTIME =       840 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.7319479184152442E-014   1.7319479184152442E-014
+  Minimum Iteration Time =    0.117 sec.
+  -------------------------------------------------- 
+  T =  4.4050E+00 NTIME =       880 DT =  5.0000E-03
+Profile save duration:    0.015s
+  Maximum divergence =    1.8623991238087001E-014   1.8623991238087001E-014
+  Minimum Iteration Time =    0.128 sec.
+  -------------------------------------------------- 
+  T =  4.6050E+00 NTIME =       920 DT =  5.0000E-03
+Profile save duration:    0.025s
+  Maximum divergence =    2.0428103653102880E-014   2.0428103653102880E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  4.8050E+00 NTIME =       960 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.8429702208777599E-014   1.8429702208777599E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  5.0050E+00 NTIME =      1000 DT =  5.0000E-03
+Profile save duration:    0.017s
+ Write slice ycut and zcut
+  Maximum divergence =    1.8623991238087001E-014   1.8623991238087001E-014
+  Minimum Iteration Time =    0.120 sec.
+  -------------------------------------------------- 
+  T =  5.2050E+00 NTIME =      1040 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.8207657603852567E-014   1.8207657603852567E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  5.4050E+00 NTIME =      1080 DT =  5.0000E-03
+Profile save duration:    0.024s
+  Maximum divergence =    1.9428902930940239E-014   1.9428902930940239E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  5.6050E+00 NTIME =      1120 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.7763568394002505E-014   1.7763568394002505E-014
+  Minimum Iteration Time =    0.114 sec.
+  -------------------------------------------------- 
+  T =  5.8050E+00 NTIME =      1160 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9900747716405931E-014   1.9900747716405931E-014
+  Minimum Iteration Time =    0.110 sec.
+  -------------------------------------------------- 
+  T =  6.0050E+00 NTIME =      1200 DT =  5.0000E-03
+Profile save duration:    0.013s
+ Write slice ycut and zcut
+  Maximum divergence =    1.9095836023552692E-014   1.9095836023552692E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  6.2050E+00 NTIME =      1240 DT =  5.0000E-03
+Profile save duration:    0.019s
+  Maximum divergence =    1.9095836023552692E-014   1.9095836023552692E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  6.4050E+00 NTIME =      1280 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.8429702208777599E-014   1.8429702208777599E-014
+  Minimum Iteration Time =    0.116 sec.
+  -------------------------------------------------- 
+  T =  6.6050E+00 NTIME =      1320 DT =  5.0000E-03
+Profile save duration:    0.020s
+  Maximum divergence =    1.8873791418627661E-014   1.8873791418627661E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  6.8050E+00 NTIME =      1360 DT =  5.0000E-03
+Profile save duration:    0.026s
+  Maximum divergence =    1.8728074646645609E-014   1.8728074646645609E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  7.0050E+00 NTIME =      1400 DT =  5.0000E-03
+Profile save duration:    0.013s
+ Write slice ycut and zcut
+  Maximum divergence =    1.8429702208777599E-014   1.8429702208777599E-014
+  Minimum Iteration Time =    0.125 sec.
+  -------------------------------------------------- 
+  T =  7.2050E+00 NTIME =      1440 DT =  5.0000E-03
+Profile save duration:    0.014s
+  Maximum divergence =    1.8873791418627661E-014   1.8873791418627661E-014
+  Minimum Iteration Time =    0.116 sec.
+  -------------------------------------------------- 
+  T =  7.4050E+00 NTIME =      1480 DT =  5.0000E-03
+Profile save duration:    0.015s
+  Maximum divergence =    1.9317880628477724E-014   1.9317880628477724E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  7.6050E+00 NTIME =      1520 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  7.8050E+00 NTIME =      1560 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9428902930940239E-014   1.9428902930940239E-014
+  Minimum Iteration Time =    0.110 sec.
+  -------------------------------------------------- 
+  T =  8.0050E+00 NTIME =      1600 DT =  5.0000E-03
+Profile save duration:    0.011s
+ Write slice ycut and zcut
+  Maximum divergence =    1.7763568394002505E-014   1.7763568394002505E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  8.2050E+00 NTIME =      1640 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  8.4050E+00 NTIME =      1680 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    2.0650148258027912E-014   2.0650148258027912E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  8.6050E+00 NTIME =      1720 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.114 sec.
+  -------------------------------------------------- 
+  T =  8.8050E+00 NTIME =      1760 DT =  5.0000E-03
+Profile save duration:    0.014s
+  Maximum divergence =    1.9984014443252818E-014   1.9984014443252818E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  9.0000E+00 NTIME =      1799 DT =  5.0000E-03
+Profile save duration:    0.021s
+ Write slice ycut and zcut
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.118 sec.
+  -------------------------------------------------- 
+  T =  9.2000E+00 NTIME =      1839 DT =  5.0000E-03
+Profile save duration:    0.014s
+  Maximum divergence =    1.9581558596826198E-014   1.9581558596826198E-014
+  Minimum Iteration Time =    0.118 sec.
+  -------------------------------------------------- 
+  T =  9.4000E+00 NTIME =      1879 DT =  5.0000E-03
+Profile save duration:    0.016s
+  Maximum divergence =    1.9095836023552692E-014   1.9095836023552692E-014
+  Minimum Iteration Time =    0.118 sec.
+  -------------------------------------------------- 
+  T =  9.6000E+00 NTIME =      1919 DT =  5.0000E-03
+Profile save duration:    0.021s
+  Maximum divergence =    1.9984014443252818E-014   1.9984014443252818E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  9.8000E+00 NTIME =      1959 DT =  5.0000E-03
+Profile save duration:    0.015s
+  Maximum divergence =    1.7739282265338829E-014   1.7739282265338829E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  1.0000E+01 NTIME =      1999 DT =  5.0000E-03
+Profile save duration:    0.014s
+ Write slice ycut and zcut
+  Maximum divergence =    1.8762769116165146E-014   1.8762769116165146E-014
+  Minimum Iteration Time =    0.110 sec.
+  -------------------------------------------------- 
+  T =  1.0200E+01 NTIME =      2039 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.116 sec.
+  -------------------------------------------------- 
+  T =  1.0400E+01 NTIME =      2079 DT =  5.0000E-03
+Profile save duration:    0.020s
+  Maximum divergence =    1.9095836023552692E-014   1.9095836023552692E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  1.0600E+01 NTIME =      2119 DT =  5.0000E-03
+Profile save duration:    0.026s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.124 sec.
+  -------------------------------------------------- 
+  T =  1.0800E+01 NTIME =      2159 DT =  5.0000E-03
+Profile save duration:    0.023s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  1.1000E+01 NTIME =      2199 DT =  5.0000E-03
+Profile save duration:    0.028s
+ Write slice ycut and zcut
+  Maximum divergence =    1.7985612998927536E-014   1.7985612998927536E-014
+  Minimum Iteration Time =    0.116 sec.
+  -------------------------------------------------- 
+  T =  1.1200E+01 NTIME =      2239 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.7985612998927536E-014   1.7985612998927536E-014
+  Minimum Iteration Time =    0.114 sec.
+  -------------------------------------------------- 
+  T =  1.1400E+01 NTIME =      2279 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9317880628477724E-014   1.9317880628477724E-014
+  Minimum Iteration Time =    0.110 sec.
+  -------------------------------------------------- 
+  T =  1.1600E+01 NTIME =      2319 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9095836023552692E-014   1.9095836023552692E-014
+  Minimum Iteration Time =    0.110 sec.
+  -------------------------------------------------- 
+  T =  1.1800E+01 NTIME =      2359 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.117 sec.
+  -------------------------------------------------- 
+  T =  1.2000E+01 NTIME =      2399 DT =  5.0000E-03
+Profile save duration:    0.016s
+ Write slice ycut and zcut
+  Maximum divergence =    1.9095836023552692E-014   1.9095836023552692E-014
+  Minimum Iteration Time =    0.119 sec.
+  -------------------------------------------------- 
+  T =  1.2200E+01 NTIME =      2439 DT =  5.0000E-03
+Profile save duration:    0.021s
+  Maximum divergence =    1.8207657603852567E-014   1.8207657603852567E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  1.2400E+01 NTIME =      2479 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.7763568394002505E-014   1.7763568394002505E-014
+  Minimum Iteration Time =    0.122 sec.
+  -------------------------------------------------- 
+  T =  1.2600E+01 NTIME =      2519 DT =  5.0000E-03
+Profile save duration:    0.026s
+  Maximum divergence =    1.9872992140790302E-014   1.9872992140790302E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  1.2800E+01 NTIME =      2559 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.8651746813702630E-014   1.8651746813702630E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  1.3000E+01 NTIME =      2599 DT =  5.0000E-03
+Profile save duration:    0.013s
+ Write slice ycut and zcut
+  Maximum divergence =    1.9761969838327786E-014   1.9761969838327786E-014
+  Minimum Iteration Time =    0.120 sec.
+  -------------------------------------------------- 
+  T =  1.3200E+01 NTIME =      2639 DT =  5.0000E-03
+Profile save duration:    0.014s
+  Maximum divergence =    1.8984813721090177E-014   1.8984813721090177E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  1.3400E+01 NTIME =      2679 DT =  5.0000E-03
+Profile save duration:    0.017s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  1.3600E+01 NTIME =      2719 DT =  5.0000E-03
+Profile save duration:    0.029s
+  Maximum divergence =    1.9581558596826198E-014   1.9581558596826198E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  1.3800E+01 NTIME =      2759 DT =  5.0000E-03
+Profile save duration:    0.028s
+  Maximum divergence =    1.8651746813702630E-014   1.8651746813702630E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  1.4000E+01 NTIME =      2799 DT =  5.0000E-03
+Profile save duration:    0.019s
+ Write slice ycut and zcut
+  Maximum divergence =    1.9262369477246466E-014   1.9262369477246466E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  1.4200E+01 NTIME =      2839 DT =  5.0000E-03
+Profile save duration:    0.021s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  1.4400E+01 NTIME =      2879 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.8873791418627661E-014   1.8873791418627661E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  1.4600E+01 NTIME =      2919 DT =  5.0000E-03
+Profile save duration:    0.015s
+  Maximum divergence =    1.8152146452621309E-014   1.8152146452621309E-014
+  Minimum Iteration Time =    0.114 sec.
+  -------------------------------------------------- 
+  T =  1.4800E+01 NTIME =      2959 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.8873791418627661E-014   1.8873791418627661E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  1.5000E+01 NTIME =      2999 DT =  5.0000E-03
+Profile save duration:    0.013s
+ Write slice ycut and zcut
+  Maximum divergence =    2.0428103653102880E-014   2.0428103653102880E-014
+  Minimum Iteration Time =    0.121 sec.
+  -------------------------------------------------- 
+  T =  1.5200E+01 NTIME =      3039 DT =  5.0000E-03
+Profile save duration:    0.019s
+  Maximum divergence =    1.8207657603852567E-014   1.8207657603852567E-014
+  Minimum Iteration Time =    0.114 sec.
+  -------------------------------------------------- 
+  T =  1.5400E+01 NTIME =      3079 DT =  5.0000E-03
+Profile save duration:    0.014s
+  Maximum divergence =    1.8651746813702630E-014   1.8651746813702630E-014
+  Minimum Iteration Time =    0.120 sec.
+  -------------------------------------------------- 
+  T =  1.5600E+01 NTIME =      3119 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9984014443252818E-014   1.9984014443252818E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  1.5800E+01 NTIME =      3159 DT =  5.0000E-03
+Profile save duration:    0.031s
+  Maximum divergence =    1.8651746813702630E-014   1.8651746813702630E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  1.6000E+01 NTIME =      3199 DT =  5.0000E-03
+Profile save duration:    0.017s
+ Write slice ycut and zcut
+  Maximum divergence =    1.9095836023552692E-014   1.9095836023552692E-014
+  Minimum Iteration Time =    0.114 sec.
+  -------------------------------------------------- 
+  T =  1.6200E+01 NTIME =      3239 DT =  5.0000E-03
+Profile save duration:    0.023s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.115 sec.
+  -------------------------------------------------- 
+  T =  1.6400E+01 NTIME =      3279 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  1.6600E+01 NTIME =      3319 DT =  5.0000E-03
+Profile save duration:    0.018s
+  Maximum divergence =    2.0372592501871623E-014   2.0372592501871623E-014
+  Minimum Iteration Time =    0.116 sec.
+  -------------------------------------------------- 
+  T =  1.6800E+01 NTIME =      3359 DT =  5.0000E-03
+Profile save duration:    0.016s
+  Maximum divergence =    1.8762769116165146E-014   1.8762769116165146E-014
+  Minimum Iteration Time =    0.120 sec.
+  -------------------------------------------------- 
+  T =  1.7000E+01 NTIME =      3399 DT =  5.0000E-03
+Profile save duration:    0.014s
+ Write slice ycut and zcut
+  Maximum divergence =    1.9317880628477724E-014   1.9317880628477724E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  1.7200E+01 NTIME =      3439 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9040324872321435E-014   1.9040324872321435E-014
+  Minimum Iteration Time =    0.116 sec.
+  -------------------------------------------------- 
+  T =  1.7400E+01 NTIME =      3479 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9984014443252818E-014   1.9984014443252818E-014
+  Minimum Iteration Time =    0.112 sec.
+  -------------------------------------------------- 
+  T =  1.7600E+01 NTIME =      3519 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.114 sec.
+  -------------------------------------------------- 
+  T =  1.7800E+01 NTIME =      3559 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9984014443252818E-014   1.9984014443252818E-014
+  Minimum Iteration Time =    0.114 sec.
+  -------------------------------------------------- 
+  T =  1.8000E+01 NTIME =      3599 DT =  5.0000E-03
+Profile save duration:    0.017s
+ Write slice ycut and zcut
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  1.8200E+01 NTIME =      3639 DT =  5.0000E-03
+Profile save duration:    0.012s
+  Maximum divergence =    1.9095836023552692E-014   1.9095836023552692E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  1.8400E+01 NTIME =      3679 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.9539925233402755E-014   1.9539925233402755E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  1.8600E+01 NTIME =      3719 DT =  5.0000E-03
+Profile save duration:    0.015s
+  Maximum divergence =    1.8873791418627661E-014   1.8873791418627661E-014
+  Minimum Iteration Time =    0.111 sec.
+  -------------------------------------------------- 
+  T =  1.8800E+01 NTIME =      3759 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.7763568394002505E-014   1.7763568394002505E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  1.9000E+01 NTIME =      3799 DT =  5.0000E-03
+Profile save duration:    0.013s
+ Write slice ycut and zcut
+  Maximum divergence =    1.8651746813702630E-014   1.8651746813702630E-014
+  Minimum Iteration Time =    0.113 sec.
+  -------------------------------------------------- 
+  T =  1.9200E+01 NTIME =      3839 DT =  5.0000E-03
+Profile save duration:    0.013s
+  Maximum divergence =    1.8873791418627661E-014   1.8873791418627661E-014
+  Minimum Iteration Time =    0.110 sec.
