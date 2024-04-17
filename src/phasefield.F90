@@ -689,12 +689,12 @@ subroutine AddLatentHeat
                     kcr = irangs(kc)
 
                     qv3 = tpdvr(kcr-2:kcr+1,jcr-2:jcr+1,icr-2:icr+1)
-                    qv2(:,:) = qv3(:,:,1)*czsalc(1,ic) + qv3(:,:,2)*czsalc(2,ic) &
-                                + qv3(:,:,3)*czsalc(3,ic) + qv3(:,:,4)*czsalc(4,ic)
-                    qv1(:) = qv2(:,1)*cysalc(1,jc) + qv2(:,2)*cysalc(2,jc) &
-                            + qv2(:,3)*cysalc(3,jc) + qv2(:,4)*cysalc(4,jc)
+                    qv2(:,:) = qv3(:,:,1)*czphic(1,ic) + qv3(:,:,2)*czphic(2,ic) &
+                                + qv3(:,:,3)*czphic(3,ic) + qv3(:,:,4)*czphic(4,ic)
+                    qv1(:) = qv2(:,1)*cyphic(1,jc) + qv2(:,2)*cyphic(2,jc) &
+                            + qv2(:,3)*cyphic(3,jc) + qv2(:,4)*cyphic(4,jc)
                         
-                    phi_rhs = sum(qv1(1:4)*cxsalc(1:4,kc))
+                    phi_rhs = sum(qv1(1:4)*cxphic(1:4,kc))
                     hro(kc,jc,ic) = hro(kc,jc,ic) + pf_S*phi_rhs*aldt
                 end do
             end do
@@ -706,13 +706,13 @@ subroutine AddLatentHeat
             
                     qv3 = tpdvr(kcr-1:kcr+2,jcr-1:jcr+2,icr-1:icr+2)
                     do ic=max(krangr(icr),xstart(3)),min(krangr(icr+1)-1,xend(3))
-                        qv2(:,:) = qv3(:,:,1)*czsalc(1,ic) + qv3(:,:,2)*czsalc(2,ic)&
-                                +qv3(:,:,3)*czsalc(3,ic) + qv3(:,:,4)*czsalc(4,ic)
+                        qv2(:,:) = qv3(:,:,1)*czphic(1,ic) + qv3(:,:,2)*czphic(2,ic)&
+                                +qv3(:,:,3)*czphic(3,ic) + qv3(:,:,4)*czphic(4,ic)
                         do jc=max(jrangr(jcr),xstart(2)),min(jrangr(jcr+1)-1,xend(2))
-                            qv1(:) = qv2(:,1)*cysalc(1,jc) + qv2(:,2)*cysalc(2,jc) &
-                                    +qv2(:,3)*cysalc(3,jc) + qv2(:,4)*cysalc(4,jc)
+                            qv1(:) = qv2(:,1)*cyphic(1,jc) + qv2(:,2)*cyphic(2,jc) &
+                                    +qv2(:,3)*cyphic(3,jc) + qv2(:,4)*cyphic(4,jc)
                             do kc=max(irangr(kcr),1),min(irangr(kcr+1)-1,nxm)
-                                phi_rhs = sum(qv1(1:4)*cxsalc(1:4,kc))
+                                phi_rhs = sum(qv1(1:4)*cxphic(1:4,kc))
 
                                 hro(kc,jc,ic) = hro(kc,jc,ic) + pf_S*phi_rhs*aldt
                             end do
