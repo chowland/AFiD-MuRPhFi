@@ -20,7 +20,7 @@
       real :: dvzx1,dvzx2,dvzx3
       real :: strn, omeg, tprfi
 
-      integer :: ic,jc,kc,ip,jp,kp,im,jm,km,itime
+      integer :: ic,jc,kc,ip,jp,kp,im,jm,km,itime,io
 
       character(30) :: filnam,filnamxdm,path
       character(5) :: ipfi
@@ -98,41 +98,41 @@
 !      if(allocated(qtens)) deallocate(qtens)
       
       if (ismaster) then
-        open(45,file=filnamxdm,status='unknown')
-        rewind(45)
-        write(45,'("<?xml version=""1.0"" ?>")')
-        write(45,'("<!DOCTYPE Xdmf SYSTEM ""Xdmf.dtd"" []>")')
-        write(45,'("<Xdmf Version=""2.0"">")')
-        write(45,'("<Domain>")')
-        write(45,'("<Grid Name=""basegrid"" GridType=""Uniform"">")')
+        open(newunit=io, file=filnamxdm, status='unknown')
+        rewind(io)
+        write(io,'("<?xml version=""1.0"" ?>")')
+        write(io,'("<!DOCTYPE Xdmf SYSTEM ""Xdmf.dtd"" []>")')
+        write(io,'("<Xdmf Version=""2.0"">")')
+        write(io,'("<Domain>")')
+        write(io,'("<Grid Name=""basegrid"" GridType=""Uniform"">")')
 
-        write(45,'("<Topology TopologyType=""3DRectMesh"" NumberOfElements=""",i4," ",i4," ",i4,"""/>")') nzm,nym,nx
+        write(io,'("<Topology TopologyType=""3DRectMesh"" NumberOfElements=""",i4," ",i4," ",i4,"""/>")') nzm,nym,nx
 
-        write(45,'("<Geometry GeometryType=""VXVYVZ"">")')
-        write(45,'("<DataItem Dimensions=""",i4,""" NumberType=""Float"" Precision=""4"" Format=""HDF"">")')nx
-        write(45,'("cordin_info.h5:/xc")')
-        write(45,'("</DataItem>")')
-        write(45,'("<DataItem Dimensions=""",i4,""" NumberType=""Float"" Precision=""4"" Format=""HDF"">")')nym
-        write(45,'("cordin_info.h5:/ym")')
-        write(45,'("</DataItem>")')
-        write(45,'("<DataItem Dimensions=""",i4,""" NumberType=""Float"" Precision=""4"" Format=""HDF"">")')nzm
-        write(45,'("cordin_info.h5:/zm")')
-        write(45,'("</DataItem>")')
-        write(45,'("</Geometry>")')
+        write(io,'("<Geometry GeometryType=""VXVYVZ"">")')
+        write(io,'("<DataItem Dimensions=""",i4,""" NumberType=""Float"" Precision=""4"" Format=""HDF"">")')nx
+        write(io,'("cordin_info.h5:/xc")')
+        write(io,'("</DataItem>")')
+        write(io,'("<DataItem Dimensions=""",i4,""" NumberType=""Float"" Precision=""4"" Format=""HDF"">")')nym
+        write(io,'("cordin_info.h5:/ym")')
+        write(io,'("</DataItem>")')
+        write(io,'("<DataItem Dimensions=""",i4,""" NumberType=""Float"" Precision=""4"" Format=""HDF"">")')nzm
+        write(io,'("cordin_info.h5:/zm")')
+        write(io,'("</DataItem>")')
+        write(io,'("</Geometry>")')
 
-        write(45,'("<Attribute Name=""Q"" AttributeType=""Scalar"" Center=""Node"">")')
-        write(45,'("<DataItem Dimensions=""",i4," ",i4," ",i4,""" NumberType=""Double"" Precision=""2"" Format=""HDF"">")')&
+        write(io,'("<Attribute Name=""Q"" AttributeType=""Scalar"" Center=""Node"">")')
+        write(io,'("<DataItem Dimensions=""",i4," ",i4," ",i4,""" NumberType=""Double"" Precision=""2"" Format=""HDF"">")')&
                   nzm,nym,nx
-        write(45,*) trim(filnam)//':/var'
-        write(45,'("</DataItem>")')
-        write(45,'("</Attribute>")')
+        write(io,*) trim(filnam)//':/var'
+        write(io,'("</DataItem>")')
+        write(io,'("</Attribute>")')
 
-       write(45,'("<Time Value=""",e12.5,""" />")') time
+       write(io,'("<Time Value=""",e12.5,""" />")') time
 
-       write(45,'("</Grid>")')
-       write(45,'("</Domain>")')
-       write(45,'("</Xdmf>")')
-       close(45) 
+       write(io,'("</Grid>")')
+       write(io,'("</Domain>")')
+       write(io,'("</Xdmf>")')
+       close(io) 
       end if
 
       end subroutine CalcWriteQ

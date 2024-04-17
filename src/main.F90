@@ -18,7 +18,7 @@ program AFiD
 
 !$    use omp_lib
     implicit none
-    integer :: errorcode!, nthreads, i, j, k
+    integer :: io,errorcode!, nthreads, i, j, k
     real    :: instCFL,CFLmr,dmax,dmaxr
     real    :: ti(2), tin(3), minwtdt
     real :: ts!, varptb,chksum
@@ -324,9 +324,9 @@ program AFiD
             !     if (ismaster) write(*,*) "Done writing power spectra"
             ! end if
             if(ismaster) then
-                open(96,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
-                write(96,769) ntime,time,dt,instCFL*dt!,vx_global,vy_global,vz_global
-                close(96)
+                open(newunit=io,file='outputdir/cfl.out',status='unknown',position='append',access='sequential')
+                write(io,769) ntime,time,dt,instCFL*dt!,vx_global,vy_global,vz_global
+                close(io)
             endif
         769 format(1x,i12,3(1x,ES20.8))
         endif

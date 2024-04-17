@@ -16,7 +16,7 @@ subroutine CreateMgrdGrid
     use afid_phasefield, only: ap3spkr, ac3spkr, am3spkr
     implicit none
 
-    integer :: kc
+    integer :: kc, io
 
     do kc=1,nxmr
         kmvr(kc)=kc-1
@@ -135,22 +135,22 @@ subroutine CreateMgrdGrid
     udx3cr(nxr) = dxr/g3rcr(nxr)
 !m====================================================
     if(ismaster) then
-        open(unit=78,file='outputdir/axicorr.out',status='unknown')
+        open(newunit=io,file='outputdir/axicorr.out',status='unknown')
         do kc=1,nxr
-            write(78,345) kc,xcr(kc),xmr(kc),g3rcr(kc),g3rmr(kc)
+            write(io,345) kc,xcr(kc),xmr(kc),g3rcr(kc),g3rmr(kc)
         end do
-        close(78)
+        close(io)
    345  format(i4,4(2x,e23.15))
     !m===================================================
     !
     !     QUANTITIES FOR DERIVATIVES
     !
-        open(unit=78,file='outputdir/fact3r.out',status='unknown')
+        open(newunit=io,file='outputdir/fact3r.out',status='unknown')
         do kc=1,nxmr
-            write(78,*) kc,udx3mr(kc),udx3cr(kc)
+            write(io,*) kc,udx3mr(kc),udx3cr(kc)
         end do
-        write(78,*) nxr,udx3mr(nxmr),udx3cr(nxr)
-        close(78)
+        write(io,*) nxr,udx3mr(nxmr),udx3cr(nxr)
+        close(io)
     end if
 
 !

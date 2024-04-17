@@ -14,7 +14,7 @@
       use decomp_2d, only: xstart,xend
       use mpih
       implicit none
-      integer :: jc,kc,kp,ic
+      integer :: jc,kc,kp,ic,io
       real :: anusin,vol,vxcen,fac2,tempcen
       real :: vy_rms_vol,vz_rms_vol
       real :: vx_rms_vol,vzvyvx_rms_vol,rradpr
@@ -78,10 +78,10 @@
 
       anusin=1.d0 + dsqrt(prat*abs(rayt))*anusin*vol
 
-      open(95,file='outputdir/nu_vol.out',status='unknown',access='sequential', &
+      open(newunit=io,file='outputdir/nu_vol.out',status='unknown',access='sequential', &
         position='append')
-      write(95,*) time, anusin
-      close(95)
+      write(io,*) time, anusin
+      close(io)
 
       rradpr=dsqrt(abs(rayt)/prat)
       tempm=tempm*vol
@@ -90,11 +90,11 @@
       vz_rms_vol=dsqrt(vz_rms_vol*vol)*rradpr
       vzvyvx_rms_vol=dsqrt(vzvyvx_rms_vol*vol)*rradpr
 
-       open(94,file='outputdir/rms_vel.out',status='unknown',position='append', &
+       open(newunit=io,file='outputdir/rms_vel.out',status='unknown',position='append', &
         access='sequential')
-       write(94,*) time,vz_rms_vol,vy_rms_vol,vx_rms_vol, &
+       write(io,*) time,vz_rms_vol,vy_rms_vol,vx_rms_vol, &
      & vzvyvx_rms_vol
-       close(94)
+       close(io)
 
       endif
 
