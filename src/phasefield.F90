@@ -507,8 +507,8 @@ subroutine InterpTempMultigrid
     ! Fill temporary array with temperature field and BCs
     do ic=xstart(3)-lvlhalo,xend(3)+lvlhalo
         do jc=xstart(2)-lvlhalo,xend(2)+lvlhalo
-            tpdv(0,jc,ic) = 2.0*tempbp(1,jc,ic) - temp(1,jc,ic)
-            tpdv(nx,jc,ic) = 2.0*temptp(1,jc,ic) - temp(nxm,jc,ic)
+            tpdv(0,jc,ic) = (1.0 - 2.0*TfixS)*temp(1,jc,ic) + 2.0*TfixS*tempbp(1,jc,ic)
+            tpdv(nx,jc,ic) = (1.0 - 2.0*TfixN)*temp(nxm,jc,ic) + 2.0*TfixN*temptp(1,jc,ic)
             do kc=1,nxm
                 tpdv(kc,jc,ic) = temp(kc,jc,ic)
             end do
