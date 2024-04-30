@@ -279,7 +279,7 @@ contains
     integer, intent(INOUT) :: p_row,p_col
     logical, dimension(3), intent(IN), optional :: periodic_bc
     
-    integer :: errorcode, ierror, row, col
+    integer :: errorcode, ierror, row, col, io
     
 #ifdef SHM_DEBUG
     character(len=80) fname
@@ -389,55 +389,55 @@ contains
     ! print out shared-memory information
     write(fname,99) nrank
 99  format('log',I2.2)
-    open(10,file=fname)
-    write(10,*)'I am mpi rank ', nrank, 'Total ranks ', nproc
-    write(10,*)' '
-    write(10,*)'Global data size:'
-    write(10,*)'nx*ny*nz', nx,ny,nz
-    write(10,*)' '
-    write(10,*)'2D processor grid:'
-    write(10,*)'p_row*p_col:', dims(1), dims(2)
-    write(10,*)' '
-    write(10,*)'Portion of global data held locally:'
-    write(10,*)'xsize:',xsize
-    write(10,*)'ysize:',ysize
-    write(10,*)'zsize:',zsize
-    write(10,*)' '
-    write(10,*)'How pensils are to be divided and sent in alltoallv:'
-    write(10,*)'x1dist:',decomp_main%x1dist
-    write(10,*)'y1dist:',decomp_main%y1dist
-    write(10,*)'y2dist:',decomp_main%y2dist
-    write(10,*)'z2dist:',decomp_main%z2dist
-    write(10,*)' '
-    write(10,*)'######Shared buffer set up after this point######'
-    write(10,*)' '
-    write(10,*) 'col communicator detais:'
+    open(newunit=io,file=fname)
+    write(io,*)'I am mpi rank ', nrank, 'Total ranks ', nproc
+    write(io,*)' '
+    write(io,*)'Global data size:'
+    write(io,*)'nx*ny*nz', nx,ny,nz
+    write(io,*)' '
+    write(io,*)'2D processor grid:'
+    write(io,*)'p_row*p_col:', dims(1), dims(2)
+    write(io,*)' '
+    write(io,*)'Portion of global data held locally:'
+    write(io,*)'xsize:',xsize
+    write(io,*)'ysize:',ysize
+    write(io,*)'zsize:',zsize
+    write(io,*)' '
+    write(io,*)'How pensils are to be divided and sent in alltoallv:'
+    write(io,*)'x1dist:',decomp_main%x1dist
+    write(io,*)'y1dist:',decomp_main%y1dist
+    write(io,*)'y2dist:',decomp_main%y2dist
+    write(io,*)'z2dist:',decomp_main%z2dist
+    write(io,*)' '
+    write(io,*)'######Shared buffer set up after this point######'
+    write(io,*)' '
+    write(io,*) 'col communicator detais:'
     call print_smp_info(decomp_main%COL_INFO)
-    write(10,*)' '
-    write(10,*) 'row communicator detais:'
+    write(io,*)' '
+    write(io,*) 'row communicator detais:'
     call print_smp_info(decomp_main%ROW_INFO)
-    write(10,*)' '
-    write(10,*)'Buffer count and dispalcement of per-core buffers'
-    write(10,*)'x1cnts:',decomp_main%x1cnts
-    write(10,*)'y1cnts:',decomp_main%y1cnts
-    write(10,*)'y2cnts:',decomp_main%y2cnts
-    write(10,*)'z2cnts:',decomp_main%z2cnts
-    write(10,*)'x1disp:',decomp_main%x1disp
-    write(10,*)'y1disp:',decomp_main%y1disp
-    write(10,*)'y2disp:',decomp_main%y2disp
-    write(10,*)'z2disp:',decomp_main%z2disp
-    write(10,*)' '
-    write(10,*)'Buffer count and dispalcement of shared buffers'
-    write(10,*)'x1cnts:',decomp_main%x1cnts_s
-    write(10,*)'y1cnts:',decomp_main%y1cnts_s
-    write(10,*)'y2cnts:',decomp_main%y2cnts_s
-    write(10,*)'z2cnts:',decomp_main%z2cnts_s
-    write(10,*)'x1disp:',decomp_main%x1disp_s
-    write(10,*)'y1disp:',decomp_main%y1disp_s
-    write(10,*)'y2disp:',decomp_main%y2disp_s
-    write(10,*)'z2disp:',decomp_main%z2disp_s
-    write(10,*)' '
-    close(10)
+    write(io,*)' '
+    write(io,*)'Buffer count and dispalcement of per-core buffers'
+    write(io,*)'x1cnts:',decomp_main%x1cnts
+    write(io,*)'y1cnts:',decomp_main%y1cnts
+    write(io,*)'y2cnts:',decomp_main%y2cnts
+    write(io,*)'z2cnts:',decomp_main%z2cnts
+    write(io,*)'x1disp:',decomp_main%x1disp
+    write(io,*)'y1disp:',decomp_main%y1disp
+    write(io,*)'y2disp:',decomp_main%y2disp
+    write(io,*)'z2disp:',decomp_main%z2disp
+    write(io,*)' '
+    write(io,*)'Buffer count and dispalcement of shared buffers'
+    write(io,*)'x1cnts:',decomp_main%x1cnts_s
+    write(io,*)'y1cnts:',decomp_main%y1cnts_s
+    write(io,*)'y2cnts:',decomp_main%y2cnts_s
+    write(io,*)'z2cnts:',decomp_main%z2cnts_s
+    write(io,*)'x1disp:',decomp_main%x1disp_s
+    write(io,*)'y1disp:',decomp_main%y1disp_s
+    write(io,*)'y2disp:',decomp_main%y2disp_s
+    write(io,*)'z2disp:',decomp_main%z2disp_s
+    write(io,*)' '
+    close(io)
 #endif
 
     ! determine the number of bytes per float number

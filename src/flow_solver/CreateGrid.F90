@@ -14,7 +14,7 @@ subroutine CreateGrid
     use GridModule
     implicit none
 
-    integer :: kc
+    integer :: kc, io
 
     do kc=1,nxm
         kmv(kc)=kc-1
@@ -138,22 +138,22 @@ subroutine CreateGrid
     udx3c(nx) = dx/g3rc(nx)
 !m====================================================
     if(ismaster) then
-        open(unit=78,file='outputdir/axicor.out',status='unknown')
+        open(newunit=io,file='outputdir/axicor.out',status='unknown')
         do kc=1,nx
-            write(78,345) kc,xc(kc),xm(kc),g3rc(kc),g3rm(kc)
+            write(io,345) kc,xc(kc),xm(kc),g3rc(kc),g3rm(kc)
         end do
-        close(78)
+        close(io)
    345  format(i4,4(2x,e23.15))
 !m===================================================
 !
 !     QUANTITIES FOR DERIVATIVES
 !
-        open(unit=78,file='outputdir/fact3.out',status='unknown')
+        open(newunit=io,file='outputdir/fact3.out',status='unknown')
         do kc=1,nxm
-            write(78,*) kc,udx3m(kc),udx3c(kc)
+            write(io,*) kc,udx3m(kc),udx3c(kc)
         end do
-        write(78,*) nx,udx3m(nxm),udx3c(nx)
-        close(78)
+        write(io,*) nx,udx3m(nxm),udx3c(nx)
+        close(io)
     end if
 
 !

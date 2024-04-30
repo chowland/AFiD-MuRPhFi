@@ -11,6 +11,7 @@
       subroutine ResetLogs
       use param
       implicit none
+      integer :: io
 
       if(resetlogstime) then    
 
@@ -37,9 +38,9 @@
       ! close(94,status='delete')
 
 !CS   cfl.out in main.F90                                                    
-       open(96,file='outputdir/cfl.out',status='unknown',position='append', &
+       open(newunit=io,file='outputdir/cfl.out',status='unknown',position='append', &
         access='sequential')                                          
-      close(96,status='delete')
+      close(io,status='delete')
 
 !CS    cf.out  in CalculatePlateCf.F
       !  open(98,file="outputdir/cf_plate.out",status='unknown',access='sequential', &
