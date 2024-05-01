@@ -113,13 +113,15 @@ subroutine CorrectVelocity
         do kc=kmid+1,nxm
             Gshape(kc) = (1.0 - exp(lam*(xm(kc) - 1.0)))/lfac
         end do
-        kmid = nxmr/2
-        do kc=1,kmid
-            GshapeR(kc) = (1.0 - exp(-lam*xmr(kc)))/lfac
-        end do
-        do kc=kmid+1,nxmr
-            GshapeR(kc) = (1.0 - exp(lam*(xmr(kc) - 1.0)))/lfac
-        end do
+        if (salinity) then
+            kmid = nxmr/2
+            do kc=1,kmid
+                GshapeR(kc) = (1.0 - exp(-lam*xmr(kc)))/lfac
+            end do
+            do kc=kmid+1,nxmr
+                GshapeR(kc) = (1.0 - exp(lam*(xmr(kc) - 1.0)))/lfac
+            end do
+        end if
 
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
