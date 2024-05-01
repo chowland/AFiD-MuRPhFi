@@ -21,7 +21,7 @@ FLAVOUR=GNU
 OBJDIR=obj
 
 ifeq ($(FLAVOUR),GNU)
-	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -fallow-argument-mismatch
+	FC = h5pfc -cpp -O2 -fdefault-real-8 -fdefault-double-8 -fallow-argument-mismatch
 else
 	FC = h5pfc -fpp -r8
 endif
