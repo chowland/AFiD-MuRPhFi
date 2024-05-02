@@ -650,7 +650,7 @@ end subroutine AdjustMeltPoint
 !! When this routine is called, rhsr should contain phi(l+1)-phi(l) = d/dt(phi)*dt
 subroutine AddLatentHeat
     use local_arrays, only: hro
-    integer :: ic,jc,kc,icr,jcr,kcr
+    integer :: ic,jc,kc,icr,jcr,kcr,n
 
     real, dimension(4,4,4) :: qv3
     real, dimension(4,4) :: qv2
@@ -678,6 +678,28 @@ subroutine AddLatentHeat
 
     ! Fill in halo values
     call update_halo(tpdvr,lvlhalo)
+    if (sidewall) then
+        if (xstart(2)==1) then
+            do n=1,lvlhalo
+                tpdvr(:,1-n,:) = tpdvr(:,n,:)
+            end do
+        end if
+        if (xend(2)==nym) then
+            do n=1,lvlhalo
+                tpdvr(:,nym+n,:) = tpdvr(:,ny-n,:)
+            end do
+        end if
+        if (xstart(3)==1) then
+            do n=1,lvlhalo
+                tpdvr(:,:,1-n) = tpdvr(:,:,n)
+            end do
+        end if
+        if (xend(3)==nzm) then
+            do n=1,lvlhalo
+                tpdvr(:,:,nzm+n) = tpdvr(:,:,nz-n)
+            end do
+        end if
+    end if
 
     ! If the grid is sufficiently fine at the boundary, use a more efficient interpolation
     if ((xmr(1) < xm(1)) .and. (xmr(nxmr) > xm(nxm))) then
