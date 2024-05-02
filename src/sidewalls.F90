@@ -236,6 +236,59 @@ subroutine SetSidewallBCs
     end if
 end subroutine SetSidewallBCs
 
+!> Impose the boundary conditions in y and z for phic and tempr
+!! if we are using the discrete cosine transform for the pressure
+!! solution. By default, we are imposing zero velocity (incl. no slip)
+!! and zero flux for scalar fields. In z the default is to
+!! impose free-slip walls so that 2D simulations are possible
+!! UPDATE THIS FOR THE REFINED VELOCITY FOR DDC
+subroutine SetExtraSidewalls
+    use decomp_2d, only: xstart, xend
+    use param
+    ! use afid_salinity, only: sal, vxr, vyr, vzr
+    use afid_phasefield, only: phic, tempr
+    implicit none
+    real :: dyy, dzz    !! Grid spacing
+    real :: dyyr, dzzr    !! Refined grid spacing
+    integer :: n
+
+    dyy = yc(2)
+    dzz = zc(2)
+
+    if (multires) then
+        dyyr = ycr(2)
+        dzzr = zcr(2)
+    end if
+
+    !! Left wall
+    if (xstart(2)==1) then
+        if (phasefield) then
+            call ApplyBC(phic, bc_phi_y_fix_lo, bc_phi_y_val_lo, 'y', 'L', lvlhalo, dyy)
+            call ApplyBC(tempr, bc_temp_y_fix_lo, bc_temp_y_val_lo, 'y', 'L', lvlhalo, dyyr)
+        end if
+    end if
+    if (xstart(3)==1) then
+        if (phasefield) then
+            call ApplyBC(phic, bc_phi_z_fix_lo, bc_phi_z_val_lo, 'z', 'L', lvlhalo, dzz)
+            call ApplyBC(tempr, bc_temp_z_fix_lo, bc_temp_z_val_lo, 'z', 'L', lvlhalo, dzzr)
+        end if
+    end if
+
+    !! Right wall
+    if (xend(2)==nym) then
+        if (phasefield) then
+            call ApplyBC(phic, bc_phi_y_fix_up, bc_phi_y_val_up, 'y', 'U', lvlhalo, dyy)
+            call ApplyBC(tempr, bc_temp_y_fix_up, bc_temp_y_val_up, 'y', 'U', lvlhalo, dyyr)
+        end if
+    end if
+    if (xend(3)==nzm) then
+        if (phasefield) then
+            call ApplyBC(phic, bc_phi_z_fix_up, bc_phi_z_val_up, 'z', 'U', lvlhalo, dzz)
+            call ApplyBC(tempr, bc_temp_z_fix_up, bc_temp_z_val_up, 'z', 'U', lvlhalo, dzzr)
+        end if
+    end if
+end subroutine SetExtraSidewalls
+
 
 !> Read the sidewall.in input file to specify the boundary conditions in y and z
 subroutine ReadSidewallInput

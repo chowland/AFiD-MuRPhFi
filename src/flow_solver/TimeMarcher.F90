@@ -21,7 +21,7 @@ subroutine TimeMarcher
     use decomp_2d
     use ibm_param, only: aldto
     use afid_moisture
-    use afid_sides, only: SetSidewallBCs
+    use afid_sides, only: SetSidewallBCs, SetExtraSidewalls
     implicit none
     integer :: ns
     integer :: j,k,i
@@ -154,6 +154,7 @@ subroutine TimeMarcher
             call update_halo(tempr,lvlhalo)
             call InterpPhiMultigrid
             call update_halo(phic,lvlhalo)
+            call SetExtraSidewalls
         end if
 
         if (moist) call UpdateSaturation
