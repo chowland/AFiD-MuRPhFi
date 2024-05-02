@@ -898,9 +898,9 @@ subroutine SolveImpEqnUpdate_YZ_pf(q, rhs, axis)
 
             do kc=1,nxm
                 if (axis=="y") then
-                    philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc+1,ic))
+                    philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc-1,ic))
                 elseif (axis=="z") then
-                    philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc,ic+1))
+                    philoc = 0.5*(phic(kc,jc,ic) + phic(kc,jc,ic-1))
                 else
                     philoc = phic(kc,jc,ic)
                 end if
