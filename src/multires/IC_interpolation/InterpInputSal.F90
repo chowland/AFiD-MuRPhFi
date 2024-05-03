@@ -7,11 +7,13 @@ subroutine InterpInputSal
     use decomp_2d
     use AuxiliaryRoutines
     use HermiteInterpolations, only: interpolate_xyz_old_to_new_ref
+    use afid_sides
     implicit none
 
     integer  :: ic,jc
 
     real :: Sup, Slo
+    real :: dyo, dzo
 
     real, allocatable, dimension(:,:,:) :: salo
     
@@ -58,6 +60,24 @@ subroutine InterpInputSal
     end do
 
     call update_halo(salo, lvlhalo)
+
+    !! Add side boundary conditions if using
+    if (sidewall) then
+        dyo = ycro(2) - ycro(1)
+        dzo = zcro(2) - zcro(1)
+        if (xstarto(2)==1) then
+            call ApplyBC(salo, bc_sal_y_fix_lo, bc_sal_y_val_lo, 'y', 'L', 2, dyo)
+        end if
+        if (xstarto(3)==1) then
+            call ApplyBC(salo, bc_sal_z_fix_lo, bc_sal_z_val_lo, 'z', 'L', 2, dzo)
+        end if
+        if (xendo(2)==nymro) then
+            call ApplyBC(salo, bc_sal_y_fix_up, bc_sal_y_val_up, 'y', 'U', 2, dyo)
+        end if
+        if (xendo(3)==nzmro) then
+            call ApplyBC(salo, bc_sal_z_fix_up, bc_sal_z_val_up, 'z', 'U', 2, dzo)
+        end if
+    end if
 
     call interpolate_xyz_old_to_new_ref(salo, sal(1:nxmr,:,:))
 

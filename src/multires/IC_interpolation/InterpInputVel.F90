@@ -8,10 +8,11 @@ subroutine InterpInputVel
     use decomp_2d
     use AuxiliaryRoutines
     use HermiteInterpolations, only: interpolate_xyz_old_to_new
+    use afid_sides
     implicit none
 
     integer  :: ic,jc,kc, ip,jp,kp, icr,jcr,kcr
-    integer  :: jc0,jcr0, ic0,icr0
+    integer  :: jc0,jcr0, ic0,icr0, n
     integer  :: comm_col,comm_row,ierror
 
     real,dimension(4,4) :: qv2
@@ -21,7 +22,7 @@ subroutine InterpInputVel
     real, allocatable, dimension(:,:,:) :: tempo, vxo, vyo, vzo
     real, allocatable, dimension(:,:,:) :: tpdvo
 
-    real  :: lxa, lya, lza, dyo, dzo, Tup, Tlo
+    real  :: lxa, lya, lza, dyo, dzo, Tup, Tlo, dyyo, dzzo
 
       !-- Allocate temporary arrays for velocities and gradients
     real,allocatable,dimension(:,:) :: dvyloc,dvybot, dvzloc,dvzbot
@@ -47,8 +48,7 @@ subroutine InterpInputVel
     call HdfReadContinua(nzo, nyo, nxo, xstarto(2), xendo(2), xstarto(3), xendo(3), 1, &
             vxo(1:nxo, xstarto(2)-lvlhalo:xendo(2)+lvlhalo,xstarto(3)-lvlhalo:xendo(3)+lvlhalo))
 
-    call update_halo(vxo, lvlhalo)
-
+    ! call update_halo(vxo, lvlhalo)
 
     !-- Interpolate dvx/dx to cell center after transpose
     do ic=xstarto(3),xendo(3)
@@ -70,6 +70,24 @@ subroutine InterpInputVel
     enddo
     
     call update_halo(tpdvo,2)
+
+    !! Add side boundary conditions if using
+    if (sidewall) then
+        dyyo = yco(2) - yco(1)
+        dzzo = zco(2) - zco(1)
+        if (xstarto(2)==1) then
+            call ApplyBC(tpdvo, bc_vx_y_fix_lo, bc_vx_y_val_lo, 'y', 'L', 2, dyyo)
+        end if
+        if (xstarto(3)==1) then
+            call ApplyBC(tpdvo, bc_vx_z_fix_lo, bc_vx_z_val_lo, 'z', 'L', 2, dzzo)
+        end if
+        if (xendo(2)==nymo) then
+            call ApplyBC(tpdvo, bc_vx_y_fix_up, bc_vx_y_val_up, 'y', 'U', 2, dyyo)
+        end if
+        if (xendo(3)==nzmo) then
+            call ApplyBC(tpdvo, bc_vx_z_fix_up, bc_vx_z_val_up, 'z', 'U', 2, dzzo)
+        end if
+    end if
 
     call interpolate_xyz_old_to_new(tpdvo, tpdv(1:nxm,:,:))
 
@@ -98,6 +116,17 @@ subroutine InterpInputVel
 
     call update_halo(vyo, lvlhalo)
 
+    ! Add side boundary conditions if using (needed for plane interpolation)
+    if (sidewall) then
+        dzzo = zco(2) - zco(1)
+        if (xstarto(3)==1) then
+            call ApplyBC(vyo, bc_vy_z_fix_lo, bc_vy_z_val_lo, 'z', 'L', 2, dzzo)
+        end if
+        if (xendo(3)==nzmo) then
+            call ApplyBC(vyo, bc_vy_z_fix_up, bc_vy_z_val_up, 'z', 'U', 2, dzzo)
+        end if
+    end if
+
     tpdvo(:,:,:) = 0.d0
     tpdv(:,:,:) = 0.d0
 
@@ -121,6 +150,25 @@ subroutine InterpInputVel
 
     call update_halo(tpdvo,2)
 
+    !! Add side boundary conditions if using
+    !! (u,w=0 @ y=0 => dv/dy=0 @ y=0 etc)
+    if (sidewall) then
+        dyyo = yco(2) - yco(1)
+        dzzo = zco(2) - zco(1)
+        if (xstarto(2)==1) then
+            call ApplyBC(tpdvo, bc_vx_y_fix_lo, bc_vx_y_val_lo, 'y', 'L', 2, dyyo)
+        end if
+        if (xstarto(3)==1) then
+            call ApplyBC(tpdvo, bc_vy_z_fix_lo, bc_vy_z_val_lo, 'z', 'L', 2, dzzo)
+        end if
+        if (xendo(2)==nymo) then
+            call ApplyBC(tpdvo, bc_vx_y_fix_up, bc_vx_y_val_up, 'y', 'U', 2, dyyo)
+        end if
+        if (xendo(3)==nzmo) then
+            call ApplyBC(tpdvo, bc_vy_z_fix_up, bc_vy_z_val_up, 'z', 'U', 2, dzzo)
+        end if
+    end if
+
     call interpolate_xyz_old_to_new(tpdvo, tpdv(1:nxm,:,:))
 
     !-- Interpolate vyr at an arbitrary x-z plane | tpvr | 1st guess
@@ -135,8 +183,8 @@ subroutine InterpInputVel
                 vyxzc(kc,ic)=vyo(kc,jc0,ic) !CS Halo updates can be optimised. Otherwise lvlhalo=2 required
             enddo
             ! x boundaries
-            vyxzc(0  ,ic) = (1-2*inslwS)*vyxzc(1,ic)
-            vyxzc(nxo,ic) = (1-2*inslwN)*vyxzc(nxmo,ic)
+            vyxzc(0  ,ic) = (1-2*inslwS)*vyxzc(1,ic) + 2*xminusU*inslwS
+            vyxzc(nxo,ic) = (1-2*inslwN)*vyxzc(nxmo,ic) + 2*xplusU*inslwN
         enddo
 
         do ic=xstarto(3)-1,xendo(3)
@@ -200,6 +248,17 @@ subroutine InterpInputVel
 
     call update_halo(vzo, lvlhalo)
 
+    !! Add side boundary conditions if using
+    if (sidewall) then
+        dyyo = yco(2) - yco(1)
+        if (xstarto(2)==1) then
+            call ApplyBC(vzo, bc_vz_y_fix_lo, bc_vz_y_val_lo, 'y', 'L', 2, dyyo)
+        end if
+        if (xendo(2)==nymo) then
+            call ApplyBC(vzo, bc_vz_y_fix_up, bc_vz_y_val_up, 'y', 'U', 2, dyyo)
+        end if
+    end if
+
     tpdvo(:,:,:) = 0.d0
     tpdv(:,:,:) = 0.d0
 
@@ -221,6 +280,25 @@ subroutine InterpInputVel
     enddo
  
     call update_halo(tpdvo,2)
+
+    !! Add side boundary conditions if using
+    !! (u,v=0 @ y=0 => dw/dz=0 @ z=0 etc)
+    if (sidewall) then
+        dyyo = yco(2) - yco(1)
+        dzzo = zco(2) - zco(1)
+        if (xstarto(2)==1) then
+            call ApplyBC(tpdvo, bc_vz_y_fix_lo, bc_vz_y_val_lo, 'y', 'L', 2, dyyo)
+        end if
+        if (xstarto(3)==1) then
+            call ApplyBC(tpdvo, bc_vx_z_fix_lo, bc_vx_z_val_lo, 'z', 'L', 2, dzzo)
+        end if
+        if (xendo(2)==nymo) then
+            call ApplyBC(tpdvo, bc_vz_y_fix_up, bc_vz_y_val_up, 'y', 'U', 2, dyyo)
+        end if
+        if (xendo(3)==nzmo) then
+            call ApplyBC(tpdvo, bc_vx_z_fix_up, bc_vx_z_val_up, 'z', 'U', 2, dzzo)
+        end if
+    end if
 
     call interpolate_xyz_old_to_new(tpdvo, tpdv(1:nxm,:,:))
     
@@ -342,6 +420,24 @@ subroutine InterpInputVel
     end do
 
     call update_halo(tempo, lvlhalo)
+
+    !! Add side boundary conditions if using
+    if (sidewall) then
+        dyyo = yco(2) - yco(1)
+        dzzo = zco(2) - zco(1)
+        if (xstarto(2)==1) then
+            call ApplyBC(tempo, bc_temp_y_fix_lo, bc_temp_y_val_lo, 'y', 'L', 2, dyyo)
+        end if
+        if (xstarto(3)==1) then
+            call ApplyBC(tempo, bc_temp_z_fix_lo, bc_temp_z_val_lo, 'z', 'L', 2, dzzo)
+        end if
+        if (xendo(2)==nymo) then
+            call ApplyBC(tempo, bc_temp_y_fix_up, bc_temp_y_val_up, 'y', 'U', 2, dyyo)
+        end if
+        if (xendo(3)==nzmo) then
+            call ApplyBC(tempo, bc_temp_z_fix_up, bc_temp_z_val_up, 'z', 'U', 2, dzzo)
+        end if
+    end if
 
     call interpolate_xyz_old_to_new(tempo, temp(1:nxm,:,:))
 
