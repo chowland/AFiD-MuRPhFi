@@ -287,8 +287,8 @@ subroutine set_ice_disc(r0)
     integer :: i, j, k
 
     ! Temperature field (0 in disc, 1 out of disc, tanh interface width approx 1e-2)
-    do i=xstart(3),xend(3)
-        do j=xstart(2),xend(2)
+    do i=xstart(3)-lvlhalo,xend(3)+lvlhalo
+        do j=xstart(2)-lvlhalo,xend(2)+lvlhalo
             do k=1,nxm
                 r = sqrt((xm(k) - 0.5*alx3)**2 + (ym(j) - 0.5*ylen)**2)
                 temp(k,j,i) = 0.5*(1.0 + tanh(100.0*(r - r0)))
@@ -296,8 +296,8 @@ subroutine set_ice_disc(r0)
         end do
     end do
     ! Phase-field (0 out of disc, 1 in disc)
-    do i=xstartr(3),xendr(3)
-        do j=xstartr(2),xendr(2)
+    do i=xstartr(3)-lvlhalo,xendr(3)+lvlhalo
+        do j=xstartr(2)-lvlhalo,xendr(2)+lvlhalo
             do k=1,nxmr
                 r = sqrt((xmr(k) - 0.5*alx3)**2 + (ymr(j) - 0.5*ylen)**2)
                 phi(k,j,i) = 0.5*(1.0 - tanh(0.5*(r - r0)/pf_eps))
