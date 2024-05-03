@@ -1,0 +1,1232 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Chris Howland">
+      
+      
+        <link rel="canonical" href="https://chowland.github.io/AFiD-MuRPhFi/equations/">
+      
+      
+        <link rel="prev" href="../phasefield_validation/">
+      
+      
+        <link rel="next" href="../numerics/">
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+    
+    
+      
+        <title>Governing equations - AFiD-MuRPhFi Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#governing-equations" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-header__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AFiD-MuRPhFi Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Governing equations
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-nav__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    AFiD-MuRPhFi Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AFiD-MuRPhFi Quick Start Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installing prerequisites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Input file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../outputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Output file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mean_outs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quantities saved to `means.h5`
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jupyter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Post-processing: Jupyter notebooks on HPCs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paraview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3D visualization with ParaView
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/rbc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rayleigh-Bénard Convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ddc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Double-diffusive convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/stefan/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stefan problems
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/coupled_flows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Flows coupled to phase change
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Benchmarking and validation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking and validation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scaling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Scaling performance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../convergence/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Convergence tests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phasefield_validation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Phase-field model validation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Technical Details
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Technical Details
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Governing equations
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Governing equations
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dimensional-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dimensional system
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dimensionless-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dimensionless system
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#salinity-as-a-second-scalar" class="md-nav__link">
+    <span class="md-ellipsis">
+      Salinity as a second scalar
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-field-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase-field method
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase-field method">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#double-diffusive-melting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Double-diffusive melting
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../numerics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Numerical time stepping scheme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interpolation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hermite interpolation between grids
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stretched_grids/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Spatial derivatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ibm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Immersed boundary method
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spectra/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Power spectra and time-averaging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rainy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Moist convection module - Rainy-Bénard
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dimensional-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dimensional system
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dimensionless-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dimensionless system
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#salinity-as-a-second-scalar" class="md-nav__link">
+    <span class="md-ellipsis">
+      Salinity as a second scalar
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-field-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase-field method
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase-field method">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#double-diffusive-melting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Double-diffusive melting
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="governing-equations">Governing equations</h1>
+<h2 id="dimensional-system">Dimensional system</h2>
+<p>The velocity field <span class="arithmatex">\(\boldsymbol{u}\)</span> is determined by the Navier-Stokes equation subject to the Oberbeck-Boussinesq (OB) approximation such that density changes are related linearly to temperature changes and are negligible everywhere except the buoyancy term:</p>
+<div class="arithmatex">\[
+\partial _t \boldsymbol{u} + \boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = -\rho_0^{-1} \boldsymbol{\nabla} p + g\alpha T \mathbf{\hat{e}_g} + \nu \nabla^2 \boldsymbol{u} .
+\]</div>
+<p>The pressure <span class="arithmatex">\(p\)</span> is determined to make the velocity field divergence-free (<span class="arithmatex">\(\boldsymbol{\nabla}\cdot\boldsymbol{u}=0\)</span>), consistent with the OB approximation.
+The nonlinear term <span class="arithmatex">\(\boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = \partial_j(u_j u_i) \mathbf{e_i}\)</span> is computed in conservative form to improve energy conservation properties.
+The gravitational axis <span class="arithmatex">\(\mathbf{\hat{e}_g}\)</span> can be specified in the input file <code>bou.in</code> using the variable <code>gAxis</code>.
+The temperature field <span class="arithmatex">\(T\)</span> satisfies an advection-diffusion equation:</p>
+<div class="arithmatex">\[
+\partial_t T + \boldsymbol{\nabla} \cdot (\boldsymbol{u} T) = \kappa_T \nabla^2 T .
+\]</div>
+<p>Parameters featured in the above equations are defined in the table below.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Parameter</th>
+<th style="text-align: left;">Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(\rho_0\)</span></td>
+<td style="text-align: left;">(Constant) Mean fluid density</td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(g\)</span></td>
+<td style="text-align: left;">Gravitational acceleration</td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(\alpha\)</span></td>
+<td style="text-align: left;">Thermal expansion coefficient</td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(\nu\)</span></td>
+<td style="text-align: left;">Kinematic viscosity / momentum diffusivity</td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(\kappa_T\)</span></td>
+<td style="text-align: left;">Thermal diffusivity</td>
+</tr>
+</tbody>
+</table>
+<h2 id="dimensionless-system">Dimensionless system</h2>
+<p>AFiD solves these equations in dimensionless form.
+This dimensionless system is obtained by scaling the variables by the following:</p>
+<div class="arithmatex">\[
+[\boldsymbol{x}] = H, \quad [T] = \Delta T, \quad [\boldsymbol{u}] = U_T = \sqrt{g\alpha H\Delta T}, \quad [t] = H/U_T, \quad [p] = \rho_0 U_T^2 .
+\]</div>
+<p>Here, <span class="arithmatex">\(H\)</span> is the distance between the two walls of the domain, <span class="arithmatex">\(\Delta T\)</span> is the temperature difference between the walls, and <span class="arithmatex">\(U_T\)</span> is known as the free-fall velocity scale, obtained by assuming a leading-order balance between the buoyancy and inertial terms.</p>
+<p>After rescaling, the equations read</p>
+<div class="arithmatex">\[
+\partial_t \boldsymbol{u} + \boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = - \boldsymbol{\nabla} p + T \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\nabla^2 \boldsymbol{u} ,
+\]</div>
+<div class="arithmatex">\[
+\partial_t T + \boldsymbol{\nabla} \cdot (\boldsymbol{u} T) = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T .
+\]</div>
+<p>The dimensionless velocity and temperature fields are therefore solely determined by the Rayleigh number <span class="arithmatex">\(Ra_T\)</span> and the Prandtl number <span class="arithmatex">\(Pr\)</span>, which act as the control parameters of the system and are defined as</p>
+<div class="arithmatex">\[
+Ra_T = \frac{g\alpha H^3 \Delta T}{\nu \kappa_T}, \quad Pr = \frac{\nu}{\kappa_T} .
+\]</div>
+<p>These parameters are prescribed by the user in the input file <code>bou.in</code> as the variables <code>RAYT</code> and <code>PRAT</code>.
+AFiD can also treat <span class="arithmatex">\(T\)</span> as a passive scalar if the variable <code>active_T</code> is set to <code>0</code> in the input file.
+In this case, the equations read the same as above, except that the buoyancy term <span class="arithmatex">\(T\mathbf{\hat{e}_g}\)</span> is set to zero.</p>
+<h2 id="salinity-as-a-second-scalar">Salinity as a second scalar</h2>
+<p>AFiD-MuRPhFi also allows for the evolution of a second scalar field on a grid of finer resolution.
+This option can be enabled by setting <code>MULTIRES</code> and <code>FLAGSAL</code> equal to 1 in the input file.
+Using the refined grid is useful for scalars with low diffusivity, such as salinity, so we proceed by labelling this scalar <span class="arithmatex">\(C\)</span> for concentration.
+The second scalar satisfies an advection-diffusion equation, but with a different diffusivity <span class="arithmatex">\(\kappa_C\)</span>:</p>
+<div class="arithmatex">\[
+\partial_t C + \boldsymbol{\nabla} \cdot (\boldsymbol{u} C) = \kappa_C \nabla^2 C .
+\]</div>
+<p>If <span class="arithmatex">\(C\)</span> is not a passive scalar, then it will also contribute towards the buoyancy of the system.
+For temperature and salinity, we can assume a linear equation of state such that the (dimensional) buoyancy term becomes <span class="arithmatex">\(g(\alpha T - \beta C)\mathbf{\hat{e}_g}\)</span>, where <span class="arithmatex">\(\beta\)</span> is the haline contraction coefficient.</p>
+<p>We now have two choices for the velocity scale used to non-dimensionalise the system, depending on whether the dominant contribution to the buoyancy is from temperature or salinity.
+The relevant scale can be prescribed in the input file by the variable <code>FFscaleS</code>.</p>
+<p>If salinity is the dominant scalar in the buoyancy, we set <code>FFscaleS = 1</code> and take the free-fall scale based on <span class="arithmatex">\(C\)</span>, that is <span class="arithmatex">\([\boldsymbol{u}] = U_C = \sqrt{g\beta H \Delta C}\)</span>.
+Analogous to the case above, <span class="arithmatex">\(\Delta C\)</span> is the difference in salinity between the walls.
+The dimensionless equations now read</p>
+<div class="arithmatex">\[
+\partial_t \boldsymbol{u} + \boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = - \boldsymbol{\nabla} p + (R_\rho T - C) \mathbf{\hat{e}_g} + \sqrt{\frac{Sc}{Ra_C}}\nabla^2 \boldsymbol{u} ,
+\]</div>
+<div class="arithmatex">\[
+\partial_t T + \boldsymbol{\nabla} \cdot (\boldsymbol{u} T) = \frac{1}{\tau\sqrt{Ra_C Sc}} \nabla^2 T ,
+\]</div>
+<div class="arithmatex">\[
+\partial_t C + \boldsymbol{\nabla} \cdot (\boldsymbol{u} C) = \frac{1}{\sqrt{Ra_C Sc}} \nabla^2 C .
+\]</div>
+<p>The solutal Rayleigh number <span class="arithmatex">\(Ra_C\)</span> and Schmidt number <span class="arithmatex">\(Sc\)</span> can be defined in the input file through the variables <code>RAYS</code> and <code>PRAS</code> and are defined similarly to the thermal Rayleigh number and Prandtl number as</p>
+<div class="arithmatex">\[
+Ra_C = \frac{g\beta H^3 \Delta C}{\nu \kappa_C}, \quad Sc = \frac{\nu}{\kappa_C} .
+\]</div>
+<p>Two new dimensionless parameters also appear in the above equations: the density ratio <span class="arithmatex">\(R_\rho\)</span> and the diffusivity ratio <span class="arithmatex">\(\tau\)</span>.
+These parameters are defined as follows and are uniquely determined by prescribing (<span class="arithmatex">\(Ra_T\)</span>, <span class="arithmatex">\(Pr\)</span>, <span class="arithmatex">\(Ra_C\)</span>, <span class="arithmatex">\(Sc\)</span>).</p>
+<div class="arithmatex">\[
+R_\rho = \frac{\alpha \Delta T}{\beta \Delta C} = \frac{Ra_T Sc}{Ra_C Pr}, \quad \tau = \frac{\kappa_C}{\kappa_T} = \frac{Pr}{Sc} .
+\]</div>
+<p>If temperature is the dominant scalar, we set <code>FFscaleS = 0</code> and take the free-fall scale as <span class="arithmatex">\(U_T\)</span>.
+In this case, the dimensionless equations take the form</p>
+<div class="arithmatex">\[
+\partial_t \boldsymbol{u} + \boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = - \boldsymbol{\nabla} p + (T - {R_\rho}^{-1} C) \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\nabla^2 \boldsymbol{u} ,
+\]</div>
+<div class="arithmatex">\[
+\partial_t T + \boldsymbol{\nabla} \cdot (\boldsymbol{u} T) = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T ,
+\]</div>
+<div class="arithmatex">\[
+\partial_t C + \boldsymbol{\nabla} \cdot (\boldsymbol{u} C) = \frac{\tau}{\sqrt{Ra_T Pr}} \nabla^2 C .
+\]</div>
+<p>As with the temperature field, we can treat <span class="arithmatex">\(C\)</span> as a passive scalar by setting <code>active_S = 0</code> in the input file.</p>
+<h2 id="phase-field-method">Phase-field method</h2>
+<p>The latest addition to AFiD-MuRPhFi is the implementation of a phase-field method to simulate melting or dissolving solid objects immersed in a fluid flow.
+This method evolves an indicator function <span class="arithmatex">\(\phi\)</span> which takes the values 0/1 in the fluid/solid, approximating the fluid-solid interface by a finite, diffuse region.
+We follow the formulation of <a href="https://doi.org/10.1098/rspa.2020.0508">Hester et al (2020)</a>, appropriately scaled to match the dimensionless system detailed above.</p>
+<p>To start with, we consider the case with no salinity effects for simplicity.
+The (dimensionless) equations for the evolution of the velocity and temperature gain additional term due to volume penalisation in the solid and latent heat respectively, and now take the form</p>
+<div class="arithmatex">\[
+\partial_t \boldsymbol{u} + \boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = - \boldsymbol{\nabla} p + T \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\left(\nabla^2 \boldsymbol{u} - \frac{\phi \boldsymbol{u}}{\eta}\right) ,
+\]</div>
+<div class="arithmatex">\[
+\partial_t T + \boldsymbol{\nabla} \cdot (\boldsymbol{u} T) = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T + \mathcal{S}\partial_t \phi ,
+\]</div>
+<p>where <span class="arithmatex">\(\eta = (\beta \varepsilon)^2\)</span> is the volume penalty coefficient for a dimensionless diffusive interface thickness <span class="arithmatex">\(\varepsilon\)</span> and <span class="arithmatex">\(\mathcal{S}=L/c_p\Delta T\)</span> is the Stefan number.
+<span class="arithmatex">\(L\)</span> is the latent heat of solidification, and <span class="arithmatex">\(c_p\)</span> is the specific heat capacity which, like the diffusivity of heat <span class="arithmatex">\(\kappa_T\)</span>, is assumed to be equal in the solid and liquid phases.
+Following <a href="https://doi.org/10.1098/rspa.2020.0508">Hester et al (2020)</a>, we take <span class="arithmatex">\(\beta=1.51044385\)</span> as the optimal coefficient for the smooth volume penalty term.</p>
+<p>As an alternative to the volume penalty method, an extremely simple immersed boundary method is also implemented for imposing zero velocity in the solid.
+For this implementation, the the velocity is simply reset to zero where <span class="arithmatex">\(\phi&lt;0.5\)</span>.
+This restriction is imposed after the implicit step of the time-stepper but before the pressure correction to ensure that the velocity field remains divergence free at all times.
+The immersed boundary technique is activated when <code>IBM</code> is set to 1 in the input file, otherwise the volume penalty method is used.</p>
+<p>In dimensional form, the evolution equation for the phase variable <span class="arithmatex">\(\phi\)</span> is</p>
+<div class="arithmatex">\[
+\hat{\varepsilon} \frac{5}{6} \frac{L}{c_p\kappa_T} \partial_t \phi - \Gamma \nabla^2 \phi = -\frac{1}{\hat{\varepsilon}^2} \phi (1-\phi)(\Gamma (1-2\phi) + \hat{\varepsilon} (T-T_m)) .
+\]</div>
+<p>Here <span class="arithmatex">\(\hat{\varepsilon}=H\varepsilon\)</span> is the dimensional interface thickness, <span class="arithmatex">\(T_m\)</span> is the equilibrium melting temperature, and <span class="arithmatex">\(\Gamma\)</span> is the coefficient arising from the Gibbs-Thomson relationship linking the interface temperature to the curvature <span class="arithmatex">\(K\)</span> of the interface:</p>
+<div class="arithmatex">\[
+T - T_m = \Gamma K = \frac{\gamma T_m}{\rho_s L} K.
+\]</div>
+<p><span class="arithmatex">\(\gamma\)</span> is the surface energy and <span class="arithmatex">\(\rho_s\)</span> is the density of the solid.</p>
+<p>We now non-dimensionalise the phase-field equation using the same scales as before.
+This results in the evolution equation</p>
+<div class="arithmatex">\[
+\partial_t \phi = D \nabla^2 \phi - \frac{D}{\varepsilon^2} \phi (1 - \phi) (1 - 2\phi + A(T - T_m)) ,
+\]</div>
+<p>where the dimensionless coefficients are given by</p>
+<div class="arithmatex">\[
+D = \frac{6}{5\varepsilon} \frac{\kappa}{U_T H} \frac{c_p \Gamma}{LH}, \quad A = \frac{\varepsilon H \Delta T}{\Gamma} .
+\]</div>
+<p>Note that we can typically set <span class="arithmatex">\(\varepsilon=1/n_x^r\)</span> to be the mean refined grid spacing.
+Furthermore, <span class="arithmatex">\(D\)</span> can be written as <span class="arithmatex">\(D=1.2 (Pe_T \mathcal{S} A)^{-1}\)</span>, so choosing <span class="arithmatex">\(A\)</span> also determines <span class="arithmatex">\(D\)</span>.
+In this case, we can write down the dimensionless phase-field equation in terms of the physical parameters and a single model parameter <span class="arithmatex">\(A\)</span>:</p>
+<div class="arithmatex">\[
+\frac{\partial\phi}{\partial t} = \frac{6}{5 Pe_T \mathcal{S} A} \left\{ \nabla^2 \phi - \frac{1}{\varepsilon^2} \phi (1 - \phi) \left[1 - 2\phi + A(T - T_m)\right]\right\}.
+\]</div>
+<p>In the absence of temperature variations, <span class="arithmatex">\(\phi\)</span> has a steady state solution of</p>
+<div class="arithmatex">\[
+\phi = \frac{1}{2}\left(1 + \tanh \left(\frac{x-x_i}{2\varepsilon}\right)\right) ,
+\]</div>
+<p>where <span class="arithmatex">\(x_i\)</span> is the position of the fluid-solid interface.</p>
+<p>When running phase-field simulations, the Stefan number <span class="arithmatex">\(\mathcal{S}\)</span> and the parameter <span class="arithmatex">\(A\)</span> must be specified in the input file as the variables <code>pf_S</code> and <code>pf_A</code> respectively.
+The dimensionless melting temperature must also be set as the variable <code>pf_Tm</code>.</p>
+<!-- ####  -->
+<!-- 
+### Parameter choices
+A wide range of parameters have appeared in the phase-field implementation, so it is important to identify what values are relevant in the current setup.
+Two examples of parameters used in the literature are detailed below.
+
+Both Hester et al (2021) and Couston et al (2021) use A=1 without further justification.-->
+
+<h3 id="double-diffusive-melting">Double-diffusive melting</h3>
+<p>Following <a href="https://doi.org/10.1098/rspa.2020.0508">Hester et al (2020)</a>, we can also simulate the ablation of ice in salt water.
+In this case, the velocity of the ice-water boundary depends on the gradients of both temperature and salinity at the interface.
+In our non-dimensionalization (using the free-fall velocity scale for temperature), the full collection of equations reads as follows:</p>
+<div class="arithmatex">\[
+\partial_t \boldsymbol{u} + \boldsymbol{\nabla} \cdot (\boldsymbol{u} \boldsymbol{u}) = - \boldsymbol{\nabla} p + (T - {R_\rho}^{-1} C) \mathbf{\hat{e}_g} + \sqrt{\frac{Pr}{Ra_T}}\nabla^2 \boldsymbol{u} ,
+\]</div>
+<div class="arithmatex">\[
+\partial_t T + \boldsymbol{\nabla} \cdot (\boldsymbol{u} T) = \frac{1}{\sqrt{Ra_T Pr}} \nabla^2 T + \mathcal{S} \partial_t \phi ,
+\]</div>
+<div class="arithmatex">\[
+\partial_t C + \boldsymbol{\nabla} \cdot (\boldsymbol{u} C) = \frac{\tau}{\sqrt{Ra_T Pr}} \left(\nabla^2 C - \frac{\boldsymbol{\nabla} \phi \cdot \boldsymbol{\nabla} C}{1 - \phi + \delta}\right) + \frac{C\partial_t \phi}{1 - \phi + \delta},
+\]</div>
+<div class="arithmatex">\[
+\partial_t \phi = D \nabla^2 \phi - \frac{D}{\varepsilon^2} \phi (1 - \phi) (1 - 2\phi + A(T - T_m +\Lambda C)) .
+\]</div>
+<p>Two new dimensionless parameters have appeared in the equations.
+<span class="arithmatex">\(\delta \ll 1\)</span> is a small parameter that is solely present to stabilise the terms on the right hand side of the salinity equation.
+In the phase-field equation, we obtain a new physical parameter defined as</p>
+<div class="arithmatex">\[
+\Lambda = \frac{\lambda \Delta C}{\Delta T} ,
+\]</div>
+<p>where <span class="arithmatex">\(\Delta C\)</span> and <span class="arithmatex">\(\Delta T\)</span> are the previously used scales for salinity and temperature, and <span class="arithmatex">\(\lambda\)</span> is the liquidus slope.
+This refects how the presence of salinity at the ice-water interface lowers the local melting temperature.</p>
+<!-- ## Boundary conditions -->
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      
+        <script src="../javascripts/katex.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+      
+        <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+      
+    
+  </body>
+</html>

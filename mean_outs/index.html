@@ -1,0 +1,1131 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Chris Howland">
+      
+      
+        <link rel="canonical" href="https://chowland.github.io/AFiD-MuRPhFi/mean_outs/">
+      
+      
+        <link rel="prev" href="../outputs/">
+      
+      
+        <link rel="next" href="../jupyter/">
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+    
+    
+      
+        <title>Quantities saved to `means.h5` - AFiD-MuRPhFi Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#quantities-saved-to-meansh5" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-header__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AFiD-MuRPhFi Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Quantities saved to `means.h5`
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-nav__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    AFiD-MuRPhFi Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AFiD-MuRPhFi Quick Start Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installing prerequisites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Input file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../outputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Output file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Quantities saved to `means.h5`
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Quantities saved to `means.h5`
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mean-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mean profiles
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-mean-square-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root mean square profiles
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fluxes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fluxes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dissipation-rates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dissipation rates
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deriving-other-quantities-from-the-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deriving other quantities from the output
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deriving other quantities from the output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#energy-budgets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Energy budgets
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jupyter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Post-processing: Jupyter notebooks on HPCs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paraview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3D visualization with ParaView
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/rbc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rayleigh-Bénard Convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ddc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Double-diffusive convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/stefan/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stefan problems
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/coupled_flows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Flows coupled to phase change
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Benchmarking and validation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking and validation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scaling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Scaling performance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../convergence/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Convergence tests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phasefield_validation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Phase-field model validation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Technical Details
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Technical Details
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../equations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governing equations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../numerics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Numerical time stepping scheme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interpolation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hermite interpolation between grids
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stretched_grids/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Spatial derivatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ibm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Immersed boundary method
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spectra/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Power spectra and time-averaging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rainy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Moist convection module - Rainy-Bénard
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mean-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mean profiles
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-mean-square-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root mean square profiles
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fluxes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fluxes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dissipation-rates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dissipation rates
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deriving-other-quantities-from-the-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deriving other quantities from the output
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deriving other quantities from the output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#energy-budgets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Energy budgets
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="quantities-saved-to-meansh5">Quantities saved to <code>means.h5</code></h1>
+<p>The file <code>means.h5</code> contains a number of variables in the form <span class="arithmatex">\(f(x,t)\)</span>, where <span class="arithmatex">\(x\)</span> is the wall-normal coordinate.
+These variables are typically quantities averaged in the periodic (<span class="arithmatex">\(y,z\)</span>) directions such that further averaging the profiles in <span class="arithmatex">\(x\)</span> then gives a time series for a volume average.
+All profiles are evaluated at the cell centres.
+Quantities involving the variables <span class="arithmatex">\(S\)</span> or <span class="arithmatex">\(\phi\)</span> are evaluated on the refined grid <code>xmr</code> whereas all other quantities are evaluated on the base grid <code>xm</code>.</p>
+<h2 id="mean-profiles">Mean profiles</h2>
+<p>The variables named <code>vybar</code>, <code>vzbar</code>, <code>Tbar</code>, <code>Sbar</code>, and <code>phibar</code> are simply <span class="arithmatex">\(yz\)</span>-averages of the flow variables, i.e.</p>
+<div class="arithmatex">\[
+\overline{f}(x,t) = \frac{1}{L_y L_z} \int_0^{L_z} \int_0^{L_y} f(x,y,z,t) \,\mathrm{d}y\,\mathrm{d}z ,
+\]</div>
+<p>for <span class="arithmatex">\(f\in\{v,w,T,S,\phi\}\)</span>.
+We will use the overbar as notation for the <span class="arithmatex">\(yz\)</span>-average throughout this page.</p>
+<p><em>Note: due to the divergence-free velocity field, there is no point writing out <span class="arithmatex">\(\overline{u}(x,t)\)</span> since it must be identically zero.</em></p>
+<h2 id="root-mean-square-profiles">Root mean square profiles</h2>
+<p>The variables <code>vxrms</code>, <code>vyrms</code>, <code>vzrms</code>, <code>Trms</code>, <code>Srms</code>, and <code>phirms</code> are defined as the square root of the <span class="arithmatex">\(yz\)</span>-average of the squared flow variables, that is</p>
+<div class="arithmatex">\[
+f_\mathrm{rms}(x,t) = \sqrt{\overline{f^2}} .
+\]</div>
+<p>Often it is useful to quantify the rms value for the turbulent fluctuations rather than the total.
+We do not write this out from the simulation explicitly, since it can already be calculated from the output as</p>
+<div class="arithmatex">\[
+f^\prime_\mathrm{rms}(x,t) = \sqrt{\overline{\left(f - \overline{f}\right)^2}} = \sqrt{ {f_\mathrm{rms}}^2 - \overline{f}^2} .
+\]</div>
+<h2 id="fluxes">Fluxes</h2>
+<p>For the scalars <span class="arithmatex">\(T\)</span> and <span class="arithmatex">\(S\)</span>, we also output the fluxes <code>vxT</code>, <code>vyT</code>, <code>vzT</code>, <code>vxS</code>, <code>vyS</code>, <code>vzS</code> defined as the components of <span class="arithmatex">\(\overline{\boldsymbol{u}T}\)</span> and <span class="arithmatex">\(\overline{\boldsymbol{u}S}\)</span>.
+Fluxes for salinity are computed using the interpolated velocity fields on the refined grid.
+As above, it is often useful to separate the fluxes into a component due to the mean profiles and that due to turbulent fluctuations.
+Thanks to the nice properties of the <span class="arithmatex">\(yz\)</span>-average, this can be done easily as shown below for the turbulent flux of salinity in the <span class="arithmatex">\(y\)</span>-direction:</p>
+<div class="arithmatex">\[
+\overline{v'S'} = \overline{(v - \overline{v})(S - \overline{S})} = \overline{vS} - \overline{v}\overline{S} .
+\]</div>
+<p>Momentum fluxes (or Reynolds stresses) are also output to <code>means.h5</code>.
+Since terms such as <span class="arithmatex">\(\overline{uu}\)</span> are already attainable from the rms quantities, we only need to save the cross-terms <code>vxvy</code>, <code>vxvz</code>, and <code>vyvz</code>, defined as <span class="arithmatex">\(\overline{uv}\)</span>, <span class="arithmatex">\(\overline{uw}\)</span>, and <span class="arithmatex">\(\overline{vw}\)</span> respectively.</p>
+<p>Note that since <span class="arithmatex">\(\overline{u}\equiv 0\)</span>, any flux of the form <span class="arithmatex">\(\overline{uf}\)</span> is equal to its turbulent counterpart <span class="arithmatex">\(\overline{u'f'}\)</span>.</p>
+<h2 id="dissipation-rates">Dissipation rates</h2>
+<p>Finally, we also output the dissipation rates of kinetic energy and scalar variance as <code>epsilon</code>, <code>chiT</code>, and <code>chiS</code>.
+These are defined as</p>
+<div class="arithmatex">\[
+\varepsilon(x,t) = \frac{1}{Re}\overline{\frac{\partial u_i}{\partial x_j} \frac{\partial u_i}{\partial x_j}} , \qquad \chi_T(x,t) = \frac{1}{RePr} \overline{|\nabla T|^2}, \qquad \chi_S(x,t) = \frac{1}{ReSc} \overline{|\nabla S|^2} ,
+\]</div>
+<p>where <span class="arithmatex">\(Re\)</span> is the bulk Reynolds number, equal to <span class="arithmatex">\(\sqrt{Pr/Ra_T}\)</span> if the temperature free-fall scale is used (<code>FFscaleS=0</code>) or equal to <span class="arithmatex">\(\sqrt{Sc/Ra_S}\)</span> if the salinity free-fall scale is used (<code>FFscaleS=1</code>).</p>
+<p>As with the rms values and fluxes, it can be useful to determine the turbulent contributions to these dissipation rates.
+This can be done by computing the wall-normal derivatives of the mean profiles (for which there is a helper function <code>ddx</code> in the <code>afidtools</code> module).
+For example, the turbulent kinetic energy dissipation rate can be computed as</p>
+<div class="arithmatex">\[
+\varepsilon'(x,t) = \varepsilon - \frac{1}{Re} \left|\frac{\partial \boldsymbol{\overline{u}}}{\partial x} \right|^2
+\]</div>
+<h2 id="deriving-other-quantities-from-the-output">Deriving other quantities from the output</h2>
+<p>The outputs can also be useful for determining key quantities such as energy budget terms and the rms displacement of the phase boundary.</p>
+<h3 id="energy-budgets">Energy budgets</h3>
+<p>As an example, we consider the energy budget of the volume-averaged turbulent kinetic energy (TKE) <span class="arithmatex">\(E_K' = \frac{1}{2}\langle|\boldsymbol{u}'|^2\rangle\)</span>.
+Here and on the rest of this page, we use <span class="arithmatex">\(\langle \cdot\rangle\)</span> to denote a volume average.
+A volume average can be calculated from the mean profile data using the helper function <code>xmean</code> in the <code>afidtools</code> module.</p>
+<p>Derived from the momentum equation, the evolution equation for the TKE reads</p>
+<div class="arithmatex">\[
+\frac{dE_K'}{dt} = \mathcal{P}_S + \mathcal{J}' - \varepsilon' ,
+\]</div>
+<p>where the shear production <span class="arithmatex">\(\mathcal{P}_S\)</span> represents the transfer of energy between the mean flow and the turbulence, the buoyancy flux <span class="arithmatex">\(\mathcal{J}'\)</span> represents the exchange between kinetic and potential energy, and the dissipation rate <span class="arithmatex">\(\varepsilon'\)</span> has been discussed above.
+The two new terms are defined as</p>
+<div class="arithmatex">\[
+\mathcal{P}_S = -\left\langle \overline{u'\boldsymbol{u}'} \cdot \frac{\partial \overline{\boldsymbol{u}}}{\partial x} \right\rangle , \qquad
+\mathcal{J}' = \langle w'b'\rangle = \langle w'(R_\rho T' - S') \rangle
+\]</div>
+<p>Example code for computing the shear production term can be found below
+<div class="highlight"><pre><span></span><code><span class="n">folder</span> <span class="o">=</span> <span class="s2">&quot;/path/to/simulation/&quot;</span>
+<span class="kn">import</span> <span class="nn">afidtools</span> <span class="k">as</span> <span class="nn">afid</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="n">afid</span><span class="o">.</span><span class="n">Grid</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+<span class="n">vxvy</span><span class="p">,</span> <span class="n">vxvz</span> <span class="o">=</span> <span class="n">afid</span><span class="o">.</span><span class="n">read_mean</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;vxvy&quot;</span><span class="p">),</span> <span class="n">afid</span><span class="o">.</span><span class="n">read_mean</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;vxvz&quot;</span><span class="p">)</span>
+<span class="n">vybar</span><span class="p">,</span> <span class="n">vzbar</span> <span class="o">=</span> <span class="n">afid</span><span class="o">.</span><span class="n">read_mean</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;vybar&quot;</span><span class="p">),</span> <span class="n">afid</span><span class="o">.</span><span class="n">read_mean</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;vzbar&quot;</span><span class="p">)</span>
+<span class="n">dvydx</span><span class="p">,</span> <span class="n">dvzdx</span> <span class="o">=</span> <span class="n">afid</span><span class="o">.</span><span class="n">ddx</span><span class="p">(</span><span class="n">vybar</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">xm</span><span class="p">),</span> <span class="n">afid</span><span class="o">.</span><span class="n">ddx</span><span class="p">(</span><span class="n">vzbar</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">xm</span><span class="p">)</span>
+<span class="n">shear_prod</span> <span class="o">=</span> <span class="o">-</span><span class="n">vxvy</span><span class="o">*</span><span class="n">dvydx</span> <span class="o">-</span> <span class="n">vxvz</span><span class="o">*</span><span class="n">dvzdx</span>
+<span class="n">P_S</span> <span class="o">=</span> <span class="n">afid</span><span class="o">.</span><span class="n">xmean</span><span class="p">(</span><span class="n">shear_prod</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">xc</span><span class="p">)</span>
+</code></pre></div></p>
+<p>A function <code>energy_budgets</code> is also provided that collects all the relevant energy budget terms as time series into a Pandas DataFrame.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      
+        <script src="../javascripts/katex.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+      
+        <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+      
+    
+  </body>
+</html>

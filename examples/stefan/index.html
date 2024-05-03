@@ -1,0 +1,1215 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Chris Howland">
+      
+      
+        <link rel="canonical" href="https://chowland.github.io/AFiD-MuRPhFi/examples/stefan/">
+      
+      
+        <link rel="prev" href="../ddc/">
+      
+      
+        <link rel="next" href="../coupled_flows/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+    
+    
+      
+        <title>Stefan problems - AFiD-MuRPhFi Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#stefan-problems" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="AFiD-MuRPhFi Documentation" class="md-header__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AFiD-MuRPhFi Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Stefan problems
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AFiD-MuRPhFi Documentation" class="md-nav__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    AFiD-MuRPhFi Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AFiD-MuRPhFi Quick Start Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../prerequisites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installing prerequisites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../inputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Input file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../outputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Output file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mean_outs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quantities saved to `means.h5`
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jupyter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Post-processing: Jupyter notebooks on HPCs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../paraview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3D visualization with ParaView
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rbc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rayleigh-Bénard Convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ddc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Double-diffusive convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Stefan problems
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Stefan problems
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-d-solidification-from-a-cooled-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      1-D solidification from a cooled boundary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1-D solidification from a cooled boundary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-d-melting-from-a-hot-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      1-D melting from a hot boundary
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-d-freezing-into-a-supercooled-melt" class="md-nav__link">
+    <span class="md-ellipsis">
+      1-D freezing into a supercooled melt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#axisymmetric-melting-of-a-solid-disc-in-2-d" class="md-nav__link">
+    <span class="md-ellipsis">
+      Axisymmetric melting of a solid disc in 2-D
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-d-axisymmetric-growth-of-a-disc-from-a-supercooled-melt" class="md-nav__link">
+    <span class="md-ellipsis">
+      2-D axisymmetric growth of a disc from a supercooled melt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-d-multicomponent-melting-martin-and-kauffman-1977" class="md-nav__link">
+    <span class="md-ellipsis">
+      1-D multicomponent melting (Martin and Kauffman, 1977)
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../coupled_flows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Flows coupled to phase change
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Benchmarking and validation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking and validation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scaling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Scaling performance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../convergence/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Convergence tests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../phasefield_validation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Phase-field model validation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Technical Details
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Technical Details
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../equations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governing equations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../numerics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Numerical time stepping scheme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interpolation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hermite interpolation between grids
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../stretched_grids/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Spatial derivatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ibm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Immersed boundary method
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spectra/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Power spectra and time-averaging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rainy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Moist convection module - Rainy-Bénard
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-d-solidification-from-a-cooled-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      1-D solidification from a cooled boundary
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1-D solidification from a cooled boundary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-d-melting-from-a-hot-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      1-D melting from a hot boundary
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-d-freezing-into-a-supercooled-melt" class="md-nav__link">
+    <span class="md-ellipsis">
+      1-D freezing into a supercooled melt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#axisymmetric-melting-of-a-solid-disc-in-2-d" class="md-nav__link">
+    <span class="md-ellipsis">
+      Axisymmetric melting of a solid disc in 2-D
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-d-axisymmetric-growth-of-a-disc-from-a-supercooled-melt" class="md-nav__link">
+    <span class="md-ellipsis">
+      2-D axisymmetric growth of a disc from a supercooled melt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-d-multicomponent-melting-martin-and-kauffman-1977" class="md-nav__link">
+    <span class="md-ellipsis">
+      1-D multicomponent melting (Martin and Kauffman, 1977)
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="stefan-problems">Stefan problems</h1>
+<p>By setting <code>activeT = 0</code> in <code>bou.in</code>, we can decouple the temperature and velocity fields and model the class of problems involving only the diffusion of heat coupled to phase changes, known as Stefan problems.
+Some of the results obtained from running these examples can be found on the <a href="../../phasefield_validation/">validation page</a>.</p>
+<h2 id="1-d-solidification-from-a-cooled-boundary">1-D solidification from a cooled boundary</h2>
+<p>First, we consider the classical textbook example of a growing solidifaction front such as that presented in <a href="https://doi.org/10.1017/CBO9780511546747">Davis (2001)</a>.
+As a standard Stefan problem, this example does not involve any fluid flow, so the dynamics are entirely determined by the 1-D diffusion equation for temperature</p>
+<div class="arithmatex">\[
+\partial_t T =\frac{1}{Pe}\partial_{xx} T,
+\]</div>
+<p>and the boundary conditions.
+The initial condition considers an isothermal fluid at the melting temperature <span class="arithmatex">\(T_m\)</span>, which in our dimensionless framework we can set to <span class="arithmatex">\(T=1\)</span>.
+At <span class="arithmatex">\(t=0\)</span>, the lower boundary at <span class="arithmatex">\(x=0\)</span> is set to a lower temperature <span class="arithmatex">\(T=0\)</span>, and the fluid begins to solidify from the bottom.
+At the moving solidification front <span class="arithmatex">\(h(t)\)</span>, the boundary conditions are</p>
+<div class="arithmatex">\[
+T = T_m = 1, \qquad \mathcal{S}\frac{dh}{dt} = \frac{1}{Pe}\frac{\partial T}{\partial x} ,
+\]</div>
+<p>where <span class="arithmatex">\(\mathcal{S}\)</span> is the Stefan number.
+Using the similarity variable <span class="arithmatex">\(\eta = \frac{x}{2\sqrt{t/Pe}}\)</span>, this problem can be solved analytically as</p>
+<div class="arithmatex">\[
+T(x,t) = \frac{\mathrm{erf}(\eta)}{\mathrm{erf}(\Lambda)} \quad \textrm{for} \quad 0&lt;x&lt;h(t), \qquad h(t) = 2\Lambda \sqrt{t/Pe} ,
+\]</div>
+<p>where <span class="arithmatex">\(\Lambda\)</span> depends on the Stefan number through the condition</p>
+<div class="arithmatex">\[
+\sqrt{\pi}\Lambda e^{\Lambda^2} \mathrm{erf}(\Lambda) = \mathcal{S}^{-1} .
+\]</div>
+<p>When validating our numerical solver against this solution, it makes sense to avoid the singularity at <span class="arithmatex">\(t=0\)</span>, so we can instead start the simulation when the solidification front is already a finite distance from the lower wall.
+We take the initial position of the interface to be <span class="arithmatex">\(x=0.1\)</span>, which corresponds to a start time of <span class="arithmatex">\(t=Pe\left(\frac{h}{2\Lambda}\right)^2 = 0.0025 Pe/\Lambda^2\)</span>, and an initial condition for the simulation of</p>
+<div class="arithmatex">\[
+T(x,t) = \frac{1}{\mathrm{erf}(\Lambda)} \mathrm{erf}\left(\frac{\Lambda x}{0.1}\right) \quad \textrm{for} \quad 0&lt;x&lt;0.1, \qquad T = 1 \quad \textrm{for} \quad x&gt;0.1.
+\]</div>
+<p>Input files to run this example are provided in <a href="https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/1DFreezing"><code>examples/1DFreezing</code></a>.
+For this example, we use <span class="arithmatex">\(\mathcal{S}=1\)</span>, which requires <span class="arithmatex">\(\Lambda=0.62\)</span>.
+The value of <span class="arithmatex">\(\Lambda\)</span> is currently hard-coded into <code>CreateInitialConditions</code>, so if you want to test other values of <span class="arithmatex">\(\mathcal{S}\)</span> then this will need modifying.
+Since the domain is 1-D, this example must be run in serial (i.e. with <code>mpiexec -n 1</code>.</p>
+<h3 id="1-d-melting-from-a-hot-boundary">1-D melting from a hot boundary</h3>
+<p>For a pure substance, i.e. one where melting and freezing solely depends on the temperature, the inverse problem is mathematically identical.
+Therefore we can also validate against the case of an initially isothermal solid at the melting temperature <span class="arithmatex">\(T=T_m = 0\)</span> melting due to a boundary whose temperature is higher at <span class="arithmatex">\(T=1\)</span>.
+The above initial condition can be used by simply mapping <span class="arithmatex">\(T \rightarrow 1 - T\)</span>.</p>
+<p>The input file for this example is provided in <a href="https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/1DMelting"><code>examples/1DMelting</code></a>.</p>
+<h2 id="1-d-freezing-into-a-supercooled-melt">1-D freezing into a supercooled melt</h2>
+<p><a href="https://doi.org/10.1017/CBO9780511546747">Davis (2001)</a> also presents an example where one-dimensional freezing occurs into a liquid that is initially at a temperature <em>below</em> the melting temperature.
+In this example, the liquid is initially at <span class="arithmatex">\(T=0\)</span> and the melting temperature is higher at <span class="arithmatex">\(T_m=1\)</span>.
+As the system evolves, the solid occupies the domain <span class="arithmatex">\(z&lt;h(t)\)</span> and remains isothermal at the melting temperature.
+In the liquid, a similarity solution can be derived by imposing the boundary condition <span class="arithmatex">\(T\rightarrow 0\)</span> as <span class="arithmatex">\(x\rightarrow \infty\)</span>, using the same similarity variable <span class="arithmatex">\(\eta=x/2\sqrt{\kappa t}\)</span> as above:</p>
+<div class="arithmatex">\[
+T(\eta) = \frac{\mathrm{erfc}(\eta)}{\mathrm{erfc}(\Lambda)} , \qquad
+\sqrt{\pi} \Lambda e^{\Lambda^2} \mathrm{erfc}(\Lambda) = \mathcal{S}^{-1} .
+\]</div>
+<p>Here, <span class="arithmatex">\(\mathrm{erfc}(x) = 1 - \mathrm{erf}(x)\)</span> is the complementary error function.
+Note that the second equation above, which determines <span class="arithmatex">\(\Lambda\)</span>, has <strong>no</strong> solutions for <span class="arithmatex">\(\mathcal{S}\leq 1\)</span>.
+For such small Stefan numbers, this highlights a breakdown of the thermodynamic equilibrium assumption at the interface.
+We are not concerned with such problems, which could be addressed by including the effect of kinetic undercooling.
+For the validation of this case, we shall simply set the Stefan number higher at <span class="arithmatex">\(\mathcal{S}=10\)</span>, at which <span class="arithmatex">\(\Lambda=0.060314\)</span>.
+Setting the initial interface position to <span class="arithmatex">\(x=0.1\)</span> in this problem would result in a temperature significantly above zero at the upper boundary.
+We therefore set the intial interface position to be <span class="arithmatex">\(x=0.02\)</span>, for which the effect of enforcing <span class="arithmatex">\(T=0\)</span> at <span class="arithmatex">\(x=1\)</span> will be minimal.</p>
+<p>The input file for this example is provided in <a href="https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/1DSupercooling"><code>examples/1DSupercooling</code></a>.</p>
+<h2 id="axisymmetric-melting-of-a-solid-disc-in-2-d">Axisymmetric melting of a solid disc in 2-D</h2>
+<p>This example is taken from appendix A.2 of <a href="https://doi.org/10.1017/jfm.2018.773">Favier et al. (2019)</a>.
+Here, we consider an isothermal solid disc of radius 0.1 that is immersed in an isothermal fluid of higher temperature.
+The melting temperature is taken to be the half way between the temperature of the solid and that of the liquid.
+This example aims to (a) test the solver in two dimensions, and (b) confirm that curvature has a minimal effect on the melting temperature.</p>
+<p>The phase-field method cannot set the surface energy (which appears in our dimensionless framework as the parameter <span class="arithmatex">\(A\)</span>) as small as in the physical problem.
+The Gibbs-Thomson effect, by which surface curvature lowers the local melting point, is only significant at very small length scales or high curvatures, which are unlikely to be relevant for the problems we are considering.</p>
+<p>Following <a href="https://doi.org/10.1017/jfm.2018.773">Favier et al. (2019)</a>, we take the intial temperature field to be</p>
+<div class="arithmatex">\[
+T(r,t) = \frac{1 + \tanh(100(r - 0.1))}{2} ,
+\]</div>
+<p>where <span class="arithmatex">\(r = \sqrt{(x-0.5)^2 + (y - 0.5)^2}\)</span>, so the temperature in the solid disc is <span class="arithmatex">\(T=0\)</span> and the temperature in the liquid is <span class="arithmatex">\(T=1\)</span>.
+The melting temperature is set to <span class="arithmatex">\(T_m=0.5\)</span>.
+We provide a smooth initial condition for the phase-field variable as</p>
+<div class="arithmatex">\[
+\phi = \frac{1 - \tanh( (r-0.1)/2\varepsilon)}{2} ,
+\]</div>
+<p>where <span class="arithmatex">\(\varepsilon=1/N_x^r\)</span> is the diffuse interface thickness, equal to one wall-normal grid space.</p>
+<p>The input file for this example is provided in <a href="https://github.com/chowland/AFiD-MuRPhFi/tree/main/examples/2DAxisymMelting"><code>examples/2DAxisymMelting</code></a>.
+Here we take <span class="arithmatex">\(\mathcal{S}=1\)</span> to match the example presented in <a href="https://doi.org/10.1017/jfm.2018.773">Favier et al. (2019)</a>.</p>
+<h2 id="2-d-axisymmetric-growth-of-a-disc-from-a-supercooled-melt">2-D axisymmetric growth of a disc from a supercooled melt</h2>
+<p>Finally, we consider the problem originally considered by <a href="https://doi.org/10.1098/rspa.1950.0080">Frank (1950)</a> of the radially symmetric growth of a solid due to diffusion in a supercooled melt.
+In 2-D the problem considers the growth of a disc at the origin in an unbounded domain.
+The solid that grows is isothermal at the melting temperature <span class="arithmatex">\(T_m=1\)</span>, and the liquid phase is supercooled such that it tends to a far field temperature of <span class="arithmatex">\(T_\infty=0\)</span> as <span class="arithmatex">\(r\rightarrow\infty\)</span>.
+The solution for the radial temperature profile is then given by</p>
+<div class="arithmatex">\[
+T(r,t) = \frac{F(s)}{F(\Lambda)}, \quad \textrm{where } F(s) = E_1\left(\frac{s^2}{4}\right), \quad \textrm{and } E_1(z) = \int_z^\infty \frac{e^{-t}}{t} \mathrm{d}t .
+\]</div>
+<p>As in the above examples, <span class="arithmatex">\(s=r\sqrt{Pe/t}\)</span> is a similarity variable, and <span class="arithmatex">\(\Lambda\)</span> is the constant value of <span class="arithmatex">\(s\)</span> associated with the phase boundary.
+<span class="arithmatex">\(\Lambda\)</span> satisfies the following solvability condition:</p>
+<div class="arithmatex">\[
+\mathcal{S} \frac{\Lambda^2}{4}e^{\Lambda^2/4} F(\Lambda) = 1 .
+\]</div>
+<p>We fix the Stefan number to be 2.5, giving a value for <span class="arithmatex">\(\Lambda\)</span> of 1.2012.
+The initial radius for the solid in the simulation is chosen to be <span class="arithmatex">\(r=0.1\)</span> such that the unbounded solution for the temperature field is close to zero at the boundaries of our finite domain.
+This is associated with an initial time of <span class="arithmatex">\(t_0=25.3\)</span>.</p>
+<h2 id="1-d-multicomponent-melting-martin-and-kauffman-1977">1-D multicomponent melting (<a href="https://doi.org/10.1175/1520-0485(1977)007%3C0272:AEATSO%3E2.0.CO;2">Martin and Kauffman, 1977</a>)</h2>
+<p>We consider the melting of a solid ice phase (<span class="arithmatex">\(x&gt;h(t)\)</span>) by a liquid phase (<span class="arithmatex">\(x&lt;h(t)\)</span>) that has a far-field temperature <span class="arithmatex">\(T_0\)</span> and a far-field concentration of salinity <span class="arithmatex">\(C_0\)</span>.
+The ice phase contains no salt, so has concentration <span class="arithmatex">\(C=0\)</span>, and is uniform in temperature.
+The ice temperature is not known <em>a priori</em> but can be derived from the interfacial boundary conditions.</p>
+<p>We consider the problem as purely diffusive, so the governing equations in both phases are simply diffusion equations.
+We nondimensionalise the temperature and concentration fields as</p>
+<div class="arithmatex">\[
+T = T_e + \Delta T \ T^\ast, \qquad
+C = C_0 C^\ast ,
+\]</div>
+<p>where <span class="arithmatex">\(T_e=0 \degree\mathrm{C}\)</span> is the equilibrium melting temperature and <span class="arithmatex">\(\Delta T=T_0 - T_e\)</span>.</p>
+<p>Dropping the asterisks, the dimensionless governing equations then read</p>
+<div class="arithmatex">\[
+\partial_t T = \kappa_T \partial_{xx} T, \qquad
+\partial_t C = \kappa_S \partial_{xx} C,
+\]</div>
+<p>using <span class="arithmatex">\(\kappa_T\)</span> as shorthand for <span class="arithmatex">\(Pe^{-1}\)</span>, with the far-field boundary conditions</p>
+<div class="arithmatex">\[
+T\rightarrow 1 \quad C\rightarrow 1 \quad \textrm{as} \quad x\rightarrow -\infty ,
+\]</div>
+<p>and the interfacial boundary conditions</p>
+<div class="arithmatex">\[
+T+\Lambda C = 0, \qquad \mathcal{S}h'=-\kappa_T \partial_x T, \qquad
+Ch' = -\kappa_S \partial_x C,
+\]</div>
+<p>at <span class="arithmatex">\(x=h(t)\)</span>.
+Here <span class="arithmatex">\(\Lambda=\lambda \Delta T/C_0\)</span> is the dimensionless liquidus slope where <span class="arithmatex">\(\lambda=5.71\times 10^{-2} \ \degree\mathrm{C} (\mathrm{psu})^{-1}\)</span>, and <span class="arithmatex">\(\mathcal{S}=L/c_p\Delta T\)</span> is the Stefan number.</p>
+<p>Note that although <span class="arithmatex">\(C=0\)</span> in the solid phase, <span class="arithmatex">\(C\)</span> can be non-zero in the liquid phase at the interface, meaning that the concentration field can jump at <span class="arithmatex">\(x=h(t)\)</span>.</p>
+<p>The solution reads</p>
+<div class="arithmatex">\[
+T(x,t) = \begin{cases}
+1 - A\mathrm{erfc}(-\eta) &amp; x&lt;h(t) \\
+1 - A\mathrm{erfc}(-\alpha) &amp;  x\geq h(t)
+\end{cases}
+\]</div>
+<div class="arithmatex">\[
+C(x,t) = \begin{cases}
+1 - B\mathrm{erfc}(-\eta/\sqrt{\tau}) &amp; x&lt;h(t) \\
+0 &amp;  x\geq h(t)
+\end{cases}
+\]</div>
+<p>where</p>
+<div class="arithmatex">\[
+\eta = \frac{x}{2\sqrt{\kappa_T t}}
+\]</div>
+<p>is the similarity variable and <span class="arithmatex">\(\tau=\kappa_S/\kappa_T\)</span> is the diffusivity ratio.
+The interface moves as <span class="arithmatex">\(h(t)=2\alpha \sqrt{\kappa_T t}\)</span> for the constant value <span class="arithmatex">\(\alpha\)</span>.
+The coefficients <span class="arithmatex">\(\alpha\)</span>, <span class="arithmatex">\(A\)</span>, and <span class="arithmatex">\(B\)</span> can be determined through the boundary conditions.</p>
+<p>Specifically, they satisfy the following relations:</p>
+<div class="arithmatex">\[
+\alpha e^{\alpha^2} \mathrm{erfc}(-\alpha) = \frac{1+\Lambda}{\mathcal{S}\sqrt{\pi}}\left[ 1 - \frac{\Lambda}{1+\Lambda} f(\alpha/\sqrt{\tau})\right] , \quad \textrm{where} \ f(\gamma) = \frac{\gamma \sqrt{\pi} \mathrm{erfc}(-\gamma)}{e^{-\gamma^2} + \gamma \sqrt{\pi}\mathrm{erfc}(-\gamma)} ,
+\]</div>
+<div class="arithmatex">\[
+\alpha e^{\alpha^2} = \frac{A}{\mathcal{S}\sqrt{\pi}} , \qquad A = \frac{1 + \Lambda - \Lambda B \mathrm{erfc}(-\alpha/\sqrt{\tau})}{\mathrm{erfc}(-\alpha)} .
+\]</div>
+<p>The coefficients are fully determined once values of <span class="arithmatex">\(\Lambda\)</span>, <span class="arithmatex">\(\tau\)</span> and <span class="arithmatex">\(\mathcal{S}\)</span> are specified.
+For our validation case, we will take <span class="arithmatex">\(\mathcal{S}=2.5\)</span>, <span class="arithmatex">\(\tau=0.1\)</span> and <span class="arithmatex">\(\Lambda =0.4\)</span>, giving the following values for the solution coefficients:</p>
+<div class="arithmatex">\[
+A=0.90954, \quad B=0.44748, \quad \alpha = 0.19742 .
+\]</div>
+<p>An animation of the solution is shown below, where temperature is plotted as a red line, concentration is in blue, and the interface position is shown by a vertical black line.
+The origin for the similarity variable has been shifted such that the initial position of the interface is at <span class="arithmatex">\(x=0.8\)</span>.
+Note the constant values of <span class="arithmatex">\(T\)</span> and <span class="arithmatex">\(C\)</span> and the interface, as well as the significant jump in <span class="arithmatex">\(C\)</span> at the interface.</p>
+<p><video width="100%" controls>
+  <source src="../../assets/1D_DD_analytic.mp4" type="video/mp4">
+</video></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      
+        <script src="../../javascripts/katex.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+      
+        <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+      
+    
+  </body>
+</html>

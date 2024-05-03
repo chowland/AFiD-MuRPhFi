@@ -1,0 +1,1058 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Chris Howland">
+      
+      
+        <link rel="canonical" href="https://chowland.github.io/AFiD-MuRPhFi/numerics/">
+      
+      
+        <link rel="prev" href="../equations/">
+      
+      
+        <link rel="next" href="../interpolation/">
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+    
+    
+      
+        <title>Numerical time stepping scheme - AFiD-MuRPhFi Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#numerical-time-stepping-scheme" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-header__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AFiD-MuRPhFi Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Numerical time stepping scheme
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-nav__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    AFiD-MuRPhFi Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AFiD-MuRPhFi Quick Start Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installing prerequisites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Input file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../outputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Output file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mean_outs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quantities saved to `means.h5`
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jupyter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Post-processing: Jupyter notebooks on HPCs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paraview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3D visualization with ParaView
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/rbc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rayleigh-Bénard Convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ddc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Double-diffusive convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/stefan/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stefan problems
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/coupled_flows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Flows coupled to phase change
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Benchmarking and validation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking and validation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scaling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Scaling performance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../convergence/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Convergence tests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phasefield_validation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Phase-field model validation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Technical Details
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Technical Details
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../equations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governing equations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Numerical time stepping scheme
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Numerical time stepping scheme
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#third-order-runge-kutta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Third order Runge-Kutta
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#crank-nicolson-semi-implicit-diffusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Crank-Nicolson (semi-implicit) diffusion
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pressure-solver-split-time-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pressure solver - split time step
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interpolation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hermite interpolation between grids
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stretched_grids/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Spatial derivatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ibm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Immersed boundary method
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spectra/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Power spectra and time-averaging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rainy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Moist convection module - Rainy-Bénard
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#third-order-runge-kutta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Third order Runge-Kutta
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#crank-nicolson-semi-implicit-diffusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Crank-Nicolson (semi-implicit) diffusion
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pressure-solver-split-time-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pressure solver - split time step
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="numerical-time-stepping-scheme">Numerical time stepping scheme</h1>
+<h2 id="third-order-runge-kutta">Third order Runge-Kutta</h2>
+<p>For the time-stepping, the evolution of each state variable (<span class="arithmatex">\(u\)</span>, <span class="arithmatex">\(v\)</span>, <span class="arithmatex">\(w\)</span>, <span class="arithmatex">\(T\)</span>, <span class="arithmatex">\(S\)</span>, <span class="arithmatex">\(\phi\)</span>) is essentially treated in the same way.
+The wall-normal diffusion (associated with a <span class="arithmatex">\(\partial_xx\)</span> term) is treated semi-implicitly, and all other terms are treated explicitly.
+A third-order Runge-Kutta scheme is used:</p>
+<div class="arithmatex">\[
+\frac{f^{l+1} - f^l}{\Delta t} = \gamma_l H^l + \rho_l H^{l-1} + \alpha_l \mathcal{L} \left(\frac{f^{l+1} + f^l}{2}\right),
+\]</div>
+<p>where <span class="arithmatex">\(H^l\)</span> denotes the explicit terms of the equation at the beginning of Runge-Kutta substep <span class="arithmatex">\(l\)</span>.
+The coefficients of the time stepper are those given by <a href="https://doi.org/10.1016/0021-9991(91)90264-L">Rai and Moin (1991)</a>:</p>
+<div class="arithmatex">\[
+\gamma_1 = 8/15, \quad \gamma_2 = 5/12, \quad \gamma_3 = 3/4, \\
+\rho_1 = 0, \quad \rho_2 = -17/60, \quad \rho_3 = -5/12 ,
+\]</div>
+<p>and <span class="arithmatex">\(\alpha_l = \gamma_l + \rho_l\)</span>.
+The pressure term in the momentum equation is treated using a split time step to ensure the velocity field remains divergence free.
+This is detailed below.</p>
+<h2 id="crank-nicolson-semi-implicit-diffusion">Crank-Nicolson (semi-implicit) diffusion</h2>
+<p>The only term in each equation that is not treated explicitly is the wall-normal component of the diffusion.
+This term is treated semi-implicitly, which we illustrate below with a simple 1D diffusion scheme to discretise <span class="arithmatex">\(\partial f/\partial t = \kappa \partial^2 f/\partial x^2\)</span>:</p>
+<div class="arithmatex">\[
+\frac{f_k^{n+1} - f_k^n}{\Delta t} = \kappa \mathcal{L}\left(\frac{f_k^{n+1} + f_k^n}{2}\right) = \kappa \mathcal{L}\left(\frac{f_k^{n+1} - f_k^n}{2} + f_k^n\right) .
+\]</div>
+<p>Here <span class="arithmatex">\(\mathcal{L}\)</span> is the discrete form of the second spatial derivative.
+Writing the scheme as above allows us to rearrange and solve for the increment <span class="arithmatex">\(\Delta f_k = f_k^{n+1} - f_k\)</span>:</p>
+<div class="arithmatex">\[
+\left(1 - \frac{\kappa \Delta t}{2}\mathcal{L}\right) \Delta f_k = \kappa \Delta t \mathcal{L} f_k^n
+\]</div>
+<p>This amounts to solving a tridiagonal matrix equation, for which AFiD uses a fast LAPACK routine <code>dgttrs</code>.
+This step is performed in the subroutines named <code>SolveImpEqnUpdate_XX</code>.
+Note that for a Runge-Kutta substep, <span class="arithmatex">\(\Delta t\)</span> in the above equation should be replaced with <span class="arithmatex">\(\alpha \Delta t\)</span>.</p>
+<h2 id="pressure-solver-split-time-step">Pressure solver - split time step</h2>
+<p>For the momentum equations, each Runge-Kutta substep is split into two steps - one to evolve the velocity due to advection, diffusion, buoyancy etc., and one to solve for the pressure correction needed to ensure that <span class="arithmatex">\(\boldsymbol{\nabla} \cdot \boldsymbol{u}^{l+1} = 0\)</span>.
+An intermediate velocity <span class="arithmatex">\(\hat{u}_k\)</span> is obtained by the RK step</p>
+<div class="arithmatex">\[
+\frac{\hat{u}_k - u_k^l}{\Delta t} = \gamma_l H^l_k + \rho_l H^{l-1}_k - \alpha_l \mathcal{G}_kp^l + \alpha_l \mathcal{L} \left(\frac{u_k^{l+1} + u_k^l}{2}\right),
+\]</div>
+<p>where <span class="arithmatex">\(\mathcal{G}_k\)</span> is the discrete form of the gradient operator and <span class="arithmatex">\(p^l\)</span> is the pressure at the start of the substep.
+The continuity equation <span class="arithmatex">\(\boldsymbol{\nabla}\cdot\boldsymbol{u}=0\)</span> is then enforced by</p>
+<div class="arithmatex">\[
+u_k^{l+1} - \hat{u}_k = -\alpha_l \Delta t \mathcal{G}_k \Phi^{l+1} ,
+\]</div>
+<p>where <span class="arithmatex">\(\Phi\)</span> is the pressure correction.</p>
+<p>The equation for the pressure correction arises by taking the divergence of the above equation, such that</p>
+<div class="arithmatex">\[
+\boldsymbol{\nabla}\cdot\boldsymbol{u}^{l+1} = 0 \approx \boldsymbol{\nabla}\cdot\boldsymbol{\hat{u}} - \alpha_l \Delta t \nabla^2 \Phi^{l+1} .
+\]</div>
+<p>The divergence of <span class="arithmatex">\(\hat{\boldsymbol{u}}\)</span> is computed using finite differences, and then Fourier transformed.
+The derivatives for the pressure correction in the periodic directions can be expressed using Fourier transforms, whereas the wall-normal derivative must use a finite difference.
+Denoting <span class="arithmatex">\(\boldsymbol{\tilde{u}}\)</span> and <span class="arithmatex">\(\tilde{\Phi}\)</span> as the (<span class="arithmatex">\(yz\)</span>-)Fourier transforms of <span class="arithmatex">\(\boldsymbol{\hat{u}}\)</span> and <span class="arithmatex">\(\Phi^{l+1}\)</span> respectively, we can now write the problem as a linear system</p>
+<div class="arithmatex">\[
+\alpha_l \Delta t\left[ \mathcal{DG} - (k_y^2 + k_z^2)\mathcal{I}\right]\tilde{\Phi} = \widetilde{\nabla\cdot \boldsymbol{u}},
+\]</div>
+<p>where <span class="arithmatex">\(\mathcal{D}\)</span> is the wall-normal discrete divergence operator.
+For each Fourier mode <span class="arithmatex">\(k_y\)</span>, <span class="arithmatex">\(k_z\)</span>, this provides a 1-D linear system that can be expressed as a tridiagonal matrix and solved for <span class="arithmatex">\(\tilde{\Phi}\)</span> using similar LAPACK routines as for the implicit step above.
+This is performed in the <code>SolvePressureCorrection</code> subroutine.</p>
+<p>Note that since we are aiming to set the divergence of <span class="arithmatex">\(\boldsymbol{u}^{l+1}\)</span> to zero, we use the composite discrete operator <span class="arithmatex">\(\mathcal{DG}\)</span> for the second derivative of <span class="arithmatex">\(\Phi\)</span> rather than the discrete Laplacian <span class="arithmatex">\(\mathcal{L}\)</span> used above in the equations of motion.
+These are <em>not</em> the same operator.
+For completeness, the composite operator <span class="arithmatex">\(\mathcal{DG}\)</span> takes the form</p>
+<div class="arithmatex">\[
+\mathcal{DG}\Phi_k = a_+ (\Phi_{k+1} - \Phi_k) - a_- (\Phi_k - \Phi_{k-1}) ,
+\]</div>
+<div class="arithmatex">\[
+a_+ = [(x^m_{k+1} - x^m_k)(x^c_{k+1} - x^c_k)]^{-1}, \qquad
+a_+ = [(x^m_k - x^m_{k-1})(x^c_{k+1} - x^c_k)]^{-1},
+\]</div>
+<p>where <span class="arithmatex">\(x^c\)</span> is the wall-normal velocity grid, and <span class="arithmatex">\(x^m\)</span> is the cell-centre grid.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      
+        <script src="../javascripts/katex.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+      
+        <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+      
+    
+  </body>
+</html>

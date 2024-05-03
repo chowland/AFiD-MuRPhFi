@@ -1,0 +1,1180 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Chris Howland">
+      
+      
+        <link rel="canonical" href="https://chowland.github.io/AFiD-MuRPhFi/rainy/">
+      
+      
+        <link rel="prev" href="../spectra/">
+      
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+    
+    
+      
+        <title>Moist convection module - Rainy-Bénard - AFiD-MuRPhFi Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#moist-convection-module-rainy-benard" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-header__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AFiD-MuRPhFi Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Moist convection module - Rainy-Bénard
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-nav__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    AFiD-MuRPhFi Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AFiD-MuRPhFi Quick Start Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installing prerequisites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Input file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../outputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Output file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mean_outs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quantities saved to `means.h5`
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jupyter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Post-processing: Jupyter notebooks on HPCs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paraview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3D visualization with ParaView
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/rbc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rayleigh-Bénard Convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ddc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Double-diffusive convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/stefan/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stefan problems
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/coupled_flows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Flows coupled to phase change
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Benchmarking and validation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking and validation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scaling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Scaling performance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../convergence/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Convergence tests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phasefield_validation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Phase-field model validation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Technical Details
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Technical Details
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../equations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governing equations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../numerics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Numerical time stepping scheme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interpolation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hermite interpolation between grids
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stretched_grids/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Spatial derivatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ibm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Immersed boundary method
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spectra/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Power spectra and time-averaging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Moist convection module - Rainy-Bénard
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Moist convection module - Rainy-Bénard
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start-humidin-input-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick start: humid.in input file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#governing-equations-and-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Governing equations and variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Governing equations and variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#buoyancy-and-temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      Buoyancy and temperature
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specific-humidity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Specific humidity
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional notes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional notes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-drizzle-solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      The drizzle solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statistics-written-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      Statistics written out
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start-humidin-input-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick start: humid.in input file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#governing-equations-and-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Governing equations and variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Governing equations and variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#buoyancy-and-temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      Buoyancy and temperature
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specific-humidity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Specific humidity
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional notes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional notes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-drizzle-solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      The drizzle solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statistics-written-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      Statistics written out
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="moist-convection-module-rainy-benard">Moist convection module - Rainy-Bénard</h1>
+<p>The <code>afid_moisture</code> module provides additional features needed to simulate a simple model of moist convection.
+This follows the setup of <a href="https://doi.org/10.1017/jfm.2018.954">Vallis et al. (2019)</a> which is outlined below.</p>
+<h2 id="quick-start-humidin-input-file">Quick start: <code>humid.in</code> input file</h2>
+<p>If you already know the setup of the Rainy-Bénard model, and just want to get started running simulations, you need to use/modify the <code>humid.in</code> file in <code>examples/RainyBenard</code>, which defines the following parameters (given by their internal names in the code)</p>
+<ul>
+<li><code>alpha_q</code>: <span class="arithmatex">\(\alpha = L\Delta T/R_v T_0^2\)</span> the dimensionless parameter determining the temperature dependence of the saturation humidity</li>
+<li><code>beta_q</code>: <span class="arithmatex">\(\beta = gH/c_p \Delta T\)</span> the dimensionless lapse rate parameter</li>
+<li><code>gamma_q</code>: <span class="arithmatex">\(\gamma = L q_0/c_p \Delta T\)</span> the dimensionless parameter determining the strength of heating due to condensation<ul>
+<li>Setting <code>gamma_q &lt; 0</code> overrides the input value by setting <span class="arithmatex">\(\gamma = \beta \Delta q\)</span>, where <span class="arithmatex">\(\Delta q\)</span> is the moisture difference between the top and bottom boundaries. This ensures that </li>
+</ul>
+</li>
+<li><code>tau_q</code>: <span class="arithmatex">\(\tau\)</span> the condensation timescale used in the fast relaxation term<ul>
+<li><code>ifdiff==.true.</code> implies that <span class="arithmatex">\(\tau\)</span> is defined in diffusive time units <span class="arithmatex">\(H^2/\kappa\)</span> (e.g. to match Vallis et al)</li>
+<li><code>ifdiff==.false.</code> implies that <span class="arithmatex">\(\tau\)</span> is defined in buoyancy-scaled time units <span class="arithmatex">\(H/\sqrt{g\Delta T H/T_0}\)</span></li>
+<li><strong>N.B.</strong> for stability, we must enforce that the time step <span class="arithmatex">\(\Delta t &lt; 0.1 \tau\)</span>. If <span class="arithmatex">\(\tau\)</span> is sufficiently small, then <code>dtmax</code> will be overwritten to enforce this constraint.</li>
+</ul>
+</li>
+<li><code>qfixN</code> sets the top boundary condition:<ul>
+<li><code>qfixN==0</code> sets a no-flux condition <span class="arithmatex">\(\partial_z q=0\)</span></li>
+<li><code>qfixN==1</code> sets a fixed, saturated value at the top <span class="arithmatex">\(q=q_s=1-e^{-\alpha}\)</span></li>
+<li><code>qfixN==2</code> sets a fixed, dry value at the top <span class="arithmatex">\(q=0\)</span></li>
+</ul>
+</li>
+<li><code>qfixS</code> sets the bottom boundary condition in the same way, and can be set as saturated (<code>1</code>) or as no flux (<code>0</code>).</li>
+<li><code>Sm</code>: <span class="arithmatex">\(S_m = \kappa_q/\kappa\)</span> the diffusivity ratio of moisture and heat.</li>
+</ul>
+<p>The model for moist convection will only be run if both <code>bou.in</code> and <code>humid.in</code> are in the current directory.
+The logical variable <code>moist</code> in the code determines which additional subroutines to call when running a simulation of moist convection.</p>
+<h2 id="governing-equations-and-variables">Governing equations and variables</h2>
+<h3 id="buoyancy-and-temperature">Buoyancy and temperature</h3>
+<p>In the Rainy-Bénard model, we solve buoyancy <span class="arithmatex">\(b\)</span> in place of temperature, where buoyancy is defined as</p>
+<div class="arithmatex">\[
+b =-\frac{g(\rho-\rho_0)}{\rho_0} =\frac{g}{T_0} \left(T - T_0  + \frac{g}{c_p} z \right).
+\]</div>
+<p>The final term in the above expression represents the dry lapse rate, i.e. the rate at which air of the same density decreases in temperature with height due to the changes in pressure.
+The Rainy-Bénard setup, like classical Rayleigh-Bénard, enforces fixed values of temperature at the top and bottom of the domain, differing by <span class="arithmatex">\(\Delta T\)</span>.
+Buoyancy can therefore be non-dimensionalised using <span class="arithmatex">\(g\Delta T/T_0\)</span>, and satisfies the equation</p>
+<div class="arithmatex">\[
+D_t b^* = (RaPr)^{1/2} \nabla^2 b^* + Q_c,
+\]</div>
+<p>where <span class="arithmatex">\(Q_c\)</span> represents the heating due to condensation of water vapour.
+In the code, we re-use the variable <code>temp</code> for <span class="arithmatex">\(b^*\)</span> and add the condensation term (defined below) in the subroutine <code>AddCondensation</code>.</p>
+<p>In dimensionless form, the boundary conditions on temperature are</p>
+<div class="arithmatex">\[
+\theta = 0, \ z=0, \qquad \theta = -1, \ z = 1,
+\]</div>
+<p>leading to the following boundary conditions for the dimensionless buoyancy</p>
+<div class="arithmatex">\[
+b = 0, \ z = 0, \qquad b = \beta - 1, \ z=1 .
+\]</div>
+<p>Here, the dimensionless parameter <span class="arithmatex">\(\beta\)</span>, which can be set by the input file <code>humid.in</code>, is defined as</p>
+<div class="arithmatex">\[
+\beta = \frac{gH}{c_p \Delta T} .
+\]</div>
+<h3 id="specific-humidity">Specific humidity</h3>
+<p>The additional scalar field introduced by the Rainy-Bénard model is the specific humidity <span class="arithmatex">\(q\)</span>.
+This field also satisfies an advection-diffusion equation with an additional term to represent the effect of condensation.
+The condensation term takes the form of a fast relaxation term that damps humidity above saturation back to the saturated value.</p>
+<p>The saturation humidity is defined as</p>
+<div class="arithmatex">\[
+q_s = q_0\exp [\alpha \theta] = q_0 \exp [\alpha (b^* - \beta z)], \qquad \alpha = \frac{L\Delta T}{R_v T_0^2}.
+\]</div>
+<p>Here, an additional dimensionless control parameter <span class="arithmatex">\(\alpha\)</span> has been introduced, that can be set by the input file <code>humid.in</code>.</p>
+<p>In the solver, specific humidity is scaled by <span class="arithmatex">\(q_0\)</span>, such that in dimensionless form a saturated bottom boundary takes the value <span class="arithmatex">\(q=1\)</span>.
+The governing equation for humidity is as follows</p>
+<div class="arithmatex">\[
+D_t q = \frac{S_m}{\sqrt{Ra Pr}} \nabla^2 q + \frac{q - q_s}{\tau} \mathcal{H}(q - q_s) ,
+\]</div>
+<p>where <span class="arithmatex">\(S_m=\kappa_q/\kappa\)</span> accounts for the fact that moisture and heat may not diffuse at the same rates.
+Both <span class="arithmatex">\(S_m\)</span> and the condensation time-scale <span class="arithmatex">\(\tau\)</span> can be set in the <code>humid.in</code> input file.
+This equation is solved in an identical manner to the temperature equation.</p>
+<p>Finally, the heating due to condensation can be expressed by invoking the first law of thermodynamics, that <span class="arithmatex">\(L \Delta q = c_p \Delta T\)</span>.
+In dimensionless form, this leads to the expression</p>
+<div class="arithmatex">\[
+Q_c = \gamma \frac{q - q_s}{\tau} \mathcal{H}(q - q_s), \qquad \gamma = \frac{L q_0}{c_p \Delta T} .
+\]</div>
+<p>As with the other dimensionless control parameters, <span class="arithmatex">\(\gamma\)</span> can be set in <code>humid.in</code>.</p>
+<h2 id="additional-notes">Additional notes</h2>
+<h3 id="the-drizzle-solution">The drizzle solution</h3>
+<p>The Rainy-Bénard system has a static solution known as the 'drizzle' solution where the moist static energy <span class="arithmatex">\(m=b+\gamma q\)</span> is linear.
+We can optionally start a simulation from this state (with small-amplitude random noise) by providing an input <code>drizzle.h5</code> in the run directory.
+This contains the individual profiles for <span class="arithmatex">\(b(z)\)</span> and <span class="arithmatex">\(q(z)\)</span>, and can be created using the python script <code>tools/drizzle.py</code>.</p>
+<h3 id="statistics-written-out">Statistics written out</h3>
+<p>The following profiles are added to <code>outputdir/means.h5</code> if the moisture model is running:</p>
+<ul>
+<li><code>qbar</code>: <span class="arithmatex">\(\overline{q}(z,t)\)</span> horizontally-averaged specific humidity</li>
+<li><code>qrms</code>: <span class="arithmatex">\(\sqrt{\overline{q^2}}(z,t)\)</span> root-mean-squared humidity</li>
+<li><code>qsat</code>: <span class="arithmatex">\(\overline{q_s}(z,t)\)</span> saturation humidity</li>
+<li><code>qrel</code>: <span class="arithmatex">\(\overline{(q/q_s)}(z,t)\)</span> <em>relative</em> humidity</li>
+<li><code>vxq</code>: <span class="arithmatex">\(\overline{wq}(z,t)\)</span> vertical advective moisture flux</li>
+<li><code>vyq</code>: <span class="arithmatex">\(\overline{uq}(z,t)\)</span> horizontal advective moisture flux (in <span class="arithmatex">\(x\)</span>)</li>
+<li><code>vzq</code>: <span class="arithmatex">\(\overline{vq}(z,t)\)</span> horizontal advective moisture flux (in <span class="arithmatex">\(y\)</span>)</li>
+</ul>
+<p>Cuts of <span class="arithmatex">\(q\)</span> are also written out to the <code>movie_Xcut.h5</code> files under the name <code>qhum</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      
+        <script src="../javascripts/katex.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+      
+        <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+      
+    
+  </body>
+</html>

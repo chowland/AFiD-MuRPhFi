@@ -1,0 +1,1291 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Chris Howland">
+      
+      
+        <link rel="canonical" href="https://chowland.github.io/AFiD-MuRPhFi/inputs/">
+      
+      
+        <link rel="prev" href="../prerequisites/">
+      
+      
+        <link rel="next" href="../outputs/">
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+    
+    
+      
+        <title>Input file overview - AFiD-MuRPhFi Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.66ac8b77.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#input-file-overview" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-header__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AFiD-MuRPhFi Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Input file overview
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AFiD-MuRPhFi Documentation" class="md-nav__button md-logo" aria-label="AFiD-MuRPhFi Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h320c53 0 96-43 96-96S405 0 352 0h-32c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h128c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+
+    </a>
+    AFiD-MuRPhFi Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/chowland/AFiD-MuRPhFi" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chowland/AFiD-MuRPhFi
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AFiD-MuRPhFi Quick Start Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Usage
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installing prerequisites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Input file overview
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Input file overview
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bouin" class="md-nav__link">
+    <span class="md-ellipsis">
+      bou.in
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="bou.in">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grid-size-time-step-algorithm-and-multi-resolution-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      Grid size, time step algorithm, and multi-resolution flags
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulation-initialization-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simulation initialization flags
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulation-time-and-io-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simulation time and I/O parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domain-size-and-grid-stretching-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Domain size and grid stretching parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#physical-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Physical parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-stepping-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Time stepping parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boundary-conditions-and-gravity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Boundary conditions and gravity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shear-pressure-gradient-and-melting-condition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shear, pressure gradient, and melting condition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-field-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase-field parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#immersed-boundary-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Immersed boundary objects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../outputs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Output file overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mean_outs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quantities saved to `means.h5`
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jupyter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Post-processing: Jupyter notebooks on HPCs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paraview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3D visualization with ParaView
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/rbc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rayleigh-Bénard Convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ddc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Double-diffusive convection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/stefan/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stefan problems
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/coupled_flows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Flows coupled to phase change
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Benchmarking and validation
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking and validation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scaling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Scaling performance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../convergence/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Convergence tests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phasefield_validation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Phase-field model validation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Technical Details
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Technical Details
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../equations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governing equations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../numerics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Numerical time stepping scheme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interpolation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hermite interpolation between grids
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stretched_grids/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Spatial derivatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ibm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Immersed boundary method
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spectra/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Power spectra and time-averaging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rainy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Moist convection module - Rainy-Bénard
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bouin" class="md-nav__link">
+    <span class="md-ellipsis">
+      bou.in
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="bou.in">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grid-size-time-step-algorithm-and-multi-resolution-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      Grid size, time step algorithm, and multi-resolution flags
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulation-initialization-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simulation initialization flags
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulation-time-and-io-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simulation time and I/O parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domain-size-and-grid-stretching-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Domain size and grid stretching parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#physical-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Physical parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-stepping-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Time stepping parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boundary-conditions-and-gravity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Boundary conditions and gravity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shear-pressure-gradient-and-melting-condition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shear, pressure gradient, and melting condition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-field-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Phase-field parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#immersed-boundary-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Immersed boundary objects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="input-file-overview">Input file overview</h1>
+<p>At present only one input file is needed to run a simulation using AFiD-MuRPhFi.
+For historical reasons unknown to me, this file is named <code>bou.in</code>.
+The only other (optional) input file at the moment is <code>spectra.in</code> which relates to the calculation of power spectra.
+If <code>spectra.in</code> is absent from the simulation directory then no power spectra are computed.</p>
+<h3 id="bouin">bou.in</h3>
+<p><code>bou.in</code> provides a simple way to define various parameters for running the simulation.
+These are detailed below.</p>
+<h4 id="grid-size-time-step-algorithm-and-multi-resolution-flags">Grid size, time step algorithm, and multi-resolution flags</h4>
+<ul>
+<li><code>NXM</code> and <code>NXMR</code> are the number of computational cells in the wall-normal direction for the coarse velocity grid and the refined scalar grid respectively.</li>
+<li><code>NYM(R)</code> and <code>NZM(R)</code> are the number of computational cells in each of the periodic directions for the refined grid.<ul>
+<li><em>Since the code is pencil-parallelized in the periodic directions, <code>NYM(R)</code> and <code>NZM(R)</code> should be divisible by the number of decompositions in that direction.
+These variables should also be products of powers of low-value primes (e.g. <span class="arithmatex">\(N=2^n 3^m\)</span>) to speed up the FFT used to calculate the pressure field.</em></li>
+<li><em>The refined variables (e.g. <code>NXMR</code>) should satisfy this condition even when <code>MULTIRES = 0</code> since the initialization routine for the domain decomposition is currently run for both grids regardless of <code>MULTIRES</code>.</em></li>
+<li><em>The variables <code>NX</code>, <code>NY</code>, and <code>NZ</code> are also used throughout the source code, defined as <code>NX = NXM + 1</code> etc.</em></li>
+</ul>
+</li>
+<li><code>NSST</code> prescribes the time-stepping algorithm:<ul>
+<li><code>NSST = 3</code> uses a third-order Runge-Kutta integrator (recommended)</li>
+<li><code>NSST = 1</code> uses an Adams-Bashforth integrator</li>
+</ul>
+</li>
+<li><code>MULTIRES</code> is a logical (set to <code>0</code> or <code>1</code>) that determines whether or not the second, refined grid is to be used.<br />
+<strong>Note</strong>: <em><code>MULTIRES = 1</code> is required if one wants to simulate the second scalar (salinity) or use the phase-field method.</em></li>
+<li><code>FLAGSAL</code> is a logical that determines whether or not to evolve a second scalar variable, namely salinity.</li>
+<li><code>FLAGPF</code> is a logical that determines whether or not to evolve the phase-field variable used to model melting solid objects.</li>
+</ul>
+<h4 id="simulation-initialization-flags">Simulation initialization flags</h4>
+<ul>
+<li><code>NREAD</code> flags whether we are continuing an old simulation<ul>
+<li><code>NREAD = 1</code> starts the simulation by reading the flow field from existing <code>outputdir/continua*</code> files</li>
+<li><code>NREAD = 0</code> starts the simulation from the initial conditions prescribed in <code>src/CreateInitialConditions.F90</code></li>
+</ul>
+</li>
+<li><code>IRESET</code> flags whether to reset time in the simulation to zero or not<ul>
+<li><code>IRESET = 0</code> leaves the simulation unchanged if reading from <code>continua</code> files. </li>
+<li>The value of <code>IRESET</code> has no effect when <code>NREAD = 0</code>.</li>
+</ul>
+</li>
+</ul>
+<h4 id="simulation-time-and-io-parameters">Simulation time and I/O parameters</h4>
+<ul>
+<li><code>NTST</code> is the maximum number of time steps for the simulation and must be an integer</li>
+<li><code>WALLTIMEMAX</code> is the maximum wall time for the simulation in seconds and must be an integer</li>
+<li><code>TMAX</code> is the time limit for the simulation in flow units (typically the number of free-fall time scale)</li>
+<li><code>TOUT</code> prescribes the simulation time interval between successive statistics calculations saved to <code>means.h5</code>, and if in use <code>spectra.h5</code>.</li>
+<li><code>TFRAME</code> sets the simulation time interval between saving 2D slices for generating movies in <code>outputdir/flowmov</code>.</li>
+<li><code>SAVE_3D</code> sets the equivalent time interval between successive saving of the full 3D flow fields to the directory <code>outputdir/fields</code>.</li>
+</ul>
+<h4 id="domain-size-and-grid-stretching-parameters">Domain size and grid stretching parameters</h4>
+<ul>
+<li><code>ALX3D</code> is the dimensionless length of the wall-bounded direction. It is strongly recommended to always set this to <code>1.0</code>.</li>
+<li><code>YLEN</code> and <code>ZLEN</code> are the dimensionless lengths of each periodic direction.</li>
+<li><code>ISTR3</code> sets the type of grid stretching applied in the wall-bounded direction. <code>ISTR3R</code> does the same for the refined scalar grid.<ul>
+<li><code>ISTR3 = 0</code> produces uniform spacing (no grid stretching)</li>
+<li><code>ISTR3 = 4</code> uses hyperbolic tangent-type clustering</li>
+<li><code>ISTR3 = 6</code> uses clipped Chebychev-type clustering</li>
+</ul>
+</li>
+<li><code>STR3</code> sets the clipping parameter used when <code>ISTR3 &gt; 0</code>. This is applied to both the base grid and the refined grid.</li>
+</ul>
+<h4 id="physical-parameters">Physical parameters</h4>
+<ul>
+<li><code>RAYT</code> and <code>RAYS</code> are the Rayleigh numbers (e.g. <span class="arithmatex">\(Ra_T = g\alpha \Delta T H^3 /\nu \kappa_T\)</span>) for temperature and salinity respectively.<ul>
+<li>Note: positive values for these parameters impose mean gradients <span class="arithmatex">\(T_x &lt; 0, \ S_x &gt; 0\)</span> through the boundary conditions. The sign of these gradients can be reversed by setting negative values here.</li>
+</ul>
+</li>
+<li><code>PRAT</code> and <code>PRAS</code> prescribe the Prandtl (or Schmidt) numbers for the two scalars (e.g. <span class="arithmatex">\(Pr_T = \nu/\kappa_T\)</span>).</li>
+<li><code>FFscaleS</code> determines which time scale to non-dimensionalize the equations by:<ul>
+<li><code>FFscaleS = 0</code> scales the governing equations using the free-fall velocity for the temperature <span class="arithmatex">\(U_T = \sqrt{g\alpha \Delta T H}\)</span>, and the corresponding inertial time scale <span class="arithmatex">\([t] = H/U\)</span></li>
+<li><code>FFscaleS = 1</code> scales the equations using the free-fall velocity associated with the salinity field <span class="arithmatex">\(U_S = \sqrt{g\beta \Delta S H}\)</span> and its corresponding inertial time scale.<br />
+<strong>Note:</strong> <em>if <code>FLAGSAL = 0</code> then this option is ignored, and the temperature free-fall scale is used.</em></li>
+</ul>
+</li>
+</ul>
+<h4 id="time-stepping-parameters">Time stepping parameters</h4>
+<ul>
+<li><code>IDTV</code> flags whether or not to use variable time stepping</li>
+<li><code>DT</code> sets the size of the first time step used in the simulation. If variable timestepping is not used (i.e. if <code>IDTV = 0</code>), then <code>DT</code> remains the fixed time step for the whole simulation</li>
+<li><code>RESID</code> prescribes the maximum allowed residual velocity divergence for mass conservation.</li>
+<li><code>CFLMAX</code> sets the maximum CFL number for the simulation.<br />
+<strong>Note:</strong> <em>if <code>MULTIRES = 1</code> then the CFL condition uses the grid spacing from the refined grid.</em></li>
+<li><code>DTMIN</code> sets the minimum time step for variable time stepping</li>
+<li><code>DTMAX</code> sets the maximum time step for variable time stepping</li>
+</ul>
+<h4 id="boundary-conditions-and-gravity">Boundary conditions and gravity</h4>
+<ul>
+<li><code>inslwS</code> and <code>inslwN</code> prescribe the velocity boundary conditions on the lower (<code>S</code>) and upper (<code>N</code>) walls respectively:<ul>
+<li><code>inslw(s/n) = 1</code> imposes no-slip <span class="arithmatex">\(v = 0, w = 0\)</span> at the wall.</li>
+<li><code>inslw(s/n) = 0</code> imposes free-slip <span class="arithmatex">\(\partial_x v = 0, \partial_x w = 0\)</span> at the wall.</li>
+</ul>
+</li>
+<li><code>Tfix(S/N)</code> and <code>Sfix(S/N)</code> prescribe the boundary conditions for temperature and salinity at each wall:<ul>
+<li><code>(T/S)fix(S/N) = 1</code> imposes fixed values, e.g. <span class="arithmatex">\(T = \pm 0.5\)</span>. These values are set in the subroutines <code>SetTempBCs</code> and <code>SetSalBCs</code> respectively.</li>
+<li><code>(T/S)fix(S/N) = 0</code> imposes no flux, e.g. <span class="arithmatex">\(\partial_x T = 0\)</span>.</li>
+</ul>
+</li>
+<li><code>active_T(S)</code> is a flag determining whether each scalar is active or passive. That is, if <code>active_T = 1</code> then the buoyancy effect of temperature is added to the momentum equation.</li>
+<li><code>gAxis</code> sets the direction of the vertical axis:<ul>
+<li>e.g. if <code>gAxis = 1</code> then gravity acts in the negative <span class="arithmatex">\(x\)</span> direction.</li>
+</ul>
+</li>
+</ul>
+<h4 id="shear-pressure-gradient-and-melting-condition">Shear, pressure gradient, and melting condition</h4>
+<ul>
+<li><code>xplusU</code> and <code>xminusU</code> specify the velocities (in the <span class="arithmatex">\(y\)</span>-direction) of the upper and lower walls respectively.</li>
+<li><code>dPdy</code> and <code>dPdz</code> set mean pressure gradients in the <span class="arithmatex">\(y\)</span> and <span class="arithmatex">\(z\)</span> directions respectively.<ul>
+<li><code>dPdy</code> is interpreted as a target shear Reynolds number <span class="arithmatex">\(Re_\tau = v_\tau H/2\nu\)</span> where <span class="arithmatex">\(v_\tau\)</span> is the friction velocity in the <span class="arithmatex">\(y\)</span>-direction. The pressure gradient is kept to a constant value such that in a statistically steady state <span class="arithmatex">\(Re_\tau\)</span> measured at the wall will match the target, i.e. that the dimensionless pressure gradient in the equations satsifies <span class="arithmatex">\(G=8 Re_\tau^2/Gr\)</span>. This constant pressure gradient is simply added to the <span class="arithmatex">\(y\)</span>-momentum equation in <code>ExplicitTermsVY</code>.</li>
+<li><code>dPdz</code> is interpreted as a target bulk Reynolds number <span class="arithmatex">\(Re_b=\langle w \rangle H/\nu\)</span> where <span class="arithmatex">\(\langle w\rangle\)</span> is the volume-averaged <span class="arithmatex">\(z\)</span>-component of velocity. The pressure gradient is adjusted at each time step to maintain this constant volume flux. We follow <a href="https://doi.org/10.1016/j.euromechflu.2015.09.005">Quadrio et al. (2016)</a> in setting the wall-normal profile of the pressure gradient such that it remains consistent with the boundary conditions. This adjustment is performed in the subroutine <code>CorrectVelocity</code>.</li>
+</ul>
+</li>
+<li><code>MELT</code> is a logical that implements a dynamic boundary condition for temperature and salinity according to the three-equation model for a melting boundary. With <code>MELT = 1</code>, the boundary at <span class="arithmatex">\(x=0\)</span> is treated as a stationary, planar wall of ice. <strong>This is not meant to be used with the phase-field. When doing phase-field simulations, set <code>MELT = 0</code>.</strong></li>
+</ul>
+<h4 id="phase-field-parameters">Phase-field parameters</h4>
+<p>As described in the documentation page on the <a href="../equations/#double-diffusive-melting">governing equations</a>, the evolution for the phase-field equation is</p>
+<div class="arithmatex">\[
+\partial_t \phi = D\nabla^2 \phi - (D/\varepsilon^2) \phi (1-\phi)(1-2\phi+A(T-T_m + \Lambda S))
+\]</div>
+<p>The diffuse interface thickness <span class="arithmatex">\(\varepsilon\)</span> is always set equal to the mean wall-normal grid spacing for the refined grid <span class="arithmatex">\(\varepsilon = 1/n_x^r\)</span>.</p>
+<ul>
+<li><code>pf_D</code> is no longer used as an input by the code - please ignore it. The diffusivity of the phase-field is always set such that <span class="arithmatex">\(D=6/5 Pe \mathcal{S} A\)</span>;</li>
+<li><code>pf_A</code><span class="arithmatex">\(=A\)</span> is the value of the thermal coupling parameter;</li>
+<li><code>pf_S</code><span class="arithmatex">\(=\mathcal{S}=L/c_p\Delta T\)</span> is the Stefan number;</li>
+<li><code>pf_Tm</code><span class="arithmatex">\(=T_m\)</span> is the dimensionless melting temperature;</li>
+<li><code>IBM</code> should be set to <code>0</code> for phase-field simulations. See below for the options for fixed-object immersed boundaries;</li>
+<li><code>pf_IC</code> determines the initial condition when the phase-field method is used:<ul>
+<li><code>pf_IC = 1</code> provides the initial condition for the 1-D melting/freezing example described <a href="../examples/stefan/#1-d-solidification-from-a-cooled-boundary">here</a>;</li>
+<li><code>pf_IC = 2</code> produces an initial condition with a solid disc at the centre of the domain, following the example described <a href="../examples/stefan/#axisymmetric-melting-of-a-solid-disc-in-2-d">here</a>;</li>
+<li><code>pf_IC = 3</code> provides an initial condition to match the validation example of Rayleigh-Bénard convection from Favier et al. (2019) as described <a href="../examples/coupled_flows/#2-d-rayleigh-benard-with-a-melting-boundary">here</a>. The velocity is zero everywhere, the phase boundary is at <span class="arithmatex">\(x=0.5\)</span>, and the temperature profile is linear plus a wave-like perturbation in the liquid phase.</li>
+<li><em>Feel free to use other values of <code>pf_IC</code> yourself to define your own initial conditions in the subroutines <code>CreateInitialConditions</code> and <code>CreateICPF</code></em></li>
+</ul>
+</li>
+</ul>
+<h4 id="immersed-boundary-objects">Immersed boundary objects</h4>
+<p>The input parameter <code>ibm</code> can be used to specify different shapes of solid objects to model as immersed boundaries. The input parameter is reused as the variable <code>solidtype</code> in the code, and the shapes are defined in the subroutine <code>topogr</code>.</p>
+<ul>
+<li><code>ibm = 1</code> produces a hexagonal lattice array of cylinders</li>
+<li><code>ibm = 2</code> produces a "scallop-like" surface of parabolic curves</li>
+<li><code>ibm = 3</code> produces streamwise riblets at the bottom plate</li>
+<li><code>ibm = 4</code> produces a hexagonal lattice of spheres</li>
+</ul>
+<p>Of these options, only 1 and 4 have been reliably tested.
+Perform your own validation cases before using.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      
+        <script src="../javascripts/katex.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+      
+        <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+      
+    
+  </body>
+</html>
