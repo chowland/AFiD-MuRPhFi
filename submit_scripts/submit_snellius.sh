@@ -14,9 +14,9 @@
 
 # Load modules for MPI and other parallel libraries
 module purge
-module load 2022
-module load foss/2022a
-module load HDF5/1.12.2-gompi-2022a
+module load 2023
+module load foss/2023a
+module load HDF5/1.14.0-gompi-2023a
 
 # Finally, call afid, specifying a processor mesh of 16x8
 # (this assumes afid can be found in your PATH)

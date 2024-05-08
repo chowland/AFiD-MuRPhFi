@@ -4,8 +4,8 @@ MACHINE=PC
 FLAVOUR=GNU
 # Modules required for each HPC system as follows:
 # SNELLIUS:
-#	GNU: 2022 foss/2022a HDF5/1.12.2-gompi-2022a
-# 	Intel: 2022 intel/2022a FFTW/3.3.10-GCC-11.3.0 HDF5/1.12.2-iimpi-2021a
+#	GNU: 2023 foss/2023a HDF5/1.12.2-gompi-2023a
+# 	Intel: 2023 intel/2023a FFTW/3.3.10-GCC-12.3.0 HDF5/1.14.0-iimpi-2023a
 # IRENE (Intel): flavor/hdf5/parallel hdf5 fftw3/gnu
 # MARENOSTRUM (Intel): fabric intel mkl impi hdf5 fftw szip
 # SUPERMUC (Intel): spack/23.1.0 intel-toolkit/2023.1.0 fftw hdf5
