@@ -686,7 +686,7 @@ subroutine AddLatentHeat
         end if
         if (xend(2)==nym) then
             do n=1,lvlhalo
-                tpdvr(:,nym+n,:) = tpdvr(:,ny-n,:)
+                tpdvr(:,nymr+n,:) = tpdvr(:,nyr-n,:)
             end do
         end if
         if (xstart(3)==1) then
@@ -696,7 +696,7 @@ subroutine AddLatentHeat
         end if
         if (xend(3)==nzm) then
             do n=1,lvlhalo
-                tpdvr(:,:,nzm+n) = tpdvr(:,:,nz-n)
+                tpdvr(:,:,nzmr+n) = tpdvr(:,:,nzr-n)
             end do
         end if
     end if
