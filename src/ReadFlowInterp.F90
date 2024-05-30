@@ -6,7 +6,7 @@ subroutine ReadFlowInterp(prow,pcol)
     use input_grids
     use afid_salinity
     use afid_phasefield
-    use afid_moisture, only: humid, InterpInputHum
+    use afid_moisture, only: humid
     use AuxiliaryRoutines
     
     implicit none

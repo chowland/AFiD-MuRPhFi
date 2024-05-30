@@ -107,7 +107,7 @@ OBJS += obj/CreateMgrdGrid.o obj/InitMgrdVariables.o \
 OBJS += obj/CreateNewInputStencil.o obj/CreateOldGrid.o obj/CreateNewSalStencil.o \
 	obj/InterpInputSal.o obj/InterpInputVel.o \
 	obj/InterpVelMgrd.o obj/InitInputVars.o obj/DeallocateInputVars.o \
-	obj/InterpInputPhi.o
+	obj/InterpInputPhi.o obj/InterpInputHumid.o
 
 # # Object files associated with the immersed boundary method
 OBJS += obj/SolveImpEqnUpdate_Temp_ibm.o obj/SolveImpEqnUpdate_X_ibm.o \
