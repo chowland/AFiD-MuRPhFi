@@ -38,7 +38,7 @@ program AFiD
 
     ! Set `sidewall` to .true. if sidewall.in exists
     inquire(file="sidewall.in", exist=sidewall)
-
+    inquire(file="Non_uniform_BC.in", exist=Non_uniform_BC)
     ! Set `moist` to .true. if humid.in exists
     inquire(file="humid.in", exist=moist)
 
@@ -244,7 +244,7 @@ program AFiD
         call mean_yplane
         call mean_zplane
     end if
-    
+
     if (ismaster) write(*,*) "Writing 3D fields"
     call MpiBarrier
     td(1) = MPI_WTIME()
@@ -359,7 +359,7 @@ program AFiD
 
             call CalcMaxCFL(instCFL,CFLmr)
             call CheckDivergence(dmax,dmaxr)
-            !  call CalcPlateNu
+            call CalcPlateNu
             !call CalcPlateCf
 
             if(.not.variabletstep) instCFL=instCFL*dt

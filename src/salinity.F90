@@ -30,9 +30,9 @@ module afid_salinity
     real, allocatable, dimension(:,:,:) :: salbp    !! Salinity boundary value (lower plate)
     real, allocatable, dimension(:,:,:) :: saltp    !! Salinity boundary value (upper plate)
 
-    real, allocatable, dimension(:) :: ap3sskr      !! Upper diagonal derivative coefficient for salinity
-    real, allocatable, dimension(:) :: ac3sskr      !! Diagonal derivative coefficient for salinity
-    real, allocatable, dimension(:) :: am3sskr      !! Lower diagonal derivative coefficient for salinity
+    real, allocatable, dimension(:,:) :: ap3sskr      !! Upper diagonal derivative coefficient for salinity
+    real, allocatable, dimension(:,:) :: ac3sskr      !! Diagonal derivative coefficient for salinity
+    real, allocatable, dimension(:,:) :: am3sskr      !! Lower diagonal derivative coefficient for salinity
 
 contains
 
@@ -62,9 +62,9 @@ subroutine InitSalVariables
     end if
 
     ! Second derivative coefficients
-    call AllocateReal1DArray(ap3sskr,1,nxr)
-    call AllocateReal1DArray(ac3sskr,1,nxr)
-    call AllocateReal1DArray(am3sskr,1,nxr)
+    call AllocateReal2DArray(ap3sskr,1,nxr,1,2)
+    call AllocateReal2DArray(ac3sskr,1,nxr,1,2)
+    call AllocateReal2DArray(am3sskr,1,nxr,1,2)
 
 end subroutine InitSalVariables
 
@@ -95,9 +95,9 @@ subroutine DeallocateSalVariables
     end if
 
     ! Second derivative coefficients
-    call DestroyReal1DArray(ap3sskr)
-    call DestroyReal1DArray(ac3sskr)
-    call DestroyReal1DArray(am3sskr)
+    call DestroyReal2DArray(ap3sskr)
+    call DestroyReal2DArray(ac3sskr)
+    call DestroyReal2DArray(am3sskr)
 
 end subroutine DeallocateSalVariables
 
@@ -162,6 +162,33 @@ subroutine SetSalBCs
         end if
     end if
 
+
+    if  (FixValueBCRegion_Length/=0) then  
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                !tempbp(1,jc,ic)= values(jc) 
+                if (j<nymr/2) then
+                    if ( FixValueBCRegion_Nord_or_Sud==0) then
+                        saltp(1,j,i) = 0.0
+                        salbp(1,j,i) = 0.5d0
+                    else  
+                        saltp(1,j,i) = 0.5d0
+                        salbp(1,j,i) = 0.0
+                    end if 
+                else 
+                    if ( FixValueBCRegion_Nord_or_Sud==0) then
+                        saltp(1,j,i) = 0.0!0!abs(1)
+                        salbp(1,j,i) = - 0.5d0
+                   else  
+                        saltp(1,j,i) = - 0.5d0!0
+                        salbp(1,j,i) = 0.0
+                   end if 
+                end if 
+
+            end do
+        end do
+    end if
+
 end subroutine SetSalBCs
 
 !> Set initial conditions for salinity field
@@ -196,7 +223,7 @@ subroutine CreateInitialSalinity
         call SetLinearSalinity
         call AddSalinityNoise(amp=5e-3, localised=.false.)
     end if
-
+    call SetZeroSalinity
 end subroutine CreateInitialSalinity
 
 !> Set salinity variable to linear profile between boundary values
@@ -396,30 +423,64 @@ end subroutine ExplicitSalinity
 
 !> Compute the implicit terms for the salinity evolution
 subroutine ImplicitSalinity
-    integer :: ic, jc, kc
-    real :: dxxs, alpec
+    integer :: ic, jc, kc,ii
+    real :: dxxs, alpec,  FlagBC_Nord, FlagBC_Sud
 
     alpec = al/pecs
+
+    if (FixValueBCRegion_Length==0) then
+        FlagBC_Sud = SfixS
+        FlagBC_Nord = SfixN
+    else if  (FixValueBCRegion_Length/=0 .and. FixValueBCRegion_Nord_or_Sud==0) then
+        FlagBC_Nord = SfixN
+    else if  (FixValueBCRegion_Length/=0 .and. FixValueBCRegion_Nord_or_Sud==1) then
+        FlagBC_Sud = SfixS
+    end if
+
 
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
             do kc=1,nxmr
+                if (FixValueBCRegion_Length/=0) then
+                    if (FixValueBCRegion_Nord_or_Sud==0) then
+                        if (ymr(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                            ymr(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                            ii = 1
+                            FlagBC_Sud = 1
+                         else 
+                            ii = 2
+                            FlagBC_Sud = 0
+                         end if
+                    else if (FixValueBCRegion_Nord_or_Sud == 1) then
+                        if (ymr(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                            ymr(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                            
+                            ii = 1
+                            FlagBC_Nord = 1
+                         else 
+                            ii = 2
+                            FlagBC_Nord = 0
+                         end if
+                    end if
+                else 
+                ii = 1
+                end if
 
                 ! Second xx derivative
                 ! Apply lower BC
                 if (kc==1) then
-                    dxxs= sal(kc+1,jc,ic)*ap3sskr(kc) &
-                        + sal(kc  ,jc,ic)*ac3sskr(kc) &
-                        - (ap3sskr(kc) + ac3sskr(kc))*salbp(1,jc,ic)*SfixS
+                    dxxs= sal(kc+1,jc,ic)*ap3sskr(kc,ii) &
+                        + sal(kc  ,jc,ic)*ac3sskr(kc,ii) &
+                        - (ap3sskr(kc,ii) + ac3sskr(kc,ii))*salbp(1,jc,ic)*FlagBC_Sud
                 ! Apply upper BC
                 elseif (kc==nxmr) then
-                    dxxs= sal(kc  ,jc,ic)*ac3sskr(kc) &
-                        + sal(kc-1,jc,ic)*am3sskr(kc) &
-                        - (am3sskr(kc) + ac3sskr(kc))*saltp(1,jc,ic)*SfixN
+                    dxxs= sal(kc  ,jc,ic)*ac3sskr(kc,ii) &
+                        + sal(kc-1,jc,ic)*am3sskr(kc,ii) &
+                        - (am3sskr(kc,ii) + ac3sskr(kc,ii))*saltp(1,jc,ic)*FlagBC_Nord
                 else
-                    dxxs= sal(kc+1,jc,ic)*ap3sskr(kc) &
-                        + sal(kc  ,jc,ic)*ac3sskr(kc) &
-                        + sal(kc-1,jc,ic)*am3sskr(kc)
+                    dxxs= sal(kc+1,jc,ic)*ap3sskr(kc,ii) &
+                        + sal(kc  ,jc,ic)*ac3sskr(kc,ii) &
+                        + sal(kc-1,jc,ic)*am3sskr(kc,ii)
                 end if
 
                 rhsr(kc,jc,ic) = (ga*hsal(kc,jc,ic) + ro*rusal(kc,jc,ic) + alpec*dxxs)*dt
@@ -441,19 +502,32 @@ end subroutine ImplicitSalinity
 !! and update the global variable sal
 subroutine SolveImpEqnUpdate_Sal
     real :: betadx, ackl_b
-    integer :: ic, jc, kc, nrhs, ipkv(nxr), info
+    integer :: ic, jc, kc, nrhs, ipkv(nxr), info,ii
     real :: amkT(nxmr-1), ackT(nxmr), apkT(nxmr-1), appk(nxmr-2)
 
     betadx = 0.5d0*al*dt/pecs
 
     ! Construct tridiagonal matrix for LHS
-    do kc=1,nxmr
-        ackl_b = 1.0d0/(1. - ac3sskr(kc)*betadx)
-        if (kc > 1) amkT(kc-1) = -am3sskr(kc)*betadx*ackl_b
-        ackT(kc) = 1.d0
-        if (kc < nxmr) apkT(kc) = -ap3sskr(kc)*betadx*ackl_b
-    end do
+    do jc=xstart(2),xend(2)
+        if (FixValueBCRegion_Length==0) then
+            ii = 1
+        else 
+            if (ymr(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                 ymr(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                
+                    ii = 1
+            else 
+                    ii = 2
+            end if        
 
+        end if
+    do kc=1,nxmr
+        ackl_b = 1.0d0/(1. - ac3sskr(kc,ii)*betadx)
+        if (kc > 1) amkT(kc-1) = -am3sskr(kc,ii)*betadx*ackl_b
+        ackT(kc) = 1.d0
+        if (kc < nxmr) apkT(kc) = -ap3sskr(kc,ii)*betadx*ackl_b
+    end do
+    end do
     ! Factor the tridiagonal matrix
     call dgttrf(nxmr,amkT,ackT,apkT,appk,ipkv,info)
 
@@ -461,8 +535,22 @@ subroutine SolveImpEqnUpdate_Sal
     nrhs=(xendr(3)-xstartr(3)+1)*(xendr(2)-xstartr(2)+1)
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
+            if (FixValueBCRegion_Length==0) then
+                ii = 1
+             
+            else 
+                if (ymr(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                     ymr(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                    
+                        ii = 1
+                else 
+                        ii = 2
+                end if        
+    
+            end if
+
             do kc=1,nxmr
-                ackl_b = 1.0/(1.0 - ac3sskr(kc)*betadx)
+                ackl_b = 1.0/(1.0 - ac3sskr(kc,ii)*betadx)
                 rhsr(kc,jc,ic) = rhsr(kc,jc,ic)*ackl_b
             end do
         end do
@@ -470,7 +558,7 @@ subroutine SolveImpEqnUpdate_Sal
 
     ! Solve tridiagonal system
     call dgttrs('N',nxmr,nrhs,amkT,ackT,apkT,appk,ipkv,rhsr,nxmr,info)
-
+    
     ! Update global variable
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
@@ -536,7 +624,7 @@ end subroutine
 
 !> Calculate and save vertical profiles related to the salinity
 !! field, storing the data in means.h5
-subroutine CalcSalStats
+subroutine CalcSalStats(ii)
     real, dimension(nxmr) :: Sbar   !! Horizontally-averaged salinity
     real, dimension(nxmr) :: Srms   !! Horizontally-averaged rms salinity
     real, dimension(nxmr) :: chiS   !! Horizontally-averaged solutal dissipation rate (nu grad(S)^2)
@@ -551,11 +639,24 @@ subroutine CalcSalStats
     character(30) :: filename   !! HDF5 file name for statistic storage
     character( 5) :: nstat      !! Character string of statistic index
 
-    integer :: i, j, k
+    integer :: i, j, k ,ii
 
-    inyzmr = 1.0/nymr/nzmr
+        if(ii==1)then
+        filename = trim("outputdir/means.h5")
 
-    filename = trim("outputdir/means.h5")
+        inyzmr = 1.0/nymr/nzmr
+
+        else if(ii==2)then
+        filename = trim("outputdir/meansHot.h5")
+
+        inyzmr = 1.0/nyr_Hot/nzmr
+        else 
+        filename = trim("outputdir/meansCold.h5")
+
+        inyzmr = 1.0/ny_Cold/nzmr
+
+        end if 
+
 
     Sbar(:) = 0.0;  Srms(:) = 0.0;  chiS(:) = 0.0
     vxS(:) = 0.0;   vyS(:) = 0.0;   vzS(:) = 0.0
@@ -575,10 +676,12 @@ subroutine CalcSalStats
     else
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
+                if (ii==1 .or. (ii==2.and.j<=nyr_Hot) .or.  (ii==3.and.j>=nym- nyr_Cold+1)) then
                 do k=1,nxmr
                     Sbar(k) = Sbar(k) + sal(k,j,i)
                     Srms(k) = Srms(k) + sal(k,j,i)**2
                 end do
+                end if
             end do
         end do
     end if
@@ -586,11 +689,13 @@ subroutine CalcSalStats
     ! Since velocities are zero in solid, no need to use if statement for IBM here
     do i=xstartr(3),xendr(3)
         do j=xstartr(2),xendr(2)
+            if (ii==1 .or. (ii==2.and.j<=nyr_Hot) .or.  (ii==3.and.j>=nym- nyr_Cold+1)) then
             do k=1,nxmr
                 vxS(k) = vxS(k) + 0.5*(vxr(k,j,i)+vxr(k+1,j,i))*sal(k,j,i)
                 vyS(k) = vyS(k) + 0.5*(vyr(k,j,i)+vyr(k,j+1,i))*sal(k,j,i)
                 vzS(k) = vzS(k) + 0.5*(vzr(k,j,i)+vzr(k,j,i+1))*sal(k,j,i)
             end do
+        end if
         end do
     end do
 
