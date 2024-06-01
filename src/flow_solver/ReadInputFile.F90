@@ -98,7 +98,7 @@ subroutine ReadInputFile
     if(flagsal.ne.0) salinity = .true.
 
     if (sidewall) call ReadSidewallInput
-
+    if (Non_uniform_BC)      call ReadNon_uniform_BC
     ! if(starea.ne.0) then 
     !   readstats = .true.
     !   if (.not. readflow) write(6,*) 'Warning: Restarting flowfield with statistics read'
@@ -185,4 +185,22 @@ subroutine ReadSidewallInput
         read(15,*) bc_humid_z_fix_lo, bc_humid_z_val_lo, bc_humid_z_fix_up,  bc_humid_z_val_up
     301     format(a4)
     close(15)
+
 end subroutine ReadSidewallInput
+
+subroutine ReadNon_uniform_BC
+    use param
+    implicit none
+    integer :: i
+    character(len=4) :: dummy
+
+    open(unit=15,file='Non_uniform_BC.in',status='old')
+        read(15,301) dummy
+        read(15,*) FixValueBCRegion_Length
+        read(15,301) dummy
+        read(15,*) FixValueBCRegion_Nord_or_Sud
+        
+    301     format(a4)
+    close(15)
+
+end subroutine ReadNon_uniform_BC

@@ -3,14 +3,17 @@
 !***********************************************************
 module param
     implicit none
+    integer   :: FixValueBCRegion_Length = 0 ! Percentuale
+    integer   :: FixValueBCRegion_Nord_or_Sud  = 0  ! 1 Up 0 down
     !==========================================================
     !       read from input file bou.in
     !==========================================================
-    integer   :: nx, ny, nz
-    integer   :: nxr, nyr, nzr, istr3r  !CS mgrd
+    integer   :: nx, ny, nz, ny_Hot, ny_Cold
+    integer   :: nxr, nyr, nzr, istr3r,  nyr_Hot, nyr_Cold  !CS mgrd
     integer   :: nsst, nread, ntst, ireset
     real      :: walltimemax,tout,tmax
     real      :: alx3,str3
+
     integer   :: istr3
     real      :: ylen,zlen
     real      :: rayt,prat,dt,resid
@@ -79,6 +82,8 @@ module param
     real, dimension(1:3) :: gam,rom,alm
     real, allocatable, dimension(:,:,:) :: tempbp,temptp !CJH make BCs 3D arrays so we can use update_halo
     integer, dimension(5) :: spec_idx
+    
+    logical :: Non_uniform_BC   = .false.!! Flag to determine Non_uniform_BC
 
     logical :: dumpslabs=.false.
     ! logical :: statcal=.false.
@@ -97,7 +102,6 @@ module param
     integer :: lvlhalo=2
 
     logical :: sidewall = .false.     !! Flag to determine whether to impose sidewalls in y and z (using a DCT)
-
     !! Sidewall boundary conditions
     logical :: bc_vx_y_fix_lo = .true.      !! Dirichlet/Neumann flag for lower y BC for vx
     logical :: bc_vx_y_fix_up = .true.      !! Dirichlet/Neumann flag for upper y BC for vx
