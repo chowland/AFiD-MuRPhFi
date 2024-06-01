@@ -12,6 +12,7 @@ subroutine CreateGrid
     use param
     use AuxiliaryRoutines
     use GridModule
+    use decomp_2d, only: xstart,xend,xstartr,xendr
     implicit none
     real, dimension(nx) :: ap3ssk_D, ac3ssk_D, am3ssk_D, ap3ssk_N, ac3ssk_N, am3ssk_N
     integer :: kc, i
@@ -173,13 +174,25 @@ subroutine CreateGrid
 !
 !    TEMPERATURE DIFFERENTIATION
 !
-    if (TfixS ==  1) then
+    if ( FixValueBCRegion_Length==0) then
+
         call second_derivative_coeff(ap3ssk_D, ac3ssk_D, am3ssk_D, xm(1:nxm), alx3, TfixN, TfixS)
-    else if (TfixS ==  0) then
-        call second_derivative_coeff(ap3ssk_N, ac3ssk_N, am3ssk_N, xm(1:nxm), alx3, TfixN, 0)
-    else 
-        call second_derivative_coeff(ap3ssk_D, ac3ssk_D, am3ssk_D, xm(1:nxm), alx3, TfixN, TfixS)
-        call second_derivative_coeff(ap3ssk_N, ac3ssk_N, am3ssk_N, xm(1:nxm), alx3, TfixN, 0)
+        call second_derivative_coeff(ap3ssk_N, ac3ssk_N, am3ssk_N, xm(1:nxm), alx3, TfixN, TfixS)
+
+    else if (FixValueBCRegion_Length/=0) then
+
+        if ( FixValueBCRegion_Nord_or_Sud==0) then
+        
+            call second_derivative_coeff(ap3ssk_D, ac3ssk_D, am3ssk_D, xm(1:nxm), alx3, TfixN, 1)
+            call second_derivative_coeff(ap3ssk_N, ac3ssk_N, am3ssk_N, xm(1:nxm), alx3, TfixN, 0)
+        
+        else if( FixValueBCRegion_Nord_or_Sud==1) then
+            
+            call second_derivative_coeff(ap3ssk_D, ac3ssk_D, am3ssk_D, xm(1:nxm), alx3, 1, TfixS)
+            call second_derivative_coeff(ap3ssk_N, ac3ssk_N, am3ssk_N, xm(1:nxm), alx3, 0, TfixS)
+        
+        end if
+   
     end if
     
     do i = 1, nx
@@ -194,5 +207,17 @@ subroutine CreateGrid
         
    end do
 
+   ny_Cold = 0
+   ny_Hot = 0
+   do i=1,nym
+       if( FixValueBCRegion_Length/=0 .and. ym(i) < 0.01 * FixValueBCRegion_Length * YLEN) then
+            ny_Cold = ny_Cold+1
+       else if  (FixValueBCRegion_Length/=0 .and. ym(i) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+            ny_Hot = ny_Hot +1 
+        end if
+    end do 
+ 
+
+    
     return
 end subroutine CreateGrid

@@ -16,7 +16,7 @@ subroutine SolveImpEqnUpdate_Sal_ibm
     use ibm_param, only: ibmaskr
     implicit none
     real, dimension(nxr) :: amkl,apkl,ackl,fkl
-    integer :: jc,kc,info,ipkv(nxmr),ic,km,kp,n
+    integer :: jc,kc,info,ipkv(nxmr),ic,km,kp,n,ii
     real :: betadx,ackl_b
     real :: amkT(nxmr-1),ackT(nxmr),apkT(nxmr-1),appk(nxmr-2)
 
@@ -34,10 +34,10 @@ subroutine SolveImpEqnUpdate_Sal_ibm
                 km = max(1,kc - 1)
                 kp = min(kc + 1,nxmr)
                 if (mod(ibmaskr(kc,jc,ic),2) == 0) then ! Liquid phase (& solid)
-                    ackl_b = 1.0d0/(1.-ac3sskr(kc)*betadx)
-                    amkl(kc) = -am3sskr(kc)*betadx*ackl_b
+                    ackl_b = 1.0d0/(1.-ac3sskr(kc,ii)*betadx)
+                    amkl(kc) = -am3sskr(kc,ii)*betadx*ackl_b
                     ackl(kc) = 1.0d0
-                    apkl(kc) = -ap3sskr(kc)*betadx*ackl_b
+                    apkl(kc) = -ap3sskr(kc,ii)*betadx*ackl_b
                     fkl(kc) = rhsr(kc,jc,ic)*ackl_b
                 ! elseif (ibmaskr(kc,jc,ic) == 0) then ! Solid phase
                 !     amkl(kc) = 0.d0

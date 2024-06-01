@@ -17,25 +17,24 @@ subroutine SolveImpEqnUpdate_Temp
     integer :: jc,kc,info,ipkv(nxm),ic,nrhs,ii
     real :: betadx,ackl_b,FixTempRegion
     real :: amkT(nxm-1),ackT(nxm),apkT(nxm-1),appk(nxm-2)
-
 !     Calculate the coefficients of the tridiagonal matrix
 !     The coefficients are normalized to prevent floating
 !     point errors.
-    FixTempRegion =  abs(TfixS) - (abs(TfixS)/10)*10
-    FixTempRegion = 0.1*FixTempRegion
+
     betadx=0.5d0*al*dt/pect
     do jc=xstart(2),xend(2)
-    if (TfixS == 1) then
-        ii = 1
-    else  if (TfixS == 0) then
-        ii=2
-    else
-        if (yc(jc) < FixTempRegion * YLEN  .or. yc(jc) >  YLEN -FixTempRegion * YLEN ) then                       
+        if (FixValueBCRegion_Length==0) then
             ii = 1
         else 
-            ii=2
+            if (ym(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                 ym(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                
+                    ii = 1
+            else 
+                    ii = 2
+            end if        
+
         end if
-    end if 
     do kc=1,nxm
         ackl_b=1.0d0/(1.0d0-ac3ssk(kc,ii)*betadx)
         amkl(kc)=-am3ssk(kc,ii)*betadx*ackl_b
@@ -54,11 +53,19 @@ subroutine SolveImpEqnUpdate_Temp
     nrhs=(xend(3)-xstart(3)+1)*(xend(2)-xstart(2)+1)
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
-            if (yc(jc)<0.3 .or.yc(jc)>0.7 ) then
+            if (FixValueBCRegion_Length==0) then
                 ii = 1
+             
+            else 
+                if (ym(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                     ym(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                    
+                        ii = 1
                 else 
-                    ii=2
-                end if
+                        ii = 2
+                end if        
+    
+            end if
             do kc=1,nxm
                 ackl_b=1.0/(1.0-ac3ssk(kc,ii)*betadx)
                 rhs(kc,jc,ic)=rhs(kc,jc,ic)*ackl_b
@@ -75,6 +82,5 @@ subroutine SolveImpEqnUpdate_Temp
             end do
         end do
     end do
-
     return
 end subroutine SolveImpEqnUpdate_Temp

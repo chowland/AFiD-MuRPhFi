@@ -80,19 +80,32 @@ subroutine SetTempBCs
         
         values(ii) = yc(ii)/YLEN !Linear
     end do
-    if (RayS<0) then 
+    if  (FixValueBCRegion_Length/=0) then  
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
                 !tempbp(1,jc,ic)= values(jc) 
                 if (jc<nym/2) then
-                    tempbp(1,jc,ic)=0.5d0!abs(1)
+                    if ( FixValueBCRegion_Nord_or_Sud==0) then
+                         tempbp(1,jc,ic) = 0.5d0!abs(1)
+                         temptp(1,jc,ic) = 0.0
+                    else  
+                        temptp(1,jc,ic) = 0.5d0
+                        tempbp(1,jc,ic) = 0.0
+                    end if 
                 else 
-                    tempbp(1,jc,ic)=-0.5d0!0
+                    if ( FixValueBCRegion_Nord_or_Sud==0) then
+                        tempbp(1,jc,ic) = - 0.5d0!0!abs(1)
+                        temptp(1,jc,ic) = 0.0
+                   else  
+                       temptp(1,jc,ic) = - 0.5d0!0
+                       tempbp(1,jc,ic) = 0.0
+                   end if 
                 end if 
-                temptp(1,jc,ic)=0.0
+
             end do
         end do
     end if
+    
     call update_halo(temptp,lvlhalo)
     call update_halo(tempbp,lvlhalo)
     

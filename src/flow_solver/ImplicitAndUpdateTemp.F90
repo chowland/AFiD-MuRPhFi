@@ -17,9 +17,8 @@ subroutine ImplicitAndUpdateTemp
     use ibm_param
     implicit none
     integer :: jc,kc,ic,ii
-    real    :: alpec,dxxt, FlagBC,FixTempRegion
+    real    :: alpec,dxxt, FlagBC_Nord,FlagBC_Sud,FixTempRegion
     alpec=al/pect
-
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &
 !$OMP   SHARED(xstart,xend,nxm,temp) &
@@ -29,44 +28,60 @@ subroutine ImplicitAndUpdateTemp
 !$OMP   PRIVATE(ic,jc,kc,km,kp) &
 !$OMP   PRIVATE(amm,acc,app) &
 !$OMP   PRIVATE(dxxt)
-    FixTempRegion =  abs(TfixS) - (abs(TfixS)/10)*10
-    FixTempRegion = 0.1*FixTempRegion
+    if (FixValueBCRegion_Length==0) then
+        FlagBC_Sud = TfixS
+        FlagBC_Nord = TfixN
+    else if  (FixValueBCRegion_Length/=0 .and. FixValueBCRegion_Nord_or_Sud==0) then
+        FlagBC_Nord = TfixN
+    else if  (FixValueBCRegion_Length/=0 .and. FixValueBCRegion_Nord_or_Sud==1) then
+        FlagBC_Sud = TfixS
+    end if
+
     do ic=xstart(3),xend(3)
         do jc=xstart(2),xend(2)
-
             do kc=1,nxm
-                    if (TfixS == 1) then
-                        ii = 1
-                        FlagBC = 1
-                    else  if (TfixS == 0) then
-                        ii=2
-                        FlagBC=0
-                    else
-                        if (yc(jc) < FixTempRegion * YLEN  .or. yc(jc) > YLEN - FixTempRegion * YLEN ) then                       
-                            ii = 1
-                            FlagBC = 1
-                        else 
-                            ii=2
-                            FlagBC=0
+                     if (FixValueBCRegion_Length/=0) then
+                        if (FixValueBCRegion_Nord_or_Sud==0) then
+                            if (ym(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                                ym(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                                ii = 1
+                                FlagBC_Sud = 1
+                             else 
+                                ii = 2
+                                FlagBC_Sud = 0
+                             end if
+                        else if (FixValueBCRegion_Nord_or_Sud == 1) then
+                            if (ym(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                                ym(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                                
+                                ii = 1
+                                FlagBC_Nord = 1
+                             else 
+                                ii = 2
+                                FlagBC_Nord = 0
+                             end if
                         end if
-                    end if 
+                    else 
+                    ii = 1
+                    end if
 !   Calculate second derivative of temperature in the x-direction.
 !   This is the only term calculated implicitly for temperature.
                 if (kc.eq.1) then       !CJH Apply lower BC
                     dxxt = temp(kc+1,jc,ic)*ap3ssk(kc,ii) &
                         + temp(kc,jc,ic)*ac3ssk(kc,ii) &
-                        - (ap3ssk(kc,ii)+ac3ssk(kc,ii))*tempbp(1,jc,ic)*FlagBC
+                        - (ap3ssk(kc,ii)+ac3ssk(kc,ii))*tempbp(1,jc,ic)*FlagBC_Sud
+                       
+
                 elseif(kc.eq.nxm) then  !CJH Apply upper BC
                     dxxt = temp(kc,jc,ic)*ac3ssk(kc,ii) &
                         + temp(kc-1,jc,ic)*am3ssk(kc,ii) &
-                        - (am3ssk(kc,ii)+ac3ssk(kc,ii))*temptp(1,jc,ic)*TfixN
+                        - (am3ssk(kc,ii)+ac3ssk(kc,ii))*temptp(1,jc,ic)*FlagBC_Nord
                 else
                     dxxt = temp(kc+1,jc,ic)*ap3ssk(kc,ii) &
                         + temp(kc  ,jc,ic)*ac3ssk(kc,ii) &
                         + temp(kc-1,jc,ic)*am3ssk(kc,ii)
                 end if
-
-
+   
 !    Calculate right hand side of Eq. 5 (VO96)
 
                 rhs(kc,jc,ic)=(ga*hro(kc,jc,ic)+ro*rutemp(kc,jc,ic) &

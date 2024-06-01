@@ -373,14 +373,14 @@ subroutine CreateInitialConditions
 
 
   ! 2DHorizontalConvection
-    if (RayS <0) then
+    !if (RayS <0) then
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                 do k=1,nxm
                     vx(k,j,i) = 0.0
                     vy(k,j,i) = 0.0
                     vz(k,j,i) = 0.0
-                    temp(k,j,i) = 0.5
+                    temp(k,j,i) = 0.0
                 end do
             end do
         end do
@@ -396,7 +396,7 @@ subroutine CreateInitialConditions
         end do
      end do
 
-    end if
+    !end if
 
 
 
