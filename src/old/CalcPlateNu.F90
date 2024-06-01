@@ -32,9 +32,22 @@
 !$OMP   REDUCTION(+:nuslow) &
 !$OMP   REDUCTION(+:nusupp)
       do i=xstart(3),xend(3)
-         do j=xstart(2),xend(2)
-           nuslow = nuslow + (temp(1,j,i)-tempbp(1,j,i))*del
-           nusupp = nusupp + (temptp(1,j,i)-temp(nxm,j,i))*deln
+            do j=xstart(2),xend(2)
+              
+            if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==0) then
+                  if (yc(jc) < 0.01 * FixValueBCRegion_Length * YLEN
+                       nusCol = nusCol + (temptp(1,j,i)-temp(nxm,j,i))*deln
+                  else if ( yc(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                        nusHot = nusHot + (temptp(1,j,i)-temp(nxm,j,i))*deln   
+                   end if 
+            else if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
+                  if (yc(jc) < 0.01 * FixValueBCRegion_Length * YLEN
+                      nusCol = nusCol + (temp(1,j,i)-tempbp(1,j,i))*del
+                  else if ( yc(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                       nusHot = nusHot + (temp(1,j,i)-tempbp(1,j,i))*del
+
+            end if
+
         enddo
       end do
 !$OMP END PARALLEL DO
