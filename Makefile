@@ -112,7 +112,7 @@ OBJS += obj/CreateNewInputStencil.o obj/CreateOldGrid.o obj/CreateNewSalStencil.
 # # Object files associated with the immersed boundary method
 OBJS += obj/SolveImpEqnUpdate_Temp_ibm.o obj/SolveImpEqnUpdate_X_ibm.o \
 	obj/SolveImpEqnUpdate_YZ_ibm.o obj/topogr_ibm.o obj/SolveImpEqnUpdate_Sal_ibm.o \
-	obj/DeallocateIBMVars.o
+	obj/DeallocateIBMVars.o  obj/CalcPlateNu.o
 
 # Object files for plane writing
 OBJS += obj/mean_zplane.o
