@@ -19,8 +19,8 @@ subroutine CalcMeanProfiles
     use afid_phasefield, only: CalcPhiStats, CreatePhaseH5Groups
     
     implicit none
-
-    integer :: i, j, k, im, ip, jm, jp, km, kp
+    
+    integer :: i, j, k, im, ip, jm, jp, km, kp,ii,jj
     real :: inym, inzm, tdx
     real :: tii(2)
     real, dimension(nxm) :: Tbar, Trms, chiT!, chiT2
@@ -33,22 +33,46 @@ subroutine CalcMeanProfiles
     character(5) :: nstat
     character(30) :: dsetname,filename
     logical :: fexist
+    if (FixValueBCRegion_Length==0) then
+        jj=1
+    else 
+        jj=3
+    end if 
+    do ii=1,jj
+        if(ii==1)then
+        filename = trim("outputdir/means.h5")
 
+        inym = 1.d0/nym
+        inzm = 1.d0/nzm
+
+        else if(ii==2)then
+        filename = trim("outputdir/meansHot.h5")
+        inym = 1.d0/ny_Hot
+        inzm = 1.d0/nzm
+
+        else 
+        filename = trim("outputdir/meansCold.h5")
+        inym = 1.d0/ny_Cold
+        inzm = 1.d0/nzm
+        end if 
+   !write(*,*)ny_Hot meansCol
+    !if (xstart(2)<ny_Hot .and. xend(2)>ny_Hot)then
+     !write(*,*) 'xstart(2)',xstart(2)
+     !write(*,*) 'xend(2)',xend(2)
+    !end if 
     tii(1) = MPI_WTIME()
-
     Tbar(:) =0.0;   vybar(:)=0.0;   vzbar(:)=0.0
     vxT(:)  =0.0;   vyT(:)  =0.0;   vzT(:)  =0.0
     vxrms(:)=0.0;   vyrms(:)=0.0;   vzrms(:)=0.0
     Trms(:) =0.0;   vxvy(:) =0.0;   vxvz(:) =0.0
     chiT(:) =0.0;   epsilon(:)=0.0; vyvz(:) =0.0
 
-    inym = 1.d0/nym
-    inzm = 1.d0/nzm
-
+   
     do i=xstart(3),xend(3)
         ip = i + 1
         do j=xstart(2),xend(2)
-            jp = j + 1
+            if (ii==1 .or. (ii==2.and.j<=ny_Hot) .or.  (ii==3.and.j>=nym- ny_Cold+1)) then
+                jp = j + 1
             do k=1,nxm
                 kp = k + 1
                 Tbar(k) = Tbar(k) + temp(k,j,i)
@@ -60,6 +84,7 @@ subroutine CalcMeanProfiles
                 vzT(k) = vzT(k) + 0.5*(vz(k,j,i)+vz(k,j,ip))*temp(k,j,i)
 
                 Trms(k) = Trms(k) + temp(k,j,i)**2
+
                 vxrms(k) = vxrms(k) + 0.5*(vx(k,j,i)**2+vx(kp,j,i)**2)
                 vyrms(k) = vyrms(k) + 0.5*(vy(k,j,i)**2+vy(k,jp,i)**2)
                 vzrms(k) = vzrms(k) + 0.5*(vz(k,j,i)**2+vz(k,j,ip)**2)
@@ -68,9 +93,10 @@ subroutine CalcMeanProfiles
                 vxvz(k) = vxvz(k) + 0.25*(vx(k,j,i)+vx(kp,j,i))*(vz(k,j,i)+vz(k,j,ip))
                 vyvz(k) = vyvz(k) + 0.25*(vy(k,j,i)+vy(k,jp,i))*(vz(k,j,i)+vz(k,j,ip))
             end do
+        end if
+
         end do
     end do
-
     call MpiSumReal1D(Tbar,nxm)
     call MpiSumReal1D(vybar,nxm)
     call MpiSumReal1D(vzbar,nxm)
@@ -84,6 +110,8 @@ subroutine CalcMeanProfiles
     call MpiSumReal1D(vxvy,nxm)
     call MpiSumReal1D(vxvz,nxm)
     call MpiSumReal1D(vyvz,nxm)
+  
+
 
     do k=1,nxm
         Tbar(k) = Tbar(k)*inym*inzm
@@ -105,6 +133,8 @@ subroutine CalcMeanProfiles
         ip = i + 1
         im = i - 1
         do j=xstart(2),xend(2)
+            if (ii==1 .or. (ii==2.and.j<=ny_Hot) .or.  (ii==3.and.j>=nym- ny_Cold+1)) then
+
             jp = j + 1
             jm = j - 1
             do k=1,nxm
@@ -123,6 +153,7 @@ subroutine CalcMeanProfiles
             tdx = 0.5*dx/g3rm(nxm)
             chiT(nxm) = chiT(nxm) + ((temp(nxm,j,i)-temp(nxm-1,j,i)+2.0*TfixN*(temptp(1,j,i)-temp(nxm,j,i)))&
                             & *tdx)**2
+        end if 
         end do
     end do
 
@@ -165,6 +196,8 @@ subroutine CalcMeanProfiles
         ip = i + 1
         im = i - 1
         do j=xstart(2),xend(2)
+            if (ii==1 .or. (ii==2.and.j<=ny_Hot) .or.  (ii==3.and.j>=nym- ny_Cold+1)) then
+
             jp = j + 1
             jm = j - 1
             do k=1,nxm
@@ -195,6 +228,7 @@ subroutine CalcMeanProfiles
                                        + (vz(nxm,j,i) - vz(nxm-1,j,i) + inslwn*2.0*(0.0 - vz(nxm,j,i)))**2) &
                                 & + tdx*((vy(nxm,jp,i) - vy(nxm-1,jp,i) + inslwn*2.0*(xplusU - vy(nxm,jp,i)))**2 &
                                        + (vy(nxm,j,i) - vy(nxm-1,j,i) + inslwn*2.0*(xplusU - vy(nxm,j,i)))**2)
+            end if
         end do
     end do
 
@@ -207,7 +241,6 @@ subroutine CalcMeanProfiles
     end do
 
     write(nstat,"(i5.5)")nint(time/tout)
-    filename = trim("outputdir/means.h5")
     
     inquire(file=filename,exist=fexist)
     if (.not.fexist) then
@@ -270,7 +303,7 @@ subroutine CalcMeanProfiles
 
     end if
 
-    if (salinity) call CalcSalStats
+    if (salinity) call CalcSalStats(ii)
 
     if (phasefield) call CalcPhiStats
 
@@ -279,8 +312,11 @@ subroutine CalcMeanProfiles
     call MpiBarrier
 
     tii(2) = MPI_WTIME()
-    if (ismaster) write(*,"(a,f8.3,a)") "Profile save duration: ",tii(2)-tii(1),"s"
+    !if (ismaster) write(*,"(a,f8.3,a)") "Profile save duration: ",tii(2)-tii(1),"s"
+  
 
+
+end do
 end subroutine
 
 
