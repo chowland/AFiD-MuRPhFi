@@ -3,8 +3,8 @@
 !***********************************************************
 module param
     implicit none
-    integer   :: FixValueBCRegion_Length = 0 ! Percentuale
-    integer   :: FixValueBCRegion_Nord_or_Sud  = 0  ! 1 Up 0 down
+    real   :: FixValueBCRegion_Length = 0 ! Percentuale
+    real   :: FixValueBCRegion_Nord_or_Sud  = 0  ! 1 Up 0 down
     !==========================================================
     !       read from input file bou.in
     !==========================================================
@@ -98,7 +98,7 @@ module param
     logical :: phasefield=.false.
     logical :: salinity=.false.
     logical :: specwrite=.false.
-
+    logical :: ErrorSetSideWallBC = .false.
     integer :: lvlhalo=2
 
     logical :: sidewall = .false.     !! Flag to determine whether to impose sidewalls in y and z (using a DCT)

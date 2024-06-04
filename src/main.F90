@@ -88,21 +88,58 @@ program AFiD
 !m==========================================
         call ResetLogs
 !m====================================================
-        write(6,112)ylen/alx3,zlen/alx3
-    112 format(//,20x,'Double Diffusive Convection ',//,10x, &
-        '3D Cell with aspect-ratio:  D1/H = ',f5.2,' D2/H = ',f5.2)
-        write(6,142)
-    142 format(//,8x,'Periodic lateral wall boundary condition')
+        if (zlen == 0.01 .and. nz == 2)then
+            write(6,412)ylen/alx3,zlen/alx3
+            412 format(//,20x,'Double Diffusive Convection ',//,10x, &
+                         '2D Cell with aspect-ratio:  D1/H = ',f5.2,' D2/H = ',f5.2)
+        else 
+            write(6,112)ylen/alx3,zlen/alx3
+            112 format(//,20x,'Double Diffusive Convection ',//,10x, &
+                       '3D Cell with aspect-ratio:  D1/H = ',f5.2,' D2/H = ',f5.2)
+        end if 
+
+        if (sidewall)then
+            write(6,442)
+            442 format(//,8x,'Side wall boundary condition')
+            if(ErrorSetSideWallBC)then
+                write(6,402)
+                402 format(//,8x,'Warning 2D simulation error in sidewall.in file')
+                write(6,403) 
+                403 format(//,8x,'The conditions on the spanwise wall have been changed to make them all adiabatic and free-slip')
+                 
+            end if 
+        else 
+            write(6,142)
+            142 format(//,8x,'Periodic lateral wall boundary condition')
+        end if   
+
+        if (FixValueBCRegion_Length /= 0 )then
+            
+            if (FixValueBCRegion_Nord_or_Sud==1)then
+                write(6,502)
+                502 format(//,8x,'Mixed contour conditions on the upper wall ')
+            else 
+                write(6,503)
+                503 format(//,8x,'Mixed contour conditions on the lower wall ')
+            end if 
+            
+            write(6,505) FixValueBCRegion_Length
+            505 format(//,8x,'Plates with fixed temperature and salinity are ', f5.2, '% of the length')    
+        
+        end if 
+
         write(6,202) rayt,prat,rays,pras
-    202 format(/,5x,'Parameters: ',' RaT=',es10.3,' PrT= ',es10.3,' RaS=',es10.3,' PrS= ',es10.3)
+        202 format(/,5x,'Parameters: ',' RaT=',es10.3,' PrT= ',es10.3,' RaS=',es10.3,' PrS= ',es10.3)
+       
         if(variabletstep) then
             write(6,204) limitCFL
         204 format(/,5x,'Variable dt and fixed cfl= ', es11.4,/ )
         else
             write(6,205) dtmax,limitCFL
         205 format(/,5x,'Fixed dt= ',es11.4,' and maximum cfl=', es11.4,/ )
-        endif
-    endif
+        end if
+
+    end if
 
     call InitTimeMarchScheme
 

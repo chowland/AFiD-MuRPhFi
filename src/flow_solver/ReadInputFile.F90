@@ -143,6 +143,7 @@ subroutine ReadSidewallInput
     implicit none
     integer :: i
     character(len=4) :: dummy
+ 
 
     open(unit=15,file='sidewall.in',status='old')
         do i=1,7
@@ -185,6 +186,45 @@ subroutine ReadSidewallInput
         read(15,*) bc_humid_z_fix_lo, bc_humid_z_val_lo, bc_humid_z_fix_up,  bc_humid_z_val_up
     301     format(a4)
     close(15)
+    
+
+
+    if(zlen==0.01 .and. nz == 2)then
+        write(*,*) 
+        if(bc_vx_z_fix_lo)then
+          bc_vx_z_val_lo = 0  
+          ErrorSetSideWallBC = .true.
+        end if 
+  
+        if(bc_vx_z_fix_up)then
+          bc_vx_z_val_up = 0
+          ErrorSetSideWallBC = .true.
+        end if 
+  
+  
+        if(bc_temp_z_fix_lo)then
+          bc_temp_z_val_lo = 0
+          ErrorSetSideWallBC = .true.
+        end if 
+  
+  
+        if(bc_temp_z_fix_up)then
+          bc_temp_z_val_up = 0
+          ErrorSetSideWallBC = .true.
+        end if 
+  
+  
+        if(bc_sal_z_fix_lo )then
+          bc_sal_z_val_lo = 0
+          ErrorSetSideWallBC = .true.
+        end if 
+  
+        if(bc_sal_z_fix_up )then
+          bc_sal_z_val_up = 0
+          ErrorSetSideWallBC = .true.
+        end if
+      end if 
+  
 
 end subroutine ReadSidewallInput
 
