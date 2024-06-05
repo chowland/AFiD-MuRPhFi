@@ -13,9 +13,10 @@ subroutine SetSidewallBCs
     use afid_phasefield, only: phi
     use afid_moisture, only: humid
     implicit none
-    real :: dyy, dzz    !! Grid spacing
+    real :: dyy, dzz      !! Grid spacing
     real :: dyyr, dzzr    !! Refined grid spacing
     integer :: n
+
 
     dyy = yc(2)
     dzz = zc(2)
@@ -92,6 +93,7 @@ subroutine SetSidewallBCs
         end if
     end if
     if (xstart(3)==1) then
+        if ( .not. periodic_bc(3)) then
         if (bc_vx_z_fix_lo) then
             do n=1,lvlhalo
                 vx(:,:,1-n) = 2.0*bc_vx_z_val_lo - vx(:,:,n)
@@ -156,7 +158,7 @@ subroutine SetSidewallBCs
             end if
         end if
     end if
-
+end if 
     !! Right wall
     if (xend(2)==nym) then
         if (bc_vx_y_fix_up) then
@@ -222,6 +224,7 @@ subroutine SetSidewallBCs
             end if
         end if
     end if
+    if ( .not. periodic_bc(3)) then
     if (xend(3)==nzm) then
         if (bc_vx_z_fix_up) then
             do n=1,lvlhalo
@@ -286,4 +289,5 @@ subroutine SetSidewallBCs
             end if
         end if
     end if
+end if 
 end subroutine SetSidewallBCs

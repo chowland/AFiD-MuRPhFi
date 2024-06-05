@@ -26,7 +26,7 @@ program AFiD
     integer :: prow=0,pcol=0
     integer :: lfactor,lfactor2
     character(100) :: arg
-    logical, dimension(3) :: periodic_bc        !! Flags for which dimensions have periodic boundary conditions
+    !logical, dimension(3) :: periodic_bc        !! Flags for which dimensions have periodic boundary conditions
     logical :: write_mean_planes=.true.!, nanexist
     ! real,allocatable,dimension(:,:) :: dummy,dscan,dbot
     ! integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
@@ -52,12 +52,13 @@ program AFiD
         read(arg,'(i10)') pcol
     endif
 
-    if (sidewall) then
+    if (sidewall .and. .not. periodic_bc_z_direction) then
         periodic_bc = [.false., .false., .false.]
+    elseif (sidewall .and.  periodic_bc_z_direction) then
+        periodic_bc = [.false., .false., .true.]
     else
         periodic_bc = [.false., .true., .true.]
     end if
-
     call decomp_2d_init(nxm ,nym ,nzm ,&
                         nxmr,nymr,nzmr,&
                         prow,pcol,&
@@ -98,7 +99,7 @@ program AFiD
                        '3D Cell with aspect-ratio:  D1/H = ',f5.2,' D2/H = ',f5.2)
         end if 
 
-        if (sidewall)then
+        if (sidewall .and. .not. periodic_bc_z_direction) then
             write(6,442)
             442 format(//,8x,'Side wall boundary condition')
             if(ErrorSetSideWallBC)then
@@ -108,6 +109,9 @@ program AFiD
                 403 format(//,8x,'The conditions on the spanwise wall have been changed to make them all adiabatic and free-slip')
                  
             end if 
+        else if  (sidewall .and. periodic_bc_z_direction) then
+            write(6,444)
+            444 format(//,8x,'Side wall boundary condition in x and y, periodic boundary condition in z')
         else 
             write(6,142)
             142 format(//,8x,'Periodic lateral wall boundary condition')

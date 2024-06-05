@@ -82,7 +82,8 @@ module param
     real, dimension(1:3) :: gam,rom,alm
     real, allocatable, dimension(:,:,:) :: tempbp,temptp !CJH make BCs 3D arrays so we can use update_halo
     integer, dimension(5) :: spec_idx
-    
+    logical, dimension(3) :: periodic_bc 
+    logical :: periodic_bc_z_direction = .false.
     logical :: Non_uniform_BC   = .false.!! Flag to determine Non_uniform_BC
 
     logical :: dumpslabs=.false.

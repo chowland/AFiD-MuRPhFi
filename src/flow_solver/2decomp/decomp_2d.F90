@@ -296,7 +296,6 @@ contains
        periodic_y = .false.
        periodic_z = .false.
     end if
-
     call MPI_INIT(ierror)
     call MPI_COMM_RANK(MPI_COMM_WORLD,nrank,ierror)
     call MPI_COMM_SIZE(MPI_COMM_WORLD,nproc,ierror)
@@ -749,7 +748,7 @@ contains
   ! Prepare the send / receive buffers for MPI_ALLTOALLV communications
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine prepare_buffer(decomp)
-   use param, only: sidewall
+   use param, only: sidewall,periodic_bc
     
     implicit none
     
@@ -845,18 +844,18 @@ contains
              zranks(index_src)=rank_z
              zweights(index_src)=decomp%zsz(1)*subsize_y*decomp%z2dist(i)
 #endif
-            if (sidewall) then
-               call MPI_Type_create_subarray(3,decomp%zsz, &
-                  (/decomp%zsz(1),subsize_y,decomp%z2dist(i)/), &
-                  (/0,offset_y,decomp%z2st(i)-decomp%zst(3)/), &
-                  MPI_ORDER_FORTRAN,real_type,decomp%ztypes_xz(rank_z+1),ierror)
-            else
-               call MPI_Type_create_subarray(3,decomp%zsz, &
-                  (/decomp%zsz(1),subsize_y,decomp%z2dist(i)/), &
-                  (/0,offset_y,decomp%z2st(i)-decomp%zst(3)/), &
-                  MPI_ORDER_FORTRAN,complex_type,decomp%ztypes_xz(rank_z+1),ierror)
-            end if
-             call MPI_Type_commit(decomp%ztypes_xz(rank_z+1),ierror)
+if (sidewall .and. .not. periodic_bc(3)) then
+      call MPI_Type_create_subarray(3,decomp%zsz, &
+      (/decomp%zsz(1),subsize_y,decomp%z2dist(i)/), &
+      (/0,offset_y,decomp%z2st(i)-decomp%zst(3)/), &
+      MPI_ORDER_FORTRAN,real_type,decomp%ztypes_xz(rank_z+1),ierror)
+else
+   call MPI_Type_create_subarray(3,decomp%zsz, &
+      (/decomp%zsz(1),subsize_y,decomp%z2dist(i)/), &
+      (/0,offset_y,decomp%z2st(i)-decomp%zst(3)/), &
+      MPI_ORDER_FORTRAN,complex_type,decomp%ztypes_xz(rank_z+1),ierror)
+end if
+call MPI_Type_commit(decomp%ztypes_xz(rank_z+1),ierror)
 !JD send to process with x-pencil defined by (k,i)
 !JD x-bounds are taken from the z-pencils
 !             send: decomp%zst(1):decomp%zen(1)
@@ -876,7 +875,7 @@ contains
              xranks(index_dest)=rank_x
              xweights(index_dest)=decomp%x1dist(k)*subsize_y*decomp%xsz(3)
 #endif
-            if (sidewall) then
+            if (sidewall .and. .not. periodic_bc(3)) then
                call MPI_Type_create_subarray(3,decomp%xsz, &
                   (/decomp%x1dist(k),subsize_y,decomp%xsz(3)/), &
                   (/decomp%x1st(k)-decomp%xst(1),offset_y,0/), &

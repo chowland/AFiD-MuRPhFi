@@ -72,7 +72,7 @@ subroutine InitPressureSolver
 
     !! Construct modified wavenumbers
     !! z
-    if (sidewall) then
+    if (sidewall .and. .not. periodic_bc(3)) then
         do i=1,nzm
             ao(i) = (i-1)*pi
             ak1(i) = 2.d0*(1.d0 - cos(ao(i)/nzm))*(float(nzm)/zlen)**2
@@ -128,7 +128,7 @@ subroutine InitPressureSolver
     allocate(ry1(ph%yst(1):ph%yen(1), &
                  ph%yst(2):ph%yen(2), &
                  ph%yst(3):ph%yen(3)))
-    if (sidewall) then
+   
         allocate(ry2(ph%yst(1):ph%yen(1), &
                      ph%yst(2):ph%yen(2), &
                      ph%yst(3):ph%yen(3)))
@@ -138,7 +138,7 @@ subroutine InitPressureSolver
         allocate(dphr(ph%xst(1):ph%xen(1), &
                       ph%xst(2):ph%xen(2), &
                       ph%xst(3):ph%xen(3)))
-    else
+   
         allocate(cy1(sp%yst(1):sp%yen(1), &
                      sp%yst(2):sp%yen(2), &
                      sp%yst(3):sp%yen(3)))
@@ -148,7 +148,7 @@ subroutine InitPressureSolver
         allocate(dphc(sp%xst(1):sp%xen(1), &
                       sp%xst(2):sp%xen(2), &
                       sp%xst(3):sp%xen(3)))
-    end if
+    
 
 end subroutine InitPressureSolver
 
@@ -189,10 +189,14 @@ subroutine SolvePressureCorrection
     ! If calling for the first time, plan the Fourier transform
     if (.not. planned) call PlanFourierTransform
 
-    if (sidewall) then
+    if (sidewall .and. .not. periodic_bc(3)) then
         call dfftw_execute_r2r(fwd_guruplan_y,ry1,ry2)
         call transpose_y_to_z(ry2,rz2,sp)
         call dfftw_execute_r2r(fwd_guruplan_z,rz2,rz2)
+    else if(sidewall .and.  periodic_bc(3))  then
+        call dfftw_execute_r2r(fwd_guruplan_y,ry1,ry2)
+        call transpose_y_to_z(ry2,rz2,sp)
+        call dfftw_execute_dft_r2c(fwd_guruplan_z,rz2,cz1)
     else
         call dfftw_execute_dft_r2c(fwd_guruplan_y,ry1,cy1)
         call transpose_y_to_z(cy1,cz1,sp)
@@ -200,21 +204,23 @@ subroutine SolvePressureCorrection
     end if
     
     ! Normalise the transformed array. FFTW does not do this automatically
-    if (sidewall) then
+    if (sidewall .and. .not. periodic_bc(3)) then
         rz2 = 0.25*rz2/(nzm*nym)
-    else
-        cz1 = cz1 / (nzm*nym)
+    else if(sidewall .and.  periodic_bc(3))  then
+         cz1 = 0.5*cz1 / (nzm*nym)
+     else
+         cz1 = cz1 / (nzm*nym)
     end if
-    
+     
     ! Transpose back to an x-pencil before the tridiagonal solve
-    if (sidewall) then
+    if (sidewall .and. .not. periodic_bc(3)) then
         call transpose_z_to_x(rz2,dphr,sp)
-    else
+    else 
         call transpose_z_to_x(cz1,dphc,sp)
     end if
     
     ! Solve the tridiagonal system with complex coefficients
-    if (sidewall) then
+   if (sidewall .and. .not. periodic_bc(3)) then
         call SolveTridiagonalPressure_real
     else
         call SolveTridiagonalPressure_complex
@@ -222,9 +228,14 @@ subroutine SolvePressureCorrection
 
     ! if (ismaster) write(*,*) 'Tridiagonal system solved'
     
-    if (sidewall) then
+    if (sidewall .and. .not. periodic_bc(3)) then
         call transpose_x_to_z(dphr,rz2,sp)
         call dfftw_execute_r2r(bwd_guruplan_z,rz2,rz2)
+        call transpose_z_to_y(rz2,ry2,sp)
+        call dfftw_execute_r2r(bwd_guruplan_y,ry2,ry1)
+    else if(sidewall .and.  periodic_bc(3))  then
+        call transpose_x_to_z(dphc,cz1,sp)
+        call dfftw_execute_dft_c2r(bwd_guruplan_z,cz1,rz2)
         call transpose_z_to_y(rz2,ry2,sp)
         call dfftw_execute_r2r(bwd_guruplan_y,ry2,ry1)
     else
@@ -235,7 +246,7 @@ subroutine SolvePressureCorrection
     end if
     
     ! if (ismaster) write(*,*) 'Back FFT performed'
-    
+
     call transpose_y_to_x(ry1,dph,ph)
 
 end subroutine SolvePressureCorrection
