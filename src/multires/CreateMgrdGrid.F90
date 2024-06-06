@@ -15,7 +15,7 @@ subroutine CreateMgrdGrid
     use afid_salinity, only: SfixS, SfixN, PraS, ap3sskr, ac3sskr, am3sskr
     use afid_phasefield, only: ap3spkr, ac3spkr, am3spkr
     implicit none
-    real, dimension(nx) :: ap3sskr_D,ac3sskr_D, am3sskr_D, ap3sskr_N,ac3sskr_N, am3sskr_N
+    real, dimension(nxmr) :: ap3sskr_D,ac3sskr_D, am3sskr_D, ap3sskr_N,ac3sskr_N, am3sskr_N
     
     integer :: kc,i
 
@@ -162,20 +162,20 @@ subroutine CreateMgrdGrid
     if (salinity) then
     if ( FixValueBCRegion_Length==0) then
 
-        call second_derivative_coeff(ap3sskr_D, ac3sskr_D, am3sskr_D, xm(1:nxm), alx3, SfixN, SfixS)
-        call second_derivative_coeff(ap3sskr_N, ac3sskr_N,  am3sskr_N, xm(1:nxm), alx3, SfixN, SfixS)
+        call second_derivative_coeff(ap3sskr_D, ac3sskr_D, am3sskr_D, xmr(1:nxmr), alx3, SfixN, SfixS)
+        call second_derivative_coeff(ap3sskr_N, ac3sskr_N,  am3sskr_N, xmr(1:nxmr), alx3, SfixN, SfixS)
 
     else if (FixValueBCRegion_Length/=0) then
 
         if ( FixValueBCRegion_Nord_or_Sud==0) then
         
-            call second_derivative_coeff(ap3sskr_D, ac3sskr_D, am3sskr_D, xm(1:nxm), alx3, SfixN, 1)
-            call second_derivative_coeff(ap3sskr_N, ac3sskr_N, am3sskr_N, xm(1:nxm), alx3, SfixN, 0)
+            call second_derivative_coeff(ap3sskr_D, ac3sskr_D, am3sskr_D, xmr(1:nxmr), alx3, SfixN, 1)
+            call second_derivative_coeff(ap3sskr_N, ac3sskr_N, am3sskr_N, xmr(1:nxmr), alx3, SfixN, 0)
         
         else if( FixValueBCRegion_Nord_or_Sud==1) then
   
-            call second_derivative_coeff(ap3sskr_D, ac3sskr_D, am3sskr_D, xm(1:nxm), alx3, 1, SfixS)
-            call second_derivative_coeff(ap3sskr_N, ac3sskr_N, am3sskr_N, xm(1:nxm), alx3, 0, SfixS)
+            call second_derivative_coeff(ap3sskr_D, ac3sskr_D, am3sskr_D, xmr(1:nxmr), alx3, 1, SfixS)
+            call second_derivative_coeff(ap3sskr_N, ac3sskr_N, am3sskr_N, xmr(1:nxmr), alx3, 0, SfixS)
            
         end if
    

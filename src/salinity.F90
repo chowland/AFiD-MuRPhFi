@@ -454,7 +454,6 @@ subroutine ImplicitSalinity
                     else if (FixValueBCRegion_Nord_or_Sud == 1) then
                         if (ymr(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
                             ymr(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
-                            
                             ii = 1
                             FlagBC_Nord = 1
                          else 
@@ -574,23 +573,57 @@ end subroutine SolveImpEqnUpdate_Sal
 !! provide buoyancy forcing to the momentum equation
 subroutine InterpSalMultigrid
     integer :: icr, jcr, kcr
+    real ::  FlagBC_Nord, FlagBC_Sud
 
     ! Set coarse salinity array to zero
     salc(:,:,:) = 0.d0
 
     ! Extend refined array in wall-normal direction to give sufficient points
     ! for cubic interpolation
+
+   
+    if (FixValueBCRegion_Length==0) then
+        FlagBC_Sud = SfixS
+        FlagBC_Nord = SfixN
+    else if  (FixValueBCRegion_Length/=0 .and. FixValueBCRegion_Nord_or_Sud==0) then
+        FlagBC_Nord = SfixN
+    else if  (FixValueBCRegion_Length/=0 .and. FixValueBCRegion_Nord_or_Sud==1) then
+        FlagBC_Sud = SfixS
+    end if
+
     do icr=xstartr(3)-lvlhalo,xendr(3)+lvlhalo
         do jcr=xstartr(2)-lvlhalo,xendr(2)+lvlhalo
             do kcr=1,nxmr
                 tpdvr(kcr,jcr,icr) = sal(kcr,jcr,icr)
             end do
-            if (SfixS==1) then
+
+            if  (ymr(jcr) < 0.01 * FixValueBCRegion_Length * YLEN )then
+                !write(*,*) jcr , 0.01 * FixValueBCRegion_Length * YLEN 
+            end if 
+            if (FixValueBCRegion_Length/=0) then
+                if (FixValueBCRegion_Nord_or_Sud==0) then
+                    if (ymr(jcr) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                        ymr(jcr) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                        FlagBC_Sud = 1
+                     else 
+                        FlagBC_Sud = 0
+                     end if
+                else if (FixValueBCRegion_Nord_or_Sud == 1) then
+                    if (ymr(jcr) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                        ymr(jcr) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                        FlagBC_Nord = 1
+                     else 
+                        FlagBC_Nord = 0
+                     end if
+                end if
+            end if
+            !write(*,*) FlagBC_Nord, ymr(jcr),saltp(1,jcr,icr) 
+            if (FlagBC_Sud==1) then
                 tpdvr(0,jcr,icr) = 2.0*salbp(1,jcr,icr) - sal(1,jcr,icr)
             else
                 tpdvr(0,jcr,icr) = sal(1,jcr,icr)
             end if
-            if (SfixN==1) then
+            if (FlagBC_Nord==1) then
                 tpdvr(nxr,jcr,icr) = 2.0*saltp(1,jcr,icr) - sal(nxmr,jcr,icr)
             else
                 tpdvr(nxr,jcr,icr) = sal(nxmr,jcr,icr)
@@ -604,7 +637,6 @@ subroutine InterpSalMultigrid
     else
         call interpolate_xyz_to_coarse(tpdvr, salc(1:nxm,:,:))
     end if
-
 end subroutine InterpSalMultigrid
 
 !> Add buoyancy contribution from the salinity to one of the

@@ -290,6 +290,7 @@ program AFiD
     call MpiBarrier
     td(1) = MPI_WTIME()
     call WriteFlowField(.false.)
+    call WriteFlowField(.true.)
     call MpiBarrier
     td(2) = MPI_WTIME()
     if (ismaster) write(*,*) "Flow field writing took: ",td(2)-td(1)
@@ -427,6 +428,7 @@ program AFiD
         if ((mod(time,save_3D).lt.dt) .and. (floor(time/tframe).ne.0)) then
             if(ismaster) write(6,*) '*** Writing 3D fields ***'
             call WriteFlowField(.false.)
+            call WriteFlowField(.true.)
             call MpiBarrier
             if(ismaster) write(6,*) '********* Done **********'
         end if
