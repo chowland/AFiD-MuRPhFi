@@ -23,7 +23,7 @@
       real :: inym, inzm
       integer :: unit
 
-
+      real ::count
       logical :: file_exists
       character(len=1024) :: buffer
       vxrms(:)=0.0;   vyrms(:)=0.0;   vzrms(:)=0.0
@@ -61,7 +61,8 @@
                   end do
             if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
                   if (ym(j) < 0.01 * FixValueBCRegion_Length * YLEN) then
-                        nu_T_Hot = nu_T_Hot + (temptp(1,j,i)-temp(nxm,j,i))*deln   
+                        nu_T_Hot = nu_T_Hot + (temptp(1,j,i)-temp(nxm,j,i))*deln  
+
                   else if ( ym(j) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                         nu_T_Col = nu_T_Col + (temptp(1,j,i)-temp(nxm,j,i))*deln
                   end if 
@@ -82,17 +83,15 @@
 
       call MpiSumRealScalar(nu_T_Hot)
       call MpiSumRealScalar(nu_T_Col)
-     
-      if(salinity) then 
+ if(salinity) then 
             do i=xstartr(3),xendr(3)
                   do j=xstartr(2),xendr(2) 
 
                   if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
                         if (ymr(j) < 0.01 * FixValueBCRegion_Length * YLEN) then
-                              nu_S_Hot = nu_S_Hot + (saltp(1,j,i)-sal(nxm,j,i))*delnr
-
+                              nu_S_Hot = nu_S_Hot + (saltp(1,j,i)-sal(nxmr,j,i))*delnr
                         else if ( ymr(j) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
-                              nu_S_Col = nu_S_Col + (saltp(1,j,i)-sal(nxm,j,i))*delnr
+                              nu_S_Col = nu_S_Col + (saltp(1,j,i)-sal(nxmr,j,i))*delnr
 
                         end if 
                   else if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==0) then
@@ -118,7 +117,6 @@
 end if 
 
 
-               
 do k=1,nxm
       vxrms(k) = sqrt(vxrms(k)*inym*inzm)
       vyrms(k) = sqrt(vyrms(k)*inym*inzm)
