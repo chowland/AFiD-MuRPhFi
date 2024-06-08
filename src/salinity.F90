@@ -103,7 +103,10 @@ end subroutine DeallocateSalVariables
 
 !> Set the values for the boundary planes of salinity
 subroutine SetSalBCs
-    integer :: i, j
+    integer :: i, j,ii
+    real, dimension(nymr)::  values
+    real :: ProfileTemp
+
 
     if (rays>=0) then ! unstable S gradient
         do i=xstartr(3),xendr(3)
@@ -129,40 +132,8 @@ subroutine SetSalBCs
         end do
     end if
     
-    ! Update halo for interpolation routine
-    call update_halo(saltp,lvlhalo)
-    call update_halo(salbp,lvlhalo)
 
-    ! Extend to sidewall halos (could be modified for other BCs...)
-    if (sidewall) then
-        if (xstartr(2)==1) then
-            do j=1,lvlhalo
-                saltp(1,1-j,:) = saltp(1,j,:)
-                salbp(1,1-j,:) = salbp(1,j,:)
-            end do
-        end if
-        if (xendr(2)==nymr) then
-            do j=1,lvlhalo
-                saltp(1,nymr+j,:) = saltp(1,nymr+1-j,:)
-                salbp(1,nymr+j,:) = salbp(1,nymr+1-j,:)
-            end do
-        end if
-
-        if (xstartr(3)==1) then
-            do i=1,lvlhalo
-                saltp(1,:,1-i) = saltp(1,:,i)
-                salbp(1,:,1-i) = salbp(1,:,i)
-            end do
-        end if
-        if (xendr(3)==nzmr) then
-            do i=1,lvlhalo
-                saltp(1,:,nzmr+i) = saltp(1,:,nzmr+1-i)
-                salbp(1,:,nzmr+i) = salbp(1,:,nzmr+1-i)
-            end do
-        end if
-    end if
-
-
+  
     if  (FixValueBCRegion_Length/=0) then  
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
@@ -188,6 +159,54 @@ subroutine SetSalBCs
             end do
         end do
     end if
+    do ii = 1, nymr
+        ProfileTemp = -1.0 + real(ii - 1) * 2.0/real(nym - 1) 
+        !values(ii) = (1.0 + tanh(5*ProfileTemp)) / 2.0  ! JFM Limiting regimes of turbulent horizontal convection. Part I: Intermediate and low Prandtl numbers
+        
+        values(ii) = ycr(ii)/YLEN !-0.5!Linear
+    end do
+    if  (FixValueBCRegion_Nord_or_Sud==10) then  
+     do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                saltp(1,j,i)= values(j)
+                salbp(1,j,i)=0.0
+            end do
+     end do
+    end if 
+
+
+   ! Update halo for interpolation routine
+   call update_halo(saltp,lvlhalo)
+   call update_halo(salbp,lvlhalo)
+
+   ! Extend to sidewall halos (could be modified for other BCs...)
+   if (sidewall) then
+       if (xstartr(2)==1) then
+           do j=1,lvlhalo
+               saltp(1,1-j,:) = saltp(1,j,:)
+               salbp(1,1-j,:) = salbp(1,j,:)
+           end do
+       end if
+       if (xendr(2)==nymr) then
+           do j=1,lvlhalo
+               saltp(1,nymr+j,:) = saltp(1,nymr+1-j,:)
+               salbp(1,nymr+j,:) = salbp(1,nymr+1-j,:)
+           end do
+       end if
+
+       if (xstartr(3)==1) then
+           do i=1,lvlhalo
+               saltp(1,:,1-i) = saltp(1,:,i)
+               salbp(1,:,1-i) = salbp(1,:,i)
+           end do
+       end if
+       if (xendr(3)==nzmr) then
+           do i=1,lvlhalo
+               saltp(1,:,nzmr+i) = saltp(1,:,nzmr+1-i)
+               salbp(1,:,nzmr+i) = salbp(1,:,nzmr+1-i)
+           end do
+       end if
+   end if
 
 end subroutine SetSalBCs
 
