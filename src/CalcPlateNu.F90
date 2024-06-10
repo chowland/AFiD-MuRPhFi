@@ -60,16 +60,16 @@
                          vzrms(k) = vzrms(k) + 0.5*(vz(k,j,i)**2+vz(k,j,ip)**2)
                   end do
             if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
-                  if (ym(j) < 0.01 * FixValueBCRegion_Length * YLEN) then
+                  if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
                         nu_T_Hot = nu_T_Hot + (temptp(1,j,i)-temp(nxm,j,i))*deln  
 
-                  else if ( ym(j) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                  else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                         nu_T_Col = nu_T_Col + (temptp(1,j,i)-temp(nxm,j,i))*deln
                   end if 
             else if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==0) then
-                  if (ym(j) < 0.01 * FixValueBCRegion_Length * YLEN) then
+                  if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
                         nu_T_Hot = nu_T_Hot + (temp(1,j,i)-tempbp(1,j,i))*del
-                  else if ( ym(j) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                  else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                         nu_T_Col = nu_T_Col + (temp(1,j,i)-tempbp(1,j,i))*del
                   end if
             end if
@@ -88,17 +88,17 @@
                   do j=xstartr(2),xendr(2) 
 
                   if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
-                        if (ymr(j) < 0.01 * FixValueBCRegion_Length * YLEN) then
+                        if (ymr(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
                               nu_S_Hot = nu_S_Hot + (saltp(1,j,i)-sal(nxmr,j,i))*delnr
-                        else if ( ymr(j) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                        else if ( ymr(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                               nu_S_Col = nu_S_Col + (saltp(1,j,i)-sal(nxmr,j,i))*delnr
 
                         end if 
                   else if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==0) then
-                        if (ymr(j) < 0.01 * FixValueBCRegion_Length * YLEN) then
+                        if (ymr(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
                               nu_S_Hot = nu_S_Hot + (sal(1,j,i)-salbp(1,j,i))*delr
 
-                        else if ( ymr(j) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                        else if ( ymr(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                               nu_S_Col = nu_S_Col + (sal(1,j,i)-salbp(1,j,i))*delr
 
                         end if

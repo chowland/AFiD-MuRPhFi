@@ -94,7 +94,8 @@
       else if(errorcode.eq.444) then
          write(*,*) "FFT size in ny or nz is not efficient"
       else if (errorcode==666) then
-        write(*,*) "Domain decomposition not a factor of the grid size"
+      else if(errorcode.eq.1234) then 
+        write(*,*) "Incorrect use of non-uniform BCs"
       else 
          write(*,*) " ==================================="
          write(*,*) " Maximum number of timesteps reached"

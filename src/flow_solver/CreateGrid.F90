@@ -44,7 +44,6 @@ subroutine CreateGrid
     ym(0) = 2.d0*ym(1) - ym(2)
     ym(ny) = 2.d0*ym(nym) - ym(nym-1)
 
-!
 !     VERTICAL COORDINATE DEFINITION
 !
 !     OPTION 0: UNIFORM CLUSTERING
@@ -210,12 +209,17 @@ subroutine CreateGrid
    ny_Cold = 0
    ny_Hot = 0
    do i=1,nym
-       if( FixValueBCRegion_Length/=0 .and. ym(i) < 0.01 * FixValueBCRegion_Length * YLEN) then
+       if( FixValueBCRegion_Length/=0 .and. ym(i) <= 0.01 * FixValueBCRegion_Length * YLEN) then
             ny_Cold = ny_Cold+1
-       else if  (FixValueBCRegion_Length/=0 .and. ym(i) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+       else if  (FixValueBCRegion_Length/=0 .and. ym(i) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
             ny_Hot = ny_Hot +1 
         end if
     end do 
+
+    y_start_Hot = ym(nym-ny_Hot+1)
+    y_end_Cold=  ym(ny_Cold+1)
+   
+ 
  
 
     

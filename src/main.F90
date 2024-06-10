@@ -13,6 +13,7 @@ program AFiD
     use afid_phasefield
     use afid_averaging
     use afid_spectra
+    use GridModule
     use h5_tools, only: InitSliceCommunicators
     ! use stat_arrays, only: nstatsamples,vx_global,vy_global,vz_global
 
@@ -28,6 +29,7 @@ program AFiD
     character(100) :: arg
     !logical, dimension(3) :: periodic_bc        !! Flags for which dimensions have periodic boundary conditions
     logical :: write_mean_planes=.true.!, nanexist
+    integer:: nymr_new,nym_new
     ! real,allocatable,dimension(:,:) :: dummy,dscan,dbot
     ! integer :: comm,ierror,row_id,row_coords(2),ic,jc,kc
 
@@ -118,13 +120,14 @@ program AFiD
         end if   
 
         if (FixValueBCRegion_Length /= 0 )then
-            
+
+
             if (FixValueBCRegion_Nord_or_Sud==1)then
                 write(6,502)
-                502 format(//,8x,'Mixed contour conditions on the upper wall ')
+                502 format(//,8x,'Mixed boundary conditions on the upper wall ')
             else 
                 write(6,503)
-                503 format(//,8x,'Mixed contour conditions on the lower wall ')
+                503 format(//,8x,'Mixed boundary conditions on the lower wall ')
             end if 
             
             write(6,505) FixValueBCRegion_Length
@@ -146,7 +149,6 @@ program AFiD
     end if
 
     call InitTimeMarchScheme
-
     call InitVariables
     call InitPressureVars
     if (multires) call InitMgrdVariables  !CS mgrd
@@ -155,12 +157,31 @@ program AFiD
     if (moist) call InitMoistVariables
 
     call InitSliceCommunicators
-
     call CreateGrid
     if (multires) call CreateMgrdGrid     !CS mgrd
+    
 
     call WriteGridInfo
+    if (FixValueBCRegion_Length /= 0 )then
+        if(salinity)then
+            call check_values(nymr_new, nymr, ymr)
+        else
+            nymr_new = nym
+        end if 
+        call check_values(nym_new, nym, ym)
 
+        if((nym_new /= nym.and. .not.salinity) .or.((nymr_new /= nymr .or.nym_new /= nym ).and.salinity) )then
+        !write(6,854)0.01 * FixValueBCRegion_Length * YLEN,YLEN-0.01 * FixValueBCRegion_Length * YLEN
+        !854 format(5x,'Attention: the number of points chosen does not allow the grid to pass through the points of interest.',' y = ' i5 ' and y = ', i5  )
+            write(6,854)
+            854 format(5x,'Attention: the number of points chosen does not allow the grid to pass through the points of interest.' )
+            
+        write(6,856)nym_new ,nymr_new
+        856 format(5x,'Try using ny =  'i5, ' and nyr = ', i5 )
+            call QuitRoutine(tin, .false., 1234)
+        end if 
+
+    end if 
     inquire(file=trim("spectra.in"),exist=specwrite)
     ! if (specwrite) call InitPowerSpec
 

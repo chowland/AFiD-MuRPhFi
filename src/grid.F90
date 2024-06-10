@@ -5,7 +5,7 @@ module GridModule
     private
     public uniform_grid, tanh_grid, cheb_grid, asym_cheb_grid, &
             second_derivative_coeff, centre_focus_grid, &
-            natural_BL_grid, sym_natural_BL_grid, scallop_grid
+            natural_BL_grid, sym_natural_BL_grid, scallop_grid,Smooth_non_uniform_BC,check_values
 
 contains
 
@@ -49,7 +49,6 @@ contains
         do i=1,Nm
             m_grd(i) = 0.5*(c_grd(i) + c_grd(i+1))
         end do
-
     end subroutine
 
     subroutine cheb_grid(c_grd, m_grd, Nm, grd_len, str)
@@ -305,5 +304,89 @@ contains
         end if
 
     end subroutine second_derivative_coeff
+
+
+    subroutine Smooth_non_uniform_BC(m_BC, Nm,zero_point)
+        use param
+        real, intent(out) :: m_BC(:)
+        integer, intent(in) :: Nm
+        real, intent(in) :: zero_point
+        real :: c_BC(Nm+1)
+        integer :: i
+        real :: tstr, z2,trasform_zero
+
+
+        tstr = tanh(str_BC)
+        trasform_zero= ylen/2-(1+zero_point*0.5);
+
+
+
+        c_BC(1) = 0.50
+        do i=2,Nm+1
+            z2 = real(2*(i-1) - Nm)/real(Nm)
+            c_BC(i) =0.5 - 0.5*(1+ tanh(str_BC * (z2+trasform_zero)) / tstr)
+        end do
+
+        do i=1,Nm
+            m_BC(i) = 0.5*(c_BC(i) + c_BC(i+1))
+        end do
+
+    end subroutine Smooth_non_uniform_BC
+
+    subroutine check_values(nym_new, ny_old, ym_old)
+        use param
+        implicit none
+        
+        integer, intent(out) :: nym_new
+        integer, intent(in) :: ny_old
+        real, dimension(ny_old), intent(in) :: ym_old
+        real, dimension(:), allocatable :: yc_new, ym_new
+        integer :: i
+        real :: targhet_hot, targhet_cold
+        logical :: find_Hot, find_Cold
+        
+        find_Hot = .false.
+        find_Cold = .false.
+        
+        targhet_hot = 0.01 * FixValueBCRegion_Length * YLEN
+        targhet_cold = YLEN - 0.01 * FixValueBCRegion_Length * YLEN
+        
+        do i = 1, ny_old
+            if (ym_old(i) == targhet_hot) then
+                find_Hot = .true.
+            end if
+            if (ym_old(i) == targhet_cold) then
+                find_Cold = .true.
+            end if
+        end do
+        
+        nym_new = ny_old
+
+        do while ((.not. find_Cold .and. .not. find_Hot) .or. (nym_new > ny_old * 100))
+            nym_new = nym_new + 1
+            allocate(yc_new(nym_new+1), ym_new(nym_new))
+            call uniform_grid(yc_new(1:nym_new+1), ym_new(1:nym_new), nym_new, ylen)
+
+            do i = 1, nym_new
+                if (ym_new(i) == targhet_hot) then
+                    find_Hot = .true.
+                end if
+                if (ym_new(i) == targhet_cold) then
+                    find_Cold = .true.
+                end if
+            end do
+
+            deallocate(ym_new)
+            deallocate(yc_new)
+
+        end do
+        
+    
+
+ 
+    end subroutine check_values
+
+
+
 
 end module GridModule

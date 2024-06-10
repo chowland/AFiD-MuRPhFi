@@ -26,8 +26,8 @@ subroutine SolveImpEqnUpdate_Temp
         if (FixValueBCRegion_Length==0) then
             ii = 1
         else 
-            if (ym(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                 ym(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+            if (ym(jc) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                 ym(jc) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                 
                     ii = 1
             else 
@@ -57,8 +57,8 @@ subroutine SolveImpEqnUpdate_Temp
                 ii = 1
              
             else 
-                if (ym(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                     ym(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                if (ym(jc) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                     ym(jc) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                     
                         ii = 1
                 else 

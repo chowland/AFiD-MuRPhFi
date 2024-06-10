@@ -17,7 +17,7 @@ subroutine ImplicitAndUpdateTemp
     use ibm_param
     implicit none
     integer :: jc,kc,ic,ii
-    real    :: alpec,dxxt, FlagBC_Nord,FlagBC_Sud,FixTempRegion
+    real    :: alpec,dxxt, FlagBC_Nord,FlagBC_Sud
     alpec=al/pect
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &
@@ -42,8 +42,8 @@ subroutine ImplicitAndUpdateTemp
             do kc=1,nxm
                      if (FixValueBCRegion_Length/=0) then
                         if (FixValueBCRegion_Nord_or_Sud==0) then
-                            if (ym(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                                ym(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                            if (ym(jc) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                                ym(jc) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                                 ii = 1
                                 FlagBC_Sud = 1
                              else 
@@ -51,8 +51,8 @@ subroutine ImplicitAndUpdateTemp
                                 FlagBC_Sud = 0
                              end if
                         else if (FixValueBCRegion_Nord_or_Sud == 1) then
-                            if (ym(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                                ym(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                            if (ym(jc) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                                ym(jc) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                                 
                                 ii = 1
                                 FlagBC_Nord = 1

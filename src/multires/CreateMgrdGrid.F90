@@ -198,15 +198,14 @@ subroutine CreateMgrdGrid
    nyr_Cold = 0
    nyr_Hot = 0
    do i = 1, nymr
-       if( FixValueBCRegion_Length/=0 .and. ymr(i) < 0.01 * FixValueBCRegion_Length * YLEN) then
+       if( FixValueBCRegion_Length/=0 .and. ymr(i) <= 0.01 * FixValueBCRegion_Length * YLEN) then
             nyr_Cold = nyr_Cold+1
-       else if  (FixValueBCRegion_Length/=0 .and. ymr(i) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+       else if  (FixValueBCRegion_Length/=0 .and. ymr(i) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
             nyr_Hot = nyr_Hot +1       
         end if
     end do 
 
-    
-
+   
     ! Phase-field differentiation (ensuring zero gradient at boundaries)
     if (phasefield) call second_derivative_coeff(ap3spkr, ac3spkr, am3spkr, xmr(1:nxmr), alx3, 0, 0)
 
