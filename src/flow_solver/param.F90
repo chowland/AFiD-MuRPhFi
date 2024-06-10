@@ -5,17 +5,19 @@ module param
     implicit none
     real   :: FixValueBCRegion_Length = 0 ! Percentuale
     real   :: FixValueBCRegion_Nord_or_Sud  = 0  ! 1 Up 0 down
+    real ::  str_BC = 0 !
+
     !==========================================================
     !       read from input file bou.in
-    !==========================================================
+    !==========================================================  
     integer   :: nx, ny, nz, ny_Hot, ny_Cold
     integer   :: nxr, nyr, nzr, istr3r,  nyr_Hot, nyr_Cold  !CS mgrd
     integer   :: nsst, nread, ntst, ireset
-    real      :: walltimemax,tout,tmax
+    real      :: walltimemax,tout,tmax 
     real      :: alx3,str3
 
     integer   :: istr3
-    real      :: ylen,zlen
+    real      :: ylen,zlen,y_start_Hot,y_end_Cold
     real      :: rayt,prat,dt,resid
     integer   :: inslws,inslwn
     integer   :: TfixS,TfixN    !CJH option for fixed T/S BCs

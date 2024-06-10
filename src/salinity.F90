@@ -103,10 +103,15 @@ end subroutine DeallocateSalVariables
 
 !> Set the values for the boundary planes of salinity
 subroutine SetSalBCs
-    integer :: i, j,ii
-    real, dimension(nymr)::  values
-    real :: ProfileTemp
+    use GridModule
 
+    integer :: i, j,ii
+    real, dimension(nymr):: m_BC_Hot,m_BC_Cold
+    real :: pontzero_hot,pontzero_cold
+
+
+    pontzero_hot =  0.01 * FixValueBCRegion_Length * YLEN
+    pontzero_cold = YLEN - 0.01 * FixValueBCRegion_Length * YLEN
 
     if (rays>=0) then ! unstable S gradient
         do i=xstartr(3),xendr(3)
@@ -133,11 +138,24 @@ subroutine SetSalBCs
     end if
     
 
-  
+  write(*,*) 'ymr'
+  if (str_BC /= 0) then
+    call Smooth_non_uniform_BC(m_BC_Hot, nymr,pontzero_hot)
+    call Smooth_non_uniform_BC(m_BC_Cold, nymr,pontzero_cold)
+    do j=xstartr(2),xendr(2)
+            if (ymr(j).ge.pontzero_hot)then
+                m_BC_Hot(j) = 0
+            end if 
+            if (ymr(j) .le. pontzero_cold)then
+                m_BC_Cold(j) = 0
+            end if 
+        end do 
+    end if 
+
     if  (FixValueBCRegion_Length/=0) then  
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
-                !tempbp(1,jc,ic)= values(jc) 
+                if (str_BC == 0) then
                 if (j<nymr/2) then
                     if ( FixValueBCRegion_Nord_or_Sud==0) then
                         saltp(1,j,i) = 0.0
@@ -148,33 +166,40 @@ subroutine SetSalBCs
                     end if 
                 else 
                     if ( FixValueBCRegion_Nord_or_Sud==0) then
-                        saltp(1,j,i) = 0.0!0!abs(1)
+                        saltp(1,j,i) = 0.0
                         salbp(1,j,i) = - 0.5d0
                    else  
-                        saltp(1,j,i) = - 0.5d0!0
+                        saltp(1,j,i) =  - 0.5d0
+                        salbp(1,j,i) = 0.0
+                   end if 
+                end if 
+            else 
+
+                if (j<nymr/2) then
+                    if ( FixValueBCRegion_Nord_or_Sud==0) then
+                        saltp(1,j,i) = 0.0
+                        salbp(1,j,i) =  m_BC_Hot(j)
+                    else  
+                        saltp(1,j,i) = m_BC_Hot(j)
+                        salbp(1,j,i) = 0.0
+                    end if 
+                else 
+                    if ( FixValueBCRegion_Nord_or_Sud==0) then
+                        saltp(1,j,i) = 0.0
+                        salbp(1,j,i) = m_BC_Cold(j)
+                   else  
+                        saltp(1,j,i) =  m_BC_Cold(j)
                         salbp(1,j,i) = 0.0
                    end if 
                 end if 
 
+
+            end if 
             end do
         end do
     end if
-    do ii = 1, nymr
-        ProfileTemp = -1.0 + real(ii - 1) * 2.0/real(nym - 1) 
-        !values(ii) = (1.0 + tanh(5*ProfileTemp)) / 2.0  ! JFM Limiting regimes of turbulent horizontal convection. Part I: Intermediate and low Prandtl numbers
-        
-        values(ii) = ycr(ii)/YLEN !-0.5!Linear
-    end do
-    if  (FixValueBCRegion_Nord_or_Sud==10) then  
-     do i=xstartr(3),xendr(3)
-            do j=xstartr(2),xendr(2)
-                saltp(1,j,i)= values(j)
-                salbp(1,j,i)=0.0
-            end do
-     end do
-    end if 
 
-
+    
    ! Update halo for interpolation routine
    call update_halo(saltp,lvlhalo)
    call update_halo(salbp,lvlhalo)
@@ -462,8 +487,8 @@ subroutine ImplicitSalinity
             do kc=1,nxmr
                 if (FixValueBCRegion_Length/=0) then
                     if (FixValueBCRegion_Nord_or_Sud==0) then
-                        if (ymr(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                            ymr(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                        if (ymr(jc) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                            ymr(jc) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                             ii = 1
                             FlagBC_Sud = 1
                          else 
@@ -471,8 +496,8 @@ subroutine ImplicitSalinity
                             FlagBC_Sud = 0
                          end if
                     else if (FixValueBCRegion_Nord_or_Sud == 1) then
-                        if (ymr(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                            ymr(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                        if (ymr(jc) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                            ymr(jc) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                             ii = 1
                             FlagBC_Nord = 1
                          else 
@@ -530,8 +555,8 @@ subroutine SolveImpEqnUpdate_Sal
         if (FixValueBCRegion_Length==0) then
             ii = 1
         else 
-            if (ymr(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                 ymr(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+            if (ymr(jc) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                 ymr(jc) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                 
                     ii = 1
             else 
@@ -557,8 +582,8 @@ subroutine SolveImpEqnUpdate_Sal
                 ii = 1
              
             else 
-                if (ymr(jc) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                     ymr(jc) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                if (ymr(jc) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                     ymr(jc) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                     
                         ii = 1
                 else 
@@ -616,20 +641,18 @@ subroutine InterpSalMultigrid
                 tpdvr(kcr,jcr,icr) = sal(kcr,jcr,icr)
             end do
 
-            if  (ymr(jcr) < 0.01 * FixValueBCRegion_Length * YLEN )then
-                !write(*,*) jcr , 0.01 * FixValueBCRegion_Length * YLEN 
-            end if 
+
             if (FixValueBCRegion_Length/=0) then
                 if (FixValueBCRegion_Nord_or_Sud==0) then
-                    if (ymr(jcr) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                        ymr(jcr) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                    if (ymr(jcr) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                        ymr(jcr) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                         FlagBC_Sud = 1
                      else 
                         FlagBC_Sud = 0
                      end if
                 else if (FixValueBCRegion_Nord_or_Sud == 1) then
-                    if (ymr(jcr) < 0.01 * FixValueBCRegion_Length * YLEN .or. &
-                        ymr(jcr) > YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                    if (ymr(jcr) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
+                        ymr(jcr) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
                         FlagBC_Nord = 1
                      else 
                         FlagBC_Nord = 0
