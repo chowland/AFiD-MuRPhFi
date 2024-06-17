@@ -70,12 +70,16 @@ subroutine ImplicitAndUpdateTemp
                     dxxt = temp(kc+1,jc,ic)*ap3ssk(kc,ii) &
                         + temp(kc,jc,ic)*ac3ssk(kc,ii) &
                         - (ap3ssk(kc,ii)+ac3ssk(kc,ii))*tempbp(1,jc,ic)*FlagBC_Sud
-                       
-
                 elseif(kc.eq.nxm) then  !CJH Apply upper BC
+                    if(Robin==1) then
+                        dxxt = temp(kc,jc,ic)*ac3_Robin(jc) &
+                        + temp(kc-1,jc,ic)*am3_Robin(jc) &
+                        +ap3_Robin(jc)*temptp(1,jc,ic)
+                    else 
                     dxxt = temp(kc,jc,ic)*ac3ssk(kc,ii) &
                         + temp(kc-1,jc,ic)*am3ssk(kc,ii) &
                         - (am3ssk(kc,ii)+ac3ssk(kc,ii))*temptp(1,jc,ic)*FlagBC_Nord
+                    end if 
                 else
                     dxxt = temp(kc+1,jc,ic)*ap3ssk(kc,ii) &
                         + temp(kc  ,jc,ic)*ac3ssk(kc,ii) &

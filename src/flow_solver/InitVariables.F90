@@ -19,6 +19,11 @@ subroutine InitVariables
 !-------------------------------------------------
 ! Arrays for grid making
 !-------------------------------------------------
+    call AllocateReal1DArray(ap3_Robin, 1,nym)
+    call AllocateReal1DArray(ac3_Robin, 1,nym)
+    call AllocateReal1DArray(am3_Robin, 1,nym)
+    call AllocateReal1DArray(alpha_Temp, 1,nym)
+
 
     call AllocateReal1DArray(zc,1,nz)
     call AllocateReal1DArray(zm,0,nz+1)

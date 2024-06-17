@@ -36,10 +36,17 @@ subroutine SolveImpEqnUpdate_Temp
 
         end if
     do kc=1,nxm
+        if (kc==nxm .and. Robin==1)then
+            ackl_b=1.0d0/(1.0d0-ac3ssk(kc,ii)*betadx)
+            amkl(kc)=-am3_Robin(jc)*betadx*ackl_b
+            ackl(kc)=1.0d0
+            apkl(kc)=-ap3_Robin(jc)*betadx*ackl_b
+        else
         ackl_b=1.0d0/(1.0d0-ac3ssk(kc,ii)*betadx)
         amkl(kc)=-am3ssk(kc,ii)*betadx*ackl_b
         ackl(kc)=1.0d0
         apkl(kc)=-ap3ssk(kc,ii)*betadx*ackl_b
+        end if 
     end do
     end do
     amkT=amkl(2:nxm)
@@ -67,8 +74,13 @@ subroutine SolveImpEqnUpdate_Temp
     
             end if
             do kc=1,nxm
+                if (kc==nxm .and. Robin==1)then 
+                    ackl_b=1.0/(1.0-ac3_Robin(jc)*betadx)
+                    rhs(kc,jc,ic)=rhs(kc,jc,ic)*ackl_b
+                else 
                 ackl_b=1.0/(1.0-ac3ssk(kc,ii)*betadx)
                 rhs(kc,jc,ic)=rhs(kc,jc,ic)*ackl_b
+                end if 
             end do
         end do
     end do

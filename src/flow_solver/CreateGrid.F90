@@ -205,7 +205,10 @@ subroutine CreateGrid
         am3ssk(i,2) = am3ssk_N(i)
         
    end do
-
+   if (Robin==1)then
+   call Scalar_Boundary_Robin_second_derivative_coeff(ap3_Robin ,ac3_Robin, am3_Robin, xm(1:nxm),&
+             &   alx3, ym(1:nym), YLEN, 1,alpha_Temp)
+   end if 
    ny_Cold = 0
    ny_Hot = 0
    do i=1,nym
