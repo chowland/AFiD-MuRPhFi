@@ -12,7 +12,7 @@ subroutine CreateMgrdGrid
     use param
     use AuxiliaryRoutines
     use GridModule
-    use afid_salinity, only: SfixS, SfixN, PraS, ap3sskr, ac3sskr, am3sskr
+    use afid_salinity, only: SfixS, SfixN, PraS, ap3sskr, ac3sskr, am3sskr,ap3r_Robin ,ac3r_Robin, am3r_Robin,alpha_Sal
     use afid_phasefield, only: ap3spkr, ac3spkr, am3spkr
     implicit none
     real, dimension(nxmr) :: ap3sskr_D,ac3sskr_D, am3sskr_D, ap3sskr_N,ac3sskr_N, am3sskr_N
@@ -204,7 +204,11 @@ subroutine CreateMgrdGrid
             nyr_Hot = nyr_Hot +1       
         end if
     end do 
-
+    if (Robin==1)then
+        call Scalar_Boundary_Robin_second_derivative_coeff(ap3r_Robin ,ac3r_Robin,&
+         am3r_Robin, xmr(1:nxmr), &
+        alx3, ymr(1:nymr), YLEN, 1,alpha_Sal)
+     end if 
    
     ! Phase-field differentiation (ensuring zero gradient at boundaries)
     if (phasefield) call second_derivative_coeff(ap3spkr, ac3spkr, am3spkr, xmr(1:nxmr), alx3, 0, 0)

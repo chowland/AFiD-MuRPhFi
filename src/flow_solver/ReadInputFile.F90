@@ -244,6 +244,8 @@ subroutine ReadNon_uniform_BC
         read(15,*) FixValueBCRegion_Nord_or_Sud
         read(15,301) dummy
         read(15,*) str_BC
+        read(15,301) dummy
+        read(15,*) Robin
         
         
     301     format(a4)

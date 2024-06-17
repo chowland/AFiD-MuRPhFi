@@ -19,7 +19,7 @@ program AFiD
 
 !$    use omp_lib
     implicit none
-    integer :: errorcode!, nthreads, i, j, k
+    integer :: errorcode, nthreads, i, j, k
     real    :: instCFL,CFLmr,dmax,dmaxr
     real    :: ti(2), tin(3), minwtdt
     real :: ts!, varptb,chksum
@@ -159,16 +159,27 @@ program AFiD
     call InitSliceCommunicators
     call CreateGrid
     if (multires) call CreateMgrdGrid     !CS mgrd
-    
+    !write(*,*) 'ym'
+    do i=1,nym 
 
+     !   write(*,*) ym(i)
+
+    end do 
+    !write(*,*) 'ymr'
+
+    do i=1,nymr
+
+      !  write(*,*) ymr(i)
+
+    end do 
     call WriteGridInfo
     if (FixValueBCRegion_Length /= 0 )then
         if(salinity)then
-            call check_values(nymr_new, nymr, ymr)
+            nymr_new = nymr!call check_values(nymr_new, nymr, ymr)!  
         else
             nymr_new = nym
         end if 
-        call check_values(nym_new, nym, ym)
+        nym_new = nym!   call check_values(nym_new, nym, ym)
 
         if((nym_new /= nym.and. .not.salinity) .or.((nymr_new /= nymr .or.nym_new /= nym ).and.salinity) )then
         !write(6,854)0.01 * FixValueBCRegion_Length * YLEN,YLEN-0.01 * FixValueBCRegion_Length * YLEN
@@ -306,7 +317,7 @@ program AFiD
         call mean_yplane
         call mean_zplane
     end if
-
+ 
     if (ismaster) write(*,*) "Writing 3D fields"
     call MpiBarrier
     td(1) = MPI_WTIME()
@@ -415,7 +426,7 @@ program AFiD
                 call mean_zplane
             end if
         endif
-
+  
         if(ntime.eq.1.or.mod(time,tout).lt.dt) then
             !call GlobalQuantities
             !if(vmax(1).gt.limitVel.and.vmax(2).gt.limitVel) errorcode = 266
