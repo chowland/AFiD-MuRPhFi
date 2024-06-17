@@ -59,6 +59,31 @@
                          vyrms(k) = vyrms(k) + 0.5*(vy(k,j,i)**2+vy(k,jp,i)**2)
                          vzrms(k) = vzrms(k) + 0.5*(vz(k,j,i)**2+vz(k,j,ip)**2)
                   end do
+
+            if(Robin==1)then
+                  if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
+                  if(alpha_Temp(j)==1)then
+                  nu_T_Hot = nu_T_Hot + (temptp(1,j,i)-temp(nxm,j,i))*deln 
+                  !write(*,*) (temptp(1,j,i)-temp(nxm,j,i))*deln,  alpha_Temp(j),ym(j),'alpha1'
+                  elseif(alpha_Temp(j)==0)then
+                  else 
+                  nu_T_Hot = nu_T_Hot +  alpha_Temp(j)/(1- alpha_Temp(j)) *(temptp(1,j,i)-temp(nxm,j,i))
+                  !write(*,*) +  alpha_Temp(j)/(1- alpha_Temp(j)) *(temptp(1,j,i)-temp(nxm,j,i)),  alpha_Temp(j),ym(j)
+ 
+                  end if
+                  else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then  
+                  if(alpha_Temp(j)==1)then
+                  nu_T_Col = nu_T_Col + (temptp(1,j,i)-temp(nxm,j,i))*deln 
+
+                  elseif(alpha_Temp(j)==0)then
+                  else 
+                  nu_T_Col = nu_T_Col +  alpha_Temp(j)/(1- alpha_Temp(j)) *(temptp(1,j,i)-temp(nxm,j,i)) 
+                   end if
+                  end if 
+            !write(*,*)nu_T_Col,  alpha_Temp(j),ym(j)
+
+
+            else 
             if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
                   if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
                         nu_T_Hot = nu_T_Hot + (temptp(1,j,i)-temp(nxm,j,i))*deln  
@@ -73,6 +98,7 @@
                         nu_T_Col = nu_T_Col + (temp(1,j,i)-tempbp(1,j,i))*del
                   end if
             end if
+             end if 
 
         enddo
       end do
@@ -86,7 +112,23 @@
  if(salinity) then 
             do i=xstartr(3),xendr(3)
                   do j=xstartr(2),xendr(2) 
-
+                        if(Robin==1)then
+                              if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
+                              if(alpha_Sal(j)==1)then
+                                    nu_S_Hot = nu_S_Hot + (saltp(1,j,i)-sal(nxmr,j,i))*delnr
+                              elseif(alpha_Sal(j)==0)then
+                              else 
+                                    nu_S_Hot = nu_S_Hot +  alpha_Sal(j)/(1- alpha_Sal(j)) *(saltp(1,j,i)-sal(nxmr,j,i))
+                              end if
+                              else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then  
+                              if(alpha_Sal(j)==1)then
+                                    nu_S_Col = nu_S_Col +(saltp(1,j,i)-sal(nxmr,j,i))*delnr
+                              elseif(alpha_Sal(j)==0)then
+                              else 
+                                    nu_S_Col = nu_S_Col +  alpha_Sal(j)/(1- alpha_Sal(j)) *(saltp(1,j,i)-sal(nxmr,j,i))
+                               end if
+                              end if 
+                        else 
                   if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
                         if (ymr(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
                               nu_S_Hot = nu_S_Hot + (saltp(1,j,i)-sal(nxmr,j,i))*delnr
@@ -103,7 +145,7 @@
 
                         end if
                   end if
-      
+            end if
               enddo
             end do
 
