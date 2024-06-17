@@ -5,7 +5,8 @@ module GridModule
     private
     public uniform_grid, tanh_grid, cheb_grid, asym_cheb_grid, &
             second_derivative_coeff, centre_focus_grid, &
-            natural_BL_grid, sym_natural_BL_grid, scallop_grid,Smooth_non_uniform_BC,check_values
+            natural_BL_grid, sym_natural_BL_grid, scallop_grid,Smooth_non_uniform_BC,check_values, &
+            Scalar_Boundary_Robin_second_derivative_coeff,alpha_Robin
 
 contains
 
@@ -385,8 +386,82 @@ contains
 
  
     end subroutine check_values
+    subroutine Scalar_Boundary_Robin_second_derivative_coeff(ap3_Robin ,ac3_Robin, am3_Robin, x, xlen, y, ylen, Up_or_Low,alhpa)
+        implicit none
+        real, intent(out) :: ap3_Robin(:), ac3_Robin(:), am3_Robin(:)
+        real, intent(in) :: x(:), xlen, y(:), ylen
+        integer, intent(in) :: Up_or_Low
+        integer :: i,j, nx,ny
+        real :: a33_Robin
+        real, dimension(size(y)),intent(out):: alhpa
+    
+        call alpha_Robin(y, alhpa)
+        
+        ny = size(y)
+        nx = size(x)
+        do j = 1, ny
+            
+            i= 1
+            if (Up_or_Low == 0) then
+                a33_Robin = 2.0 / (x(i) + x(i+1))
+                ap3_Robin(j) = a33_Robin / (x(i+1) - x(i))
+                am3_Robin(j) = 0.0
+                ac3_Robin(j) = -ap3_Robin(j) -  a33_Robin / x(i)
+            else
+                i = nx
+                a33_Robin = 2.0 / (2.0 * xlen - x(i) - x(i-1))
+                ap3_Robin(j) = a33_Robin * (1 / (2 * (xlen - x(i)))) * (2 / (alhpa(j) + (1 - alhpa(j)) / (xlen - x(i))))*alhpa(j)
+                am3_Robin(j) = a33_Robin / (x(i) - x(i-1))
+                ac3_Robin(j) = -am3_Robin(j) - a33_Robin / (2 * (xlen - x(i))) + &
+                               & a33_Robin * (1 / (2 * (xlen - x(i)))) *&
+                               & ((2 / (alhpa(j) + (1 - alhpa(j)) / (xlen - x(i)))) * &
+                               &((1 - alhpa(j)) / (2 * (xlen - x(i))) - alhpa(j) / 2))
+            end if
+           
+        end do
+    end subroutine Scalar_Boundary_Robin_second_derivative_coeff
+    
+    subroutine alpha_Robin(y, alhpa)
+        use param
+        implicit none
+        real, intent(in) :: y(:)
+        real,  dimension(size(y)) , intent(out) :: alhpa
+        real :: x_end1, x_start1, x_start2, x_end2
+        real :: a1, a2
+        integer :: i, ny_sub
+    
+        x_end1 = 0.01 * FixValueBCRegion_Length * YLEN
+        x_start2 = YLEN - 0.01 * FixValueBCRegion_Length * YLEN
+    
+        x_start1 = 0.01 * FixValueBCRegion_Length * YLEN - 0.1 * (0.01 * FixValueBCRegion_Length * YLEN)
+        x_end2 = YLEN - 0.01 * FixValueBCRegion_Length * YLEN + 0.1 * (0.01 * FixValueBCRegion_Length * YLEN)
 
-
+    
+        ny_sub = size(y)
+    
+        a1 = 5.0 / (x_end1 - x_start1)
+        a2 = 5.0 / (x_start2 - x_end2)
+    
+        do i = 1, ny
+            if (y(i) <= x_end1 .and. y(i) >= x_start1) then
+                alhpa(i) = tanh(a1 * (-y(i) + x_end1))
+                if (y(i) <= x_end1)then
+                end if 
+            elseif (y(i) >= x_start2 .and. y(i) <= x_end2) then
+                alhpa(i) = -tanh(a2 * (y(i) - x_start2))
+            elseif (y(i) < x_start1) then
+                alhpa(i) = 1.0
+            elseif (y(i) > x_end2) then
+                alhpa(i) = 1.0
+            else
+                alhpa(i) = 0.0
+            end if
+        end do
+    end subroutine alpha_Robin
+    
+    
+ 
+    
 
 
 end module GridModule
