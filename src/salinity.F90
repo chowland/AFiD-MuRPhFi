@@ -33,12 +33,17 @@ module afid_salinity
     real, allocatable, dimension(:,:) :: ap3sskr      !! Upper diagonal derivative coefficient for salinity
     real, allocatable, dimension(:,:) :: ac3sskr      !! Diagonal derivative coefficient for salinity
     real, allocatable, dimension(:,:) :: am3sskr      !! Lower diagonal derivative coefficient for salinity
-
+    real, allocatable,dimension(:) :: ap3r_Robin ,ac3r_Robin, am3r_Robin
+    real, allocatable,dimension(:) :: alpha_Sal
 contains
 
 !> Subroutine to allocate memory for salinity-related variables
 subroutine InitSalVariables
-    
+    call AllocateReal1DArray(ap3r_Robin, 1,nym)
+    call AllocateReal1DArray(ac3r_Robin, 1,nym)
+    call AllocateReal1DArray(am3r_Robin, 1,nym)
+    call AllocateReal1DArray(alpha_Sal, 1,nym)
+
     ! Boundary planes
     call AllocateReal3DArray(salbp,1,1,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
     call AllocateReal3DArray(saltp,1,1,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
@@ -138,7 +143,6 @@ subroutine SetSalBCs
     end if
     
 
-  write(*,*) 'ymr'
   if (str_BC /= 0) then
     call Smooth_non_uniform_BC(m_BC_Hot, nymr,pontzero_hot)
     call Smooth_non_uniform_BC(m_BC_Cold, nymr,pontzero_cold)
@@ -199,7 +203,7 @@ subroutine SetSalBCs
         end do
     end if
 
-    
+
    ! Update halo for interpolation routine
    call update_halo(saltp,lvlhalo)
    call update_halo(salbp,lvlhalo)
@@ -517,9 +521,15 @@ subroutine ImplicitSalinity
                         - (ap3sskr(kc,ii) + ac3sskr(kc,ii))*salbp(1,jc,ic)*FlagBC_Sud
                 ! Apply upper BC
                 elseif (kc==nxmr) then
+                    if(Robin==1) then
+                        dxxs = sal(kc,jc,ic)*ac3r_Robin(jc) &
+                        + sal(kc-1,jc,ic)*am3r_Robin(jc) &
+                        +ap3r_Robin(jc)*saltp(1,jc,ic)
+                    else 
                     dxxs= sal(kc  ,jc,ic)*ac3sskr(kc,ii) &
                         + sal(kc-1,jc,ic)*am3sskr(kc,ii) &
                         - (am3sskr(kc,ii) + ac3sskr(kc,ii))*saltp(1,jc,ic)*FlagBC_Nord
+                    end if 
                 else
                     dxxs= sal(kc+1,jc,ic)*ap3sskr(kc,ii) &
                         + sal(kc  ,jc,ic)*ac3sskr(kc,ii) &
@@ -565,10 +575,18 @@ subroutine SolveImpEqnUpdate_Sal
 
         end if
     do kc=1,nxmr
+        if (kc==nxmr .and. Robin==1)then 
+
+            ackl_b = 1.0d0/(1. - ac3r_Robin(jc)*betadx)
+            if (kc > 1) amkT(kc-1) = -am3r_Robin(jc)*betadx*ackl_b
+            ackT(kc) = 1.d0
+            if (kc < nxmr) apkT(kc) = -am3r_Robin(jc)*betadx*ackl_b
+        else 
         ackl_b = 1.0d0/(1. - ac3sskr(kc,ii)*betadx)
         if (kc > 1) amkT(kc-1) = -am3sskr(kc,ii)*betadx*ackl_b
         ackT(kc) = 1.d0
         if (kc < nxmr) apkT(kc) = -ap3sskr(kc,ii)*betadx*ackl_b
+        end if 
     end do
     end do
     ! Factor the tridiagonal matrix
@@ -593,8 +611,13 @@ subroutine SolveImpEqnUpdate_Sal
             end if
 
             do kc=1,nxmr
+                if (kc==nxmr .and. Robin==1)then 
+                    ackl_b = 1.0/(1.0 - ac3r_Robin(jc)*betadx)
+                    rhsr(kc,jc,ic) = rhsr(kc,jc,ic)*ackl_b
+                else 
                 ackl_b = 1.0/(1.0 - ac3sskr(kc,ii)*betadx)
                 rhsr(kc,jc,ic) = rhsr(kc,jc,ic)*ackl_b
+                end if 
             end do
         end do
     end do
