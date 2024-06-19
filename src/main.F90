@@ -1,7 +1,7 @@
 program AFiD
     use mpih
     use param
-    use local_arrays, only: vx,vy,vz,temp,pr
+    use local_arrays, only: vx,vy,vz,temp,pr,vxr,vyr,vzr
     ! use mgrd_arrays, only: phic,tempr,phi!,vxr,vyr,vzr,salc,sal
     use AuxiliaryRoutines
     use hdf5
@@ -10,6 +10,7 @@ program AFiD
     use afid_pressure
     use afid_moisture
     use afid_salinity
+    use afid_Termperature_Fine
     use afid_phasefield
     use afid_averaging
     use afid_spectra
@@ -153,25 +154,14 @@ program AFiD
     call InitPressureVars
     if (multires) call InitMgrdVariables  !CS mgrd
     if (salinity) call InitSalVariables
+    if (multiRes_Temp) call Init_Termperature_Fine_Variables
     if (phasefield) call InitPFVariables
     if (moist) call InitMoistVariables
 
     call InitSliceCommunicators
     call CreateGrid
     if (multires) call CreateMgrdGrid     !CS mgrd
-    !write(*,*) 'ym'
-    do i=1,nym 
-
-     !   write(*,*) ym(i)
-
-    end do 
-    !write(*,*) 'ymr'
-
-    do i=1,nymr
-
-      !  write(*,*) ymr(i)
-
-    end do 
+  
     call WriteGridInfo
     if (FixValueBCRegion_Length /= 0 )then
         if(salinity)then
@@ -182,8 +172,7 @@ program AFiD
         nym_new = nym!   call check_values(nym_new, nym, ym)
 
         if((nym_new /= nym.and. .not.salinity) .or.((nymr_new /= nymr .or.nym_new /= nym ).and.salinity) )then
-        !write(6,854)0.01 * FixValueBCRegion_Length * YLEN,YLEN-0.01 * FixValueBCRegion_Length * YLEN
-        !854 format(5x,'Attention: the number of points chosen does not allow the grid to pass through the points of interest.',' y = ' i5 ' and y = ', i5  )
+    
             write(6,854)
             854 format(5x,'Attention: the number of points chosen does not allow the grid to pass through the points of interest.' )
             
@@ -233,7 +222,11 @@ program AFiD
     ! if(statcal) nstatsamples = 0
 
     call InitPressureSolver
+    if(.not.multiRes_Temp)then 
     call SetTempBCs
+    else 
+    call Set_Termperature_Fine_BCs
+    end if 
     if (salinity) call SetSalBCs
     if (moist) call SetHumidityBCs
 
@@ -250,14 +243,13 @@ program AFiD
         ntime=0
         time=0.d0
         instCFL=0.d0
-
         call CreateInitialConditions
-        if (salinity) call CreateInitialSalinity
-        if (phasefield) call CreateInitialPhase
-        if (moist) call CreateInitialHumidity
+        if (salinity)     call CreateInitialSalinity
+        if(multiRes_Temp) call CreateInitia_Termperature_Fine  
+        if (phasefield)   call CreateInitialPhase
+        if (moist)        call CreateInitialHumidity
 
     endif
-
 !CS   Create multigrid stencil for interpolation
     if (multires) call CreateMgrdStencil
     if (phasefield .and. IBM) call CreatePFStencil
@@ -270,27 +262,34 @@ program AFiD
     end if
 
     if (specwrite) then
-        call InitAveragingVariables
+        !call InitAveragingVariables
         !call InitSpectra
     end if
-
 !EP   Update all relevant halos
     call update_halo(vx,lvlhalo)
     call update_halo(vy,lvlhalo)
     call update_halo(vz,lvlhalo)
-    call update_halo(temp,lvlhalo)
+
+    if(.not.multiRes_Temp)  call update_halo(temp,lvlhalo) 
+    if(multiRes_Temp)  call update_halo(temp_fine,lvlhalo)
+
     if (salinity) call update_halo(sal,lvlhalo)
     call update_halo(pr,lvlhalo)
     if (moist) call update_halo(humid,lvlhalo)
     if (moist) call UpdateSaturation
     if (sidewall) call SetSidewallBCs
 
-
-!CS   Interpolate initial values
+!CS   Interpolate initial value
     if (salinity) then
         call InterpVelMgrd
         call InterpSalMultigrid
     end if
+    if(multiRes_Temp.and. .not.salinity) then
+        call Interpl_temp_fineMultigrid
+        call InterpVelMgrd
+    elseif(multiRes_Temp.and. salinity) then
+        call Interpl_temp_fineMultigrid
+    end if 
     if (phasefield) then
         call InterpTempMultigrid
         call InterpPhiMultigrid
@@ -302,12 +301,21 @@ program AFiD
         call update_halo(vzr,lvlhalo)
         call update_halo(salc,lvlhalo)
     end if
+    if (multiRes_Temp .and. .not.salinity) then
+        call update_halo(temp_fine_corse,lvlhalo)
+        call update_halo(vxr,lvlhalo)
+        call update_halo(vyr,lvlhalo)
+        call update_halo(vzr,lvlhalo)
+    elseif (multiRes_Temp .and. salinity) then
+        call update_halo(temp_fine_corse,lvlhalo)
+    end if
+
     if (phasefield) then
         call update_halo(tempr,lvlhalo)
         call update_halo(phic,lvlhalo)
     end if
 
-    call CalcMeanProfiles
+   ! call CalcMeanProfiles
     ! if (specwrite) call WritePowerSpec
     if(ismaster)  write(6,*) 'Write plane slices'
     call Mkmov_xcut
@@ -317,7 +325,6 @@ program AFiD
         call mean_yplane
         call mean_zplane
     end if
- 
     if (ismaster) write(*,*) "Writing 3D fields"
     call MpiBarrier
     td(1) = MPI_WTIME()
@@ -366,7 +373,10 @@ program AFiD
         ti(1) = MPI_WTIME()
 
 !EP   Determine timestep size
+       
+
         call CalcMaxCFL(instCFL,CFLmr)
+  
 
         if(variabletstep) then
             if(ntime.gt.1) then
@@ -390,10 +400,9 @@ program AFiD
         call TimeMarcher
 
         if (specwrite .and. time > tav_start) then
-            call UpdateTemporalAverages
+           ! call UpdateTemporalAverages
             !call UpdateSpectra
         end if
-
         time=time+dt
 
         if(mod(time,tout).lt.dt) then
@@ -401,7 +410,7 @@ program AFiD
                 write(6,*) ' -------------------------------------------------- '
                 write(6,'(a,ES11.4,a,i9,a,ES11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
             endif
-            call CalcMeanProfiles
+            !call CalcMeanProfiles
             ! if (specwrite) then
             !     if (ismaster) write(*,*) "Writing power spectra"
             !     call WritePowerSpec
@@ -414,10 +423,10 @@ program AFiD
             endif
         769 format(1x,i12,3(1x,ES20.8))
         endif
-
         if((mod(time,tframe).lt.dt) .and. (floor(time/tframe).ne.0)) then
             if(ismaster)  write(6,*) 'Write slice ycut and zcut'
             !call CalcWriteQ
+
             call Mkmov_xcut
             call Mkmov_ycut
             call Mkmov_zcut
@@ -435,7 +444,6 @@ program AFiD
             call CheckDivergence(dmax,dmaxr)
             call CalcPlateNu
             !call CalcPlateCf
-
             if(.not.variabletstep) instCFL=instCFL*dt
 
             if(abs(dmax).gt.resid) errorcode = 169
