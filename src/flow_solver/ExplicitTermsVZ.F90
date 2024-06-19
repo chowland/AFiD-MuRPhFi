@@ -105,17 +105,22 @@ subroutine ExplicitTermsVZ
     enddo
 
     !CJH Add the buoyancy term if z is chosen gAxis
+   
     if (gAxis.eq.3) then
         do ic=xstart(3),xend(3)
             imm=ic-1
             do jc=xstart(2),xend(2)
                 do kc=1,nxm
+                    if(.not. multiRes_Temp)then
                     tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(kc,jc,imm))
                     dq(kc,jc,ic) = dq(kc,jc,ic) + byct*tempit
+
+                end if 
                 end do
             end do
         end do
     end if
+
 !$OMP END PARALLEL DO
 
     return

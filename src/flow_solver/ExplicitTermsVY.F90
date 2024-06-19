@@ -109,6 +109,7 @@ subroutine ExplicitTermsVY
     enddo
 
     !CJH Add the buoyancy term if y is chosen gAxis
+    if(.not. multiRes_Temp)then
     if (gAxis.eq.2) then
         do ic=xstart(3),xend(3)
             do jc=xstart(2),xend(2)
@@ -120,6 +121,7 @@ subroutine ExplicitTermsVY
             end do
         end do
     end if
+end if 
 
 !$OMP END PARALLEL DO
 
