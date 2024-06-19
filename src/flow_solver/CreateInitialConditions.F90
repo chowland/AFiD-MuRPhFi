@@ -26,7 +26,7 @@ subroutine CreateInitialConditions
 
 
 
-
+if(.not.multiRes_Temp)then
 
     if ((xminusU /= 0) .or. (xplusU /= 0)) then
         !CJH: Base velocity profile if walls in motion
@@ -380,7 +380,9 @@ subroutine CreateInitialConditions
                     vx(k,j,i) = 0.0
                     vy(k,j,i) = 0.0
                     vz(k,j,i) = 0.0
-                    temp(k,j,i) = 0.0
+                    call random_number(varptb)
+                    varptb = (varptb - 0.5) * 0.01
+                    temp(k,j,i) = 0 +varptb
                 end do
             end do
         end do
@@ -391,12 +393,22 @@ subroutine CreateInitialConditions
         do i=xstart(3),xend(3)
             do j=xstart(2),xend(2)
                
-                !temp(k,j,i) = yc(j)/YLEN
+               ! temp(k,j,i) = yc(j)/YLEN
             end do 
         end do
      end do
+    else 
 
-    !end if
+        do i=xstart(3),xend(3)
+            do j=xstart(2),xend(2)
+                do k=1,nxm
+                    vx(k,j,i) = 0.0
+                    vy(k,j,i) = 0.0
+                    vz(k,j,i) = 0.0
+                end do
+            end do
+        end do
+    end if
 
 
 

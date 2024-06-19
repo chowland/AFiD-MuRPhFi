@@ -11,6 +11,7 @@
       use hdf5
       use mpih
       use param
+      use local_arrays
       use decomp_2d, only: nrank, decomp_2d_finalize
       use decomp_2d_fft
       use afid_pressure, only: DeallocatePressureVars
@@ -47,6 +48,7 @@
       call DeallocatePressureVars
       if (multires) call DeallocateMgrdVariables
       if (salinity) call DeallocateSalVariables
+      if (multiRes_Temp) call DeallocateSalVariables
       if (phasefield) call DeallocatePFVariables
       if (IBM) call DeallocateIBMVariables
       if (moist) call DeallocateMoistVariables

@@ -10,16 +10,15 @@
 
 subroutine CalcMaxCFL(cflm,cflmr)
     use param
-    use local_arrays, only: vx,vy,vz
-    use afid_salinity, only: vxr,vyr,vzr
+    use local_arrays, only: vx,vy,vz,vxr,vyr,vzr
     use decomp_2d
     use mpih
     implicit none
     real,intent(out) :: cflm, cflmr
     integer :: j,k,jp,kp,i,ip
     real :: qcf
-    
     cflm=0.00000001d0
+  
     !
     !$OMP  PARALLEL DO &
     !$OMP   DEFAULT(none) &
@@ -36,18 +35,19 @@ subroutine CalcMaxCFL(cflm,cflmr)
                 qcf=( abs((vz(k,j,i)+vz(k,j,ip))*0.5d0*dz) &
                      +abs((vy(k,j,i)+vy(k,jp,i))*0.5d0*dy) &
                      +abs((vx(k,j,i)+vx(kp,j,i))*0.5d0*udx3m(k)))
-                
+
                 cflm = max(cflm,qcf)
+
             end do
         end do
     end do
+
     !$OMP END PARALLEL DO
-    
     call MpiAllMaxRealScalar(cflm)
-    
-    if (salinity) then
+
+  
+    if (salinity .or. multiRes_Temp) then
         ! Refined mesh
-        
         cflmr = 1.d-8
         do i=xstartr(3),xendr(3)
             ip = i + 1
@@ -60,14 +60,16 @@ subroutine CalcMaxCFL(cflm,cflmr)
                     +abs((vxr(k,j,i) + vxr(kp,j,i))*0.5d0*udx3mr(k)))
                     
                     cflmr = max(cflmr,qcf)
+
                 end do
             end do
         end do
-        
         call MpiAllMaxRealScalar(cflmr)
+
     else
+
         cflmr = cflm
     end if
-    
+
     return
-end
+end subroutine CalcMaxCFL

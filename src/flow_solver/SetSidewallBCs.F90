@@ -10,6 +10,7 @@ subroutine SetSidewallBCs
     use decomp_2d, only: xstart, xend
     use param
     use afid_salinity, only: sal
+    use afid_Termperature_Fine, only: temp_fine
     use afid_phasefield, only: phi
     use afid_moisture, only: humid
     implicit none
@@ -51,11 +52,19 @@ subroutine SetSidewallBCs
         end if
         if (bc_temp_y_fix_lo) then
             do n=1,lvlhalo
+                if(.not.multiRes_Temp)then
                 temp(:,1-n,:) = 2.0*bc_temp_y_val_lo - temp(:,n,:)
+                else 
+                temp_fine(:,1-n,:) = 2.0*bc_temp_y_val_lo - temp_fine(:,n,:)
+                end if 
             end do
         else
             do n=1,lvlhalo
+                if(.not.multiRes_Temp)then
                 temp(:,1-n,:) = temp(:,n,:) - dyy*bc_temp_y_val_lo
+            else 
+                temp_fine(:,1-n,:) = temp_fine(:,n,:) - dyyr*bc_temp_y_val_lo
+            end if 
             end do
         end if
         if (salinity) then
@@ -117,11 +126,19 @@ subroutine SetSidewallBCs
         vz(:,:,0) = vz(:,:,2)
         if (bc_temp_z_fix_lo) then
             do n=1,lvlhalo
+                if(.not.multiRes_Temp)then
                 temp(:,:,1-n) = 2.0*bc_temp_z_val_lo - temp(:,:,n)
+                else 
+                temp_fine(:,:,1-n) = 2.0*bc_temp_z_val_lo - temp_fine(:,:,n)
+                end if 
             end do
         else
             do n=1,lvlhalo
+                if(.not.multiRes_Temp)then
                 temp(:,:,1-n) = temp(:,:,n) - dzz*bc_temp_z_val_lo
+                else 
+                    temp_fine(:,:,1-n) = temp_fine(:,:,n) - dzzr*bc_temp_z_val_lo
+                end if 
             end do
         end if
         if (salinity) then
@@ -183,11 +200,19 @@ end if
         end if
         if (bc_temp_y_fix_up) then
             do n=1,lvlhalo
+                if(.not.multiRes_Temp)then
                 temp(:,nym+n,:) = 2.0*bc_temp_y_val_up - temp(:,nym+1-n,:)
+                else 
+                temp_fine(:,nymr+n,:) = 2.0*bc_temp_y_val_up - temp_fine(:,nymr+1-n,:)
+                end if 
             end do
         else
             do n=1,lvlhalo
+                if(.not.multiRes_Temp)then
                 temp(:,nym+n,:) = temp(:,nym+1-n,:) - dyy*bc_temp_y_val_up
+                else 
+                temp_fine(:,nymr+n,:) = temp_fine(:,nymr+1-n,:) - dyyr*bc_temp_y_val_up 
+                end if 
             end do
         end if
         if (salinity) then
@@ -248,11 +273,19 @@ end if
         vz(:,:,nz) = 0.d0
         if (bc_temp_z_fix_up) then
             do n=1,lvlhalo
+                if(.not.multiRes_Temp)then
                 temp(:,:,nzm+n) = 2.0*bc_temp_z_val_up - temp(:,:,nzm+1-n)
+                else 
+                temp_fine(:,:,nzmr+n) = 2.0*bc_temp_z_val_up - temp_fine(:,:,nzmr+1-n)
+                end if 
             end do
         else
             do n=1,lvlhalo
+                if(.not.multiRes_Temp)then
                 temp(:,:,nzm+n) = temp(:,:,nzm+1-n) - dzz*bc_temp_z_val_up
+                else 
+                temp_fine(:,:,nzmr+n) = temp_fine(:,:,nzmr+1-n) - dzzr*bc_temp_z_val_up
+                end if 
             end do
         end if
         if (salinity) then

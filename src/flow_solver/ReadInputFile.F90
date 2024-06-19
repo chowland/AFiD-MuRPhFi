@@ -94,6 +94,7 @@ subroutine ReadInputFile
     if(ireset.ne.0) resetlogstime = .true.
     if(flagmelt.ne.0) melt = .true.
     if(flagMR.ne.0) multires = .true.
+    if(flagMR==2) multiRes_Temp = .true.
     if(flagPF.ne.0) phasefield = .true.
     if(flagsal.ne.0) salinity = .true.
 

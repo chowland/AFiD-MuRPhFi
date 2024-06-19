@@ -10,8 +10,7 @@
 
 subroutine CheckDivergence(qmax,qmaxr)
     use param
-    use local_arrays, only: vy,vx,vz
-    use afid_salinity, only: vyr,vxr,vzr
+    use local_arrays, only: vy,vx,vz,vyr,vxr,vzr
     use mpih
     use decomp_2d, only: xstart,xend,xstartr,xendr!,nrank
     implicit none
@@ -20,7 +19,7 @@ subroutine CheckDivergence(qmax,qmaxr)
     real    :: dqcap
     
     qmax =-huge(0.0)
-    
+
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &
 !$OMP   SHARED(xstart,xend,nxm,vz,vy,vx,dz,dy,udx3m) &
@@ -43,8 +42,8 @@ subroutine CheckDivergence(qmax,qmaxr)
     !$OMP END PARALLEL DO
     
     call MpiMaxRealScalar(qmax)
-    
-    if (salinity) then
+
+    if (salinity.or. multiRes_Temp) then
         !------------------------------------
         qmaxr =-huge(0.0)
         !      if(nrank.eq.0) write(*,*) "I   J   K   RANK"
@@ -82,7 +81,7 @@ subroutine CheckDivergence(qmax,qmaxr)
     else
         qmaxr = qmax
     end if
-    
+
     
     return     
 end
