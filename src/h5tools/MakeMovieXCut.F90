@@ -13,13 +13,14 @@ subroutine Mkmov_xcut
     use decomp_2d, only: xstart,xend,xstartr,xendr!,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal, RayS
+    use afid_Termperature_Fine,only: temp_fine
     ! use afid_phasefield, only: phi
     use afid_moisture, only: humid
     use h5_tools
-    use param, only: nxm, nxmr, IBM, RayT
+    use param, only: nxm, nxmr, IBM, RayT,multiRes_Temp
     implicit none
     character(70) :: filename
-    character(4) :: varname
+    character(15) :: varname
 
     integer(HID_T) :: file_id
     integer :: ic, comm
@@ -52,7 +53,8 @@ subroutine Mkmov_xcut
     call write_H5_plane(file_id, varname, vz(ic, xstart(2):xend(2), xstart(3):xend(3)), 'x')
 
     varname = 'temp'
-    call write_H5_plane(file_id, varname, temp(ic, xstart(2):xend(2), xstart(3):xend(3)), 'x')
+    if(.not. multiRes_Temp) call write_H5_plane(file_id, varname, temp(ic, xstart(2):xend(2), xstart(3):xend(3)), 'x') 
+    if (multiRes_Temp) call write_H5_plane(file_id, varname, temp_fine(ic, xstartr(2):xendr(2), xstartr(3):xendr(3)), 'x')
 
     if (moist) then
         varname = 'qhum'
@@ -72,6 +74,7 @@ subroutine Mkmov_xcut
         if (.not. fexist) call h5_add_slice_groups(file_id)
 
         varname = 'sal'
+
         call write_H5_plane(file_id, varname, sal(ic, xstartr(2):xendr(2), xstartr(3):xendr(3)), 'x')
         if (IBM) then
             varname = 'sal2'

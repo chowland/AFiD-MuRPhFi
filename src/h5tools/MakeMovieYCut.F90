@@ -8,18 +8,19 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine Mkmov_ycut
-    use param, only: nym, nymr
+    use param, only: nym, nymr,multiRes_Temp
     use mpih
     use hdf5
     use decomp_2d, only: xstart,xend,xstartr,xendr!,DECOMP_2D_COMM_CART_X
     use local_arrays, only: vz,vy,vx,temp
     use afid_salinity, only: sal
+    use afid_Termperature_Fine,only: temp_fine
     use afid_phasefield, only: phi
     use afid_moisture, only: humid
     use h5_tools
     implicit none
     character(70) :: filename
-    character(4) :: varname
+    character(15) :: varname
 
     integer(HID_T) :: file_id
     integer :: ic, comm
@@ -52,7 +53,9 @@ subroutine Mkmov_ycut
         call write_H5_plane(file_id, varname, vz(1:nxm, ic, xstart(3):xend(3)), 'y')
 
         varname = 'temp'
-        call write_H5_plane(file_id, varname, temp(1:nxm, ic, xstart(3):xend(3)), 'y')
+        if(.not. multiRes_Temp)   call write_H5_plane(file_id, varname, temp(1:nxm, ic, xstart(3):xend(3)), 'y')
+  
+    
 
         if (moist) then
             varname = 'qhum'
@@ -62,7 +65,22 @@ subroutine Mkmov_ycut
         call h5fclose_f(file_id, hdf_error)
 
     end if
+    if (multiRes_Temp) then
 
+
+        ic = nymr/2 + 1
+        if (ic.le.xendr(2) .and. ic.ge.xstartr(2)) then
+            call h5_open_or_create(file_id, filename, comm, fexist)
+            if (.not. fexist) call h5_add_slice_groups(file_id)
+
+            varname = 'temp'
+
+            call write_H5_plane(file_id, varname, temp_fine(1:nxmr, ic, xstartr(3):xendr(3)), 'y')
+
+            call h5fclose_f(file_id, hdf_error)
+
+        end if 
+    end if 
     if (salinity) then
         !! Repeat on refined grid to save salinity
         ! Select midplane index for refined grid

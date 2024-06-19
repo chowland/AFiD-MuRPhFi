@@ -5,6 +5,7 @@ subroutine ReadFlowInterp(prow,pcol)
     use param
     use input_grids
     use afid_salinity
+    use afid_Termperature_Fine
     use afid_phasefield
     use afid_moisture, only: humid
     use AuxiliaryRoutines
@@ -146,8 +147,13 @@ subroutine ReadFlowInterp(prow,pcol)
                                 xstart(3), xend(3), 2, vy)
         call HdfReadContinua(nz, ny, nx, xstart(2), xend(2), &
                                 xstart(3), xend(3), 3, vz)
+        if(.not. multiRes_Temp)then
         call HdfReadContinua(nz, ny, nx, xstart(2), xend(2), &
                                 xstart(3), xend(3), 4, temp)
+        elseif(multiRes_Temp)then
+            call HdfReadContinua(nzr, nyr, nxr, xstartr(2), xendr(2), &
+            xstartr(3), xendr(3), 4, temp_fine)
+        end if
         if (salinity) then
             call HdfReadContinua(nzr, nyr, nxr, xstartr(2), xendr(2), &
                                 xstartr(3), xendr(3), 5, sal)

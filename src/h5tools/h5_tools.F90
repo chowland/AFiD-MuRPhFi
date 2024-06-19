@@ -1,7 +1,7 @@
 module h5_tools
     use HDF5
     use mpih, only: MPI_INFO_NULL, MPI_COMM_WORLD
-    use param, only: salinity, phasefield, nx, nxm, nym, nzm, time, tframe, nxmr, nymr, nzmr, IBM, moist
+    use param, only: salinity, phasefield, nx, nxm, nym, nzm, time, tframe, nxmr, nymr, nzmr, IBM, moist,multiRes_Temp
     use decomp_2d, only: xstart, xstartr, xend
     implicit none
 
@@ -32,17 +32,20 @@ subroutine h5_open_or_create(file_id, filename, comm, fexist)
 end subroutine
 
 subroutine h5_add_slice_groups(file_id)
+    use param, only:multiRes_Temp
     integer(HID_T), intent(inout) :: file_id
-
+     
     integer :: i
-    character(len=4), dimension(4) :: var_list
+    character(len=15), dimension(4) :: var_list
+    
 
-    var_list = [character(len=4) :: "vx", "vy", "vz", "temp"]
-
+   
+    var_list = [character(len=15) :: "vx", "vy", "vz", "temp"]
     do i=1,size(var_list)
         call h5gcreate_f(file_id, trim(var_list(i)), group_id, hdf_error)
         call h5gclose_f(group_id, hdf_error)
     end do
+
 
     if (salinity) then
         call h5gcreate_f(file_id, "sal", group_id, hdf_error)
@@ -65,8 +68,9 @@ subroutine h5_add_slice_groups(file_id)
 end subroutine
 
 subroutine write_H5_plane(file_id, varname, var, axis)
+    use param,only:multiRes_Temp
     integer(HID_T), intent(inout) :: file_id
-    character(len=4), intent(in) :: varname
+    character(len=15), intent(in) :: varname
     real, intent(in) :: var(:,:)
     character, intent(in) :: axis
 
@@ -74,9 +78,8 @@ subroutine write_H5_plane(file_id, varname, var, axis)
     integer(HID_T) :: filespace, memspace, dset
     integer(HSIZE_T), dimension(2) :: dims, data_count, data_offset
     character(len=5) :: frame
-    character(len=10) :: dsetname
+    character(len=20) :: dsetname
     logical :: dexist
-
     if (axis=='x') then
         dims = [nym, nzm]
         data_offset = [xstart(2) - 1, xstart(3) - 1]
@@ -94,7 +97,7 @@ subroutine write_H5_plane(file_id, varname, var, axis)
             dims(1) = nxm
         end if
     end if
-    if (index('phisal2', trim(varname)) /= 0) then
+    if (index('phisal2', trim(varname)) /= 0 .or. (varname== 'temp'.and. multiRes_Temp)) then
         dims = [nxmr, nzmr]
         data_offset = [0, xstartr(3) - 1]
         if (axis=='x') then
@@ -119,6 +122,7 @@ subroutine write_H5_plane(file_id, varname, var, axis)
     if (dexist) call h5ldelete_f(file_id, dsetname, hdf_error)
     call h5dcreate_f(file_id, dsetname, H5T_NATIVE_DOUBLE, filespace, dset, hdf_error)
     call h5dget_space_f(dset, filespace, hdf_error)
+
     call h5sselect_hyperslab_f(filespace, H5S_SELECT_SET_F,data_offset, data_count, hdf_error)
     call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, hdf_error) 
     call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, hdf_error)
@@ -129,7 +133,6 @@ subroutine write_H5_plane(file_id, varname, var, axis)
         mem_space_id = memspace, xfer_prp = plist_id)
     call h5pclose_f(plist_id, hdf_error)
     call h5dclose_f(dset, hdf_error)
-
     call h5sclose_f(filespace, hdf_error)
     call h5sclose_f(memspace, hdf_error)
 

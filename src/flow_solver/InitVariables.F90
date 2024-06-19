@@ -68,10 +68,10 @@ subroutine InitVariables
 !-------------------------------------------------
 ! Arrays for temperature boundary conditions
 !-------------------------------------------------
-
+    if(.not. multiRes_Temp) then 
     call AllocateReal3DArray(tempbp,1,1,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
     call AllocateReal3DArray(temptp,1,1,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
-
+    end if 
     !-------------------------------------------------
     ! Arrays with ghost cells
     !-------------------------------------------------
@@ -79,7 +79,9 @@ subroutine InitVariables
     call AllocateReal3DArray(vz,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
     call AllocateReal3DArray(vx,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
     call AllocateReal3DArray(pr,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
+    if(.not. multiRes_Temp) then 
     call AllocateReal3DArray(temp,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
+    end if 
     call AllocateReal3DArray(dphhalo,1,nxm,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
 
     !-- For salinity
@@ -99,7 +101,9 @@ subroutine InitVariables
     call AllocateReal3DArray(ruy,1,nx,xstart(2),xend(2),xstart(3),xend(3))
     call AllocateReal3DArray(ruz,1,nx,xstart(2),xend(2),xstart(3),xend(3))
     call AllocateReal3DArray(hro,1,nx,xstart(2),xend(2),xstart(3),xend(3))
+    
+    if(.not. multiRes_Temp) then 
     call AllocateReal3DArray(rutemp,1,nx,xstart(2),xend(2),xstart(3),xend(3))
-
+    end if 
     return
 end

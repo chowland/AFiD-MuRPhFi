@@ -14,6 +14,8 @@ subroutine WriteFlowField(final)
     use afid_salinity, only: sal
     use afid_phasefield, only: phi
     use afid_moisture, only: humid
+    use afid_Termperature_Fine,only: temp_fine
+
     implicit none
     logical, intent(in) :: final
     character(30) :: filnam1,dsetname,basename
@@ -25,7 +27,9 @@ subroutine WriteFlowField(final)
         basename='outputdir/fields/'//frame
     end if
     filnam1 = trim(basename)//'_temp.h5'
-    call HdfWriteRealHalo3D(filnam1,temp)
+    if(.not. multiRes_Temp)  call HdfWriteRealHalo3D(filnam1,temp)
+    if( multiRes_Temp)  call HdfWriteRealHalo3D(filnam1,temp_fine)
+
     filnam1 = trim(basename)//'_vx.h5'
     call HdfWriteRealHalo3D(filnam1,vx)
     filnam1 = trim(basename)//'_vy.h5'
