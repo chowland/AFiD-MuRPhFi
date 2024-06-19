@@ -1,15 +1,13 @@
 subroutine InterpVelMgrd
 
     use param
-    use local_arrays, only: vx,vy,vz
+    use local_arrays, only: vx,vy,vz, vxr, vyr, vzr
     use mgrd_arrays
-    use afid_salinity, only: vxr, vyr, vzr
     use mpih
     use decomp_2d
     use AuxiliaryRoutines
     use HermiteInterpolations
     implicit none
-    
     integer  :: ic,jc,kc, ip,jp,kp, icr,jcr,kcr
     integer  :: jc0,jcr0, ic0,icr0
     integer  :: comm_col,comm_row,ierror

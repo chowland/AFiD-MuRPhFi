@@ -97,6 +97,6 @@ subroutine DeallocateMgrdVariables
 
     call DestroyReal3DArray(tpdv)
     call DestroyReal3DArray(tpdvr)  !CS BUG: ERROR WHILE DEALLOCATING
-
+    call DestroyReal3DArray(temp_pdvr)
     return
 end subroutine DeallocateMgrdVariables

@@ -9,6 +9,9 @@ module param
     real ::  Robin = 0 !
     real, allocatable,dimension(:) :: ap3_Robin ,ac3_Robin, am3_Robin
     real, allocatable,dimension(:) :: alpha_Temp
+    real, allocatable,dimension(:) :: alpha_Sal
+
+    logical:: multiRes_Temp =.false.
     !==========================================================
     !       read from input file bou.in
     !==========================================================  
@@ -89,7 +92,7 @@ module param
     logical, dimension(3) :: periodic_bc 
     logical :: periodic_bc_z_direction = .false.
     logical :: Non_uniform_BC   = .false.!! Flag to determine Non_uniform_BC
-
+  
     logical :: dumpslabs=.false.
     ! logical :: statcal=.false.
     ! logical :: disscal=.false.
@@ -179,9 +182,11 @@ module local_arrays
     use param
     implicit none
     real,allocatable,dimension(:,:,:) :: vx,vy,vz
+    real, allocatable,dimension(:,:,:) :: vxr ,vyr ,vzr   !! Velocity interpolated to refined grid (x component)
     real,allocatable,dimension(:,:,:) :: pr,temp,rhs
     real,allocatable,dimension(:,:,:) :: rux,ruy,ruz,rutemp
     real,allocatable,dimension(:,:,:) :: dph,qcap,dq,hro,dphhalo
+
     real,allocatable,dimension(:,:,:) :: qtens
 end module local_arrays
 
@@ -198,7 +203,7 @@ module mgrd_arrays
     real,allocatable,dimension(:,:) :: cyvx, cyvy, cyvz, cyrs, cysalc, cyphic
     real,allocatable,dimension(:,:) :: czvx, czvy, czvz, czrs, czsalc, czphic
     real,allocatable,dimension(:,:) :: cych, czch
-    real,allocatable,dimension(:,:,:) :: tpdv,tpdvr  !CS mgrd
+    real,allocatable,dimension(:,:,:) :: tpdv,tpdvr,temp_pdvr  !CS mgrd
     real,allocatable,dimension(:,:,:) :: Tplaner
     real,allocatable,dimension(:,:) :: solid_height, height_vx, height_vy, height_vz
 end module mgrd_arrays

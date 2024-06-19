@@ -97,6 +97,8 @@ subroutine InitMgrdVariables
     call AllocateReal2DArray(cysalc,1,4,1,nym)
     call AllocateReal2DArray(czsalc,1,4,1,nzm)
 
+    call AllocateReal1DArray(alpha_Sal, 1,nym)
+
     if (IBM) then
         if (phasefield) then
             call AllocateReal2DArray(cych,1,4,1,nym)
@@ -111,8 +113,10 @@ subroutine InitMgrdVariables
     call AllocateReal3DArray(tpdv,-1,nx+1,xstart(2)-2,xend(2)+2,xstart(3)-2,xend(3)+2)
     !CS   For tpdvr, larger array needed to prevent memory overflow in InterpVelMgrd
     call AllocateReal3DArray(tpdvr,-1,nxr+1,xstartr(2)-2,xendr(2)+2,xstartr(3)-2,xendr(3)+2)
+    call AllocateReal3DArray(temp_pdvr,-1,nxr+1,xstartr(2)-2,xendr(2)+2,xstartr(3)-2,xendr(3)+2)
 
     ! RHS array without ghost cells
     call AllocateReal3DArray(rhsr,1,nxmr,xstartr(2),xendr(2),xstartr(3),xendr(3))
+
     return
 end subroutine InitMgrdVariables
