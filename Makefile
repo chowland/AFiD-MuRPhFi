@@ -34,7 +34,7 @@ ifeq ($(MACHINE),PC)
 	# FC += -fcheck=all -finit-real=snan -ffpe-trap=invalid #-std=f2018
 # FC += -O0 -pg -fbacktrace -fbounds-check
 # Intel Debug Flags
-# FC += -O0 -g -traceback -check bounds
+    # FC += -O0 -g -traceback -check bounds
 	ifeq ($(FLAVOUR),GNU)
 		LDFLAGS = -lfftw3 -llapack -ldl
 	else
@@ -121,15 +121,15 @@ OBJS += obj/mean_zplane.o
 MOBJS = obj/param.o obj/decomp_2d.o obj/AuxiliaryRoutines.o obj/decomp_2d_fft.o \
 	obj/fft.o obj/pressure.o obj/HermiteInterpolations.o obj/grid.o obj/h5_tools.o obj/means.o \
 	obj/ibm_param.o obj/IBMTools.o obj/moisture.o obj/salinity.o obj/phasefield.o \
-	obj/time_averaging.o obj/spectra.o
+	obj/time_averaging.o obj/spectra.o  obj/Temp_Fine.o
 
 #=======================================================================
 #  Files that create modules:
 #=======================================================================
 MFILES = param.F90 decomp_2d.F90 AuxiliaryRoutines.F90 decomp_2d_fft.F90 \
 	fft.F90 pressure.F90 HermiteInterpolations.F90 grid.F90 ibm_param.F90 IBMTools.F90 \
-	moisture.F90 salinity.F90 phasefield.F90 time_averaging.F90 spectra.F90
-
+	moisture.F90 salinity.F90 phasefield.F90 time_averaging.F90 spectra.F90\
+    Temp_Fine.F90
 #============================================================================ 
 #  make PROGRAM   
 #============================================================================
@@ -168,6 +168,8 @@ $(OBJDIR)/means.o: src/h5tools/means.F90 obj/ibm_param.o
 $(OBJDIR)/IBMTools.o: src/ibm/IBMTools.F90
 	$(FC) -c -o $@ $<
 $(OBJDIR)/salinity.o: src/salinity.F90
+	$(FC) -c -o $@ $<
+$(OBJDIR)/Temp_Fine.o: src/Temp_Fine.F90
 	$(FC) -c -o $@ $<
 $(OBJDIR)/phasefield.o: src/phasefield.F90 obj/salinity.o
 	$(FC) -c -o $@ $<
