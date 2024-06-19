@@ -28,7 +28,7 @@ subroutine WriteFlowField(final)
     end if
     filnam1 = trim(basename)//'_temp.h5'
     if(.not. multiRes_Temp)  call HdfWriteRealHalo3D(filnam1,temp)
-    if( multiRes_Temp)  call HdfWriteRealHalo3D(filnam1,temp_fine)
+    if( multiRes_Temp)  call HdfWriteRealHalo3DR(filnam1,temp_fine)
 
     filnam1 = trim(basename)//'_vx.h5'
     call HdfWriteRealHalo3D(filnam1,vx)
