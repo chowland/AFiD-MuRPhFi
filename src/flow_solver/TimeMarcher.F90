@@ -17,6 +17,7 @@ subroutine TimeMarcher
     use afid_pressure
     use afid_salinity
     use afid_phasefield
+    use afid_Termperature_Fine
     use mpih
     use decomp_2d
     use ibm_param, only: aldto
@@ -24,11 +25,9 @@ subroutine TimeMarcher
     implicit none
     integer :: ns
     integer :: j,k,i
-
     beta = dt/ren*0.5d0
-
-    do ns=1,nsst                                                 
-
+ 
+    do ns=1,nsst 
 !RO     Coefficients for time marching integration (alpha, gamma, rho)
         if(ntime.le.1) then
             aldto = alm(1)*dt
@@ -45,11 +44,25 @@ subroutine TimeMarcher
         call ExplicitTermsVX
         call ExplicitTermsVY
         call ExplicitTermsVZ
+
+
+        if(multiRes_Temp) then
+            call Explicit_Termperature_Fine
+            if (active_T==1) then
+                if (gAxis==1) then
+                    call AddBuoyancy_temp_fine(qcap)
+                elseif (gAxis==2) then
+                    call AddBuoyancy_temp_fine(dph)
+                elseif (gAxis==3) then
+                    call AddBuoyancy_temp_fine(dq)
+                end if
+            end if 
+        else 
         call ExplicitTermsTemp
+        end if
 
         if (salinity) then
             call ExplicitSalinity
-            
             ! If using salinity as an active scalar, add its buoyancy contribution
             ! to the relevant component of the momentum equation
             if (active_S==1) then
@@ -80,26 +93,29 @@ subroutine TimeMarcher
 
         if (moist) call AddCondensation
 
-        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX pre-implicit',ns
-        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY pre-implicit',ns
-        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ pre-implicit',ns
-        ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP pre-implicit',ns
+        !iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX pre-implicit',ns
+        !iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY pre-implicit',ns
+        !iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ pre-implicit',ns
+        !iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP pre-implicit',ns
 
         if (phasefield) call update_halo(phi,lvlhalo)
 
         call ImplicitAndUpdateVX
         call ImplicitAndUpdateVY
         call ImplicitAndUpdateVZ
-        call ImplicitAndUpdateTemp
+
+        if(multiRes_Temp)  call Implicit_Termperature_Fine 
+        if(.not.multiRes_Temp)  call ImplicitAndUpdateTemp 
 
         if (salinity) call ImplicitSalinity
 
         if (moist) call ImplicitHumidity
+        !iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX post-implicit',ns
+        !iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY post-implicit',ns
+        !iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ post-implicit',ns
+        !iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP post-implicit',ns
+        !iF(ANY(IsNaN(sal))) write(*,*)nrank,'NaN in SAL post-implicit',ns
 
-        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX post-implicit',ns
-        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY post-implicit',ns
-        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ post-implicit',ns
-        ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP post-implicit',ns
 
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
@@ -108,7 +124,6 @@ subroutine TimeMarcher
 
         call CalcLocalDivergence
         call SolvePressureCorrection
-
 !EP this copy can be avoided by changing transpose_x_to_y_real and
 !transpose_y_to_x_real so these routines can handle arrays with
 !halo. This copy is a defacto array temporary. Using inferred size
@@ -124,21 +139,26 @@ subroutine TimeMarcher
         end do
 
         call update_halo(dphhalo,lvlhalo)
-
+        
         call CorrectVelocity
         call CorrectPressure
 
         call update_halo(vx,lvlhalo)
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
+   
         call update_halo(pr,lvlhalo)
+        if(multiRes_Temp) then
+        call update_halo(temp_fine,lvlhalo)
+        else 
         call update_halo(temp,lvlhalo)
+        end if 
         if (salinity) call update_halo(sal,lvlhalo)
         if (phasefield) call update_halo(phi,lvlhalo)
         if (moist) call update_halo(humid,lvlhalo)
 
         if (sidewall) call SetSidewallBCs
-
+ 
         if (salinity) then
             call InterpVelMgrd !Vel from base mesh to refined mesh
             call update_halo(vxr,lvlhalo)
@@ -146,6 +166,20 @@ subroutine TimeMarcher
             call update_halo(vzr,lvlhalo)
             call InterpSalMultigrid !Sal from refined mesh to base mesh
             call update_halo(salc,lvlhalo)
+        end if
+     
+        if (multiRes_Temp .and. .not.salinity) then
+            call InterpVelMgrd !Vel from base mesh to refined mesh
+            call update_halo(vxr,lvlhalo)
+            call update_halo(vyr,lvlhalo)
+            call update_halo(vzr,lvlhalo)
+            call Interpl_temp_fineMultigrid !Sal from refined mesh to base mesh
+            call update_halo(temp_fine_corse,lvlhalo)
+
+
+        elseif (multiRes_Temp .and. salinity) then
+            call Interpl_temp_fineMultigrid !temp from refined mesh to base mesh
+            call update_halo(temp_fine_corse,lvlhalo)
         end if
 
         if (phasefield) then
@@ -156,14 +190,10 @@ subroutine TimeMarcher
         end if
 
         if (moist) call UpdateSaturation
-
-        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX',ns
-        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY',ns
-        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ',ns
-        ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in PHI',ns
-
+         !iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX',ns
+         !iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY',ns
+         !iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ',ns
+         !iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in PHI',ns
     end do
-
-
     return
 end subroutine TimeMarcher
