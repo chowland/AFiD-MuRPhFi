@@ -4,6 +4,7 @@
 !! interpolation modules
 module afid_salinity
     use param
+    use local_arrays
     use mgrd_arrays
     use decomp_2d, only: xstart, xend, xstartr, xendr, update_halo
     use AuxiliaryRoutines
@@ -15,9 +16,6 @@ module afid_salinity
     real, allocatable, dimension(:,:,:) :: rusal    !! RK storage array for salinity (previous substep)
     real, allocatable, dimension(:,:,:) :: hsal     !! RK storage array for salinity
     real, allocatable, dimension(:,:,:) :: salc     !! Interpolated salinity field on coarse grid
-    real, allocatable, dimension(:,:,:) :: vxr      !! Velocity interpolated to refined grid (x component)
-    real, allocatable, dimension(:,:,:) :: vyr      !! Velocity interpolated to refined grid (y component)
-    real, allocatable, dimension(:,:,:) :: vzr      !! Velocity interpolated to refined grid (z component)
 
     real :: rays    !! Solutal Rayleigh number
     real :: pras    !! Schmidt number (solutal Prandtl number)
@@ -34,7 +32,6 @@ module afid_salinity
     real, allocatable, dimension(:,:) :: ac3sskr      !! Diagonal derivative coefficient for salinity
     real, allocatable, dimension(:,:) :: am3sskr      !! Lower diagonal derivative coefficient for salinity
     real, allocatable,dimension(:) :: ap3r_Robin ,ac3r_Robin, am3r_Robin
-    real, allocatable,dimension(:) :: alpha_Sal
 contains
 
 !> Subroutine to allocate memory for salinity-related variables
@@ -42,7 +39,6 @@ subroutine InitSalVariables
     call AllocateReal1DArray(ap3r_Robin, 1,nym)
     call AllocateReal1DArray(ac3r_Robin, 1,nym)
     call AllocateReal1DArray(am3r_Robin, 1,nym)
-    call AllocateReal1DArray(alpha_Sal, 1,nym)
 
     ! Boundary planes
     call AllocateReal3DArray(salbp,1,1,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
@@ -155,7 +151,14 @@ subroutine SetSalBCs
             end if 
         end do 
     end if 
-
+    if  (FixValueBCRegion_Length==0) then  
+        do i=xstartr(3),xendr(3)
+            do j=xstartr(2),xendr(2)
+                saltp(1,j,i) =  -0.5d0
+                salbp(1,j,i) = 0.5d0
+            end do 
+        end do 
+    end if 
     if  (FixValueBCRegion_Length/=0) then  
         do i=xstartr(3),xendr(3)
             do j=xstartr(2),xendr(2)
@@ -243,6 +246,8 @@ end subroutine SetSalBCs
 !! N.B. This can get overwritten by CreateInitialPhase if also using phase-field
 subroutine CreateInitialSalinity
     integer :: i, j, k
+    real :: varptb
+
     
     !! Rayleigh-Taylor setup for pore-scale simulation
     if (IBM) then
@@ -272,6 +277,19 @@ subroutine CreateInitialSalinity
         call AddSalinityNoise(amp=5e-3, localised=.false.)
     end if
     call SetZeroSalinity
+
+
+
+    do i=xstartr(3),xendr(3)
+        do j=xstartr(2),xendr(2)
+            do k=1,nxmr
+                call random_number(varptb)
+                varptb = (varptb - 0.5) * 0.01
+                sal(k,j,i) = 0 !+varptb
+            end do
+        end do
+    end do
+
 end subroutine CreateInitialSalinity
 
 !> Set salinity variable to linear profile between boundary values
@@ -410,6 +428,7 @@ subroutine ExplicitSalinity
                           vxr(kp,jc,ic)*(sal(kp,jc,ic) + sal(kc,jc,ic)) &
                         - vxr(kc,jc,ic)*2.d0*salbp(1,jc,ic) &
                     )*udx3mr(kc)*0.5d0
+
                 elseif (kc==nxmr) then
                     hsx = ( &
                           vxr(kp,jc,ic)*2.d0*saltp(1,jc,ic) &
@@ -475,7 +494,6 @@ subroutine ImplicitSalinity
     real :: dxxs, alpec,  FlagBC_Nord, FlagBC_Sud
 
     alpec = al/pecs
-
     if (FixValueBCRegion_Length==0) then
         FlagBC_Sud = SfixS
         FlagBC_Nord = SfixN
@@ -519,7 +537,9 @@ subroutine ImplicitSalinity
                     dxxs= sal(kc+1,jc,ic)*ap3sskr(kc,ii) &
                         + sal(kc  ,jc,ic)*ac3sskr(kc,ii) &
                         - (ap3sskr(kc,ii) + ac3sskr(kc,ii))*salbp(1,jc,ic)*FlagBC_Sud
-                ! Apply upper BC
+                
+
+                        ! Apply upper BC
                 elseif (kc==nxmr) then
                     if(Robin==1) then
                         dxxs = sal(kc,jc,ic)*ac3r_Robin(jc) &
@@ -539,10 +559,10 @@ subroutine ImplicitSalinity
                 rhsr(kc,jc,ic) = (ga*hsal(kc,jc,ic) + ro*rusal(kc,jc,ic) + alpec*dxxs)*dt
 
                 rusal(kc,jc,ic) = hsal(kc,jc,ic)
+  
             end do
         end do
     end do
-
     if (IBM) then
         call SolveImpEqnUpdate_Sal_ibm
     else
@@ -615,6 +635,7 @@ subroutine SolveImpEqnUpdate_Sal
                     ackl_b = 1.0/(1.0 - ac3r_Robin(jc)*betadx)
                     rhsr(kc,jc,ic) = rhsr(kc,jc,ic)*ackl_b
                 else 
+      
                 ackl_b = 1.0/(1.0 - ac3sskr(kc,ii)*betadx)
                 rhsr(kc,jc,ic) = rhsr(kc,jc,ic)*ackl_b
                 end if 
@@ -624,31 +645,36 @@ subroutine SolveImpEqnUpdate_Sal
 
     ! Solve tridiagonal system
     call dgttrs('N',nxmr,nrhs,amkT,ackT,apkT,appk,ipkv,rhsr,nxmr,info)
-    
+
     ! Update global variable
     do ic=xstartr(3),xendr(3)
         do jc=xstartr(2),xendr(2)
            do kc=1,nxmr
+ 
              sal(kc,jc,ic) = sal(kc,jc,ic) + rhsr(kc,jc,ic)
             end do
          end do
      end do
-
 end subroutine SolveImpEqnUpdate_Sal
 
 !> Interpolate the salinity field onto the coarse grid to
 !! provide buoyancy forcing to the momentum equation
 subroutine InterpSalMultigrid
+    use param
     integer :: icr, jcr, kcr
-    real ::  FlagBC_Nord, FlagBC_Sud
-
+    real ::  FlagBC_Nord, FlagBC_Sud,dxr_Top
     ! Set coarse salinity array to zero
     salc(:,:,:) = 0.d0
+    dxr_Top = alx3 - xmr(nxmr)
 
     ! Extend refined array in wall-normal direction to give sufficient points
     ! for cubic interpolation
 
-   
+    
+
+
+
+
     if (FixValueBCRegion_Length==0) then
         FlagBC_Sud = SfixS
         FlagBC_Nord = SfixN
@@ -663,8 +689,22 @@ subroutine InterpSalMultigrid
             do kcr=1,nxmr
                 tpdvr(kcr,jcr,icr) = sal(kcr,jcr,icr)
             end do
+            
 
 
+
+            if (Robin == 1) then
+                if (alpha_Sal(jcr) == 1) then
+                    tpdvr(nxr, jcr, icr) = 2.0 * saltp(1, jcr, icr) - sal(nxmr, jcr, icr)
+                elseif (alpha_Sal(jcr) == 0) then
+                    tpdvr(nxr, jcr, icr) = sal(nxmr, jcr, icr)
+                else
+                    tpdvr(nxr, jcr, icr) = -alpha_Sal(jcr) / (alpha_Sal(jcr) / 2.0 + (1 - alpha_Sal(jcr)) / (2 * dxr_Top)) &
+                                           * (sal(nxmr, jcr, icr) / 2.0 - saltp(1, jcr, icr)) &
+                                           + (1 - alpha_Sal(jcr)) / (alpha_Sal(jcr) / 2.0 + (1 - alpha_Sal(jcr)) / (2 * dxr_Top)) &
+                                           * sal(nxmr, jcr, icr) / dxr_Top
+                end if
+            else 
             if (FixValueBCRegion_Length/=0) then
                 if (FixValueBCRegion_Nord_or_Sud==0) then
                     if (ymr(jcr) <= 0.01 * FixValueBCRegion_Length * YLEN .or. &
@@ -693,6 +733,7 @@ subroutine InterpSalMultigrid
             else
                 tpdvr(nxr,jcr,icr) = sal(nxmr,jcr,icr)
             end if
+        end if 
         end do
     end do
 
@@ -702,6 +743,8 @@ subroutine InterpSalMultigrid
     else
         call interpolate_xyz_to_coarse(tpdvr, salc(1:nxm,:,:))
     end if
+
+
 end subroutine InterpSalMultigrid
 
 !> Add buoyancy contribution from the salinity to one of the
@@ -717,7 +760,8 @@ subroutine AddSalBuoyancy(rkv)
             end do
         end do
     end do
-end subroutine
+
+end subroutine AddSalBuoyancy
 
 !> Calculate and save vertical profiles related to the salinity
 !! field, storing the data in means.h5
