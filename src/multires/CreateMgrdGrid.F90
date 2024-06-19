@@ -13,6 +13,7 @@ subroutine CreateMgrdGrid
     use AuxiliaryRoutines
     use GridModule
     use afid_salinity, only: SfixS, SfixN, PraS, ap3sskr, ac3sskr, am3sskr,ap3r_Robin ,ac3r_Robin, am3r_Robin,alpha_Sal
+    use afid_Termperature_Fine, only: temp_ap3sskr, temp_ac3sskr, temp_am3sskr
     use afid_phasefield, only: ap3spkr, ac3spkr, am3spkr
     implicit none
     real, dimension(nxmr) :: ap3sskr_D,ac3sskr_D, am3sskr_D, ap3sskr_N,ac3sskr_N, am3sskr_N
@@ -184,17 +185,54 @@ subroutine CreateMgrdGrid
     do kc = 1, nxmr
         ap3sskr(kc,1) = ap3sskr_D(kc)
         ap3sskr(kc,2) = ap3sskr_N(kc)
-        
+
         ac3sskr(kc,1) = ac3sskr_D(kc)
         ac3sskr(kc,2) = ac3sskr_N(kc)
         
         am3sskr(kc,1) = am3sskr_D(kc)
         am3sskr(kc,2) = am3sskr_N(kc)
-        
    end do
 
    end if 
+   if (multiRes_Temp) then
+    ap3sskr_N = 0
+    ap3sskr_D = 0
+    ac3sskr_D = 0
+    ac3sskr_N = 0
+    am3sskr_D = 0
+    am3sskr_N = 0
+    if ( FixValueBCRegion_Length==0) then
+
+        call second_derivative_coeff(ap3sskr_D, ac3sskr_D, am3sskr_D, xmr(1:nxmr), alx3, TfixN, TfixS)
+        call second_derivative_coeff(ap3sskr_N, ac3sskr_N,  am3sskr_N, xmr(1:nxmr), alx3, TfixN, TfixS)
+    else if (FixValueBCRegion_Length/=0) then
+
+        if ( FixValueBCRegion_Nord_or_Sud==0) then
+        
+            call second_derivative_coeff(ap3sskr_D, ac3sskr_D, am3sskr_D, xmr(1:nxmr), alx3, TfixN, 1)
+            call second_derivative_coeff(ap3sskr_N, ac3sskr_N, am3sskr_N, xmr(1:nxmr), alx3, TfixN, 0)
+        
+        else if( FixValueBCRegion_Nord_or_Sud==1) then
+  
+            call second_derivative_coeff(ap3sskr_D, ac3sskr_D, am3sskr_D, xmr(1:nxmr), alx3, 1, TfixS)
+            call second_derivative_coeff(ap3sskr_N, ac3sskr_N, am3sskr_N, xmr(1:nxmr), alx3, 0, TfixS)
+           
+        end if
+
+    end if
     
+    do kc = 1, nxmr
+        temp_ap3sskr(kc,1) = ap3sskr_D(kc)
+        temp_ap3sskr(kc,2) = ap3sskr_N(kc)
+
+        temp_ac3sskr(kc,1) = ac3sskr_D(kc)
+        temp_ac3sskr(kc,2) = ac3sskr_N(kc)
+        
+        temp_am3sskr(kc,1) = am3sskr_D(kc)
+        temp_am3sskr(kc,2) = am3sskr_N(kc)
+
+   end do
+   end if 
    nyr_Cold = 0
    nyr_Hot = 0
    do i = 1, nymr
