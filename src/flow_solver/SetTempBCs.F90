@@ -86,6 +86,14 @@ subroutine SetTempBCs
         
         !values(ii) = yc(ii)/YLEN !Linear
     end do
+    if (FixValueBCRegion_Length == 0) then
+        do ic = xstart(3), xend(3)
+            do jc = xstart(2), xend(2)
+                temptp(1, jc, ic) =0.0
+                tempbp(1, jc, ic) = yc(jc)/YLEN !Linear
+            end do
+        end do
+    end if 
     if (str_BC /= 0) then
         call Smooth_non_uniform_BC(m_BC_Hot, nym,pontzero_hot)
         call Smooth_non_uniform_BC(m_BC_Cold, nym,pontzero_cold)
