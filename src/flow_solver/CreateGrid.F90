@@ -205,12 +205,25 @@ subroutine CreateGrid
         am3ssk(i,2) = am3ssk_N(i)
         
    end do
+
    if (Robin==1)then
    call Scalar_Boundary_Robin_second_derivative_coeff(ap3_Robin ,ac3_Robin, am3_Robin, xm(1:nxm),&
              &   alx3, ym(1:nym), YLEN, 1,alpha_Temp)
    end if 
    ny_Cold = 0
    ny_Hot = 0
+
+   if(Robin==1)then 
+    do i=1,nym
+        if( FixValueBCRegion_Length/=0 .and. ym(i) <=  YLEN/2 .and.alpha_Temp(i)/=0 ) then
+            ny_Cold = ny_Cold+1
+
+        else if  (FixValueBCRegion_Length/=0 .and. ym(i) >=  YLEN/2 .and.alpha_Temp(i)/=0) then
+            ny_Hot = ny_Hot +1 
+        end if
+
+        end do 
+    else 
    do i=1,nym
        if( FixValueBCRegion_Length/=0 .and. ym(i) <= 0.01 * FixValueBCRegion_Length * YLEN) then
             ny_Cold = ny_Cold+1
@@ -218,6 +231,7 @@ subroutine CreateGrid
             ny_Hot = ny_Hot +1 
         end if
     end do 
+end if 
 
     y_start_Hot = ym(nym-ny_Hot+1)
     y_end_Cold=  ym(ny_Cold+1)

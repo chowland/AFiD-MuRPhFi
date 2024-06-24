@@ -97,7 +97,6 @@ subroutine InitMgrdVariables
     call AllocateReal2DArray(cysalc,1,4,1,nym)
     call AllocateReal2DArray(czsalc,1,4,1,nzm)
 
-    call AllocateReal1DArray(alpha_Sal, 1,nym)
 
     if (IBM) then
         if (phasefield) then

@@ -12,14 +12,14 @@ subroutine CreateMgrdGrid
     use param
     use AuxiliaryRoutines
     use GridModule
-    use afid_salinity, only: SfixS, SfixN, PraS, ap3sskr, ac3sskr, am3sskr,ap3r_Robin ,ac3r_Robin, am3r_Robin,alpha_Sal
+    use afid_salinity, only: SfixS, SfixN, PraS, ap3sskr, ac3sskr, am3sskr,&
+                            &ap3r_Robin ,ac3r_Robin, am3r_Robin,alpha_Sal
     use afid_Termperature_Fine, only: temp_ap3sskr, temp_ac3sskr, temp_am3sskr
     use afid_phasefield, only: ap3spkr, ac3spkr, am3spkr
     implicit none
     real, dimension(nxmr) :: ap3sskr_D,ac3sskr_D, am3sskr_D, ap3sskr_N,ac3sskr_N, am3sskr_N
     
     integer :: kc,i
-
     do kc=1,nxmr
         kmvr(kc)=kc-1
         kpvr(kc)=kc+1
@@ -233,22 +233,37 @@ subroutine CreateMgrdGrid
 
    end do
    end if 
-   nyr_Cold = 0
-   nyr_Hot = 0
-   do i = 1, nymr
-       if( FixValueBCRegion_Length/=0 .and. ymr(i) <= 0.01 * FixValueBCRegion_Length * YLEN) then
-            nyr_Cold = nyr_Cold+1
-       else if  (FixValueBCRegion_Length/=0 .and. ymr(i) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
-            nyr_Hot = nyr_Hot +1       
-        end if
-    end do 
+
     if (Robin==1)then
         call Scalar_Boundary_Robin_second_derivative_coeff(ap3r_Robin ,ac3r_Robin,&
-         am3r_Robin, xmr(1:nxmr), &
-        alx3, ymr(1:nymr), YLEN, 1,alpha_Sal)
-     end if 
-   
-    ! Phase-field differentiation (ensuring zero gradient at boundaries)
+                                                am3r_Robin, xmr(1:nxmr), &
+                                                alx3, ymr(1:nymr), YLEN, 1,alpha_Sal)
+    end if 
+
+   nyr_Cold = 0
+   nyr_Hot = 0
+   if(Robin==1)then 
+    do i = 1, nymr
+        if( FixValueBCRegion_Length/=0 .and. ymr(i) <=  YLEN/2 .and.alpha_Sal(i)/=0 ) then
+            nyr_Cold = nyr_Cold+1
+
+        else if  (FixValueBCRegion_Length/=0 .and. ymr(i) >=  YLEN/2 .and.alpha_Sal(i)/=0) then
+            nyr_Hot = nyr_Hot +1 
+        end if
+
+        end do 
+    else 
+        do i = 1, nymr
+            if( FixValueBCRegion_Length/=0 .and. ymr(i) <= 0.01 * FixValueBCRegion_Length * YLEN) then
+                nyr_Cold = nyr_Cold+1
+            else if  (FixValueBCRegion_Length/=0 .and. ymr(i) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                nyr_Hot = nyr_Hot +1       
+            end if
+        end do 
+    end if   
+
+
+     ! Phase-field differentiation (ensuring zero gradient at boundaries)
     if (phasefield) call second_derivative_coeff(ap3spkr, ac3spkr, am3spkr, xmr(1:nxmr), alx3, 0, 0)
 
     return
