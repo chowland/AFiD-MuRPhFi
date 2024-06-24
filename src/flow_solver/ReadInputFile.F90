@@ -247,8 +247,8 @@ subroutine ReadNon_uniform_BC
         read(15,*) str_BC
         read(15,301) dummy
         read(15,*) Robin
-        
-        
+        read(15,301) dummy
+        read(15,*) perc_robin
     301     format(a4)
     close(15)
 

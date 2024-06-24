@@ -7,9 +7,10 @@ module param
     real   :: FixValueBCRegion_Nord_or_Sud  = 0  ! 1 Up 0 down
     real ::  str_BC = 0 !
     real ::  Robin = 0 !
+    real :: perc_robin = 0.0
     real, allocatable,dimension(:) :: ap3_Robin ,ac3_Robin, am3_Robin
     real, allocatable,dimension(:) :: alpha_Temp
-    real, allocatable,dimension(:) :: alpha_Sal
+    
 
     logical:: multiRes_Temp =.false.
     !==========================================================
