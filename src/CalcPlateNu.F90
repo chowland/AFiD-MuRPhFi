@@ -14,7 +14,8 @@
       use local_arrays, only: temp,vx,vy,vz
       use mpih
       use decomp_2d, only: xstart,xend,xstartr,xendr
-      use afid_salinity
+      use afid_salinity, only: sal,salbp,&
+                              &saltp,alpha_Sal
       use afid_Termperature_Fine
       implicit none
       integer :: j,i,ip,jp,k,kp
@@ -25,13 +26,16 @@
       real:: del,deln,delr,delnr
       real :: inym, inzm
       integer :: unit
+      real :: Ghost
 
       integer :: case_number
       real ::count
       logical :: file_exists
       character(len=1024) :: buffer
-      vxrms(:)=0.0;   vyrms(:)=0.0;   vzrms(:)=0.0
 
+
+
+      vxrms(:)=0.0;   vyrms(:)=0.0;   vzrms(:)=0.0
       del  = 1.0/(xm(1)-xc(1))
       deln = 1.0/(xc(nx)-xm(nxm))
       if(salinity .or. multiRes_Temp)then
@@ -71,53 +75,33 @@
                          vzrms(k) = vzrms(k) + 0.5*(vz(k,j,i)**2+vz(k,j,ip)**2)
                   end do
      if(.not.multiRes_Temp)then
-            if(Robin==1)then
-                  if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
-                  if(alpha_Temp(j)==1)then
-                  nu_T_Hot = nu_T_Hot + (temptp(1,j,i)-temp(nxm,j,i))*deln 
-                  !write(*,*) (temptp(1,j,i)-temp(nxm,j,i))*deln,  alpha_Temp(j),ym(j),'alpha1'
-                  elseif(alpha_Temp(j)==0)then
+                  if(Robin==1)then
+                        if (ym(j) <= YLEN/2) then
+                              call T_G(alpha_Temp(j), deln, temp(1,j,i), temptp(1,j,i), Ghost)
+                              nu_T_Hot =(Ghost-temp(1,j,i)) *deln/2 
+
+                        else 
+                              call T_G(alpha_Temp(i), deln, temp(1,j,i), temptp(1,j,i), Ghost)
+                              nu_T_Col =(Ghost-temp(1,j,i)) *deln/2 
+                                          
+                        end if
+
                   else 
-                  Ghost_var = -( alpha_Temp(j)/( alpha_Temp(j)/2 -( 1-alpha_Temp(j))/(alx3 - xm(nxm)))   )*&
-                               &(temp(nxm,j,i)/2- temptp(1,j,i))+ &
-                               & ((1- alpha_Temp(j))/( alpha_Temp(j)/2 -( 1-alpha_Temp(j))/(alx3 - xm(nxm)))   )*&
-                               &  temp(nxm,j,i)/(alx3 - xm(nxm))
-                  nu_T_Hot = nu_T_Hot +  (temptp(1,j,i)-Ghost_var)/(2*(alx3 - xm(nxm)))
-                  !write(*,*) +  alpha_Temp(j)/(1- alpha_Temp(j)) *(temptp(1,j,i)-temp(nxm,j,i)),  alpha_Temp(j),ym(j)
- 
-                  end if
-                  else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then  
-                  if(alpha_Temp(j)==1)then
-                  nu_T_Col = nu_T_Col + (temptp(1,j,i)-temp(nxm,j,i))*deln 
+                        if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
+                              if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
+                                    nu_T_Hot = nu_T_Hot + (temptp(1,j,i)-temp(nxm,j,i))*deln  
 
-                  elseif(alpha_Temp(j)==0)then
-                  else 
-                  Ghost_var = -( alpha_Temp(j)/( alpha_Temp(j)/2 -( 1-alpha_Temp(j))/(alx3 - xm(nxm)))   )*&
-                               &(temp(nxm,j,i)/2- temptp(1,j,i))+ &
-                               & ((1- alpha_Temp(j))/( alpha_Temp(j)/2 -( 1-alpha_Temp(j))/(alx3 - xm(nxm)))   )*&
-                               &  temp(nxm,j,i)/(alx3 - xm(nxm))
-                  nu_T_Col = nu_T_Col +  (temptp(1,j,i)-Ghost_var)/(2*(alx3 - xm(nxm)))
-                  end if
+                              else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                                    nu_T_Col = nu_T_Col + (temptp(1,j,i)-temp(nxm,j,i))*deln
+                              end if 
+                        else if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==0) then
+                              if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
+                                    nu_T_Hot = nu_T_Hot + (temp(1,j,i)-tempbp(1,j,i))*del
+                              else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
+                                    nu_T_Col = nu_T_Col + (temp(1,j,i)-tempbp(1,j,i))*del
+                              end if
+                        end if
                   end if 
-            !write(*,*)nu_T_Col,  alpha_Temp(j),ym(j)
-
-
-            else 
-            if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
-                  if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
-                        nu_T_Hot = nu_T_Hot + (temptp(1,j,i)-temp(nxm,j,i))*deln  
-
-                  else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
-                        nu_T_Col = nu_T_Col + (temptp(1,j,i)-temp(nxm,j,i))*deln
-                  end if 
-            else if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==0) then
-                  if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
-                        nu_T_Hot = nu_T_Hot + (temp(1,j,i)-tempbp(1,j,i))*del
-                  else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
-                        nu_T_Col = nu_T_Col + (temp(1,j,i)-tempbp(1,j,i))*del
-                  end if
-            end if
-             end if 
             end if 
         enddo
       end do
@@ -130,53 +114,18 @@
       call MpiSumRealScalar(nu_T_Col)
       end if 
 
-
-
-
-
  if(salinity) then 
             do i=xstartr(3),xendr(3)
                   do j=xstartr(2),xendr(2) 
                         if(Robin==1)then
-                              if (ym(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
-                              if(alpha_Sal(j)==1)then
-                                    nu_S_Hot = nu_S_Hot + (saltp(1,j,i)-sal(nxmr,j,i))*delnr
-                              elseif(alpha_Sal(j)==0)then
-                              else 
-                                    Ghost_var = -( alpha_Sal(j)/( alpha_Sal(j)/2 -( 1-alpha_Sal(j))/(alx3 - xmr(nxm)))   )*&
-                                                 &(sal(nxmr,j,i)/2- saltp(1,j,i))+ &
-                                                 & ((1- alpha_Sal(j))/( alpha_Sal(j)/2 -( 1-alpha_Sal(j))/(alx3 - xmr(nxm)))   )*&
-                                                  &  sal(nxmr,j,i)/(alx3 - xmr(nxm))
-                                    nu_S_Hot = nu_S_Hot +  (saltp(1,j,i)-Ghost_var)/(2*(alx3 - xmr(nxmr)))
-                              end if
-                              else if ( ym(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then  
-                              if(alpha_Sal(j)==1)then
-                                    nu_S_Col = nu_S_Col +(saltp(1,j,i)-sal(nxmr,j,i))*delnr
-                              elseif(alpha_Sal(j)==0)then
-                              else 
-                                    Ghost_var = -( alpha_Sal(j)/( alpha_Sal(j)/2 -( 1-alpha_Sal(j))/(alx3 - xmr(nxm)))   )*&
-                                                    &(sal(nxmr,j,i)/2- saltp(1,j,i))+ &
-                                                  & ((1- alpha_Sal(j))/( alpha_Sal(j)/2 -( 1-alpha_Sal(j))/(alx3 - xmr(nxm)))   )*&
-                                                  &  sal(nxmr,j,i)/(alx3 - xmr(nxm))
-                                    nu_S_Col = nu_S_Col +  (saltp(1,j,i)-Ghost_var)/(2*(alx3 - xmr(nxmr)))
-                               end if
-                              end if 
+                        if (ymr(j) <= YLEN/2) then
+                              call T_G(alpha_Sal(j), delnr, sal(1,j,i), saltp(1,j,i), Ghost)
+                              nu_S_Hot =(Ghost-sal(1,j,i)) *delnr/2 
+
                         else 
-                  if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==1) then
-                        if (ymr(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
-                              nu_S_Hot = nu_S_Hot + (saltp(1,j,i)-sal(nxmr,j,i))*delnr
-                        else if ( ymr(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
-                              nu_S_Col = nu_S_Col + (saltp(1,j,i)-sal(nxmr,j,i))*delnr
-
-                        end if 
-                  else if  (FixValueBCRegion_Length/=0 .and.FixValueBCRegion_Nord_or_Sud==0) then
-                        if (ymr(j) <= 0.01 * FixValueBCRegion_Length * YLEN) then
-                              nu_S_Hot = nu_S_Hot + (sal(1,j,i)-salbp(1,j,i))*delr
-
-                        else if ( ymr(j) >= YLEN - 0.01 * FixValueBCRegion_Length * YLEN) then
-                              nu_S_Col = nu_S_Col + (sal(1,j,i)-salbp(1,j,i))*delr
-
-                        end if
+                              call T_G(alpha_Sal(i), delnr, sal(1,j,i), saltp(1,j,i), Ghost)
+                              nu_S_Col =(Ghost-sal(1,j,i)) *delnr/2 
+                                          
                   end if
             end if 
             if(multiRes_Temp)then
@@ -352,4 +301,16 @@ end select
   
   
       return         
-      end                                                               
+      end   
+      
+      subroutine T_G(alpha, delta_x, Var_nx, delta_Var, Ghost)
+            implicit none
+            real, intent(in):: alpha, delta_x, Var_nx, delta_Var
+            real, intent(out):: Ghost
+            real :: term1, term2
+            term1 = (-2.0 * alpha / (alpha + (1.0 - alpha) / delta_x)) * (Var_nx / 2.0 - delta_Var)
+            term2 = ((1.0 - alpha) / (alpha + (1.0 - alpha) / delta_x)) * (Var_nx / delta_x)
+            
+            Ghost = term1 + term2  
+        end subroutine T_G
+        
