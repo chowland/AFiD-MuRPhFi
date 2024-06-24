@@ -31,14 +31,18 @@ module afid_salinity
     real, allocatable, dimension(:,:) :: ap3sskr      !! Upper diagonal derivative coefficient for salinity
     real, allocatable, dimension(:,:) :: ac3sskr      !! Diagonal derivative coefficient for salinity
     real, allocatable, dimension(:,:) :: am3sskr      !! Lower diagonal derivative coefficient for salinity
+    
+    real, allocatable,dimension(:) :: alpha_Sal
     real, allocatable,dimension(:) :: ap3r_Robin ,ac3r_Robin, am3r_Robin
+
 contains
 
 !> Subroutine to allocate memory for salinity-related variables
 subroutine InitSalVariables
-    call AllocateReal1DArray(ap3r_Robin, 1,nym)
-    call AllocateReal1DArray(ac3r_Robin, 1,nym)
-    call AllocateReal1DArray(am3r_Robin, 1,nym)
+    call AllocateReal1DArray(ap3r_Robin, 1,nymr)
+    call AllocateReal1DArray(ac3r_Robin, 1,nymr)
+    call AllocateReal1DArray(am3r_Robin, 1,nymr)
+    call AllocateReal1DArray(alpha_Sal, 1,nymr)
 
     ! Boundary planes
     call AllocateReal3DArray(salbp,1,1,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
@@ -99,6 +103,12 @@ subroutine DeallocateSalVariables
     call DestroyReal2DArray(ap3sskr)
     call DestroyReal2DArray(ac3sskr)
     call DestroyReal2DArray(am3sskr)
+
+
+    call DestroyReal1DArray(ap3r_Robin)
+    call DestroyReal1DArray(ac3r_Robin)
+    call DestroyReal1DArray(am3r_Robin)
+    call DestroyReal1DArray(alpha_Sal)
 
 end subroutine DeallocateSalVariables
 

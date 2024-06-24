@@ -159,9 +159,10 @@ program AFiD
     if (moist) call InitMoistVariables
 
     call InitSliceCommunicators
+
     call CreateGrid
     if (multires) call CreateMgrdGrid     !CS mgrd
-  
+
     call WriteGridInfo
     if (FixValueBCRegion_Length /= 0 )then
         if(salinity)then
@@ -188,7 +189,6 @@ program AFiD
 !m===================================
 !m===================================
 !m===================================
-
     if(ismaster) then
         write(6,754)nx,ny,nz
     754 format(/,5x,'grid resolution: ',' nx = ',i5,' ny = ',i5,' nz = ',i5)
@@ -314,7 +314,6 @@ program AFiD
         call update_halo(tempr,lvlhalo)
         call update_halo(phic,lvlhalo)
     end if
-
    ! call CalcMeanProfiles
     ! if (specwrite) call WritePowerSpec
     if(ismaster)  write(6,*) 'Write plane slices'
@@ -398,7 +397,6 @@ program AFiD
         endif
 
         call TimeMarcher
-
         if (specwrite .and. time > tav_start) then
            ! call UpdateTemporalAverages
             !call UpdateSpectra

@@ -387,15 +387,14 @@ contains
  
     end subroutine check_values
     subroutine Scalar_Boundary_Robin_second_derivative_coeff(ap3_Robin ,ac3_Robin, am3_Robin, x, xlen, y, ylen, Up_or_Low,alhpa)
-        implicit none
+        use param, only :perc_robin
         real, intent(out) :: ap3_Robin(:), ac3_Robin(:), am3_Robin(:)
         real, intent(in) :: x(:), xlen, y(:), ylen
         integer, intent(in) :: Up_or_Low
         integer :: i,j, nx,ny
         real :: a33_Robin
         real, dimension(size(y)),intent(out):: alhpa
-    
-        call alpha_Robin(y, alhpa)
+        call alpha_Robin(y, alhpa,perc_robin)
         
         ny = size(y)
         nx = size(x)
@@ -421,42 +420,60 @@ contains
         end do
     end subroutine Scalar_Boundary_Robin_second_derivative_coeff
     
-    subroutine alpha_Robin(y, alhpa)
+    subroutine alpha_Robin(y, alhpa,perc)
         use param
         implicit none
         real, intent(in) :: y(:)
+        real, intent(in) :: perc
         real,  dimension(size(y)) , intent(out) :: alhpa
         real :: x_end1, x_start1, x_start2, x_end2
-        real :: a1, a2
+        real :: a1, a2, xo1,xo2
         integer :: i, ny_sub
-    
-        x_end1 = 0.01 * FixValueBCRegion_Length * YLEN
-        x_start2 = YLEN - 0.01 * FixValueBCRegion_Length * YLEN
-    
-        x_start1 = 0.01 * FixValueBCRegion_Length * YLEN - 0.1 * (0.01 * FixValueBCRegion_Length * YLEN)
-        x_end2 = YLEN - 0.01 * FixValueBCRegion_Length * YLEN + 0.1 * (0.01 * FixValueBCRegion_Length * YLEN)
+     
 
-    
+        x_end1 = 0.01 * FixValueBCRegion_Length * YLEN;
+        !x_start2 = YLEN - 0.01 * FixValueBCRegion_Length * YLEN;
+        x_start1 = 0.01 * FixValueBCRegion_Length * YLEN - perc * (0.01 * FixValueBCRegion_Length * YLEN);
+        !x_end2 = YLEN - 0.01 * FixValueBCRegion_Length * YLEN + perc * (0.01 * FixValueBCRegion_Length * YLEN);
+        
+        a1 = 6.138/(x_end1 - x_start1);
+        xo1 = x_start1+4.492/a1;
+
+        !a2 = 6.138/(x_end2 - x_start2);
+        !xo2 = x_start2+ 4.492/a2;
+   
         ny_sub = size(y)
-    
-        a1 = 5.0 / (x_end1 - x_start1)
-        a2 = 5.0 / (x_start2 - x_end2)
-    
-        do i = 1, ny
-            if (y(i) <= x_end1 .and. y(i) >= x_start1) then
-                alhpa(i) = tanh(a1 * (-y(i) + x_end1))
-                if (y(i) <= x_end1)then
-                end if 
-            elseif (y(i) >= x_start2 .and. y(i) <= x_end2) then
-                alhpa(i) = -tanh(a2 * (y(i) - x_start2))
-            elseif (y(i) < x_start1) then
-                alhpa(i) = 1.0
-            elseif (y(i) > x_end2) then
-                alhpa(i) = 1.0
+     
+       
+        do i = 1, ny_sub
+            if (y(i) <= YLEN/2) then
+                
+                alhpa(i) = -(tanh(a1* (y(i)-xo1)))/2+0.5;
+
             else
-                alhpa(i) = 0.0
+                alhpa(i) = alhpa(ny_sub-i+1);
             end if
+
         end do
+        !a1 = 5.0 / (x_end1 - x_start1)
+        !a2 = 5.0 / (x_start2 - x_end2)
+    
+        !do i = 1, ny
+         !   if (y(i) <= x_end1 .and. y(i) >= x_start1) then
+          !      alhpa(i) = tanh(a1 * (-y(i) + x_end1))
+           !     if (y(i) <= x_end1)then
+            !    end if 
+            !elseif (y(i) >= x_start2 .and. y(i) <= x_end2) then
+             !   alhpa(i) = -tanh(a2 * (y(i) - x_start2))
+            !elseif (y(i) < x_start1) then
+            !    alhpa(i) = 1.0
+           ! elseif (y(i) > x_end2) then
+            !    alhpa(i) = 1.0
+            !else
+             !   alhpa(i) = 0.0
+           ! end if
+        !end do
+
     end subroutine alpha_Robin
     
     
