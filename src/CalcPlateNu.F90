@@ -22,6 +22,7 @@
       real ::  nu_T_Col, nu_T_Hot,  nu_S_Col, nu_S_Hot,Urms
       real ::  nuTslow, nuTsupp, nuSslow, nuSsupp
       real :: Ghost_var
+      real, dimension(nx-1) :: dx_mean
       real, dimension(nxm) :: vxrms, vyrms, vzrms,u_rms
       real:: del,deln,delr,delnr
       real :: inym, inzm
@@ -32,7 +33,7 @@
       real ::count
       logical :: file_exists
       character(len=1024) :: buffer
-
+  
 
 
       vxrms(:)=0.0;   vyrms(:)=0.0;   vzrms(:)=0.0
@@ -40,7 +41,7 @@
       deln = 1.0/(xc(nx)-xm(nxm))
       if(salinity .or. multiRes_Temp)then
       delr  = 1.0/(xmr(1)-xcr(1))
-      delnr = 1.0/(xcr(nx)-xmr(nxm))
+      delnr = 1.0/(xcr(nxr)-xmr(nxmr))
       endif 
 
       if (FixValueBCRegion_Length /= 0) then
@@ -51,7 +52,7 @@
 
       inym = 1.d0/nym
       inzm = 1.d0/nzm
-
+ 
 !$OMP  PARALLEL DO &
 !$OMP   DEFAULT(none) &
 !$OMP   SHARED(xstart,xend,temp,del,deln) &
@@ -76,13 +77,15 @@
                   end do
      if(.not.multiRes_Temp)then
                   if(Robin==1)then
-                        if (ym(j) <= YLEN/2) then
-                              call T_G(alpha_Temp(j), deln, temp(1,j,i), temptp(1,j,i), Ghost)
-                              nu_T_Hot =(Ghost-temp(1,j,i)) *deln/2 
+                        if (ym(j) <= YLEN/2 .and. alpha_Temp(j)/=0) then
+                              call T_G(alpha_Temp(j), deln, temp(nxm,j,i), temptp(1,j,i), Ghost)
+                              nu_T_Hot =nu_T_Hot+(Ghost-temp(nxm,j,i)) *deln/2 
+                              
 
-                        else 
-                              call T_G(alpha_Temp(i), deln, temp(1,j,i), temptp(1,j,i), Ghost)
-                              nu_T_Col =(Ghost-temp(1,j,i)) *deln/2 
+                        elseif (ym(j) >= YLEN/2 .and. alpha_Temp(j)/=0) then
+                              call T_G(alpha_Temp(j), deln, temp(nxm,j,i), temptp(1,j,i), Ghost)
+                              nu_T_Col =nu_T_Col+(Ghost-temp(nxm,j,i)) *deln/2 
+
                                           
                         end if
 
@@ -118,13 +121,13 @@
             do i=xstartr(3),xendr(3)
                   do j=xstartr(2),xendr(2) 
                         if(Robin==1)then
-                        if (ymr(j) <= YLEN/2) then
-                              call T_G(alpha_Sal(j), delnr, sal(1,j,i), saltp(1,j,i), Ghost)
-                              nu_S_Hot =(Ghost-sal(1,j,i)) *delnr/2 
+                        if (ymr(j) <= YLEN/2 .and. alpha_Sal(j)/=0) then
+                              call T_G(alpha_Sal(j), delnr, sal(nxmr,j,i), saltp(1,j,i), Ghost)
+                              nu_S_Hot =nu_S_Hot+(Ghost-sal(nxmr,j,i)) *delnr/2 
 
-                        else 
-                              call T_G(alpha_Sal(i), delnr, sal(1,j,i), saltp(1,j,i), Ghost)
-                              nu_S_Col =(Ghost-sal(1,j,i)) *delnr/2 
+                        elseif (ymr(j) >= YLEN/2 .and. alpha_Sal(j)/=0)then
+                              call T_G(alpha_Sal(j), delnr, sal(nxmr,j,i), saltp(1,j,i), Ghost)
+                              nu_S_Col =nu_S_Col+(Ghost-sal(nxmr,j,i)) *delnr/2 
                                           
                   end if
             end if 
@@ -176,8 +179,11 @@ do k=1,nxm
   end do
 
   u_rms = vxrms**2 + vyrms**2 +  vyrms**2
-  u_rms = u_rms/nxm
-  Urms = sum(u_rms)
+  do i = 1, nx-1
+      dx_mean(i) = xc(i+1) - xc(i)
+      Urms = Urms + u_rms(i) * dx_mean(i)
+end do
+write(*,*)Urms
 
 !$OMP END PARALLEL DO
 
@@ -265,9 +271,7 @@ case (2)
          
 
       end if 
-      write(*,*)multiRes_Temp
-      write(*,*) 'nuTslow',nuTslow
-      write(*,*) 'nuTsupp',nuTsupp
+
       if (ismaster) then
             ! Verifica se il file esiste
             inquire(file="outputdir/nu.csv", exist=file_exists)
@@ -303,11 +307,13 @@ end select
       return         
       end   
       
-      subroutine T_G(alpha, delta_x, Var_nx, delta_Var, Ghost)
+      subroutine T_G(alpha, del, Var_nx, delta_Var, Ghost)
             implicit none
-            real, intent(in):: alpha, delta_x, Var_nx, delta_Var
+            real, intent(in):: alpha, Var_nx, delta_Var,del
             real, intent(out):: Ghost
-            real :: term1, term2
+            real :: term1, term2,delta_x
+
+            delta_x = 1/del
             term1 = (-2.0 * alpha / (alpha + (1.0 - alpha) / delta_x)) * (Var_nx / 2.0 - delta_Var)
             term2 = ((1.0 - alpha) / (alpha + (1.0 - alpha) / delta_x)) * (Var_nx / delta_x)
             

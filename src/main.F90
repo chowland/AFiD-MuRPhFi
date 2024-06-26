@@ -314,7 +314,7 @@ program AFiD
         call update_halo(tempr,lvlhalo)
         call update_halo(phic,lvlhalo)
     end if
-   ! call CalcMeanProfiles
+    call CalcMeanProfiles
     ! if (specwrite) call WritePowerSpec
     if(ismaster)  write(6,*) 'Write plane slices'
     call Mkmov_xcut
@@ -408,7 +408,7 @@ program AFiD
                 write(6,*) ' -------------------------------------------------- '
                 write(6,'(a,ES11.4,a,i9,a,ES11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
             endif
-            !call CalcMeanProfiles
+            call CalcMeanProfiles
             ! if (specwrite) then
             !     if (ismaster) write(*,*) "Writing power spectra"
             !     call WritePowerSpec
