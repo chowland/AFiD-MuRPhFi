@@ -409,6 +409,7 @@ program AFiD
                 write(6,'(a,ES11.4,a,i9,a,ES11.4)') '  T = ',time,' NTIME = ',ntime,' DT = ',dt
             endif
             call CalcMeanProfiles
+            call CalcPlateNu
             ! if (specwrite) then
             !     if (ismaster) write(*,*) "Writing power spectra"
             !     call WritePowerSpec
@@ -440,7 +441,7 @@ program AFiD
 
             call CalcMaxCFL(instCFL,CFLmr)
             call CheckDivergence(dmax,dmaxr)
-            call CalcPlateNu
+            !call CalcPlateNu
             !call CalcPlateCf
             if(.not.variabletstep) instCFL=instCFL*dt
 

@@ -170,7 +170,9 @@
       end if 
 
 end if 
-
+call MpiSumReal1D(vxrms,nxm)
+call MpiSumReal1D(vyrms,nxm)
+call MpiSumReal1D(vzrms,nxm)
 
 do k=1,nxm
       vxrms(k) = sqrt(vxrms(k)*inym*inzm)
@@ -178,12 +180,11 @@ do k=1,nxm
       vzrms(k) = sqrt(vzrms(k)*inym*inzm)
   end do
 
-  u_rms = vxrms**2 + vyrms**2 +  vyrms**2
+  u_rms = vxrms**2 + vyrms**2 +  vzrms**2
   do i = 1, nx-1
       dx_mean(i) = xc(i+1) - xc(i)
       Urms = Urms + u_rms(i) * dx_mean(i)
 end do
-write(*,*)Urms
 
 !$OMP END PARALLEL DO
 
