@@ -139,11 +139,14 @@ end subroutine SetSalBCs
 !! N.B. This can get overwritten by CreateInitialPhase if also using phase-field
 subroutine CreateInitialSalinity
     integer :: i, j, k
+    real :: eps
     
     !! Rayleigh-Taylor setup for pore-scale simulation
     if (IBM) then
-        call SetSaltTwoLayer(h0=0.5*alx3, eps=1e-7, stable=.false.)
-        call AddSalinityNoise(amp=0.1, localised=.true., h0=0.5*alx3, extent=0.01)
+        eps = 2.0*sqrt(200/pecs)
+        call SetSaltTwoLayer(h0=0.5*alx3, eps=eps, stable=.false.)
+        ! call AddSalinityNoise(amp=0.1, localised=.true., h0=0.5*alx3, extent=0.01)
+        call AddSalinityNoise(amp=0.05, localised=.false.)
 
     !! Bounded double-diffusive convection (begin with small amplitude noise + BLs)
     else if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
@@ -215,7 +218,8 @@ subroutine SetSaltTwoLayer(h0, eps, stable, mode, mode_amp)
             do k=1,nxmr
                 ! Use pf_IC input parameter as mode number for initial perturbation
                 if (present(mode)) x0 = h0 + mode_amp*sin(mode*2.0*pi*ymr(j)/ylen)
-                sal(k,j,i) = 0.5*tanh((xmr(k) - x0)/eps)
+                ! sal(k,j,i) = 0.5*tanh((xmr(k) - x0)/eps)
+                sal(k,j,i) = 0.5*erf((xmr(k) - x0)/eps)
                 if (stable) sal(k,j,i) = -sal(k,j,i)
             end do
         end do
