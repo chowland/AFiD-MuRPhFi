@@ -143,10 +143,11 @@ subroutine CreateInitialSalinity
     
     !! Rayleigh-Taylor setup for pore-scale simulation
     if (IBM) then
-        eps = 2.0*sqrt(200/pecs)
+        eps = 2.0*sqrt(2e-6)
         call SetSaltTwoLayer(h0=0.5*alx3, eps=eps, stable=.false.)
         ! call AddSalinityNoise(amp=0.1, localised=.true., h0=0.5*alx3, extent=0.01)
-        call AddSalinityNoise(amp=0.05, localised=.false.)
+        ! call AddSalinityNoise(amp=0.05, localised=.false.)
+        call AddSalinityNoise(amp=0.0, localised=.false.)
 
     !! Bounded double-diffusive convection (begin with small amplitude noise + BLs)
     else if ((active_S==1) .and. (active_T==1) .and. (gAxis==1)) then
@@ -254,12 +255,12 @@ subroutine AddSalinityNoise(amp, localised, h0, extent)
                 !! Add noise everywhere uniformly
                 else
                     ! Prevent values of |S| exceeding 0.5 by restricting noise amplitude locally
-                    if (abs(sal(k,j,i)) + amp > 0.5) then
-                        a2 = 0.5 - abs(sal(k,j,i))
-                        sal(k,j,i) = sal(k,j,i) + a2*(2.d0*varptb - 1.d0)
-                    else
+                    ! if (abs(sal(k,j,i)) + amp > 0.5) then
+                    !     a2 = 0.5 - abs(sal(k,j,i))
+                    !     sal(k,j,i) = sal(k,j,i) + a2*(2.d0*varptb - 1.d0)
+                    ! else
                         sal(k,j,i) = sal(k,j,i) + amp*(2.d0*varptb - 1.d0)
-                    end if
+                    ! end if
                 end if
             end do
         end do
