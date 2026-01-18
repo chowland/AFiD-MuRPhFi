@@ -62,3 +62,87 @@ subroutine SolveImpEqnUpdate_Temp
 
     return
 end subroutine SolveImpEqnUpdate_Temp
+
+
+
+subroutine SolveImpEqnUpdate_TempPhi
+    use param
+    use local_arrays, only : temp,rhs
+    use afid_phasefield, only:  phic
+    use decomp_2d, only: xstart,xend
+    implicit none
+    real, dimension(nx) :: amkl,apkl,ackl
+    integer :: jc,kc,info,ipkv(nxm),ic,nrhs
+    real :: betadx,ackl_b
+    real :: amkT(nxm-1),ackT(nxm),apkT(nxm-1),appk(nxm-2),rhsphic(nxm)
+    real :: rho,Cp
+!     Calculate the coefficients of the tridiagonal matrix
+!     The coefficients are normalized to prevent floating
+!     point errors.
+
+    do ic=xstart(3),xend(3)
+        do jc=xstart(2),xend(2) 
+        do kc=1,nxm	
+            rho = ((1.0-phic(kc,jc,ic))*(1.0-rd_sl )+rd_sl)
+            Cp  = ((1.0-phic(kc,jc,ic))*(1.0-rCp_sl)+rCp_sl)
+            betadx=0.5d0*al*dt/pect/rho/Cp
+ 
+    
+            if (kc.eq.1) then 
+                ackl_b=1.0d0/(1.0d0+betadx*(am3ssk(kc)*((2.0-(phic(kc  ,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)+&
+                                            ap3ssk(kc)*((2.0-(phic(kc+1,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)))	
+                
+                amkl(kc)=-betadx*am3ssk(kc)*((2.0-(phic(kc  ,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)*ackl_b
+                ackl(kc)=1.0d0
+                apkl(kc)=-betadx*ap3ssk(kc)*((2.0-(phic(kc+1,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)*ackl_b
+                
+                rhsphic(kc)=rhs(kc,jc,ic)*ackl_b
+                
+            elseif(kc.eq.nxm) then
+                ackl_b=1.0d0/(1.0d0+betadx*(am3ssk(kc)*((2.0-(phic(kc-1,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)+&
+                                            ap3ssk(kc)*((2.0-(phic(kc  ,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)))	
+                
+                amkl(kc)=-betadx*am3ssk(kc)*((2.0-(phic(kc-1,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)*ackl_b
+                ackl(kc)=1.0d0
+                apkl(kc)=-betadx*ap3ssk(kc)*((2.0-(phic(kc  ,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)*ackl_b
+                
+                rhsphic(kc)=rhs(kc,jc,ic)*ackl_b
+                
+            else
+                ackl_b=1.0d0/(1.0d0+betadx*(am3ssk(kc)*((2.0-(phic(kc-1,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)+&
+                                            ap3ssk(kc)*((2.0-(phic(kc+1,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)))	
+                
+                amkl(kc)=-betadx*am3ssk(kc)*((2.0-(phic(kc-1,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)*ackl_b
+                ackl(kc)=1.0d0
+                apkl(kc)=-betadx*ap3ssk(kc)*((2.0-(phic(kc+1,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)*ackl_b
+                
+                rhsphic(kc)=rhs(kc,jc,ic)*ackl_b
+            end if
+
+    
+    
+    
+    
+            enddo !kc
+            
+            
+            amkT=amkl(2:nxm)
+            apkT=apkl(1:(nxm-1))
+            ackT=ackl(1:nxm)
+            
+            call dgttrf(nxm,amkT,ackT,apkT,appk,ipkv,info)
+            call dgttrs('N',nxm,1,amkT,ackT,apkT,appk,ipkv,rhsphic,nxm,info)
+    
+    
+            do kc=1,nxm
+                temp(kc,jc,ic)=temp(kc,jc,ic) + rhsphic(kc)
+                rhs(kc,jc,ic) = rhsphic(kc)
+            end do
+    
+          
+          
+          enddo !jc
+          enddo !ic
+
+    return
+end subroutine SolveImpEqnUpdate_TempPhi

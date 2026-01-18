@@ -1,79 +1,14 @@
-# Choose the machine being used
-# Options: PC, SNELLIUS, IRENE, MARENOSTRUM, SUPERMUC, DISCOVERER
 MACHINE=PC
 FLAVOUR=GNU
-# Modules required for each HPC system as follows:
-# SNELLIUS:
-#	GNU: 2022 foss/2022a HDF5/1.12.2-gompi-2022a
-# 	Intel: 2022 intel/2022a FFTW/3.3.10-GCC-11.3.0 HDF5/1.12.2-iimpi-2021a
-# IRENE (Intel): flavor/hdf5/parallel hdf5 fftw3/gnu
-# MARENOSTRUM (Intel): fabric intel mkl impi hdf5 fftw szip
-# SUPERMUC (Intel): spack/23.1.0 intel-toolkit/2023.1.0 fftw hdf5
-# DISCOVERER:
-#	GNU: hdf5/1/1.14/latest-gcc-openmpi fftw/3/latest-gcc-openmpi lapack
-#	Intel: hdf5/1/1.14/latest-intel-openmpi fftw/3/latest-gcc-openmpi mkl
-
-#=======================================================================
-#  Compiler options
-#=======================================================================
 
 # Object and module directory:
 OBJDIR=obj
 
-ifeq ($(FLAVOUR),GNU)
-	FC = h5pfc -cpp -fdefault-real-8 -fdefault-double-8 -fallow-argument-mismatch
-else
-	FC = h5pfc -fpp -r8
-endif
 
-ifeq ($(MACHINE),PC)
-# GNU Debug Flags
-	# FC += -O0 -g -fbacktrace -Wall -Wextra
-	# FC += -Wpedantic
-	# FC += -Warray-temporaries
-	# FC += -fcheck=all -finit-real=snan -ffpe-trap=invalid #-std=f2018
-# FC += -O0 -pg -fbacktrace -fbounds-check
-# Intel Debug Flags
-# FC += -O0 -g -traceback -check bounds
-	ifeq ($(FLAVOUR),GNU)
-		LDFLAGS = -lfftw3 -llapack -ldl
-	else
-		LDFLAGS = -lfftw3 -qmkl=sequential
-	endif
-endif
-ifeq ($(MACHINE),DISCOVERER)
-	ifeq ($(FLAVOUR),GNU)
-		FC = h5pfc -O2 -cpp -fdefault-real-8 -fdefault-double-8
-		LDFLAGS += -lfftw3 -llapack -ldl
-	else
-		LDFLAGS += -lfftw3 -qmkl=sequential
-	endif
-endif
-ifeq ($(MACHINE),SNELLIUS)
-	ifeq ($(FLAVOUR),GNU)
-		LDFLAGS = -lfftw3 -lopenblas -ldl
-	else
-		LDFLAGS = -lfftw3 -qmkl=sequential
-	endif
-endif
-ifeq ($(MACHINE),IRENE)
-	FC += -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW3_FFLAGS)
-	LDFLAGS = $(FFTW3_LDFLAGS) $(MKL_LDFLAGS) -ldl
-endif
-ifeq ($(MACHINE),MARENOSTRUM)
-	FC += -mtune=skylake -xCORE-AVX512 -m64 -fPIC $(FFTW_FFLAGS)
-	LDFLAGS = $(FFTW_LIBS) -mkl=sequential
-endif
-ifeq ($(MACHINE),SUPERMUC)
-	FC = mpiifort -r8 -O3 $(HDF5_INC)
-	LDFLAGS = $(FFTW_LIB) $(HDF5_F90_SHLIB) $(HDF5_SHLIB) -qmkl=sequential
-endif
-
-ifeq ($(FLAVOUR),GNU)
-	FC += -J $(OBJDIR)
-else
-	FC += -module $(OBJDIR)
-endif
+FC =mpiifort -fpp
+FC += -r8 -O3 -march=core-avx2 -I/home/software/hdf5-1.12.0/include
+FC += -module $(OBJDIR)
+LDFLAGS = -lfftw3 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lhdf5_fortran -L/home/software/hdf5-1.12.0/lib -lhdf5  -lz -ldl -lm
 
 #=======================================================================
 #  Non-module Fortran files to be compiled:

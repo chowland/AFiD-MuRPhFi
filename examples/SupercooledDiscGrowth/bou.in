@@ -4,7 +4,7 @@ NXM     NYM     NZM     NSST(>1=RK,else AB)
 
 Refined grid: on/off and grid size
 MULTIRES    NXMR    NYMR    NZMR
-1           1024     1024     1
+1           512     512     1
 
 Salinity and Phase-field (on/off)
 FLAGSAL     FLAGPF
@@ -12,7 +12,7 @@ FLAGSAL     FLAGPF
 
 Read flow / Reset logs
 NREAD       IRESET
-1           1
+0           1
 
 Time steps / time limit (wall/flow) 
 NTST        WALLTIMEMAX     TMAX
@@ -28,7 +28,7 @@ ALX3   YLEN   ZLEN
 
 Grid stretching parameters
 ISTR3   STR3    ISTR3R
-6       12.0    0
+0      0    0
 
 Physical flow parameters / Free-fall timescale
 RAYT    PRAT    RAYS    PRAS    FFscaleS
@@ -53,3 +53,7 @@ xplusU  xminusU     dPdy    dPdz    MELT
 Phase-field parameters
 pf_D(*Pe)   pf_A    pf_S    pf_Tm   IBM     pf_IC
 0.48        1.0     2.5     1.0     0       2
+
+ice-warer parameters
+num_Tmeff   k_c    rd_sl    rCp_sl   theta_Tmax
+0           1.0    1.0     1.0       0.5

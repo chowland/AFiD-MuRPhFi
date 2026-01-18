@@ -1,8 +1,9 @@
+# 1 "e:\科研日志\2025年\2月\2025_02_19_【AFiD两相程序开源】\【最终版本_phi1为冰】计划使用\src\flow_solver\TimeMarcher.F90"
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!                                                         ! 
+!                                                         !
 !    FILE: TimeMarcher.F90                                !
 !    CONTAINS: subroutine TimeMarcher                     !
-!                                                         ! 
+!                                                         !
 !    PURPOSE: Main time integrating routine, which calls  !
 !     other subroutines for calculating the Navier-Stokes !
 !     equations and advancing velocity and temperature in !
@@ -13,7 +14,7 @@
 subroutine TimeMarcher
     use param
     use local_arrays
-    ! use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
+! use mgrd_arrays, only: vxr,vyr,vzr,salc,sal,phi,phic,tempr
     use afid_pressure
     use afid_salinity
     use afid_phasefield
@@ -39,9 +40,9 @@ subroutine TimeMarcher
         ga = gam(ns)
         ro = rom(ns)
 
-        ! if (melt) call UpdateBCs
+! if (melt) call UpdateBCs
 
-        ! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-explicit'
+! iF(ANY(IsNaN(phi))) write(*,*)nrank,'NaN in PHI pre-explicit'
         call ExplicitTermsVX
         call ExplicitTermsVY
         call ExplicitTermsVZ
@@ -55,8 +56,8 @@ subroutine TimeMarcher
         if (salinity) then
             call ExplicitSalinity
             
-            ! If using salinity as an active scalar, add its buoyancy contribution
-            ! to the relevant component of the momentum equation
+! If using salinity as an active scalar, add its buoyancy contribution
+! to the relevant component of the momentum equation
             if (active_S==1) then
                 if (gAxis==1) then
                     call AddSalBuoyancy(qcap)
@@ -85,7 +86,7 @@ subroutine TimeMarcher
 			call ExplicitPhase
 			call ImplicitPhase
 			call update_halo(phi,lvlhalo)
-            ! Add the latent heat and salt terms *after* computing the implicit solve for phi
+! Add the latent heat and salt terms *after* computing the implicit solve for phi
             call AddLatentHeat
             if (salinity) call AddLatentSalt
         end if
@@ -94,10 +95,10 @@ subroutine TimeMarcher
 
         if (moist) call AddCondensation
 
-        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX pre-implicit',ns
-        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY pre-implicit',ns
-        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ pre-implicit',ns
-        ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP pre-implicit',ns
+! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX pre-implicit',ns
+! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY pre-implicit',ns
+! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ pre-implicit',ns
+! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP pre-implicit',ns
 
         if (phasefield) call update_halo(phi,lvlhalo)
 
@@ -114,10 +115,10 @@ subroutine TimeMarcher
 
         if (moist) call ImplicitHumidity
 
-        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX post-implicit',ns
-        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY post-implicit',ns
-        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ post-implicit',ns
-        ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP post-implicit',ns
+! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX post-implicit',ns
+! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY post-implicit',ns
+! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ post-implicit',ns
+! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in TEMP post-implicit',ns
 
         call update_halo(vy,lvlhalo)
         call update_halo(vz,lvlhalo)
@@ -171,10 +172,10 @@ subroutine TimeMarcher
 
         if (moist) call UpdateSaturation
 
-        ! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX',ns
-        ! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY',ns
-        ! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ',ns
-        ! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in PHI',ns
+! iF(ANY(IsNaN(vx))) write(*,*)nrank,'NaN in VX',ns
+! iF(ANY(IsNaN(vy))) write(*,*)nrank,'NaN in VY',ns
+! iF(ANY(IsNaN(vz))) write(*,*)nrank,'NaN in VZ',ns
+! iF(ANY(IsNaN(temp))) write(*,*)nrank,'NaN in PHI',ns
 
     end do
 

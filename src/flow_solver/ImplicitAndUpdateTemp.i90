@@ -1,8 +1,9 @@
+# 1 "e:\科研日志\2025年\2月\2025_02_19_【AFiD两相程序开源】\【最终版本_phi1为冰】计划使用\src\flow_solver\ImplicitAndUpdateTemp.F90"
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!                                                         ! 
+!                                                         !
 !    FILE: ImplicitAndUpdateTemp.F90                      !
 !    CONTAINS: subroutine ImplicitAndUpdateTemp           !
-!                                                         ! 
+!                                                         !
 !    PURPOSE: Compute the linear terms associated to      !
 !     the temperature and call the implicit solver.       !
 !     After this routine, the temperature has been        !
@@ -56,7 +57,7 @@ subroutine ImplicitAndUpdateTemp
                 rhs(kc,jc,ic)=(ga*hro(kc,jc,ic)+ro*rutemp(kc,jc,ic) &
                         +alpec*dxxt)*dt
 
-!    Store the non-linear terms for the calculation of 
+!    Store the non-linear terms for the calculation of
 !    the next timestep
 
                 rutemp(kc,jc,ic)=hro(kc,jc,ic)
@@ -107,19 +108,19 @@ subroutine ImplicitAndUpdateTempPhi
 
 !   Calculate second derivative of temperature in the x-direction.
 !   This is the only term calculated implicitly for temperature.
-                ! if (kc.eq.1) then       !CJH Apply lower BC
-                !     dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
-                !         + temp(kc,jc,ic)*ac3ssk(kc) &
-                !         - (ap3ssk(kc)+ac3ssk(kc))*tempbp(1,jc,ic)*TfixS
-                ! elseif(kc.eq.nxm) then  !CJH Apply upper BC
-                !     dxxt = temp(kc,jc,ic)*ac3ssk(kc) &
-                !         + temp(kc-1,jc,ic)*am3ssk(kc) &
-                !         - (am3ssk(kc)+ac3ssk(kc))*temptp(1,jc,ic)*TfixN
-                ! else
-                !     dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
-                !         + temp(kc  ,jc,ic)*ac3ssk(kc) &
-                !         + temp(kc-1,jc,ic)*am3ssk(kc)
-                ! end if
+! if (kc.eq.1) then       !CJH Apply lower BC
+!     dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
+!         + temp(kc,jc,ic)*ac3ssk(kc) &
+!         - (ap3ssk(kc)+ac3ssk(kc))*tempbp(1,jc,ic)*TfixS
+! elseif(kc.eq.nxm) then  !CJH Apply upper BC
+!     dxxt = temp(kc,jc,ic)*ac3ssk(kc) &
+!         + temp(kc-1,jc,ic)*am3ssk(kc) &
+!         - (am3ssk(kc)+ac3ssk(kc))*temptp(1,jc,ic)*TfixN
+! else
+!     dxxt = temp(kc+1,jc,ic)*ap3ssk(kc) &
+!         + temp(kc  ,jc,ic)*ac3ssk(kc) &
+!         + temp(kc-1,jc,ic)*am3ssk(kc)
+! end if
                 if (kc.eq.1) then       !CJH Apply lower BC
 					app = ap3ssk(kc)*((2.0-(phic(kc+1,jc,ic)+phic(kc,jc,ic)))*0.5*(1.0-k_c)+k_c)
 					amm = 0.0d0
@@ -155,7 +156,7 @@ subroutine ImplicitAndUpdateTempPhi
             rhs(kc,jc,ic)=(ga*hro(kc,jc,ic)+ro*rutemp(kc,jc,ic) &
                         +alpec*dxxt/rho/Cp)*dt
 
-!    Store the non-linear terms for the calculation of 
+!    Store the non-linear terms for the calculation of
 !    the next timestep
 
                 rutemp(kc,jc,ic)=hro(kc,jc,ic)

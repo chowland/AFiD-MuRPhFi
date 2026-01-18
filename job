@@ -1,0 +1,10 @@
+#!/bin/sh 
+#SBATCH -J zyp
+#SBATCH -o  AFiD%j.log
+#SBATCH -e  AFiD%j.err
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=64
+export UCX_IB_MLX5_DEVX=no
+export UCX_WARN_UNUSED_ENV_VARS=n
+mpirun ./afid
+

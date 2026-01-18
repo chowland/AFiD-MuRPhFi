@@ -91,7 +91,12 @@ module param
     logical :: specwrite=.false.
 
     integer :: lvlhalo=2
-
+	real    :: E_quick = 3.0/8.0
+	real    :: num_Tmeff = 1
+	real    :: k_c = 4.0 !//rk_sl  ratio of thermal conductivity k_s/k_l
+	real    :: rd_sl = 0.9172     !   // ratio of density f[]/f_gas[]
+	real    :: rCp_sl = 0.4882      ! // ratio of Heat capacity Cp_s/Cp_l
+    real    :: theta_Tmax
 end module param
 
 !************* End of param module******************************
