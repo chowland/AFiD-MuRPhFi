@@ -111,6 +111,7 @@ subroutine ExplicitTermsVZ
             do jc=xstart(2),xend(2)
                 do kc=1,nxm
                     tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(kc,jc,imm))
+                    !tempit=active_T* (  dabs(0.5d0*(temp(kc,jc,ic)+temp(kc,jc,imm))-theta_Tmax)  )**1.895d0
                     dq(kc,jc,ic) = dq(kc,jc,ic) + byct*tempit
                 end do
             end do

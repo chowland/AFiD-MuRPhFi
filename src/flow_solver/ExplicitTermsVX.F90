@@ -120,6 +120,7 @@ subroutine ExplicitTermsVX
                 do kc=2,nxm
                     km=kc-1
                     tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(km,jc,ic))
+                    !tempit=active_T* (  dabs(0.5d0*(temp(kc,jc,ic)+temp(km,jc,ic))-theta_Tmax)  )**1.895d0
                     qcap(kc,jc,ic) = qcap(kc,jc,ic) + byct*tempit
                 end do
             end do

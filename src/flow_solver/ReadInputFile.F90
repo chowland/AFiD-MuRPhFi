@@ -73,6 +73,10 @@ subroutine ReadInputFile
         read(io,301) dummy
         read(io,301) dummy
         read(io,*) pf_D, pf_A, pf_S, pf_Tm, solidtype, pf_IC
+        read(io,301) dummy
+        read(io,301) dummy
+        read(io,301) dummy
+        read(io,*) num_Tmeff,k_c,rd_sl,rCp_sl,theta_Tmax
 301     format(a4)
     close(io)
 

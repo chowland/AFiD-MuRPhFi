@@ -12,8 +12,32 @@ module afid_phasefield
     real, allocatable, dimension(:,:,:) :: phi      !! Phase-field variable
     real, allocatable, dimension(:,:,:) :: ruphi    !! RK storage array for phase-field (previous substep)
     real, allocatable, dimension(:,:,:) :: hphi     !! RK storage array for phase-field
+    real, allocatable, dimension(:,:,:) :: hphi0    !! RK storage array for phase-field zyp
     real, allocatable, dimension(:,:,:) :: phic     !! Interpolated phase-field on coarse grid (also used to store d(phi)/dt)
     real, allocatable, dimension(:,:,:) :: tempr    !! Interpolated temperature field on refined grid
+    real, allocatable, dimension(:,:,:) :: potx      !! Auxiliary variable
+	real, allocatable, dimension(:,:,:) :: poty      !! Auxiliary variable
+	real, allocatable, dimension(:,:,:) :: potz      !! Auxiliary variable		
+
+    real, allocatable, dimension(:,:,:) :: potxt      !! Auxiliary variable
+	real, allocatable, dimension(:,:,:) :: potyt      !! Auxiliary variable
+	real, allocatable, dimension(:,:,:) :: potzt      !! Auxiliary variable		
+
+    real, allocatable, dimension(:,:,:) :: phi_x      !! x-gradient of a Phase-field
+	real, allocatable, dimension(:,:,:) :: phi_y      !! y-gradient of a Phase-field
+	real, allocatable, dimension(:,:,:) :: phi_z      !! z-gradient of a Phase-field
+	
+	real, allocatable, dimension(:,:,:) :: T_x      !! x gradient of the temperature field
+	real, allocatable, dimension(:,:,:) :: T_y      !! y gradient of the temperature field
+	real, allocatable, dimension(:,:,:) :: T_z      !! z gradient of the temperature field
+	
+	real, allocatable, dimension(:,:,:) :: phit        !! Estimate the Phase-field
+	real, allocatable, dimension(:,:,:) :: Tm_eff      !! equivalent melting temperature
+	real, allocatable, dimension(:,:,:) :: Tm_eff2     !! Auxiliary variable
+	
+	real, allocatable, dimension(:,:,:) :: cut_type
+	real, allocatable, dimension(:,:,:) :: cut_type2
+	real, allocatable, dimension(:,:,:) :: RHS_Tm
 
     real :: pf_A        !! Phase-field Gibbs-Thomson parameter
     real :: pf_eps      !! Phase-field interface thickness
@@ -35,13 +59,40 @@ subroutine InitPFVariables
 
     ! Main array with ghost cells
     call AllocateReal3DArray(phi,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+    call AllocateReal3DArray(phit,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+	
+	call AllocateReal3DArray(potx,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo) !zyp
+	call AllocateReal3DArray(poty,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)  !zyp
+	call AllocateReal3DArray(potz,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)   !zyp
+
+	call AllocateReal3DArray(potxt,1,nxr,xstartr(2),xendr(2),xstartr(3),xendr(3))
+	call AllocateReal3DArray(potyt,1,nxr,xstartr(2),xendr(2),xstartr(3),xendr(3))
+	call AllocateReal3DArray(potzt,1,nxr,xstartr(2),xendr(2),xstartr(3),xendr(3))
+
+	call AllocateReal3DArray(phi_x,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo) !zyp
+	call AllocateReal3DArray(phi_y,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)  !zyp
+	call AllocateReal3DArray(phi_z,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)   !zyp
     ! Refined temperature array
     call AllocateReal3DArray(tempr,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+	call AllocateReal3DArray(Tm_eff,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+	Tm_eff=pf_Tm
+	call AllocateReal3DArray(Tm_eff2,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+	Tm_eff2=pf_Tm
+	call AllocateReal3DArray(RHS_Tm,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)
+	
+	
+	call AllocateReal3DArray(T_x,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo) !zyp
+	call AllocateReal3DArray(T_y,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)  !zyp
+	call AllocateReal3DArray(T_z,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)   !zyp
 
+	call AllocateReal3DArray(cut_type, 1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)  !zyp
+	cut_type=1.0
+	call AllocateReal3DArray(cut_type2,1,nxr,xstartr(2)-lvlhalo,xendr(2)+lvlhalo,xstartr(3)-lvlhalo,xendr(3)+lvlhalo)   !zyp
+	cut_type2=1.0
     ! Arrays without ghost cells
     call AllocateReal3DArray(ruphi,1,nxr,xstartr(2),xendr(2),xstartr(3),xendr(3))
     call AllocateReal3DArray(hphi,1,nxr,xstartr(2),xendr(2),xstartr(3),xendr(3))
-
+	call AllocateReal3DArray(hphi0,1,nxr,xstartr(2),xendr(2),xstartr(3),xendr(3))
     ! Coarse array for phi or d(phi)/dt
     call AllocateReal3DArray(phic,1,nx,xstart(2)-lvlhalo,xend(2)+lvlhalo,xstart(3)-lvlhalo,xend(3)+lvlhalo)
 
@@ -64,9 +115,33 @@ subroutine DeallocatePFVariables
     ! Arrays without ghost cells
     call DestroyReal3DArray(ruphi)
     call DestroyReal3DArray(hphi)
-
+    call DestroyReal3DArray(hphi0)
     ! Coarse array for phi or d(phi)/dt
     call DestroyReal3DArray(phic)
+	call DestroyReal3DArray(phit) !zyp
+	
+	call DestroyReal3DArray(potx) !zyp
+	call DestroyReal3DArray(poty) !zyp
+	call DestroyReal3DArray(potz) !zyp
+	
+	call DestroyReal3DArray(potxt) !zyp
+	call DestroyReal3DArray(potyt) !zyp
+	call DestroyReal3DArray(potzt) !zyp
+	
+	call DestroyReal3DArray(phi_x) !zyp
+	call DestroyReal3DArray(phi_y) !zyp
+	call DestroyReal3DArray(phi_z) !zyp
+	
+	call DestroyReal3DArray(T_x) !zyp
+	call DestroyReal3DArray(T_y) !zyp
+	call DestroyReal3DArray(T_z) !zyp
+	
+	call DestroyReal3DArray(Tm_eff) !zyp
+	call DestroyReal3DArray(Tm_eff2) !zyp
+	
+	call DestroyReal3DArray(cut_type) !zyp
+	call DestroyReal3DArray(cut_type2) !zyp
+	call DestroyReal3DArray(RHS_Tm) !zyp
 
     ! Second derivative coefficients
     call DestroyReal1DArray(ap3spkr)
@@ -151,9 +226,9 @@ subroutine set_flat_interface(h0, ice_above)
         do j=xstartr(2),xendr(2)
             do k=1,nxmr
                 if (ice_above) then
-                    phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - h0)/2/pf_eps))
+                    phi(k,j,i) = 0.5*(1.0 + tanh((xmr(k) - h0)/2./sqrt(2.0)/pf_eps))
                 else
-                    phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - h0)/2/pf_eps))
+                    phi(k,j,i) = 0.5*(1.0 - tanh((xmr(k) - h0)/2./sqrt(2.0)/pf_eps))
                 end if
             end do
         end do
@@ -300,7 +375,7 @@ subroutine set_ice_disc(r0)
         do j=xstartr(2),xendr(2)
             do k=1,nxmr
                 r = sqrt((xmr(k) - 0.5*alx3)**2 + (ymr(j) - 0.5*ylen)**2)
-                phi(k,j,i) = 0.5*(1.0 - tanh(0.5*(r - r0)/pf_eps))
+                phi(k,j,i) =0.5*(1.0 - tanh(0.5*(r - r0)/sqrt(2.0)/pf_eps))
             end do
         end do
     end do
@@ -334,7 +409,7 @@ subroutine set_ice_sphere(r0)
         do j=xstartr(2),xendr(2)
             do k=1,nxmr
                 r = sqrt((xmr(k) - 0.5*alx3)**2 + (ymr(j) - 0.5*ylen)**2 + (zmr(i) - 0.5*zlen)**2)
-                phi(k,j,i) = 0.5*(1.0 - tanh(0.5*(r - r0)/pf_eps))
+                phi(k,j,i) = 0.5*(1.0 - tanh(0.5*(r - r0)/sqrt(2.0)/pf_eps))
             end do
         end do
     end do
@@ -342,21 +417,19 @@ end subroutine set_ice_sphere
 
 !> Compute the explicit terms for the phase-field evolution
 !! and store the result in `hphi`
-subroutine ExplicitPhase
+subroutine ExplicitPhase_CalcNorm
     integer :: ic, jc, kc
-    integer :: im, jm
-    integer :: ip, jp
+    integer :: im, jm, km
+    integer :: ip, jp, kp
+	real(8) :: udyr, udzr    !!zyp
+	real(8) :: cx, cy, cz, tx, ty, tz       !!zyp
+	real(8) :: grad,keep=1.0e-6
 
-    real :: udyrq, udzrq
-    real :: pf_B, nlphi
-    real :: dyyp, dzzp
+    udzr = dzr*0.5    !!zyp
+    udyr = dyr*0.5      !!zyp
 
-    ! Nonlinear term prefactor
-    pf_B = pf_D/(pf_eps)**2
 
-    ! Diffusion coefficients
-    udzrq = pf_D*dzqr
-    udyrq = pf_D*dyqr
+	
 
     do ic=xstartr(3),xendr(3)
         im = ic - 1
@@ -365,20 +438,171 @@ subroutine ExplicitPhase
             jm = jc - 1
             jp = jc + 1
             do kc=1,nxmr
+			    km = kc - 1
+				kp = kc + 1
+
+
+
+				if (kc.eq.1) then
+                    cx = (-3./2.*phi(kc,jc,ic)  +2.*phi(kc+1,jc,ic)   -1./2.*phi(kc+2,jc,ic))*dxr
+					tx = (-3./2.*tempr(kc,jc,ic)+2.*tempr(kc+1,jc,ic) -1./2.*tempr(kc+2,jc,ic))*dxr
+				elseif(kc.eq.nxmr) then
+					cx = ( 3./2.*phi(kc,jc,ic)  -2.*phi(kc-1,jc,ic)   +1./2*phi(kc-2,jc,ic))*dxr
+					tx = ( 3./2.*tempr(kc,jc,ic)-2.*tempr(kc-1,jc,ic) +1./2*tempr(kc-2,jc,ic))*dxr
+                else
+					cx = (phi(kp,jc,ic) - phi(km,jc,ic))*0.5*dxr
+					tx = (tempr(kp,jc,ic) - tempr(km,jc,ic))*0.5*dxr
+                end if
+
+				cy = (phi(kc,jp,ic) - phi(kc,jm,ic))*udyr 
+				cz = (phi(kc,jc,ip) - phi(kc,jc,im))*udzr 
+				
+				grad =dsqrt(cx*cx+cy*cy+cz*cz)
+				
+				ty = (tempr(kc,jp,ic) - tempr(kc,jm,ic))*udyr
+				tz = (tempr(kc,jc,ip) - tempr(kc,jc,im))*udzr	!tempr是插值在最密网格上的
+				
+				T_x(kc,jc,ic) = tx
+				T_y(kc,jc,ic) = ty
+				T_z(kc,jc,ic) = tz
+				
+				if (grad>=keep) then
+					potx(kc,jc,ic)=cx/grad
+					poty(kc,jc,ic)=cy/grad
+					potz(kc,jc,ic)=cz/grad
+				else 
+					potx(kc,jc,ic)=0.0
+					poty(kc,jc,ic)=0.0
+					potz(kc,jc,ic)=0.0				
+				end if
+				
+            end do
+
+        end do
+    end do
+	
+	
+	call update_halo(potx,lvlhalo)
+	call update_halo(poty,lvlhalo)
+	call update_halo(potz,lvlhalo)
+	
+	call update_halo(T_x,lvlhalo)
+	call update_halo(T_y,lvlhalo)
+	call update_halo(T_z,lvlhalo)
+	
+end subroutine ExplicitPhase_CalcNorm
+
+
+
+subroutine ExplicitPhase_EquilState
+    integer :: ic, jc, kc
+    integer :: im, jm, km
+    integer :: ip, jp, kp
+	
+    real(8) :: udyrq, udzrq
+    real(8) :: pf_B, nlphi
+    real(8) :: dyyp, dzzp
+
+	real(8) :: grad, keep=1.0e-6,cof_div
+	real(8) :: cx1,cx2,  cy2,cy1,  cz2,cz1
+	real(8) :: fx1,fx2,  fy2,fy1,  fz2,fz1
+	real(8) :: divphix, divphiy, divphiz
+	
+    ! Nonlinear term prefactor
+    pf_B = pf_D/(pf_eps)**2
+    cof_div = pf_D/dsqrt(2.0)/pf_eps
+    ! Diffusion coefficients
+    udzrq = pf_D*dzqr
+    udyrq = pf_D*dyqr
+
+
+	call ExplicitPhase_CalcNorm
+
+    do ic=xstartr(3),xendr(3)
+        im = ic - 1
+        ip = ic + 1
+        do jc=xstartr(2),xendr(2)
+            jm = jc - 1
+            jp = jc + 1
+            do kc=1,nxmr
+			    km = kc - 1
+				kp = kc + 1
+				
+
+				if (kc.eq.1) then
+					fx1=  (3.0*(phi(kc,jc,ic)    *(1.-phi(kc,jc,ic))    *potx(kc,jc,ic)) &
+						      -(phi(kc+1,jc,ic)  *(1.-phi(kc+1,jc,ic))  *potx(kc+1,jc,ic)))/2.d0
+				elseif(kc.eq.nxmr) then
+					fx2=  (3.0*(phi(kc,jc,ic)    *(1.-phi(kc,jc,ic))    *potx(kc,jc,ic)) &
+						      -(phi(kc-1,jc,ic)  *(1.-phi(kc-1,jc,ic))  *potx(kc-1,jc,ic)))/2.d0
+				else
+					fx2= (phi(kc+1,jc,ic)*(1.-phi(kc+1,jc,ic))*potx(kc+1,jc,ic)+ &
+						  phi(kc,jc,ic)  *(1.-phi(kc,jc,ic))  *potx(kc,jc,ic))/2.d0
+
+					fx1= (phi(kc-1,jc,ic)*(1.-phi(kc-1,jc,ic))*potx(kc-1,jc,ic)+ &
+						  phi(kc,jc,ic)  *(1.-phi(kc,jc,ic))  *potx(kc,jc,ic))/2.d0	
+				end if	
+
+				fy2= (phi(kc,jc+1,ic)*(1.-phi(kc,jc+1,ic))*poty(kc,jc+1,ic)+ &
+					  phi(kc,jc,ic)  *(1.-phi(kc,jc,ic))  *poty(kc,jc,ic))/2.d0
+
+				fy1= (phi(kc,jc-1,ic)*(1.-phi(kc,jc-1,ic))*poty(kc,jc-1,ic)+ &
+					  phi(kc,jc,ic)  *(1.-phi(kc,jc,ic))  *poty(kc,jc,ic))/2.d0
+	
+				fz2= (phi(kc,jc,ic+1)*(1.-phi(kc,jc,ic+1))*potz(kc,jc,ic+1)+ &
+					  phi(kc,jc,ic)  *(1.-phi(kc,jc,ic))  *potz(kc,jc,ic))/2.d0
+
+				fz1= (phi(kc,jc,ic-1)*(1.-phi(kc,jc,ic-1))*potz(kc,jc,ic-1)+ &
+					  phi(kc,jc,ic)  *(1.-phi(kc,jc,ic))  *potz(kc,jc,ic))/2.d0
+
+					  
+				divphix  = (fx2-fx1)*cof_div*dxr
+				divphiy  = (fy2-fy1)*cof_div*dyr
+				divphiz  = (fz2-fz1)*cof_div*dzr
                 ! yy second derivative of phi
                 dyyp = (phi(kc,jp,ic) - 2.0*phi(kc,jc,ic) + phi(kc,jm,ic))*udyrq
                 ! zz second derivative of phi
                 dzzp = (phi(kc,jc,ip) - 2.0*phi(kc,jc,ic) + phi(kc,jc,im))*udzrq
-                ! Extra nonlinear terms
-                nlphi = pf_B*phi(kc,jc,ic)*(1.0 - phi(kc,jc,ic)) &
-                        *(1.0 - 2.0*phi(kc,jc,ic) + pf_A*(tempr(kc,jc,ic) - pf_Tm))
+				
+				!hphi(kc,jc,ic) = dyyp + dzzp + nlphi - (divphix+divphiy+divphiz)
+				hphi0(kc,jc,ic) = dyyp + dzzp  - (divphix+divphiy+divphiz)
+				! nlphi = pf_B*phi(kc,jc,ic)*(1.0 - phi(kc,jc,ic)) &
+                       ! *(1.0 - 2.0*phi(kc,jc,ic) + pf_A*(tempr(kc,jc,ic) - pf_Tm))
+                ! hphi(kc,jc,ic) = dyyp + dzzp - nlphi
+            end do
+        end do
+    end do
 
-                hphi(kc,jc,ic) = dyyp + dzzp - nlphi
+end subroutine ExplicitPhase_EquilState
+
+
+
+
+subroutine ExplicitPhase
+    integer :: ic, jc, kc
+    real :: pf_B, nlphi
+
+    ! Nonlinear term prefactor
+    pf_B = pf_D/(pf_eps)**2
+    do ic=xstartr(3),xendr(3)
+        do jc=xstartr(2),xendr(2)
+            do kc=1,nxmr
+
+                ! Extra nonlinear terms
+                nlphi = pf_B*phi(kc,jc,ic)*(1.0 - phi(kc,jc,ic))&
+                               *(+pf_A*(tempr(kc,jc,ic) - Tm_eff(kc,jc,ic)))
+
+				
+				hphi(kc,jc,ic) = hphi0(kc,jc,ic)- nlphi
+
             end do
         end do
     end do
 
 end subroutine ExplicitPhase
+
+
+
 
 !> Compute the implicit terms for the phase-field evolution
 subroutine ImplicitPhase
@@ -418,6 +642,47 @@ subroutine ImplicitPhase
     call SolveImpEqnUpdate_Phi
 
 end subroutine ImplicitPhase
+
+!> Compute the implicit terms for the phase-field evolution
+subroutine ImplicitPhase_forecast
+    integer :: jc,kc,ic
+    real(8)    :: alpec,dxxp
+
+    alpec=al*pf_D
+
+    do ic=xstartr(3),xendr(3)
+        do jc=xstartr(2),xendr(2)
+            do kc=1,nxmr
+
+                ! Second xx derivative
+                ! Apply lower BC (d/dx(phi)=0)
+                if (kc.eq.1) then
+                    dxxp = phi(kc+1,jc, ic)*ap3spkr(kc) &
+                         + phi(kc  ,jc, ic)*ac3spkr(kc)
+                ! Apply upper BC (d/dx(phi)=0)
+                elseif(kc.eq.nxmr) then
+                    dxxp = phi(kc  ,jc,ic)*ac3spkr(kc) &
+                         + phi(kc-1,jc,ic)*am3spkr(kc)
+                else
+                    dxxp = phi(kc+1,jc,ic)*ap3spkr(kc) &
+                         + phi(kc  ,jc,ic)*ac3spkr(kc) &
+                         + phi(kc-1,jc,ic)*am3spkr(kc)
+                end if
+
+                rhsr(kc,jc,ic) = (ga*hphi(kc,jc,ic) + ro*ruphi(kc,jc,ic) + alpec*dxxp)*dt
+
+                !ruphi(kc,jc,ic) = hphi(kc,jc,ic)
+
+            end do
+        end do
+    end do
+
+!  Solve equation and update salinity
+   call SolveImpEqnUpdate_Phi_forecast
+
+end subroutine ImplicitPhase_forecast
+
+
 
 !> Solve the implicit system for the phase-field
 !! and update the global variable phi
@@ -459,11 +724,492 @@ subroutine SolveImpEqnUpdate_Phi
         do jc=xstartr(2),xendr(2)
             do kc=1,nxmr
                 phi(kc,jc,ic) = phi(kc,jc,ic) + rhsr(kc,jc,ic)
+                if (phi(kc,jc,ic)<0.0 ) phi(kc,jc,ic)=0.0
+				if (phi(kc,jc,ic)>1.0 ) phi(kc,jc,ic)=1.0
             end do
         end do
     end do
 
 end subroutine SolveImpEqnUpdate_Phi
+
+
+!> Solve the implicit system for the phase-field
+!! and update the global variable phi
+
+subroutine SolveImpEqnUpdate_Phi_forecast
+    integer :: jc,kc,info,ipkv(nxr),ic,nrhs
+    real(8) :: betadx,ackl_b
+    real(8) :: amkT(nxmr-1),ackT(nxmr),apkT(nxmr-1),appk(nxmr-2)
+
+    betadx=0.5d0*al*dt*pf_D
+
+    ! Construct tridiagonal matrix for LHS
+    ! (normalised to prevent floating point errors)
+    do kc=1,nxmr
+        ackl_b=1.0d0/(1.-ac3spkr(kc)*betadx)
+        if (kc > 1) amkT(kc-1) = -am3spkr(kc)*betadx*ackl_b
+        ackT(kc)=1.0d0
+        if (kc < nxmr) apkT(kc) = -ap3spkr(kc)*betadx*ackl_b
+    end do
+
+    ! Factor the tridiagonal matrix
+    call dgttrf(nxmr,amkT,ackT,apkT,appk,ipkv,info)
+    
+    ! Rescale RHS to match rescaling of LHS
+    nrhs=(xendr(3)-xstartr(3)+1)*(xendr(2)-xstartr(2)+1)
+    do ic=xstartr(3),xendr(3)
+        do jc=xstartr(2),xendr(2)
+            do kc=1,nxmr
+                ackl_b=1.0/(1.0-ac3spkr(kc)*betadx)
+                rhsr(kc,jc,ic)=rhsr(kc,jc,ic)*ackl_b
+            end do
+        end do
+    end do
+
+    ! Solve tridiagonal system
+    call dgttrs('N',nxmr,nrhs,amkT,ackT,apkT,appk,ipkv,rhsr,nxmr,info)
+
+    ! Update global variable
+    do ic=xstartr(3),xendr(3)
+        do jc=xstartr(2),xendr(2)
+            do kc=1,nxmr
+                phit(kc,jc,ic) = phi(kc,jc,ic) + rhsr(kc,jc,ic)
+				
+				
+				if (phit(kc,jc,ic)<0.0 ) phit(kc,jc,ic)=0.0
+				if (phit(kc,jc,ic)>1.0 ) phit(kc,jc,ic)=1.0
+            end do
+        end do
+    end do
+	
+	call update_halo(phit,lvlhalo)
+	
+end subroutine SolveImpEqnUpdate_Phi_forecast
+
+
+subroutine TmEffCalculate
+
+    integer :: ic, jc, kc
+    integer :: im, jm, km
+    integer :: ip, jp, kp
+    integer :: di, dj, dk
+    ! integer :: info,ipkv(nxr),nrhs
+    ! real(8) :: betadx,ackl_b
+    ! real(8) :: amkT(nxmr-1),ackT(nxmr),apkT(nxmr-1),appk(nxmr-2)
+
+	real(8) :: phidx(nxmr)   !!zyp
+	real(8) :: udyr, udzr    !!zyp
+	real(8) :: cx=0.0, cy=0.0, cz=0.0, tx, ty, tz       !!zyp
+	real(8) :: grad=0.0, keep=1.0e-6,cof_div
+	!real(8) :: cx1,cx2,  cy2,cy1,  cz2,cz1					
+	real(8) :: T_n=0.,T_interf=0.,delta_T=0.
+    real :: phit_center, phit_shift
+	logical :: condition_met
+    cof_div = pf_D/dsqrt(2.0)/pf_eps
+
+    udzr = dzr*0.5
+    udyr = dyr*0.5
+
+    do kc=1,nxmr
+        !phidx(kc) = 0.5*dxr/g3rmr(kc)
+		phidx(kc) = 0.5*dxr
+    end do
+
+    do ic=xstartr(3),xendr(3)
+        im = ic - 1
+        ip = ic + 1
+        do jc=xstartr(2),xendr(2)
+            jm = jc - 1
+            jp = jc + 1
+            do kc=1,nxmr
+			    km = kc - 1
+				kp = kc + 1
+
+
+				if (kc.eq.1) then
+                    cx = (-3./2*phit(kc,jc,ic)  +2.*phit(kc+1,jc,ic)   -1./2.*phit(kc+2,jc,ic))*dxr
+				elseif(kc.eq.nxmr) then
+					cx = (3./2.*phit(kc,jc,ic)  -2.*phit(kc-1,jc,ic)   +1./2.*phit(kc-2,jc,ic))*dxr
+                else
+					cx = (phit(kp,jc,ic) - phit(km,jc,ic))*0.5*dxr
+                end if
+
+				cy = (phit(kc,jp,ic) - phit(kc,jm,ic))*udyr 
+				cz = (phit(kc,jc,ip) - phit(kc,jc,im))*udzr 
+				
+				grad =dsqrt(cx*cx+cy*cy+cz*cz)
+				
+				phi_x(kc,jc,ic) = cx
+				phi_y(kc,jc,ic) = cy
+				phi_z(kc,jc,ic) = cz
+				
+				if (grad>=keep) then
+					potxt(kc,jc,ic)=cx/grad
+					potyt(kc,jc,ic)=cy/grad
+					potzt(kc,jc,ic)=cz/grad
+				else 
+					potxt(kc,jc,ic)=0.0
+					potyt(kc,jc,ic)=0.0
+					potzt(kc,jc,ic)=0.0				
+				end if
+
+            end do
+        end do
+    end do
+	
+	call update_halo(phi_x,lvlhalo)
+	call update_halo(phi_y,lvlhalo)
+	call update_halo(phi_z,lvlhalo)
+
+	
+	!At each step, cut_type is initialized
+    cut_type(:,:,:)=1.0
+	! do ic=xstartr(3),xendr(3)
+	! 		do jc=xstartr(2),xendr(2)
+	! 			do kc=1,nxmr
+	! 				cut_type(kc,jc,ic)=1.0
+	! 			end do
+	! 	end do
+	! end do			
+	
+	!1D
+	if (nymr<=2 .and. nzmr<=2)then
+	    do ic=xstartr(3),xendr(3)
+			do jc=xstartr(2),xendr(2)
+				do kc=1,nxmr
+				    if (kc==1) then
+						if( (phit(kc,jc,ic)-0.5)*(phit(kc+1,jc  ,ic  )-0.5)<=0.0) cut_type(kc,jc,ic)=-1.0
+						
+					elseif(kc==nxmr)then
+						if( (phit(kc,jc,ic)-0.5)*(phit(kc-1,jc  ,ic  )-0.5)<=0.0) cut_type(kc,jc,ic)=-1.0
+						
+					else
+						if( (phit(kc,jc,ic)-0.5)*(phit(kc+1,jc  ,ic  )-0.5)<=0.0 .OR. &
+							(phit(kc,jc,ic)-0.5)*(phit(kc-1,jc  ,ic  )-0.5)<=0.0)then
+							cut_type(kc,jc,ic)=-1.0
+						end if	
+					end if
+				end do
+			end do
+		end do
+	!2D
+	elseif	(nzmr<=2 .and. nymr>2)then
+        do ic = xstartr(3), xendr(3)
+            do jc = xstartr(2), xendr(2)
+                do kc = 2, nxmr - 1
+                    phit_center = phit(kc, jc, ic) - 0.5
+                    condition_met = .false.
+                    
+                    ! Check adjacent points in a loop
+                    do dk = -1, 1
+                        do dj = -1, 1
+                      
+                            ! Skip the center point itself
+                            if (di == 0 .and. dj == 0) cycle
+                            
+                            ! Check the condition
+                            if (phit_center * (phit(kc + dk, jc + dj, ic) - 0.5) <= 0.0) then
+                                condition_met = .true.
+                                exit
+                            end if
+                         
+                            if (condition_met) exit
+                        end do
+                        if (condition_met) exit
+                    end do
+                    
+                    if (condition_met) then
+                        cut_type(kc, jc, ic) = -1.0
+                    end if
+                end do
+                
+                ! Set boundary conditions
+                cut_type(1, jc, ic) = cut_type(2, jc, ic)
+                cut_type(nxmr, jc, ic) = cut_type(nxmr - 1, jc, ic)
+            end do
+        end do
+        
+
+	!3D
+	else !3d
+	
+		do ic=xstartr(3),xendr(3)
+			do jc=xstartr(2),xendr(2)
+				do kc=2,nxmr-1                
+                    phit_center = phit(kc,jc,ic) - 0.5
+                    condition_met = .false.
+                    do dk = -1, 1
+                        do dj = -1, 1
+                            do di = -1, 1
+                                ! Skip the center point itself
+                                if (di == 0 .and. dj == 0 .and. dk == 0) cycle
+                                ! Check the condition
+                                if (phit_center * (phit(kc+dk, jc+dj, ic+di) - 0.5) <= 0.0) then
+                                    condition_met = .true.
+                                    exit
+                                end if
+                            end do
+                            if (condition_met) exit
+                        end do
+                        if (condition_met) exit
+                    end do
+
+                    if (condition_met) then
+                        cut_type(kc,jc,ic) = -1.0
+                    end if
+				end do
+                cut_type(1,jc,ic)=cut_type(2,jc,ic)
+                cut_type(nxmr,jc,ic)=cut_type(nxmr-1,jc,ic)
+			end do
+		end do
+	endif
+	
+	call update_halo(cut_type,lvlhalo)
+	!Calculate Tm_eff
+    do ic=xstartr(3),xendr(3)
+        do jc=xstartr(2),xendr(2)
+            do kc=1,nxmr
+			if (cut_type(kc,jc,ic) <-0.5 ) then 
+				T_n= T_x(kc,jc,ic)*potxt(kc,jc,ic)+ &
+				     T_y(kc,jc,ic)*potyt(kc,jc,ic)+ &
+					 T_z(kc,jc,ic)*potzt(kc,jc,ic)
+					 
+				T_interf = tempr(kc,jc,ic)+(0.5- phit(kc,jc,ic))/&
+				         (sqrt( (phi_x(kc,jc,ic))**2+(phi_y(kc,jc,ic))**2+(phi_z(kc,jc,ic))**2 ) +1.e-15) *T_n
+
+				delta_T = T_interf -pf_Tm
+				Tm_eff(kc,jc,ic) = Tm_eff(kc,jc,ic) -delta_T	
+			endif
+
+            end do
+        end do
+    end do
+	
+
+    
+	call update_halo(Tm_eff,lvlhalo)
+
+end subroutine TmEffCalculate
+
+
+
+subroutine TmEffAverage
+
+	integer :: ic, jc, kc
+    integer :: di, dj, dk
+	real(8) :: err_AC=1.e-10
+  	real(8) :: Large = 1.e15
+	real(8), dimension(3, 3, 3) :: L, w
+	real(8) :: weight_sum
+	L(:,:,:) = Large
+	w(:,:,:) = 0.0
+
+	do ic=xstartr(3),xendr(3)
+		do jc=xstartr(2),xendr(2)
+			do kc=2,nxmr-1
+                L(:,:,:) = Large
+                w(:,:,:) = 0.0	    
+                do di = -1, 1
+                    do dj = -1, 1
+                        do dk = -1, 1
+                            if (cut_type(kc+dk, jc+dj, ic+di) < 0.0) then
+                                L(dk+2, dj+2, di+2) = abs((phit(kc + dk, jc + dj, ic + di) - 0.5)  &
+                                                            /(sqrt((phi_x(kc + dk, jc + dj, ic + di))**2 &
+                                                                + (phi_y(kc + dk, jc + dj, ic + di))**2 &
+                                                                + (phi_z(kc + dk, jc + dj, ic + di))**2) + err_AC))
+                            end if
+                        end do
+                    end do
+                end do
+                if (cut_type(kc, jc, ic) < 0)then 
+                    ! Calculat weight_sum
+                    weight_sum = 0.0
+                    do di = -1, 1
+                        do dj = -1, 1
+                            do dk = -1, 1
+                                    weight_sum = weight_sum + 1.0 / (L(dk+2, dj+2, di+2) + err_AC)
+                            end do
+                        end do
+                    end do
+                    ! Calculat w
+                    do di = -1, 1
+                        do dj = -1, 1
+                            do dk = -1, 1
+                                    w(dk+2, dj+2, di+2) = 1.0 / (L(dk+2, dj+2, di+2) + err_AC) / weight_sum							
+                            end do
+                        end do
+                    end do
+
+                    Tm_eff2(kc, jc, ic) = 0.0
+                    do di = -1, 1
+                        do dj = -1, 1
+                            do dk = -1, 1									
+                                Tm_eff2(kc, jc, ic) = Tm_eff2(kc, jc, ic) + &
+                                                        w(dk+2, dj+2, di+2) * Tm_eff(kc + dk, jc + dj, ic + di)							
+                            end do
+                        end do
+                    end do
+                else
+                    Tm_eff2(kc,jc,ic) =Tm_eff(kc,jc,ic) 
+                endif 
+				
+
+			end do
+		end do
+	end do
+
+	do ic=xstartr(3),xendr(3)
+        do jc=xstartr(2),xendr(2)
+            do kc=1,nxmr	
+				Tm_eff(kc,jc,ic) =Tm_eff2(kc,jc,ic) 
+	        end do
+        end do
+    end do
+	
+	call update_halo(Tm_eff,lvlhalo)
+	
+end subroutine TmEffAverage
+
+
+
+subroutine TmEffExtend
+	!%%%%Expand along the normal direction
+	integer :: ic, jc, kc
+	real(8) :: dtau
+	real(8) :: pspx =0.0
+	real(8) :: pspy=0.0
+	real(8) :: pspz=0.0
+	integer :: kkk
+
+	dtau = 0.8*min(min(1./dxr,1./dyr),1./dzr)
+	do kkk=0,1
+    
+
+        !----------------------------------advet plus
+        do ic=xstartr(3),xendr(3)
+            do jc=xstartr(2),xendr(2)
+                do kc=1,nxmr
+                !do kc=2,nxmr-1
+
+                if (cut_type(kc,jc,ic) >0.5  .AND. (phit(kc,jc,ic)-0.5)>0)then
+
+                    if (potxt(kc,jc,ic)<0. .AND.(kc+1)<=nxmr)then
+                        pspx=(Tm_eff(kc+1,jc,ic)-Tm_eff(kc,jc,ic))*dxr
+                    elseif(potxt(kc,jc,ic)>0. .AND.(kc-1)>=1)then
+                        pspx=(Tm_eff(kc,jc,ic)-Tm_eff(kc-1,jc,ic))*dxr
+                    else
+                        pspx=0.0
+                    endif
+
+
+                    if (potyt(kc,jc,ic)<0.)then
+                        pspy=(Tm_eff(kc,jc+1,ic)-Tm_eff(kc,jc,ic))*dyr
+                    elseif (potyt(kc,jc,ic)>0.)then
+                        pspy=(Tm_eff(kc,jc,ic)-Tm_eff(kc,jc-1,ic))*dyr
+                    else 
+                        pspy=0.0
+                    endif
+                    
+                    if (potzt(kc,jc,ic)<0.)then
+                        pspz=(Tm_eff(kc,jc,ic+1)-Tm_eff(kc,jc,ic))*dzr
+                    elseif (potzt(kc,jc,ic)>0.)then
+                        pspz=(Tm_eff(kc,jc,ic)-Tm_eff(kc,jc,ic-1))*dzr
+                    else 
+                        pspz=0.0
+                    endif 
+
+
+                    RHS_Tm(kc,jc,ic)=potxt(kc,jc,ic)*pspx + potyt(kc,jc,ic)*pspy + potzt(kc,jc,ic)*pspz  
+                endif
+                end do
+            end do
+        end do
+        
+        do ic=xstartr(3),xendr(3)
+            do jc=xstartr(2),xendr(2)
+                do kc=1,nxmr
+                !do kc=2,nxmr-1
+                    if (cut_type(kc,jc,ic) >0.5 .AND. (phit(kc,jc,ic)-0.5)>0.) &
+                        Tm_eff(kc,jc,ic) = Tm_eff(kc,jc,ic) - dtau*RHS_Tm(kc,jc,ic)  
+                end do
+            end do
+        end do
+        
+        !----------------------------------advet minus
+        do ic=xstartr(3),xendr(3)
+            do jc=xstartr(2),xendr(2)
+                do kc=1,nxmr
+                !do kc=2,nxmr-1
+                    
+                if (cut_type(kc,jc,ic) >-0.5 .AND. (phit(kc,jc,ic)-0.5)<0.)then
+
+                    if (-potxt(kc,jc,ic)<0. .AND.(kc+1)<=nxmr)then
+                        pspx=(Tm_eff(kc+1,jc,ic)-Tm_eff(kc,jc,ic))*dxr
+                    elseif(-potxt(kc,jc,ic)>0. .AND.(kc-1)>=1)then
+                        pspx=(Tm_eff(kc,jc,ic)-Tm_eff(kc-1,jc,ic))*dxr
+                    else
+                        pspx=0.0
+                    endif
+                    
+                    if (-potyt(kc,jc,ic)<0.) then
+                        pspy=(Tm_eff(kc,jc+1,ic)-Tm_eff(kc,jc,ic))*dyr
+                    elseif (-potyt(kc,jc,ic)>0.) then
+                        pspy=(Tm_eff(kc,jc,ic)-Tm_eff(kc,jc-1,ic))*dyr
+                    else 
+                        pspy=0.0
+                    endif
+                    
+                    if (-potzt(kc,jc,ic)<0.) then
+                        pspz=(Tm_eff(kc,jc,ic+1)-Tm_eff(kc,jc,ic))*dzr
+                    elseif (-potzt(kc,jc,ic)>0.) then
+                        pspz=(Tm_eff(kc,jc,ic)-Tm_eff(kc,jc,ic-1))*dzr
+                    else 
+                        pspz=0.0
+                    endif
+                    
+                    RHS_Tm(kc,jc,ic)=-potxt(kc,jc,ic)*pspx - potyt(kc,jc,ic)*pspy - potzt(kc,jc,ic)*pspz 
+                endif
+                
+
+                
+                end do
+            end do
+        end do
+        
+        do ic=xstartr(3),xendr(3)
+            do jc=xstartr(2),xendr(2)
+                do kc=1,nxmr
+                !do kc=2,nxmr-1
+                    if (cut_type(kc,jc,ic) >-0.5 .AND. (phit(kc,jc,ic)-0.5)<0.) &
+                        Tm_eff(kc,jc,ic) = Tm_eff(kc,jc,ic) - dtau*RHS_Tm(kc,jc,ic)
+                end do
+            end do
+        end do
+
+        call update_halo(Tm_eff,lvlhalo)
+	
+	enddo
+	do ic=xstartr(3),xendr(3)
+		do jc=xstartr(2),xendr(2)
+			do kc=1,nxmr
+			!do kc=2,nxmr-1
+				if (phit(kc,jc,ic)<0.01 .or. phit(kc,jc,ic)>0.99) &
+					Tm_eff(kc,jc,ic) = pf_Tm
+			end do
+		end do
+	end do
+	
+
+
+end subroutine TmEffExtend
+
+
+
+
+
+
+
+
 
 !> Interpolate the phase-field onto the coarse grid to provide
 !! volume penalty forcing for the momentum equation
@@ -655,7 +1401,7 @@ subroutine AddLatentHeat
     real, dimension(4,4,4) :: qv3
     real, dimension(4,4) :: qv2
     real, dimension(4) :: qv1
-
+    real :: rho,Cp
     real :: phi_rhs, aldt
 
     phi_rhs = 0.d0
@@ -695,7 +1441,10 @@ subroutine AddLatentHeat
                             + qv2(:,3)*cyphic(3,jc) + qv2(:,4)*cyphic(4,jc)
                         
                     phi_rhs = sum(qv1(1:4)*cxphic(1:4,kc))
-                    hro(kc,jc,ic) = hro(kc,jc,ic) + pf_S*phi_rhs*aldt
+                    rho = (1.0-phic(kc,jc,ic))*(1.0-rd_sl) +rd_sl
+					Cp  = (1.0-phic(kc,jc,ic))*(1.0-rCp_sl)+rCp_sl
+                    hro(kc,jc,ic) = hro(kc,jc,ic) + pf_S*phi_rhs*aldt/rho/Cp*rd_sl
+                    !hro(kc,jc,ic) = hro(kc,jc,ic) + pf_S*phi_rhs*aldt
                 end do
             end do
         end do
@@ -713,8 +1462,10 @@ subroutine AddLatentHeat
                                     +qv2(:,3)*cyphic(3,jc) + qv2(:,4)*cyphic(4,jc)
                             do kc=max(irangr(kcr),1),min(irangr(kcr+1)-1,nxm)
                                 phi_rhs = sum(qv1(1:4)*cxphic(1:4,kc))
-
-                                hro(kc,jc,ic) = hro(kc,jc,ic) + pf_S*phi_rhs*aldt
+                                rho = (1.0-phic(kc,jc,ic))*(1.0-rd_sl) +rd_sl
+                                Cp  = (1.0-phic(kc,jc,ic))*(1.0-rCp_sl)+rCp_sl
+                                hro(kc,jc,ic) = hro(kc,jc,ic) + pf_S*phi_rhs*aldt/rho/Cp*rd_sl
+                                !hro(kc,jc,ic) = hro(kc,jc,ic) + pf_S*phi_rhs*aldt
                             end do
                         end do
                     end do

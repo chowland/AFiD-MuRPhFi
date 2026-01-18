@@ -115,6 +115,7 @@ subroutine ExplicitTermsVY
                 jmm=jc-1
                 do kc=1,nxm
                     tempit=active_T*0.5d0*(temp(kc,jc,ic)+temp(kc,jmm,ic))
+                    !tempit=active_T* (  dabs(0.5d0*(temp(kc,jc,ic)+temp(kc,jmm,ic))-theta_Tmax)  )**1.895d0
                     dph(kc,jc,ic) = dph(kc,jc,ic) + byct*tempit
                 end do
             end do
